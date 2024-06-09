@@ -31,8 +31,8 @@
 - Enemy squads capturing towns
 - Losing game (or just the level?) if enemy squad reaches player base
 - Story/lore
-- Level/area progression, displaying next location(s) on worldmap
-- Character stat progression
+- Level/area/map progression, displaying next location(s) on worldmap
+- Character stat/xp/level progression
 - Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
 - Replacement of placeholder music
 - Hopefully some graphical improvements, since I'm a terrible graphics artist
