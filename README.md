@@ -21,7 +21,7 @@
 - Menu for possible locations within a town to interact with (e.g. item shop, character recruitment, tavern to get story/lore bits from, etc)
 - Menu for item trading in shops at merchant towns
 - Menu for purchasing more characters at academy towns
-- Dispatching additional squads
+- Dispatching additional squads to player base on map
 - Right-clicking squads on map to view their characters/formation
 - Context menu to handle selection of a squad when there's multiple in one location
 - Capturing/liberating neutral towns (flipping them to player-controlled)
