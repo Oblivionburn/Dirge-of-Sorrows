@@ -17,7 +17,10 @@
 - Menu for viewing general inventory of player army
 #
 ### Planned features not yet implemented:
-- Context menu to handle town/base/location interactions (e.g. purchasing equipment at shops, purchasing more characters at academies, getting story/lore bits at taverns, capturing neutral towns, capturing Enemy Base to win level)
+- Context menu to handle multiple possible interactions at a location (e.g. selecting a squad or entering town the squad is at)
+- Menu for possible locations within a town to interact with (e.g. item shop, character recruitment, tavern to get story/lore bits from, etc)
+- Menu for item trading in shops at merchant towns
+- Menu for purchasing more characters at academy towns
 - Dispatching additional squads
 - Context menu to handle selection of a squad when there's multiple in one location
 - Combat screen and general combat mechanics
@@ -25,5 +28,3 @@
 - Level/area progression, displaying next location(s) on worldmap
 - Character stat progression
 - Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
-
- 
