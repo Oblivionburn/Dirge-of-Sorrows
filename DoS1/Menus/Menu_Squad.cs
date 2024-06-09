@@ -1,0 +1,1071 @@
+﻿using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+
+using OP_Engine.Characters;
+using OP_Engine.Controls;
+using OP_Engine.Inputs;
+using OP_Engine.Menus;
+using OP_Engine.Utility;
+
+using DoS1.Util;
+
+namespace DoS1.Menus
+{
+    public class Menu_Squad : Menu
+    {
+        #region Variables
+
+        int Top = 0;
+
+        bool examining;
+        bool moving;
+        Character moving_character = null;
+
+        List<Picture> GridList = new List<Picture>();
+        List<Character> ReserveList = new List<Character>();
+
+        static int width = Main.Game.MenuSize.X * 3;
+        static int height = Main.Game.MenuSize.Y * 3;
+        int starting_Y = Main.Game.MenuSize.Y + (height / 2) + height;
+        int starting_X = (Main.Game.ScreenWidth / 2) - (width / 2) - width;
+
+        static int grid_width = Main.Game.MenuSize.X;
+        static int grid_height = Main.Game.MenuSize.Y;
+        int starting_grid_Y = (Main.Game.ScreenHeight / 2) - (grid_height * 5);
+        int starting_grid_X = (Main.Game.ScreenWidth / 2) + (grid_width * 2);
+
+        Vector2 starting_pos;
+        Rectangle starting_region;
+
+        Vector2 new_pos;
+
+        #endregion
+
+        #region Constructors
+
+        public Menu_Squad(ContentManager content)
+        {
+            ID = Handler.GetID();
+            Name = "Squad";
+            Load(content);
+        }
+
+        #endregion
+
+        #region Methods
+
+        public override void Update(Game gameRef, ContentManager content)
+        {
+            if (Visible ||
+                Active)
+            {
+                if (moving)
+                {
+                    MoveCharacter();
+                }
+                else
+                {
+                    UpdateControls();
+                }
+
+                Army army = CharacterManager.GetArmy("Player");
+                if (army != null)
+                {
+                    foreach (Squad squad in army.Squads)
+                    {
+                        foreach (Character character in squad.Characters)
+                        {
+                            if (character.Visible)
+                            {
+                                CharacterUtil.UpdateGear(character);
+                            }
+                        }
+                    }
+                }
+
+                Army reserve_army = CharacterManager.GetArmy("Reserves");
+                if (reserve_army != null)
+                {
+                    foreach (Squad squad in reserve_army.Squads)
+                    {
+                        foreach (Character character in squad.Characters)
+                        {
+                            if (character.Visible)
+                            {
+                                CharacterUtil.UpdateGear(character);
+                            }
+                        }
+                    }
+                }
+
+                base.Update(gameRef, content);
+            }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (Visible)
+            {
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name == "Background")
+                    {
+                        picture.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name != "Window_Top" &&
+                        picture.Name != "Highlight" &&
+                        picture.Name != "Background")
+                    {
+                        picture.Draw(spriteBatch);
+                    }
+                }
+
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name == "Highlight")
+                    {
+                        picture.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                Army army = CharacterManager.GetArmy("Player");
+                if (army != null)
+                {
+                    foreach (Squad squad in army.Squads)
+                    {
+                        foreach (Character character in squad.Characters)
+                        {
+                            if (character.Visible)
+                            {
+                                CharacterUtil.Draw(spriteBatch, character, Color.White);
+                            }
+                        }
+                    }
+                }
+
+                Army reserve_army = CharacterManager.GetArmy("Reserves");
+                if (reserve_army != null)
+                {
+                    foreach (Squad squad in reserve_army.Squads)
+                    {
+                        foreach (Character character in squad.Characters)
+                        {
+                            if (character.Visible)
+                            {
+                                CharacterUtil.Draw(spriteBatch, character, Color.White);
+                            }
+                        }
+                    }
+                }
+
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name == "Window_Top")
+                    {
+                        picture.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                foreach (Button button in Buttons)
+                {
+                    button.Draw(spriteBatch);
+                }
+
+                foreach (Label label in Labels)
+                {
+                    label.Draw(spriteBatch);
+                }
+            }  
+        }
+
+        private void UpdateControls()
+        {
+            examining = false;
+
+            bool found_button = HoveringButton();
+            bool found_squad = HoveringSquad();
+            bool found_grid = HoveringGrid();
+
+            if (!examining)
+            {
+                GetLabel("Examine").Visible = false;
+            }
+
+            if (!found_squad &&
+                !found_grid)
+            {
+                GetPicture("Highlight").Visible = false;
+            }
+
+            if (InputManager.Mouse_ScrolledDown)
+            {
+                Army army = CharacterManager.GetArmy("Reserves");
+                if (army != null)
+                {
+                    Character last_character = null;
+                    if (ReserveList.Count > 0)
+                    {
+                        last_character = ReserveList[ReserveList.Count - 1];
+                    }
+
+                    if (last_character != null)
+                    {
+                        Top++;
+
+                        if (Top > last_character.Formation.Y)
+                        {
+                            Top = (int)last_character.Formation.Y;
+                        }
+                    }
+
+                    ResizeGrid();
+                }
+            }
+            else if (InputManager.Mouse_ScrolledUp)
+            {
+                Top--;
+                if (Top <= 0)
+                {
+                    Top = 0;
+                }
+
+                ResizeGrid();
+            }
+
+            if (InputManager.KeyPressed("Esc"))
+            {
+                Back();
+            }
+        }
+
+        private bool HoveringButton()
+        {
+            bool found = false;
+
+            foreach (Button button in Buttons)
+            {
+                if (button.Visible &&
+                    button.Enabled)
+                {
+                    if (InputManager.MouseWithin(button.Region.ToRectangle))
+                    {
+                        found = true;
+                        examining = true;
+
+                        if (button.HoverText != null)
+                        {
+                            GameUtil.Examine(this, button.HoverText);
+                        }
+
+                        button.Opacity = 1;
+                        button.Selected = true;
+
+                        if (InputManager.Mouse_LB_Pressed)
+                        {
+                            found = false;
+                            examining = false;
+
+                            CheckClick(button);
+
+                            button.Opacity = 0.8f;
+                            button.Selected = false;
+
+                            break;
+                        }
+                    }
+                    else if (InputManager.Mouse.Moved)
+                    {
+                        button.Opacity = 0.8f;
+                        button.Selected = false;
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        private bool HoveringSquad()
+        {
+            bool found = false;
+
+            Army army = CharacterManager.GetArmy("Player");
+            if (army != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == Handler.Selected_Squad)
+                    {
+                        for (int y = 0; y < 3; y++)
+                        {
+                            for (int x = 0; x < 3; x++)
+                            {
+                                Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                                if (tile != null)
+                                {
+                                    if (InputManager.MouseWithin(tile.Region.ToRectangle))
+                                    {
+                                        found = true;
+
+                                        if (!moving)
+                                        {
+                                            Character character = squad.GetCharacter(new Vector2(x, y));
+                                            if (character != null)
+                                            {
+                                                examining = true;
+
+                                                GameUtil.Examine(this, character.Name);
+
+                                                if (InputManager.Mouse_LB_Held &&
+                                                    InputManager.Mouse.Moved)
+                                                {
+                                                    found = false;
+                                                    examining = false;
+                                                    moving = true;
+
+                                                    starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
+                                                    starting_region = character.Region.ToRectangle;
+                                                    moving_character = character;
+
+                                                    break;
+                                                }
+                                                else if (InputManager.Mouse_RB_Pressed)
+                                                {
+                                                    found = false;
+                                                    examining = false;
+
+                                                    SelectCharacter(character.ID);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            new_pos = new Vector2(x, y);
+                                        }
+
+                                        Picture highlight = GetPicture("Highlight");
+                                        highlight.Region = tile.Region;
+                                        highlight.Visible = true;
+
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (found)
+                            {
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        private bool HoveringGrid()
+        {
+            bool found = false;
+
+            Army army = CharacterManager.GetArmy("Reserves");
+            if (army != null)
+            {
+                Squad squad = army.Squads[0];
+                if (squad != null)
+                {
+                    for (int y = 0; y < 10; y++)
+                    {
+                        for (int x = 0; x < 10; x++)
+                        {
+                            Picture tile = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
+                            if (tile != null)
+                            {
+                                if (InputManager.MouseWithin(tile.Region.ToRectangle))
+                                {
+                                    found = true;
+
+                                    if (!moving)
+                                    {
+                                        Character character = squad.GetCharacter(new Vector2(x, y));
+                                        if (character != null)
+                                        {
+                                            examining = true;
+
+                                            GameUtil.Examine(this, character.Name);
+
+                                            if (InputManager.Mouse_LB_Held &&
+                                                InputManager.Mouse.Moved)
+                                            {
+                                                found = false;
+                                                examining = false;
+                                                moving = true;
+
+                                                starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
+                                                starting_region = character.Region.ToRectangle;
+                                                moving_character = character;
+                                                break;
+                                            }
+                                            else if (InputManager.Mouse_RB_Pressed)
+                                            {
+                                                found = false;
+                                                SelectCharacter(character.ID);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        new_pos = new Vector2(x, y);
+                                    }
+
+                                    Picture highlight = GetPicture("Highlight");
+                                    highlight.Region = tile.Region;
+                                    highlight.Visible = true;
+
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        private void MoveCharacter()
+        {
+            bool found_squad = HoveringSquad();
+            bool found_grid = HoveringGrid();
+
+            if (!found_squad &&
+                !found_grid)
+            {
+                GetPicture("Highlight").Visible = false;
+            }
+
+            if (InputManager.Mouse_LB_Held)
+            {
+                moving_character.Region = new Region(InputManager.Mouse.X - (grid_width / 2), InputManager.Mouse.Y - (grid_height / 3) - grid_height, grid_width, grid_height + (grid_height / 2));
+            }
+            else
+            {
+                moving = false;
+
+                if (!found_squad &&
+                    !found_grid)
+                {
+                    moving_character.Formation = new Vector2(starting_pos.X, starting_pos.Y);
+                    moving_character.Region = new Region(starting_region.X, starting_region.Y, starting_region.Width, starting_region.Height);
+                }
+                else if (found_squad)
+                {
+                    AddToSquad();
+                }
+                else if (found_grid)
+                {
+                    AddToReserves();
+                }
+
+                ResizeSquad();
+                ResizeGrid();
+            }
+        }
+
+        private void AddToSquad()
+        {
+            Squad player_squad = null;
+            Squad reserves = null;
+
+            Army army = CharacterManager.GetArmy("Player");
+            if (army != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == Handler.Selected_Squad)
+                    {
+                        player_squad = squad;
+                        break;
+                    }
+                }
+            }
+
+            Army reserve_army = CharacterManager.GetArmy("Reserves");
+            if (reserve_army != null)
+            {
+                reserves = reserve_army.Squads[0];
+            }
+
+            if (player_squad != null)
+            {
+                bool inSquad = false;
+                foreach (Character existing in player_squad.Characters)
+                {
+                    if (existing.ID == moving_character.ID)
+                    {
+                        inSquad = true;
+                        break;
+                    }
+                }
+
+                bool found_other = false;
+
+                foreach (Character existing in player_squad.Characters)
+                {
+                    if (existing.Formation.X == new_pos.X &&
+                        existing.Formation.Y == new_pos.Y &&
+                        existing.ID != moving_character.ID)
+                    {
+                        found_other = true;
+
+                        if (inSquad)
+                        {
+                            SwapCharacters(player_squad, moving_character, player_squad, existing);
+                        }
+                        else
+                        {
+                            SwapCharacters(reserves, moving_character, player_squad, existing);
+
+                            ReserveList.Add(existing);
+                            ReserveList.Remove(moving_character);
+                        }
+                        
+                        break;
+                    }
+                }
+
+                if (!found_other)
+                {
+                    moving_character.Formation = new Vector2(new_pos.X, new_pos.Y);
+
+                    if (!inSquad)
+                    {
+                        reserves.Characters.Remove(moving_character);
+                        ReserveList.Remove(moving_character);
+
+                        player_squad.Characters.Add(moving_character);
+                        if (player_squad.Characters.Count == 1)
+                        {
+                            player_squad.Name = moving_character.Name;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void AddToReserves()
+        {
+            Squad player_squad = null;
+            Squad reserves = null;
+
+            Army army = CharacterManager.GetArmy("Player");
+            if (army != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == Handler.Selected_Squad)
+                    {
+                        player_squad = squad;
+                        break;
+                    }
+                }
+            }
+
+            Army reserve_army = CharacterManager.GetArmy("Reserves");
+            if (reserve_army != null)
+            {
+                reserves = reserve_army.Squads[0];
+            }
+
+            if (reserves != null)
+            {
+                bool inReserves = false;
+                foreach (Character existing in reserves.Characters)
+                {
+                    if (existing.ID == moving_character.ID)
+                    {
+                        inReserves = true;
+                        break;
+                    }
+                }
+
+                bool found_other = false;
+
+                foreach (Character existing in reserves.Characters)
+                {
+                    if (existing.Formation.X == new_pos.X &&
+                        existing.Formation.Y == new_pos.Y &&
+                        existing.ID != moving_character.ID)
+                    {
+                        found_other = true;
+
+                        if (inReserves)
+                        {
+                            SwapCharacters(reserves, moving_character, reserves, existing);
+                        }
+                        else
+                        {
+                            SwapCharacters(player_squad, moving_character, reserves, existing);
+
+                            ReserveList.Add(moving_character);
+                            ReserveList.Remove(existing);
+                        }
+                        
+                        break;
+                    }
+                }
+
+                if (!found_other)
+                {
+                    moving_character.Formation = new Vector2(new_pos.X, new_pos.Y);
+
+                    if (!inReserves)
+                    {
+                        reserves.Characters.Add(moving_character);
+                        ReserveList.Add(moving_character);
+
+                        player_squad.Characters.Remove(moving_character);
+                        if (player_squad.Characters.Count == 0)
+                        {
+                            player_squad.Name = "";
+                        }
+                        else if (player_squad.Characters.Count > 0)
+                        {
+                            player_squad.Name = player_squad.Characters[0].Name;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SwapCharacters(Squad old_squad, Character moving_char, Squad new_squad, Character existing_char)
+        {
+            new_squad.Characters.Remove(existing_char);
+            old_squad.Characters.Add(existing_char);
+
+            new_squad.Characters.Add(moving_char);
+            old_squad.Characters.Remove(moving_char);
+
+            moving_char.Formation = new Vector2(new_pos.X, new_pos.Y);
+            moving_char.Region = new Region(existing_char.Region.X, existing_char.Region.Y, existing_char.Region.Width, existing_char.Region.Height);
+
+            existing_char.Formation = new Vector2(starting_pos.X, starting_pos.Y);
+            existing_char.Region = new Region(starting_region.X, starting_region.Y, starting_region.Width, starting_region.Height);
+        }
+
+        private void CheckClick(Button button)
+        {
+            AssetManager.PlaySound_Random("Click");
+
+            button.Opacity = 0.8f;
+            button.Selected = false;
+
+            if (button.Name == "Back")
+            {
+                Back();
+            }
+        }
+
+        private void Back()
+        {
+            InputManager.Mouse.Flush();
+            InputManager.Keyboard.Flush();
+            MenuManager.ChangeMenu_Previous();
+        }
+
+        private void SelectCharacter(long id)
+        {
+            Handler.Selected_Character = id;
+            MenuManager.ChangeMenu("Character");
+        }
+
+        private void ResetPos()
+        {
+            width = Main.Game.MenuSize.X * 3;
+            height = Main.Game.MenuSize.Y * 3;
+            starting_Y = (Main.Game.ScreenHeight / 2) + (grid_height * 5) - (height * 3);
+            starting_X = (Main.Game.ScreenWidth / 2) - (width / 2) - (width * 3);
+        }
+
+        private void ResetGridPos()
+        {
+            grid_width = Main.Game.MenuSize.X;
+            grid_height = Main.Game.MenuSize.Y;
+            starting_grid_Y = (Main.Game.ScreenHeight / 2) - (grid_height * 5);
+            starting_grid_X = (Main.Game.ScreenWidth / 2) + (grid_width * 2);
+        }
+
+        public override void Load(ContentManager content)
+        {
+            Clear();
+
+            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
+
+            AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
+
+            AddButton(Handler.GetID(), "Back", AssetManager.Textures["Button_Back"], AssetManager.Textures["Button_Back_Hover"], AssetManager.Textures["Button_Back_Disabled"],
+                new Region(0, 0, 0, 0), Color.White, true);
+            GetButton("Back").HoverText = "Back";
+
+            AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+                new Region(0, 0, 0, 0), false);
+
+            Resize(Main.Game.Resolution);
+        }
+
+        private void DisplayArrows()
+        {
+            Army army = CharacterManager.GetArmy("Reserves");
+            if (army != null)
+            {
+                Picture arrow_down = GetPicture("Arrow_Down");
+
+                bool down_visible = true;
+                int bottom_row = 9 + Top;
+
+                Character last_character = null;
+                if (ReserveList.Count > 0)
+                {
+                    last_character = ReserveList[ReserveList.Count - 1];
+                }
+
+                if (last_character != null)
+                {
+                    if (last_character.Visible &&
+                       (last_character.Region.Y <= arrow_down.Region.Y))
+                    {
+                        down_visible = false;
+                    }
+                    else if (!last_character.Visible &&
+                              last_character.Formation.Y <= bottom_row)
+                    {
+                        down_visible = false;
+                    }
+                }
+                else
+                {
+                    down_visible = false;
+                }
+
+                arrow_down.Visible = down_visible;
+            }
+
+            Picture arrow_up = GetPicture("Arrow_Up");
+            if (Top == 0)
+            {
+                arrow_up.Visible = false;
+            }
+            else
+            {
+                arrow_up.Visible = true;
+            }
+        }
+
+        private void ResizeSquad()
+        {
+            ResetPos();
+
+            Army army = CharacterManager.GetArmy("Player");
+            if (army != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == Handler.Selected_Squad)
+                    {
+                        for (int y = 0; y < 3; y++)
+                        {
+                            for (int x = 0; x < 3; x++)
+                            {
+                                Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                                if (tile != null)
+                                {
+                                    tile.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
+                                    tile.Location = new Vector3(x, y, 0);
+                                }
+
+                                Character character = squad.GetCharacter(new Vector2(x, y));
+                                if (character != null)
+                                {
+                                    character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
+                                    character.Visible = true;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void ClearSquad()
+        {
+            Army army = CharacterManager.GetArmy("Player");
+            if (army != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == Handler.Selected_Squad)
+                    {
+                        for (int i = 0; i < Pictures.Count; i++)
+                        {
+                            bool found = false;
+
+                            Picture picture = Pictures[i];
+                            for (int y = 0; y < 3; y++)
+                            {
+                                for (int x = 0; x < 3; x++)
+                                {
+                                    Character character = squad.GetCharacter(new Vector2(x, y));
+                                    if (character != null)
+                                    {
+                                        character.Visible = false;
+                                    }
+
+                                    if (picture.Name == "squad_x:" + x.ToString() + ",squad_y:" + y.ToString())
+                                    {
+                                        found = true;
+                                        Pictures.Remove(picture);
+                                        i--;
+                                        break;
+                                    }
+                                }
+
+                                if (found)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void LoadSquad()
+        {
+            ClearSquad();
+            ResetPos();
+
+            Army army = CharacterManager.GetArmy("Player");
+            if (army != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == Handler.Selected_Squad)
+                    {
+                        for (int y = 0; y < 3; y++)
+                        {
+                            for (int x = 0; x < 3; x++)
+                            {
+                                long id = Handler.GetID();
+
+                                Character character = squad.GetCharacter(new Vector2(x, y));
+                                if (character != null)
+                                {
+                                    id = character.ID;
+                                    character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
+                                    character.Visible = true;
+                                }
+
+                                AddPicture(id, "squad_x:" + x.ToString() + ",squad_y:" + y.ToString(), AssetManager.Textures["Grid"],
+                                    new Region(starting_X + (width * x), starting_Y + (height * y), width, height), Color.White, true);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void ResizeGrid()
+        {
+            ResetGridPos();
+
+            Army army = CharacterManager.GetArmy("Reserves");
+            if (army != null)
+            {
+                Squad squad = army.Squads[0];
+                if (squad != null)
+                {
+                    foreach (Character character in squad.Characters)
+                    {
+                        character.Visible = false;
+                    }
+
+                    for (int y = 0; y < 10; y++)
+                    {
+                        for (int x = 0; x < 10; x++)
+                        {
+                            Picture picture = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
+                            if (picture != null)
+                            {
+                                picture.Region = new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y), grid_width, grid_height);
+                                picture.Location = new Vector3(x, y + Top, 0);
+                            }
+                        }
+                    }
+
+                    foreach (Character reserve in ReserveList)
+                    {
+                        foreach (Picture grid in GridList)
+                        {
+                            if (reserve.Formation.X == grid.Location.X &&
+                                reserve.Formation.Y == grid.Location.Y)
+                            {
+                                reserve.Region = new Region(grid.Region.X, grid.Region.Y - grid_height, grid.Region.Width, grid_height + (grid_height / 2));
+                                reserve.Visible = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            GetPicture("Arrow_Up").Region = new Region(starting_grid_X - grid_width, starting_grid_Y, grid_width, grid_height);
+            GetPicture("Arrow_Down").Region = new Region(starting_grid_X - grid_width, starting_grid_Y + (grid_height * 9), grid_width, grid_height);
+
+            DisplayArrows();
+        }
+
+        private void ClearGrid()
+        {
+            Army army = CharacterManager.GetArmy("Reserves");
+            if (army != null)
+            {
+                Squad squad = army.Squads[0];
+                if (squad != null)
+                {
+                    foreach (Character existing in squad.Characters)
+                    {
+                        existing.Visible = false;
+                    }
+                }
+            }
+
+            ReserveList.Clear();
+
+            for (int y = 0; y < 10; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    Picture existing = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
+                    if (existing != null)
+                    {
+                        Pictures.Remove(existing);
+
+                        foreach (Picture grid in GridList)
+                        {
+                            if (grid.ID == existing.ID)
+                            {
+                                GridList.Remove(grid);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LoadGrid()
+        {
+            Top = 0;
+
+            ClearGrid();
+            ResetGridPos();
+
+            Army army = CharacterManager.GetArmy("Reserves");
+            if (army != null)
+            {
+                Squad squad = army.Squads[0];
+                if (squad != null)
+                {
+                    foreach (Character existing in squad.Characters)
+                    {
+                        ReserveList.Add(existing);
+                    }
+
+                    for (int y = 0; y < 10; y++)
+                    {
+                        for (int x = 0; x < 10; x++)
+                        {
+                            long id = Handler.GetID();
+
+                            Character character = squad.GetCharacter(new Vector2(x, y));
+                            if (character != null)
+                            {
+                                id = character.ID;
+                                character.Region = new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y) - grid_height, grid_width, grid_height + (grid_height / 2));
+                                character.Visible = true;
+                            }
+
+                            AddPicture(id, "x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
+                                new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y), grid_width, grid_height), Color.White, true);
+
+                            Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
+                            if (grid != null)
+                            {
+                                grid.Location = new Vector3(x, y, 0);
+                                GridList.Add(grid);
+                            }
+                        }
+                    }
+                }
+            }
+
+            GetPicture("Arrow_Up").Region = new Region(starting_grid_X - grid_width, starting_grid_Y, grid_width, grid_height);
+            GetPicture("Arrow_Down").Region = new Region(starting_grid_X - grid_width, starting_grid_Y + (grid_height * 9), grid_width, grid_height);
+        }
+
+        public override void Load()
+        {
+            LoadSquad();
+            LoadGrid();
+        }
+
+        public override void Resize(Point point)
+        {
+            int width = Main.Game.MenuSize.X;
+            int height = Main.Game.MenuSize.X;
+
+            int X = 0;
+            int Y = 0;
+
+            GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+
+            GetButton("Back").Region = new Region(X, Y, width, height);
+
+            GetPicture("Highlight").Region = new Region(0, 0, 0, 0);
+            GetLabel("Examine").Region = new Region(0, 0, 0, 0);
+
+            if (Visible)
+            {
+                ResizeSquad();
+                ResizeGrid();
+            }
+        }
+
+        #endregion
+    }
+}
