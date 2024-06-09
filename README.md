@@ -15,6 +15,7 @@
 - Menu for managing character equipped gear
 - Menu for managing rune attachments in items/gear
 - Menu for viewing general inventory of player army
+#
 ### Planned features not yet implemented:
 - Context menu to handle town/base/location interactions (e.g. purchasing equipment at shops, purchasing more characters at academies, getting story/lore bits at taverns, capturing neutral towns, capturing Enemy Base to win level)
 - Dispatching additional squads
