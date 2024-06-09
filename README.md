@@ -22,8 +22,14 @@
 - Menu for item trading in shops at merchant towns
 - Menu for purchasing more characters at academy towns
 - Dispatching additional squads
+- Right-clicking squads on map to view their characters/formation
 - Context menu to handle selection of a squad when there's multiple in one location
+- Capturing/liberating neutral towns (flipping them to player-controlled)
+- Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
 - Combat screen and general combat mechanics
+- AI to control enemy squad movement on map
+- Enemy squads capturing towns
+- Losing game (or just the level?) if enemy squad reaches player base
 - Story/lore
 - Level/area progression, displaying next location(s) on worldmap
 - Character stat progression
