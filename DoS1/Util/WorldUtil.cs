@@ -69,23 +69,54 @@ namespace DoS1.Util
                 Layer ground = map.GetLayer("Ground");
                 if (ground != null)
                 {
-                    Tile current = ground.GetTile(new Vector2(ground.Columns / 2, ground.Rows / 2));
+                    Tile target = ground.GetTile(new Vector2(ground.Columns / 2, ground.Rows / 2));
 
-                    if (Main.LocalMap)
+                    if (Handler.LocalMap)
                     {
-                        Army army = CharacterManager.GetArmy("Player");
+                        Army army = CharacterManager.GetArmy("Ally");
                         Squad squad = army.Squads[0];
-                        current = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+                        target = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
                     }
 
-                    if (current != null)
-                    {
-                        current.Region.X = Main.Game.Resolution.X / 2 - (Main.Game.TileSize.X / 2);
-                        current.Region.Y = Main.Game.Resolution.Y / 2 - (Main.Game.TileSize.Y / 2);
+                    CameraToTile(map, ground, target);
+                }
+            }
+        }
 
-                        ResizeMap(map, ground, current);
+        public static void Resize_OnCombat(Map map)
+        {
+            if (map != null)
+            {
+                Layer ground = map.GetLayer("Ground");
+                if (ground != null)
+                {
+                    int width = Main.Game.Resolution.X / ground.Columns;
+                    int height = width;
+                    int starting_y = Main.Game.Resolution.Y - (height * ground.Rows);
+
+                    for (int y = 0; y < ground.Rows; y++)
+                    {
+                        for (int x = 0; x < ground.Columns; x++)
+                        {
+                            Tile tile = ground.GetTile(new Vector2(x, y));
+                            if (tile != null)
+                            {
+                                tile.Region = new Region(x * width, starting_y + (y * height), width, height);
+                            }
+                        }
                     }
                 }
+            }
+        }
+
+        public static void CameraToTile(Map map, Layer ground, Tile target)
+        {
+            if (target != null)
+            {
+                target.Region.X = Main.Game.Resolution.X / 2 - (Main.Game.TileSize.X / 2);
+                target.Region.Y = Main.Game.Resolution.Y / 2 - (Main.Game.TileSize.Y / 2);
+
+                ResizeMap(map, ground, target);
             }
         }
 
@@ -138,7 +169,7 @@ namespace DoS1.Util
                 }
             }
 
-            if (Main.LocalMap)
+            if (Handler.LocalMap)
             {
                 foreach (Army army in CharacterManager.Armies)
                 {
@@ -266,7 +297,7 @@ namespace DoS1.Util
                     }
                 }
 
-                Handler.MoveGridDelay = true;
+                Handler.MovingGrid = true;
             }
         }
 
@@ -313,9 +344,13 @@ namespace DoS1.Util
         public static void AnimateTiles()
         {
             Scene scene = SceneManager.GetScene("Worldmap");
-            if (Main.LocalMap)
+            if (Handler.LocalMap)
             {
                 scene = SceneManager.GetScene("Localmap");
+            }
+            else if (Handler.Combat)
+            {
+                scene = SceneManager.GetScene("Combat");
             }
 
             Map map = null;
@@ -360,7 +395,7 @@ namespace DoS1.Util
             Layer pathing = map.GetLayer("Pathing");
             pathing.Tiles.Clear();
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             Squad squad = army.GetSquad(Handler.Selected_Token);
             if (squad == null)
             {
@@ -441,12 +476,29 @@ namespace DoS1.Util
                 return;
             }
 
-            Tile destination = ground.GetTile(squad.Coordinates);
+            Tile destination = ground.GetTile(new Vector2(squad.Coordinates.X, squad.Coordinates.Y));
             if (destination != null)
             {
                 Picture select = menu.GetPicture("Select");
                 select.Region = destination.Region;
                 select.Visible = true;
+
+                Squad target = ArmyUtil.Get_TargetSquad(squad.GetLeader().Target_ID);
+                if (target != null)
+                {
+                    if (target.Type == "Ally")
+                    {
+                        select.DrawColor = new Color(0, 0, 255, 255);
+                    }
+                    else if (target.Type == "Enemy")
+                    {
+                        select.DrawColor = new Color(255, 0, 0, 255);
+                    }
+                }
+                else
+                {
+                    select.DrawColor = new Color(0, 255, 0, 255);
+                }
             }
 
             for (int i = 0; i < path.Count; i++)
@@ -612,7 +664,7 @@ namespace DoS1.Util
                         Name = texture.Name,
                         Texture = texture,
                         Image = new Rectangle(0, 0, texture.Width, texture.Height),
-                        Location = new Vector3(current_location.X, current_location.Y, 0),
+                        Location = new Location(current_location.X, current_location.Y, 0),
                         Region = tile.Region
                     });
                 }
@@ -683,39 +735,47 @@ namespace DoS1.Util
             return direction;
         }
 
-        public static float Get_TerrainSpeed(Map map, Vector2 location)
+        public static string Get_Terrain(Map map, Vector2 location)
         {
-            float speed = 0;
-
             Layer ground = map.GetLayer("Ground");
 
             Tile tile = ground.GetTile(location);
             if (tile != null)
             {
-                switch (tile.Type)
-                {
-                    case "Grass":
-                    case "Desert":
-                    case "Snow":
-                    case "Ice":
-                        speed = (float)Main.Game.TileSize.X / 24; //2
-                        break;
+                return tile.Type;
+            }
 
-                    case "Forest":
-                    case "Forest_Snow":
-                        speed = (float)Main.Game.TileSize.X / 32; //1.5
-                        break;
+            return null;
+        }
 
-                    case "Water":
-                        speed = (float)Main.Game.TileSize.X / 48; //1
-                        break;
+        public static float Get_TerrainSpeed(Map map, Vector2 location)
+        {
+            float speed = 0;
 
-                    case "Mountains":
-                    case "Mountains_Desert":
-                    case "Mountains_Snow":
-                        speed = (float)Main.Game.TileSize.X / 96; //0.5
-                        break;
-                }
+            string terrain = Get_Terrain(map, location);
+            switch (terrain)
+            {
+                case "Grass":
+                case "Desert":
+                case "Snow":
+                case "Ice":
+                    speed = (float)Main.Game.TileSize.X / 24; //2
+                    break;
+
+                case "Forest":
+                case "Forest_Snow":
+                    speed = (float)Main.Game.TileSize.X / 32; //1.5
+                    break;
+
+                case "Water":
+                    speed = (float)Main.Game.TileSize.X / 48; //1
+                    break;
+
+                case "Mountains":
+                case "Mountains_Desert":
+                case "Mountains_Snow":
+                    speed = (float)Main.Game.TileSize.X / 96; //0.5
+                    break;
             }
 
             Layer roads = map.GetLayer("Roads");
@@ -731,16 +791,26 @@ namespace DoS1.Util
             return speed / 20;
         }
 
-        public static void AllyToken_Start(Squad squad, Map map)
+        public static Tile Get_Base(Map map, string type)
         {
             Layer locations = map.GetLayer("Locations");
-
-            if (squad.Type == "Player")
+            Tile base_location = locations.GetTile(type + " Base");
+            if (base_location != null)
             {
-                Tile ally_base = locations.GetTile("Your Base");
+                return base_location;
+            }
+
+            return null;
+        }
+
+        public static void AllyToken_Start(Squad squad, Map map)
+        {
+            if (squad.Type == "Ally")
+            {
+                Tile ally_base = Get_Base(map, "Ally");
                 if (ally_base != null)
                 {
-                    squad.Location = new Vector3(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
+                    squad.Location = new Location(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
                     squad.Region = new Region(ally_base.Region.X, ally_base.Region.Y, ally_base.Region.Width, ally_base.Region.Height);
                     squad.Visible = true;
                 }
@@ -749,16 +819,144 @@ namespace DoS1.Util
 
         public static void EnemyToken_Start(Squad squad, Map map)
         {
-            Layer locations = map.GetLayer("Locations");
-
             if (squad.Type == "Enemy")
             {
-                Tile enemy_base = locations.GetTile("Enemy Base");
+                Tile enemy_base = Get_Base(map, "Enemy");
                 if (enemy_base != null)
                 {
-                    squad.Location = new Vector3(enemy_base.Location.X, enemy_base.Location.Y, enemy_base.Location.Z);
+                    squad.Location = new Location(enemy_base.Location.X, enemy_base.Location.Y, enemy_base.Location.Z);
                     squad.Region = new Region(enemy_base.Region.X, enemy_base.Region.Y, enemy_base.Region.Width, enemy_base.Region.Height);
                     squad.Visible = true;
+                }
+            }
+        }
+
+        public static Squad CheckSquadCollision(Squad squad)
+        {
+            if (squad.Type == "Ally")
+            {
+                Army enemy_army = CharacterManager.GetArmy("Enemy");
+                foreach (Squad enemy_squad in enemy_army.Squads)
+                {
+                    if (enemy_squad.Region != null)
+                    {
+                        if (Utility.RegionsOverlapping(squad.Region, enemy_squad.Region))
+                        {
+                            return enemy_squad;
+                        }
+                    }
+                }
+            }
+            else if (squad.Type == "Enemy")
+            {
+                Army ally_army = CharacterManager.GetArmy("Ally");
+                foreach (Squad ally_squad in ally_army.Squads)
+                {
+                    if (ally_squad.Region != null)
+                    {
+                        if (Utility.RegionsOverlapping(squad.Region, ally_squad.Region))
+                        {
+                            return ally_squad;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static void MoveSquads()
+        {
+            Scene localmap = SceneManager.GetScene("Localmap");
+            if (localmap.World.Maps.Any())
+            {
+                Map map = localmap.World.Maps[0];
+                Layer ground = map.GetLayer("Ground");
+
+                foreach (Army army in CharacterManager.Armies)
+                {
+                    foreach (Squad squad in army.Squads)
+                    {
+                        if (squad.Path.Any())
+                        {
+                            ALocation path = squad.Path[0];
+
+                            Vector2 path_location = new Vector2(path.X, path.Y);
+                            Vector2 squad_location = new Vector2(squad.Location.X, squad.Location.Y);
+
+                            Tile destination = ground.GetTile(path_location);
+
+                            squad.Move_TotalDistance = Main.Game.TileSize.X;
+                            squad.Moving = true;
+                            squad.Speed = Get_TerrainSpeed(map, squad_location);
+                            squad.Destination = new Vector3(path_location.X, path_location.Y, 0);
+                            squad.Update();
+
+                            Squad other_squad = CheckSquadCollision(squad);
+                            if (other_squad != null)
+                            {
+                                Vector2 other_squad_location = new Vector2(other_squad.Location.X, other_squad.Location.Y);
+
+                                Handler.Combat_Terrain = Get_Terrain(map, other_squad_location);
+
+                                Handler.Combat_Ally_Base = false;
+                                Handler.Combat_Enemy_Base = false;
+
+                                if (squad.Type == "Ally")
+                                {
+                                    Handler.Combat_Ally_Squad = squad.ID;
+                                    Handler.Combat_Enemy_Squad = other_squad.ID;
+
+                                    Tile enemy_base = Get_Base(map, "Enemy");
+                                    if (enemy_base != null)
+                                    {
+                                        if (other_squad_location.X == enemy_base.Location.X &&
+                                            other_squad_location.Y == enemy_base.Location.Y)
+                                        {
+                                            Handler.Combat_Enemy_Base = true;
+                                        }
+                                    }
+                                }
+                                else if (squad.Type == "Enemy")
+                                {
+                                    Handler.Combat_Ally_Squad = other_squad.ID;
+                                    Handler.Combat_Enemy_Squad = squad.ID;
+
+                                    Tile ally_base = Get_Base(map, "Ally");
+                                    if (ally_base != null)
+                                    {
+                                        if (other_squad_location.X == ally_base.Location.X &&
+                                            other_squad_location.Y == ally_base.Location.Y)
+                                        {
+                                            Handler.Combat_Ally_Base = true;
+                                        }
+                                    }
+                                }
+
+                                Main.Timer.Stop();
+                                CameraToTile(map, ground, destination);
+                                GameUtil.Alert_Combat(squad.Name, other_squad.Name);
+                            }
+
+                            if (squad.Location.X == squad.Destination.X &&
+                                squad.Location.Y == squad.Destination.Y)
+                            {
+                                squad.Region = new Region(destination.Region.X, destination.Region.Y, destination.Region.Width, destination.Region.Height);
+                                squad.Path.Remove(path);
+
+                                //Chase targeted squad
+                                Squad target = ArmyUtil.Get_TargetSquad(squad.GetLeader().Target_ID);
+                                if (target != null)
+                                {
+                                    Tile target_location = ground.GetTile(new Vector2(target.Location.X, target.Location.Y));
+                                    if (target_location != null)
+                                    {
+                                        ArmyUtil.SetPath(MenuManager.GetMenu("UI"), map, target_location);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

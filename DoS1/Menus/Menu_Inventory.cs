@@ -88,7 +88,7 @@ namespace DoS1.Menus
                     }
                 }
 
-                Inventory inventory = InventoryManager.GetInventory("Player");
+                Inventory inventory = InventoryManager.GetInventory("Ally");
                 if (inventory != null)
                 {
                     foreach (Item item in inventory.Items)
@@ -135,7 +135,7 @@ namespace DoS1.Menus
 
             if (InputManager.Mouse_ScrolledDown)
             {
-                Inventory inventory = InventoryManager.GetInventory("Player");
+                Inventory inventory = InventoryManager.GetInventory("Ally");
                 if (inventory != null)
                 {
                     Item last_item = null;
@@ -247,7 +247,7 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            Inventory inventory = InventoryManager.GetInventory("Player");
+            Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
             {
                 foreach (Item item in inventory.Items)
@@ -462,7 +462,7 @@ namespace DoS1.Menus
             GetPicture("Arrow_Up").Visible = false;
             GetPicture("Arrow_Down").Visible = false;
 
-            Inventory inventory = InventoryManager.GetInventory("Player");
+            Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
             {
                 foreach (Item item in inventory.Items)
@@ -493,7 +493,7 @@ namespace DoS1.Menus
                     {
                         Picture grid = GridList[i];
                         item.Icon_Region = new Region(grid.Region.X, grid.Region.Y, grid.Region.Width, grid.Region.Height);
-                        item.Location = new Vector3(grid.Location.X, grid.Location.Y, 0);
+                        item.Location = new Location(grid.Location.X, grid.Location.Y, 0);
                         item.Icon_Visible = true;
                     }
                 }
@@ -509,29 +509,84 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
-            AddButton(Handler.GetID(), "Back", AssetManager.Textures["Button_Back"], AssetManager.Textures["Button_Back_Hover"], AssetManager.Textures["Button_Back_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Back").HoverText = "Back";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Back",
+                hover_text = "Back",
+                texture = AssetManager.Textures["Button_Back"],
+                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Helms", AssetManager.Textures["Button_Helms"], AssetManager.Textures["Button_Helms_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Helms").HoverText = "Helms";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Helms",
+                hover_text = "Helms",
+                texture = AssetManager.Textures["Button_Helms"],
+                texture_highlight = AssetManager.Textures["Button_Helms_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Armors", AssetManager.Textures["Button_Armors"], AssetManager.Textures["Button_Armors_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Armors").HoverText = "Armors";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Armors",
+                hover_text = "Armors",
+                texture = AssetManager.Textures["Button_Armors"],
+                texture_highlight = AssetManager.Textures["Button_Armors_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Shields", AssetManager.Textures["Button_Shields"], AssetManager.Textures["Button_Shields_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Shields").HoverText = "Shields";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Shields",
+                hover_text = "Shields",
+                texture = AssetManager.Textures["Button_Shields"],
+                texture_highlight = AssetManager.Textures["Button_Shields_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Weapons", AssetManager.Textures["Button_Weapons"], AssetManager.Textures["Button_Weapons_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Weapons").HoverText = "Weapons";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Weapons",
+                hover_text = "Weapons",
+                texture = AssetManager.Textures["Button_Weapons"],
+                texture_highlight = AssetManager.Textures["Button_Weapons_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Runes", AssetManager.Textures["Button_Runes"], AssetManager.Textures["Button_Runes_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Runes").HoverText = "Runes";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Runes",
+                hover_text = "Runes",
+                texture = AssetManager.Textures["Button_Runes"],
+                texture_highlight = AssetManager.Textures["Button_Runes_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
@@ -552,7 +607,7 @@ namespace DoS1.Menus
                     if (grid != null)
                     {
                         grid.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
-                        grid.Location = new Vector3(x, y + Top, 0);
+                        grid.Location = new Location(x, y + Top, 0);
                     }
                 }
             }
@@ -574,7 +629,7 @@ namespace DoS1.Menus
         {
             ResizeGrid();
 
-            Inventory inventory = InventoryManager.GetInventory("Player");
+            Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
             {
                 foreach (Item item in inventory.Items)
@@ -602,7 +657,7 @@ namespace DoS1.Menus
 
         private void DisplayArrows()
         {
-            Inventory inventory = InventoryManager.GetInventory("Player");
+            Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
             {
                 Picture arrow_down = GetPicture("Arrow_Down");
@@ -694,7 +749,7 @@ namespace DoS1.Menus
                     Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
                     if (grid != null)
                     {
-                        grid.Location = new Vector3(x, y, 0);
+                        grid.Location = new Location(x, y, 0);
                         GridList.Add(grid);
                     }
                 }

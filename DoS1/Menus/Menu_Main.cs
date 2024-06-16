@@ -138,6 +138,11 @@ namespace DoS1.Menus
         {
             TimeManager.Paused = false;
 
+            if (Handler.Combat)
+            {
+                Handler.CombatTimer.Start();
+            }
+
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
@@ -150,33 +155,86 @@ namespace DoS1.Menus
 
             int Y = Main.Game.ScreenHeight / (Main.Game.MenuSize.Y * 2);
 
-            AddButton(Handler.GetID(), "Back", AssetManager.Textures["Button_Back"], AssetManager.Textures["Button_Back_Hover"], AssetManager.Textures["Button_Back_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, false);
-            GetButton("Back").HoverText = "Resume";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Back",
+                hover_text = "Resume",
+                texture = AssetManager.Textures["Button_Back"],
+                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = false
+            });
 
-            AddButton(Handler.GetID(), "Play", AssetManager.Textures["Button_Play"], AssetManager.Textures["Button_Play_Hover"], AssetManager.Textures["Button_Play_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Play").HoverText = "Play";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Play",
+                hover_text = "Play",
+                texture = AssetManager.Textures["Button_Play"],
+                texture_highlight = AssetManager.Textures["Button_Play_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Play_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Play", AssetManager.Textures["Button_Play"], AssetManager.Textures["Button_Play_Hover"], AssetManager.Textures["Button_Play_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Play").HoverText = "Play";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Save",
+                hover_text = "Save Game",
+                texture = AssetManager.Textures["Button_Save"],
+                texture_highlight = AssetManager.Textures["Button_Save_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Save_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = false
+            });
 
-            AddButton(Handler.GetID(), "Save", AssetManager.Textures["Button_Save"], AssetManager.Textures["Button_Save_Hover"], AssetManager.Textures["Button_Save_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, false);
-            GetButton("Save").HoverText = "Save Game";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Main",
+                hover_text = "Return to Title",
+                texture = AssetManager.Textures["Button_Main"],
+                texture_highlight = AssetManager.Textures["Button_Main_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = false
+            });
 
-            AddButton(Handler.GetID(), "Main", AssetManager.Textures["Button_Main"], AssetManager.Textures["Button_Main_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, false);
-            GetButton("Main").HoverText = "Back to Title";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Options",
+                hover_text = "Options",
+                texture = AssetManager.Textures["Button_Options"],
+                texture_highlight = AssetManager.Textures["Button_Options_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Options", AssetManager.Textures["Button_Options"], AssetManager.Textures["Button_Options_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Options").HoverText = "Options";
-
-            AddButton(Handler.GetID(), "Exit", AssetManager.Textures["Button_Exit"], AssetManager.Textures["Button_Exit_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Exit").HoverText = "Exit";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Exit",
+                hover_text = "Exit",
+                texture = AssetManager.Textures["Button_Exit"],
+                texture_highlight = AssetManager.Textures["Button_Exit_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Version", "v" + Main.Version, Color.White, new Region(0, 0, 0, 0), true);
 

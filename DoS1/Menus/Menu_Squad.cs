@@ -71,7 +71,7 @@ namespace DoS1.Menus
                     UpdateControls();
                 }
 
-                Army army = CharacterManager.GetArmy("Player");
+                Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
                 {
                     foreach (Squad squad in army.Squads)
@@ -137,18 +137,12 @@ namespace DoS1.Menus
                     }
                 }
 
-                Army army = CharacterManager.GetArmy("Player");
+                Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
                 {
                     foreach (Squad squad in army.Squads)
                     {
-                        foreach (Character character in squad.Characters)
-                        {
-                            if (character.Visible)
-                            {
-                                CharacterUtil.Draw(spriteBatch, character, Color.White);
-                            }
-                        }
+                        CharacterUtil.DrawSquad(spriteBatch, squad, Color.White);
                     }
                 }
 
@@ -161,7 +155,7 @@ namespace DoS1.Menus
                         {
                             if (character.Visible)
                             {
-                                CharacterUtil.Draw(spriteBatch, character, Color.White);
+                                CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
                             }
                         }
                     }
@@ -298,7 +292,7 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 foreach (Squad squad in army.Squads)
@@ -490,17 +484,19 @@ namespace DoS1.Menus
 
         private void AddToSquad()
         {
-            Squad player_squad = null;
+            AssetManager.PlaySound_Random("Equip");
+
+            Squad ally_squad = null;
             Squad reserves = null;
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 foreach (Squad squad in army.Squads)
                 {
                     if (squad.ID == Handler.Selected_Squad)
                     {
-                        player_squad = squad;
+                        ally_squad = squad;
                         break;
                     }
                 }
@@ -512,10 +508,10 @@ namespace DoS1.Menus
                 reserves = reserve_army.Squads[0];
             }
 
-            if (player_squad != null)
+            if (ally_squad != null)
             {
                 bool inSquad = false;
-                foreach (Character existing in player_squad.Characters)
+                foreach (Character existing in ally_squad.Characters)
                 {
                     if (existing.ID == moving_character.ID)
                     {
@@ -526,7 +522,7 @@ namespace DoS1.Menus
 
                 bool found_other = false;
 
-                foreach (Character existing in player_squad.Characters)
+                foreach (Character existing in ally_squad.Characters)
                 {
                     if (existing.Formation.X == new_pos.X &&
                         existing.Formation.Y == new_pos.Y &&
@@ -536,11 +532,11 @@ namespace DoS1.Menus
 
                         if (inSquad)
                         {
-                            SwapCharacters(player_squad, moving_character, player_squad, existing);
+                            SwapCharacters(ally_squad, moving_character, ally_squad, existing);
                         }
                         else
                         {
-                            SwapCharacters(reserves, moving_character, player_squad, existing);
+                            SwapCharacters(reserves, moving_character, ally_squad, existing);
 
                             ReserveList.Add(existing);
                             ReserveList.Remove(moving_character);
@@ -559,10 +555,10 @@ namespace DoS1.Menus
                         reserves.Characters.Remove(moving_character);
                         ReserveList.Remove(moving_character);
 
-                        player_squad.Characters.Add(moving_character);
-                        if (player_squad.Characters.Count == 1)
+                        ally_squad.Characters.Add(moving_character);
+                        if (ally_squad.Characters.Count == 1)
                         {
-                            player_squad.Name = moving_character.Name;
+                            ally_squad.Name = moving_character.Name;
                         }
                     }
                 }
@@ -571,17 +567,17 @@ namespace DoS1.Menus
 
         private void AddToReserves()
         {
-            Squad player_squad = null;
+            Squad ally_squad = null;
             Squad reserves = null;
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 foreach (Squad squad in army.Squads)
                 {
                     if (squad.ID == Handler.Selected_Squad)
                     {
-                        player_squad = squad;
+                        ally_squad = squad;
                         break;
                     }
                 }
@@ -621,7 +617,7 @@ namespace DoS1.Menus
                         }
                         else
                         {
-                            SwapCharacters(player_squad, moving_character, reserves, existing);
+                            SwapCharacters(ally_squad, moving_character, reserves, existing);
 
                             ReserveList.Add(moving_character);
                             ReserveList.Remove(existing);
@@ -640,14 +636,14 @@ namespace DoS1.Menus
                         reserves.Characters.Add(moving_character);
                         ReserveList.Add(moving_character);
 
-                        player_squad.Characters.Remove(moving_character);
-                        if (player_squad.Characters.Count == 0)
+                        ally_squad.Characters.Remove(moving_character);
+                        if (ally_squad.Characters.Count == 0)
                         {
-                            player_squad.Name = "";
+                            ally_squad.Name = "";
                         }
-                        else if (player_squad.Characters.Count > 0)
+                        else if (ally_squad.Characters.Count > 0)
                         {
-                            player_squad.Name = player_squad.Characters[0].Name;
+                            ally_squad.Name = ally_squad.Characters[0].Name;
                         }
                     }
                 }
@@ -691,7 +687,9 @@ namespace DoS1.Menus
 
         private void SelectCharacter(long id)
         {
+            AssetManager.PlaySound_Random("Click");
             Handler.Selected_Character = id;
+            InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Character");
         }
 
@@ -720,9 +718,19 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
-            AddButton(Handler.GetID(), "Back", AssetManager.Textures["Button_Back"], AssetManager.Textures["Button_Back_Hover"], AssetManager.Textures["Button_Back_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Back").HoverText = "Back";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Back",
+                hover_text = "Back",
+                texture = AssetManager.Textures["Button_Back"],
+                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
@@ -783,7 +791,7 @@ namespace DoS1.Menus
         {
             ResetPos();
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 foreach (Squad squad in army.Squads)
@@ -798,7 +806,7 @@ namespace DoS1.Menus
                                 if (tile != null)
                                 {
                                     tile.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
-                                    tile.Location = new Vector3(x, y, 0);
+                                    tile.Location = new Location(x, y, 0);
                                 }
 
                                 Character character = squad.GetCharacter(new Vector2(x, y));
@@ -818,7 +826,7 @@ namespace DoS1.Menus
 
         private void ClearSquad()
         {
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 foreach (Squad squad in army.Squads)
@@ -867,7 +875,7 @@ namespace DoS1.Menus
             ClearSquad();
             ResetPos();
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 foreach (Squad squad in army.Squads)
@@ -922,7 +930,7 @@ namespace DoS1.Menus
                             if (picture != null)
                             {
                                 picture.Region = new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y), grid_width, grid_height);
-                                picture.Location = new Vector3(x, y + Top, 0);
+                                picture.Location = new Location(x, y + Top, 0);
                             }
                         }
                     }
@@ -1026,7 +1034,7 @@ namespace DoS1.Menus
                             Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
                             if (grid != null)
                             {
-                                grid.Location = new Vector3(x, y, 0);
+                                grid.Location = new Location(x, y, 0);
                                 GridList.Add(grid);
                             }
                         }

@@ -74,12 +74,15 @@ namespace DoS1.Scenes
             {
                 base.DrawWorld(spriteBatch, resolution, color);
 
-                Army player = CharacterManager.GetArmy("Player");
-                foreach (Squad squad in player.Squads)
+                foreach (Army army in CharacterManager.Armies)
                 {
-                    if (squad.Characters.Any())
+                    foreach (Squad squad in army.Squads)
                     {
-                        squad.Draw(spriteBatch, resolution, color);
+                        if (squad.Characters.Any() &&
+                            squad.Visible)
+                        {
+                            squad.Draw(spriteBatch, resolution, color);
+                        }
                     }
                 }
             }

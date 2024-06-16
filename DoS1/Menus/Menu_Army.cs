@@ -48,7 +48,7 @@ namespace DoS1.Menus
             {
                 UpdateControls();
 
-                Army army = CharacterManager.GetArmy("Player");
+                Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
                 {
                     foreach (Squad squad in army.Squads)
@@ -99,7 +99,7 @@ namespace DoS1.Menus
                     }
                 }
 
-                Army army = CharacterManager.GetArmy("Player");
+                Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
                 {
                     foreach (Squad squad in army.Squads)
@@ -108,7 +108,7 @@ namespace DoS1.Menus
                         {
                             if (character.Visible)
                             {
-                                CharacterUtil.Draw(spriteBatch, character, Color.White);
+                                CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
                             }
                         }
                     }
@@ -176,7 +176,7 @@ namespace DoS1.Menus
 
             if (SelectedSquad == 0)
             {
-                Army army = CharacterManager.GetArmy("Player");
+                Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
                 {
                     foreach (Squad squad in army.Squads)
@@ -251,8 +251,8 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Add")
             {
-                Army army = CharacterManager.GetArmy("Player");
-                army.Squads.Add(ArmyUtil.NewSquad("Player"));
+                Army army = CharacterManager.GetArmy("Ally");
+                army.Squads.Add(ArmyUtil.NewSquad("Ally"));
                 Load();
             }
             else if (button.Name == "Remove")
@@ -295,8 +295,8 @@ namespace DoS1.Menus
 
         private void RemoveSquad()
         {
-            Army player_army = CharacterManager.GetArmy("Player");
-            Squad squad = player_army.GetSquad(SelectedSquad);
+            Army ally_army = CharacterManager.GetArmy("Ally");
+            Squad squad = ally_army.GetSquad(SelectedSquad);
 
             Army army_reserves = CharacterManager.GetArmy("Reserves");
             Squad reserves = army_reserves.Squads[0];
@@ -334,8 +334,8 @@ namespace DoS1.Menus
             {
                 Pictures.Remove(picture);
             }
-            
-            player_army.Squads.Remove(squad);
+
+            ally_army.Squads.Remove(squad);
 
             SelectedSquad = 0;
         }
@@ -358,18 +358,46 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
-            AddButton(Handler.GetID(), "Back", AssetManager.Textures["Button_Back"], AssetManager.Textures["Button_Back_Hover"], AssetManager.Textures["Button_Back_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Back").HoverText = "Back";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Back",
+                hover_text = "Back",
+                texture = AssetManager.Textures["Button_Back"],
+                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Add", AssetManager.Textures["Button_Add"], AssetManager.Textures["Button_Add_Hover"], AssetManager.Textures["Button_Add_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Add").HoverText = "Add Squad";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Add",
+                hover_text = "Add Squad",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Remove", AssetManager.Textures["Button_Remove"], AssetManager.Textures["Button_Remove_Hover"], AssetManager.Textures["Button_Remove_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Remove").HoverText = "Remove Squad";
-            GetButton("Remove").Enabled = false;
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Remove",
+                hover_text = "Remove Squad",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                visible = true
+            });
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Squad"], new Region(0, 0, 0, 0), Color.White, false);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
@@ -383,7 +411,7 @@ namespace DoS1.Menus
 
         private void ResizeArmy()
         {
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 int Y = (Main.Game.MenuSize.Y * 2) - Top;
@@ -473,7 +501,7 @@ namespace DoS1.Menus
                             }
                         }
 
-                        Army army = CharacterManager.GetArmy("Player");
+                        Army army = CharacterManager.GetArmy("Ally");
                         if (army != null)
                         {
                             foreach (Squad existing in army.Squads)
@@ -507,7 +535,7 @@ namespace DoS1.Menus
         {
             ClearArmy();
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             if (army != null)
             {
                 int Y = Main.Game.MenuSize.Y * 2;

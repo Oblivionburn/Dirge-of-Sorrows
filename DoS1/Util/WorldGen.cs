@@ -104,6 +104,26 @@ namespace DoS1.Util
             SceneManager.GetScene("Localmap").World = world;
         }
 
+        public static void GenCombatMap()
+        {
+            World world = new World
+            {
+                ID = Handler.GetID(),
+                Visible = true,
+                DrawColor = Color.White
+            };
+
+            Map combat_map = NewMap(world, Handler.Combat_Terrain, true);
+            combat_map.Type = Handler.Combat_Terrain;
+            world.Maps.Add(combat_map);
+
+            Layer combat_ground = NewCombatLayer(combat_map, "Ground");
+            GenCombatGround(combat_ground, Handler.Combat_Terrain);
+            combat_map.Layers.Add(combat_ground);
+
+            SceneManager.GetScene("Combat").World = world;
+        }
+
         public static Map NewMap(World world, string name, bool visible)
         {
             return new Map
@@ -128,6 +148,21 @@ namespace DoS1.Util
                 Name = name,
                 Rows = 18 + (depth * scale),
                 Columns = 30 + (depth * scale)
+            };
+        }
+
+        public static Layer NewCombatLayer(Map map, string name)
+        {
+            return new Layer
+            {
+                ID = Handler.GetID(),
+                WorldID = map.WorldID,
+                MapID = map.ID,
+                Visible = true,
+                DrawColor = Color.White,
+                Name = name,
+                Rows = 5,
+                Columns = 21
             };
         }
 
@@ -161,6 +196,47 @@ namespace DoS1.Util
             }
         }
 
+        public static void GenCombatGround(Layer layer, string type)
+        {
+            int width = Main.Game.Resolution.X / layer.Columns;
+            int height = width;
+            int starting_y = Main.Game.Resolution.Y - (height * layer.Rows);
+
+            if (type == "Water")
+            {
+                for (int y = 0; y < layer.Rows; y++)
+                {
+                    for (int x = 0; x < layer.Columns; x++)
+                    {
+                        Region region = new Region(x * width, starting_y + (y * height), width, height);
+
+                        if (y == 0 ||
+                            y == layer.Rows - 1 ||
+                            x == 0 ||
+                            x == layer.Columns - 1)
+                        {
+                            layer.Tiles.Add(NewTile(layer, type, new Vector2(x, y), region));
+                        }
+                        else
+                        {
+                            layer.Tiles.Add(NewTile(layer, "Grass", new Vector2(x, y), region));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int y = 0; y < layer.Rows; y++)
+                {
+                    for (int x = 0; x < layer.Columns; x++)
+                    {
+                        Region region = new Region(x * width, starting_y + (y * height), width, height);
+                        layer.Tiles.Add(NewTile(layer, type, new Vector2(x, y), region));
+                    }
+                }
+            }
+        }
+
         public static void GenLocations(World world, Layer ground, Layer layer, int count, bool local)
         {
             if (!local)
@@ -180,7 +256,7 @@ namespace DoS1.Util
                 {
                     if (location.Name == "Base_Ally")
                     {
-                        location.Name = "Your Base";
+                        location.Name = "Ally Base";
                     }
                     else if (location.Name == "Base_Enemy")
                     {
@@ -226,7 +302,7 @@ namespace DoS1.Util
                 Name = type,
                 Type = type,
                 Texture = texture,
-                Location = new Vector3(location.X, location.Y, 0),
+                Location = new Location(location.X, location.Y, 0),
                 Region = new Region(region.X, region.Y, region.Width, region.Height)
             };
 

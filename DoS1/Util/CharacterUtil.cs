@@ -8,9 +8,10 @@ namespace DoS1.Util
 {
     public static class CharacterUtil
     {
-        public static void Draw(SpriteBatch spriteBatch, Character character, Color color)
+        public static void DrawCharacter(SpriteBatch spriteBatch, Character character, Color color)
         {
-            if (character != null)
+            if (character != null &&
+                !character.Dead)
             {
                 //Draw shield
                 Item item = InventoryUtil.Get_EquippedItem(character, "Shield");
@@ -57,7 +58,44 @@ namespace DoS1.Util
                 {
                     item.Draw(spriteBatch, Main.Game.Resolution, color);
                 }
+
+                if (character.HealthBar.Visible)
+                {
+                    character.HealthBar.Draw(spriteBatch);
+                }
+
+                if (character.ManaBar.Visible)
+                {
+                    character.ManaBar.Draw(spriteBatch);
+                }
             }
+        }
+
+        public static void DrawSquad(SpriteBatch spriteBatch, Squad squad, Color color)
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Character character = squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        DrawCharacter(spriteBatch, character, color);
+                    }
+                }
+            }
+        }
+
+        public static void Animate(Character character)
+        {
+            character.Animator.Animate(character);
+            UpdateGear(character);
+        }
+
+        public static void ResetAnimation(Character character)
+        {
+            character.Animator.Reset(character);
+            UpdateGear(character);
         }
 
         public static void UpdateGear(Character character)
@@ -70,6 +108,24 @@ namespace DoS1.Util
                     item.Region = character.Region;
                 }
             }
+        }
+
+        public static string AttackType(Character character)
+        {
+            Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+            if (weapon != null)
+            {
+                if (weapon.Categories.Contains("Grimoire"))
+                {
+                    return "Cast";
+                }
+                else if (weapon.Categories.Contains("Bow"))
+                {
+                    return "Ranged";
+                }
+            }
+
+            return "Attack";
         }
     }
 }

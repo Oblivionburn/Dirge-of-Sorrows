@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Timers;
 using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
@@ -21,12 +22,25 @@ namespace DoS1
         #region Variables
 
         public static long ID;
-        public static bool MoveGridDelay;
+        public static bool LocalMap;
+        public static bool MovingGrid;
+        public static int MoveGridDelay;
+        public static string AlertType;
 
         public static long Selected_Token = -1;
         public static long Selected_Squad;
         public static long Selected_Character;
         public static long Selected_Item;
+
+        public static string ItemFilter;
+
+        public static Timer CombatTimer = new Timer(1);
+        public static bool Combat;
+        public static string Combat_Terrain;
+        public static bool Combat_Ally_Base;
+        public static bool Combat_Enemy_Base;
+        public static long Combat_Ally_Squad = -1;
+        public static long Combat_Enemy_Squad = -1;
 
         public static string[] SkinTones = new string[] { "Light", "Tan", "Dark", "Darkest" };
         public static string[] HeadStyles = new string[] { "Head1", "Head2", "Head3", "Head4" };
@@ -147,12 +161,17 @@ namespace DoS1
                 "Equip",
                 "Fire",
                 "Heal",
+                "Ice",
                 "IronSword",
+                "Leech",
                 "Poison",
                 "Punch",
                 "Purchase",
                 "Shock",
+                "Siphon",
                 "SteelSword",
+                "Swing",
+                "Thump",
                 "Thunder",
                 "Water",
                 "Wind",

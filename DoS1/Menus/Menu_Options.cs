@@ -342,29 +342,68 @@ namespace DoS1.Menus
         {
             Clear();
 
-            AddButton(Handler.GetID(), "Back", AssetManager.Textures["Button_Back"], AssetManager.Textures["Button_Back_Hover"], AssetManager.Textures["Button_Back_Disabled"],
-                new Region(0, 0, 0, 0), Color.White, true);
-            GetButton("Back").HoverText = "Back";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Back",
+                hover_text = "Back",
+                texture = AssetManager.Textures["Button_Back"],
+                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
             if (Main.Game.GraphicsManager.IsFullScreen)
             {
-                AddButton(Handler.GetID(), "FullscreenOn", AssetManager.Textures["Button_FullscreenOn"], AssetManager.Textures["Button_FullscreenOn_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("FullscreenOn").HoverText = "Toggle Fullscreen";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "FullscreenOn",
+                    hover_text = "Toggle Fullscreen",
+                    texture = AssetManager.Textures["Button_FullscreenOn"],
+                    texture_highlight = AssetManager.Textures["Button_FullscreenOn_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
                 GetButton("FullscreenOn").Value = 1;
             }
             else
             {
-                AddButton(Handler.GetID(), "FullscreenOff", AssetManager.Textures["Button_FullscreenOff"], AssetManager.Textures["Button_FullscreenOff_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("FullscreenOff").HoverText = "Toggle Fullscreen";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "FullscreenOff",
+                    hover_text = "Toggle Fullscreen",
+                    texture = AssetManager.Textures["Button_FullscreenOff"],
+                    texture_highlight = AssetManager.Textures["Button_FullscreenOff_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
             }
 
             if (SoundManager.MusicEnabled)
             {
-                AddButton(Handler.GetID(), "MusicOn", AssetManager.Textures["Button_MusicOn"], AssetManager.Textures["Button_MusicOn_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("MusicOn").HoverText = "Toggle Music";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "MusicOn",
+                    hover_text = "Toggle Music",
+                    texture = AssetManager.Textures["Button_MusicOn"],
+                    texture_highlight = AssetManager.Textures["Button_MusicOn_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
                 GetButton("MusicOn").Value = 1;
 
                 AddProgressBar(Handler.GetID(), "Music", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
@@ -373,9 +412,18 @@ namespace DoS1.Menus
             }
             else
             {
-                AddButton(Handler.GetID(), "MusicOff", AssetManager.Textures["Button_MusicOff"], AssetManager.Textures["Button_MusicOff_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("MusicOff").HoverText = "Toggle Music";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "MusicOff",
+                    hover_text = "Toggle Music",
+                    texture = AssetManager.Textures["Button_MusicOff"],
+                    texture_highlight = AssetManager.Textures["Button_MusicOff_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
 
                 AddProgressBar(Handler.GetID(), "Music", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
                     new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), false);
@@ -385,9 +433,19 @@ namespace DoS1.Menus
 
             if (SoundManager.AmbientEnabled)
             {
-                AddButton(Handler.GetID(), "AmbienceOn", AssetManager.Textures["Button_AmbienceOn"], AssetManager.Textures["Button_AmbienceOn_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("AmbienceOn").HoverText = "Toggle Ambience";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "AmbienceOn",
+                    hover_text = "Toggle Ambience",
+                    texture = AssetManager.Textures["Button_AmbienceOn"],
+                    texture_highlight = AssetManager.Textures["Button_AmbienceOn_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
                 GetButton("AmbienceOn").Value = 1;
 
                 AddProgressBar(Handler.GetID(), "Ambience", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
@@ -396,9 +454,18 @@ namespace DoS1.Menus
             }
             else
             {
-                AddButton(Handler.GetID(), "AmbienceOff", AssetManager.Textures["Button_AmbienceOff"], AssetManager.Textures["Button_AmbienceOff_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("AmbienceOff").HoverText = "Toggle Ambience";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "AmbienceOff",
+                    hover_text = "Toggle Ambience",
+                    texture = AssetManager.Textures["Button_AmbienceOff"],
+                    texture_highlight = AssetManager.Textures["Button_AmbienceOff_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
 
                 AddProgressBar(Handler.GetID(), "Ambience", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
                     new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), false);
@@ -408,9 +475,19 @@ namespace DoS1.Menus
 
             if (SoundManager.SoundEnabled)
             {
-                AddButton(Handler.GetID(), "SoundOn", AssetManager.Textures["Button_SoundOn"], AssetManager.Textures["Button_SoundOn_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("SoundOn").HoverText = "Toggle Sound";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "SoundOn",
+                    hover_text = "Toggle Sound",
+                    texture = AssetManager.Textures["Button_SoundOn"],
+                    texture_highlight = AssetManager.Textures["Button_SoundOn_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
                 GetButton("SoundOn").Value = 1;
 
                 AddProgressBar(Handler.GetID(), "Sound", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
@@ -419,9 +496,18 @@ namespace DoS1.Menus
             }
             else
             {
-                AddButton(Handler.GetID(), "SoundOff", AssetManager.Textures["Button_SoundOff"], AssetManager.Textures["Button_SoundOff_Hover"], null,
-                    new Region(0, 0, 0, 0), Color.White, true);
-                GetButton("SoundOff").HoverText = "Toggle Sound";
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "SoundOff",
+                    hover_text = "Toggle Sound",
+                    texture = AssetManager.Textures["Button_SoundOff"],
+                    texture_highlight = AssetManager.Textures["Button_SoundOff_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
 
                 AddProgressBar(Handler.GetID(), "Sound", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
                     new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), false);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using Microsoft.Xna.Framework;
 
@@ -7,8 +8,6 @@ using OP_Engine.Inventories;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
-using OP_Engine.Scenes;
-using System;
 
 namespace DoS1.Util
 {
@@ -32,16 +31,16 @@ namespace DoS1.Util
         {
             CharacterManager.Armies.Clear();
 
-            //Player army
+            //Ally army
             Army army = new Army
             {
                 ID = Handler.GetID(),
-                Name = "Player"
+                Name = "Ally"
             };
             CharacterManager.Armies.Add(army);
 
-            Squad player_squad = NewSquad("Player");
-            army.Squads.Add(player_squad);
+            Squad ally_squad = NewSquad("Ally");
+            army.Squads.Add(ally_squad);
 
             //Reserves
             Army reserves = new Army
@@ -52,6 +51,7 @@ namespace DoS1.Util
             CharacterManager.Armies.Add(reserves);
 
             Squad reserves_squad = NewSquad("Reserves");
+            Gen_Reserves_Test(reserves_squad);
             reserves.Squads.Add(reserves_squad);
 
             //Academy
@@ -74,7 +74,8 @@ namespace DoS1.Util
             CharacterManager.Armies.Add(enemies);
 
             Squad enemy_squad = NewSquad("Enemy");
-            Gen_EnemySquad(enemy_squad, 1);
+            //Gen_EnemySquad(enemy_squad, 1);
+            Gen_EnemySquad_Test(enemy_squad);
             enemies.Squads.Add(enemy_squad);
         }
 
@@ -86,7 +87,7 @@ namespace DoS1.Util
                 Type = type
             };
 
-            if (type == "Player")
+            if (type == "Ally")
             {
                 squad.Texture = AssetManager.Textures["Token_Ally"];
             }
@@ -103,22 +104,15 @@ namespace DoS1.Util
             return squad;
         }
 
-        public static Character NewCharacter(string name, Vector2 formation, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor, bool enemy)
+        public static Character NewCharacter(string name, Vector2 formation, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor)
         {
             Character character = new Character();
             character.ID = Handler.GetID();
             character.Name = name;
+            character.Animator.Frames = 4;
             character.Formation = new Vector2(formation.X, formation.Y);
-
-            if (enemy)
-            {
-                character.Direction = Direction.Right;
-            }
-            else
-            {
-                character.Direction = Direction.Left;
-            }
-
+            character.Type = "Ally";
+            character.Direction = Direction.Left;
             character.Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + skinColor + "_Idle"];
             character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
 
@@ -127,6 +121,7 @@ namespace DoS1.Util
             item.ID = Handler.GetID();
             item.Name = "Head";
             item.Type = "Head";
+            item.Location = new Location();
             item.Equipped = true;
             item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + headStyle];
             item.Image = character.Image;
@@ -138,6 +133,7 @@ namespace DoS1.Util
             item.ID = Handler.GetID();
             item.Name = "Eyes";
             item.Type = "Eyes";
+            item.Location = new Location();
             item.Equipped = true;
             item.Texture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
             item.Image = character.Image;
@@ -152,6 +148,7 @@ namespace DoS1.Util
                 item.ID = Handler.GetID();
                 item.Name = "Hair";
                 item.Type = "Hair";
+                item.Location = new Location();
                 item.Equipped = true;
                 item.DrawColor = Handler.HairColors[hairColor];
                 item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + hairStyle];
@@ -159,6 +156,22 @@ namespace DoS1.Util
                 item.Visible = true;
                 character.Inventory.Items.Add(item);
             }
+
+            character.HealthBar.Base_Texture = AssetManager.Textures["ProgressBase"];
+            character.HealthBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
+            character.HealthBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
+            character.HealthBar.DrawColor = Color.Red;
+            character.HealthBar.Max_Value = 100;
+            character.HealthBar.Value = 100;
+            character.HealthBar.Update();
+
+            character.ManaBar.Base_Texture = AssetManager.Textures["ProgressBase"];
+            character.ManaBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
+            character.ManaBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
+            character.ManaBar.DrawColor = Color.Blue;
+            character.ManaBar.Max_Value = 100;
+            character.ManaBar.Value = 100;
+            character.ManaBar.Update();
 
             return character;
         }
@@ -170,18 +183,28 @@ namespace DoS1.Util
             Character character = new Character();
             character.ID = Handler.GetID();
             character.Name = name;
+            character.Animator.Frames = 4;
             character.Formation = new Vector2(formation.X, formation.Y);
 
             if (enemy)
             {
+                character.Type = "Enemy";
                 character.Direction = Direction.Right;
             }
             else
             {
+                character.Type = "Ally";
                 character.Direction = Direction.Left;
             }
 
-            character.Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)] + "_Idle"];
+            string direction = character.Direction.ToString();
+            string skin_tone = Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)];
+            string head_style = Handler.HeadStyles[random.Next(0, Handler.HeadStyles.Length)];
+            Color eye_color = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Value;
+            string hairStyle = Handler.HairStyles[random.Next(0, Handler.HairStyles.Length)];
+            Color hair_color = Handler.HairColors.ElementAt(random.Next(0, 6)).Value;
+
+            character.Texture = AssetManager.Textures[direction + "_Body_" + skin_tone + "_Idle"];
             character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
 
             //Add head
@@ -189,10 +212,9 @@ namespace DoS1.Util
             item.ID = Handler.GetID();
             item.Name = "Head";
             item.Type = "Head";
+            item.Location = new Location();
             item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + 
-                Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)] + "_" + 
-                Handler.HeadStyles[random.Next(0, Handler.HeadStyles.Length)]];
+            item.Texture = AssetManager.Textures[direction + "_" + skin_tone + "_" + head_style];
             item.Image = character.Image;
             item.Visible = true;
             character.Inventory.Items.Add(item);
@@ -202,14 +224,14 @@ namespace DoS1.Util
             item.ID = Handler.GetID();
             item.Name = "Eyes";
             item.Type = "Eyes";
+            item.Location = new Location();
             item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
+            item.Texture = AssetManager.Textures[direction + "_Eye"];
             item.Image = character.Image;
-            item.DrawColor = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Value;
+            item.DrawColor = eye_color;
             item.Visible = true;
             character.Inventory.Items.Add(item);
 
-            string hairStyle = Handler.HairStyles[random.Next(0, Handler.HairStyles.Length)];
             if (hairStyle != "Bald")
             {
                 //Add hair
@@ -217,15 +239,135 @@ namespace DoS1.Util
                 item.ID = Handler.GetID();
                 item.Name = "Hair";
                 item.Type = "Hair";
+                item.Location = new Location();
                 item.Equipped = true;
-                item.DrawColor = Handler.HairColors.ElementAt(random.Next(0, 6)).Value;
-                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + hairStyle];
+                item.DrawColor = hair_color;
+                item.Texture = AssetManager.Textures[direction + "_" + hairStyle];
                 item.Image = character.Image;
                 item.Visible = true;
                 character.Inventory.Items.Add(item);
             }
 
+            character.HealthBar.Base_Texture = AssetManager.Textures["ProgressBase"];
+            character.HealthBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
+            character.HealthBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
+            character.HealthBar.DrawColor = Color.Red;
+            character.HealthBar.Max_Value = 100;
+            character.HealthBar.Value = 100;
+            character.HealthBar.Update();
+
+            character.ManaBar.Base_Texture = AssetManager.Textures["ProgressBase"];
+            character.ManaBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
+            character.ManaBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
+            character.ManaBar.DrawColor = Color.Blue;
+            character.ManaBar.Max_Value = 100;
+            character.ManaBar.Value = 100;
+            character.ManaBar.Update();
+
             return character;
+        }
+
+        public static void Gen_EnemySquad_Test(Squad squad)
+        {
+            CryptoRandom random;
+
+            for (int i = 0; i < 5; i++)
+            {
+                Vector2 formation = new Vector2(-1, -1);
+
+                for (int z = 0; z < 80; z++)
+                {
+                    bool found = false;
+
+                    random = new CryptoRandom();
+                    int x = random.Next(0, 3);
+                    int y = random.Next(0, 3);
+
+                    for (int j = 0; j < squad.Characters.Count; j++)
+                    {
+                        Character existing = squad.Characters[j];
+                        if (existing.Formation.X == x &&
+                            existing.Formation.Y == y)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        formation = new Vector2(x, y);
+                        break;
+                    }
+                }
+
+                if (formation.X == -1)
+                {
+                    continue;
+                }
+
+                string name = "";
+
+                random = new CryptoRandom();
+                int gender = random.Next(0, 2);
+                if (gender == 0)
+                {
+                    name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
+                }
+                else
+                {
+                    name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
+                }
+                name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
+
+                Character character = NewCharacter_Random(name, formation, true);
+                if (gender == 0)
+                {
+                    character.Gender = "Male";
+                }
+                else
+                {
+                    character.Gender = "Female";
+                }
+
+                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+
+                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+
+                string weapon_type = "";
+
+                random = new CryptoRandom();
+                int weapon_choice = random.Next(0, 3);
+                switch (weapon_choice)
+                {
+                    case 0:
+                        weapon_type = "Sword";
+                        break;
+
+                    case 1:
+                        weapon_type = "Mace";
+                        break;
+
+                    case 2:
+                        weapon_type = "Axe";
+                        break;
+                }
+
+                InventoryUtil.AddItem(character.Inventory, "Iron", weapon_type, "Weapon");
+                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+
+                if (weapon_type != "Axe")
+                {
+                    InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                }
+
+                squad.Characters.Add(character);
+            }
+
+            squad.Name = squad.Characters[0].Name;
         }
 
         public static void Gen_EnemySquad(Squad squad, int depth)
@@ -531,6 +673,82 @@ namespace DoS1.Util
             }
         }
 
+        public static void Gen_Reserves_Test(Squad squad)
+        {
+            CryptoRandom random;
+
+            for (int i = 0; i < 4; i++)
+            {
+                string name = "";
+
+                random = new CryptoRandom();
+                int gender = random.Next(0, 2);
+                if (gender == 0)
+                {
+                    name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
+                }
+                else
+                {
+                    name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
+                }
+                name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
+
+                Character character = NewCharacter_Random(name, new Vector2(i, 0), false);
+                if (gender == 0)
+                {
+                    character.Gender = "Male";
+                }
+                else
+                {
+                    character.Gender = "Female";
+                }
+
+                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+
+                InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
+                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+
+                squad.Characters.Add(character);
+            }
+        }
+
+        public static Squad Get_TargetSquad(long target_id)
+        {
+            foreach (Army army in CharacterManager.Armies)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.ID == target_id)
+                    {
+                        return squad;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static Squad Get_Squad(Map map, Vector2 location)
+        {
+            Layer ground = map.GetLayer("Ground");
+            Tile tile = ground.GetTile(location);
+
+            foreach (Army army in CharacterManager.Armies)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.Location.X == tile.Location.X &&
+                        squad.Location.Y == tile.Location.Y)
+                    {
+                        return squad;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static int Get_CharacterIndex(Character character)
         {
             return (int)((character.Formation.Y * 10) + character.Formation.X);
@@ -571,7 +789,7 @@ namespace DoS1.Util
             pathing.Visible = false;
             pathing.Tiles.Clear();
 
-            Army army = CharacterManager.GetArmy("Player");
+            Army army = CharacterManager.GetArmy("Ally");
             Squad squad = army.GetSquad(Handler.Selected_Token);
             if (squad != null)
             {
@@ -605,7 +823,24 @@ namespace DoS1.Util
                         squad.Moved = 0;
                     }
 
-                    squad.Coordinates = new Vector2(destination.Location.X, destination.Location.Y);
+                    bool enemy_targeted = false;
+                    Army enemy_army = CharacterManager.GetArmy("Enemy");
+                    foreach (Squad enemy_squad in enemy_army.Squads)
+                    {
+                        if (enemy_squad.Location.X == destination.Location.X &&
+                            enemy_squad.Location.Y == destination.Location.Y)
+                        {
+                            enemy_targeted = true;
+                            squad.GetLeader().Target_ID = enemy_squad.ID;
+                            squad.Coordinates = enemy_squad.Location;
+                            break;
+                        }
+                    }
+
+                    if (!enemy_targeted)
+                    {
+                        squad.Coordinates = destination.Location;
+                    }
                 }
                 
                 Handler.Selected_Token = -1;
@@ -615,45 +850,6 @@ namespace DoS1.Util
                 menu.GetPicture("Highlight").DrawColor = new Color(255, 255, 255, 255);
 
                 pathing.Visible = false;
-            }
-        }
-
-        public static void MoveSquads()
-        {
-            Scene localmap = SceneManager.GetScene("Localmap");
-            if (localmap.World.Maps.Any())
-            {
-                Map map = localmap.World.Maps[0];
-                Layer ground = map.GetLayer("Ground");
-
-                foreach (Army army in CharacterManager.Armies)
-                {
-                    foreach (Squad squad in army.Squads)
-                    {
-                        if (squad.Path.Any())
-                        {
-                            ALocation path = squad.Path[0];
-
-                            Vector2 path_location = new Vector2(path.X, path.Y);
-                            Vector2 squad_location = new Vector2(squad.Location.X, squad.Location.Y);
-
-                            Tile destination = ground.GetTile(path_location);
-
-                            squad.Move_TotalDistance = Main.Game.TileSize.X;
-                            squad.Moving = true;
-                            squad.Speed = WorldUtil.Get_TerrainSpeed(map, squad_location);
-                            squad.Destination = new Vector3(path_location.X, path_location.Y, 0);
-                            squad.Update();
-
-                            if (squad.Location.X == squad.Destination.X &&
-                                squad.Location.Y == squad.Destination.Y)
-                            {
-                                squad.Region = new Region(destination.Region.X, destination.Region.Y, destination.Region.Width, destination.Region.Height);
-                                squad.Path.Remove(path);
-                            }
-                        }
-                    }
-                }
             }
         }
 

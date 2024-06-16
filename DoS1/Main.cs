@@ -32,7 +32,6 @@ namespace DoS1
         public static string Version;
 
         public static bool LocalPause = false;
-        public static bool LocalMap = false;
 
         public static long TimeSpeed = 1;
         public static double GameTime;
@@ -132,6 +131,11 @@ namespace DoS1
                             {
                                 TimeManager.Paused = true;
 
+                                if (Handler.Combat)
+                                {
+                                    Handler.CombatTimer.Stop();
+                                }
+
                                 OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");
                                 ui.Active = false;
                                 ui.Visible = false;
@@ -150,7 +154,8 @@ namespace DoS1
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
 
-                            if (!LocalPause)
+                            if (!LocalPause ||
+                                Handler.Combat)
                             {
                                 WeatherManager.Update(Game.Resolution);
                             }
@@ -214,7 +219,7 @@ namespace DoS1
                             SceneManager.Draw_MenusOnly(Game.SpriteBatch);
 
                             //Render weather ontop of scene but underneath standalone menus
-                            if (LocalMap ||
+                            if (Handler.LocalMap ||
                                 SceneManager.GetScene("Title").Visible)
                             {
                                 WeatherManager.Draw(Game.SpriteBatch);
@@ -262,6 +267,8 @@ namespace DoS1
             SceneManager.Scenes.Add(new Title(Content));
             SceneManager.Scenes.Add(new Worldmap(Content));
             SceneManager.Scenes.Add(new Localmap(Content));
+            SceneManager.Scenes.Add(new Combat(Content));
+            SceneManager.Scenes.Add(new GameOver(Content));
         }
 
         private void LoadMenus()

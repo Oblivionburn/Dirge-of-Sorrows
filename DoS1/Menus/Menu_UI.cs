@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 
 using OP_Engine.Scenes;
 using OP_Engine.Menus;
@@ -41,11 +42,17 @@ namespace DoS1.Menus
 
         public override void Update(Game gameRef, ContentManager content)
         {
+            if (Handler.Combat)
+            {
+                Active = false;
+                Visible = false;
+            }
+
             if (Visible &&
                 !TimeManager.Paused)
             {
                 Scene scene = SceneManager.GetScene("Worldmap");
-                if (Main.LocalMap)
+                if (Handler.LocalMap)
                 {
                     scene = SceneManager.GetScene("Localmap");
                 }
@@ -61,21 +68,89 @@ namespace DoS1.Menus
             }
         }
 
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (Visible)
+            {
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name != "Highlight" &&
+                        picture.Name != "Select")
+                    {
+                        picture.Draw(spriteBatch);
+                    }
+                }
+
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name == "Highlight")
+                    {
+                        picture.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                foreach (Picture picture in Pictures)
+                {
+                    if (picture.Name == "Select")
+                    {
+                        picture.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                foreach (Button button in Buttons)
+                {
+                    button.Draw(spriteBatch);
+                }
+
+                foreach (Slider slider in Sliders)
+                {
+                    slider.Draw(spriteBatch, slider.DrawColor);
+                }
+
+                foreach (InputBox input in Inputs)
+                {
+                    input.Draw(spriteBatch);
+                }
+
+                foreach (ProgressBar progressBar in ProgressBars)
+                {
+                    progressBar.Draw(spriteBatch);
+                }
+
+                foreach (Label label in Labels)
+                {
+                    label.Draw(spriteBatch);
+                }
+            }
+        }
+
         private void UpdateControls(World world)
         {
-            if (!Handler.MoveGridDelay)
+            if (!Handler.MovingGrid)
             {
                 bool hovering_button = HoveringButton();
                 bool hovering_squad = false;
                 bool hovering_location = false;
                 bool hovering_selection = false;
 
-                if (!hovering_button)
+                if (!hovering_button &&
+                    string.IsNullOrEmpty(Handler.AlertType))
                 {
                     Map map = null;
                     if (world.Maps.Any())
                     {
                         map = world.Maps[0];
+                    }
+
+                    if (Handler.Selected_Token != -1)
+                    {
+                        hovering_selection = HoveringSelection(world, map);
+                        if (hovering_selection)
+                        {
+                            GetPicture("Select").Visible = true;
+                        }
                     }
 
                     Layer pathing = null;
@@ -85,45 +160,22 @@ namespace DoS1.Menus
                     }
 
                     hovering_squad = HoveringSquad(world);
-
                     if (!hovering_squad)
                     {
-                        if (pathing != null)
+                        if (Handler.Selected_Token == -1 &&
+                            pathing != null)
                         {
                             pathing.Visible = false;
                         }
-                        
-                        GetPicture("Select").Visible = false;
 
                         hovering_location = HoveringLocation(map);
-
-                        if (Handler.Selected_Token != -1)
-                        {
-                            hovering_selection = HoveringSelection(world, map);
-                        }
                     }
 
-                    if (hovering_squad)
+                    if (!hovering_selection &&
+                        !hovering_squad &&
+                        !hovering_location)
                     {
-                        if (Handler.Selected_Token != -1)
-                        {
-                            //Hide selection box while hovering a token
-                            if (pathing != null)
-                            {
-                                pathing.Visible = false;
-                            }
-                            
-                            GetPicture("Select").Visible = false;
-                        }
-                    }
-                    else if (hovering_selection)
-                    {
-                        if (pathing != null)
-                        {
-                            pathing.Visible = true;
-                        }
-
-                        GetPicture("Select").Visible = true;
+                        GetPicture("Select").Visible = false;
                     }
                 }
 
@@ -145,14 +197,20 @@ namespace DoS1.Menus
 
                 if (InputManager.Mouse_LB_Pressed)
                 {
-                    Handler.MoveGridDelay = false;
+                    Handler.MoveGridDelay = 0;
+                    Handler.MovingGrid = false;
                 }
             }
 
             if (InputManager.Mouse_LB_Held &&
                 InputManager.Mouse.Moved)
             {
-                WorldUtil.MoveGrid(world);
+                Handler.MoveGridDelay++;
+
+                if (Handler.MoveGridDelay >= 4)
+                {
+                    WorldUtil.MoveGrid(world);
+                }
             }
             else if (InputManager.Mouse_ScrolledUp)
             {
@@ -165,7 +223,7 @@ namespace DoS1.Menus
 
             if (InputManager.KeyPressed("Space"))
             {
-                LocalPauseToggle();
+                GameUtil.Toggle_Pause();
             }
             else if (InputManager.KeyPressed("Esc"))
             {
@@ -197,6 +255,16 @@ namespace DoS1.Menus
                         button.Opacity = 1;
                         button.Selected = true;
 
+                        if (button.Name == "Alert")
+                        {
+                            if (Handler.AlertType == "Combat")
+                            {
+                                GetLabel("Combat_Attacker").TextColor = button.TextColor_Selected;
+                                GetLabel("Combat_VS").TextColor = button.TextColor_Selected;
+                                GetLabel("Combat_Defender").TextColor = button.TextColor_Selected;
+                            }
+                        }
+
                         if (InputManager.Mouse_LB_Pressed)
                         {
                             found = false;
@@ -213,6 +281,16 @@ namespace DoS1.Menus
                     {
                         button.Opacity = 0.8f;
                         button.Selected = false;
+
+                        if (button.Name == "Alert")
+                        {
+                            if (Handler.AlertType == "Combat")
+                            {
+                                GetLabel("Combat_Attacker").TextColor = button.TextColor;
+                                GetLabel("Combat_VS").TextColor = button.TextColor;
+                                GetLabel("Combat_Defender").TextColor = button.TextColor;
+                            }
+                        }
                     }
                 }
             }
@@ -231,6 +309,7 @@ namespace DoS1.Menus
                     if (squad.Visible)
                     {
                         Picture highlight = GetPicture("Highlight");
+                        Picture select = GetPicture("Select");
 
                         if (InputManager.MouseWithin(squad.Region.ToRectangle))
                         {
@@ -245,43 +324,62 @@ namespace DoS1.Menus
                             
                             GameUtil.Examine(this, squad.Name);
 
-                            highlight.Region = squad.Region;
-                            highlight.Visible = true;
-
-                            if (squad.Type == "Player")
+                            if (Handler.Selected_Token == -1)
                             {
-                                highlight.DrawColor = new Color(0, 0, 255, 255);
+                                highlight.Region = squad.Region;
+                                highlight.Visible = true;
+
+                                if (squad.Type == "Ally")
+                                {
+                                    highlight.DrawColor = new Color(0, 0, 255, 255);
+                                }
+                                else if (squad.Type == "Enemy")
+                                {
+                                    highlight.DrawColor = new Color(255, 0, 0, 255);
+                                }
+                            }
+                            else if (Handler.Selected_Token == squad.ID)
+                            {
+                                select.Region = squad.Region;
+                                select.Visible = true;
+                                select.DrawColor = new Color(0, 255, 255, 255);
                             }
                             else if (squad.Type == "Enemy")
                             {
-                                highlight.DrawColor = new Color(255, 0, 0, 255);
+                                select.Region = squad.Region;
+                                select.Visible = true;
+                                select.DrawColor = new Color(255, 0, 0, 255);
                             }
 
                             if (InputManager.Mouse_LB_Pressed)
                             {
-                                AssetManager.PlaySound_Random("Click");
-
                                 hovered_squad = false;
 
                                 if (Handler.Selected_Token == squad.ID)
                                 {
                                     WorldUtil.DeselectToken(map, this);
                                 }
-                                else
+                                else if (squad.Type == "Ally" &&
+                                         Handler.Selected_Token == -1)
                                 {
-                                    //Select new token
+                                    AssetManager.PlaySound_Random("Click");
                                     Handler.Selected_Token = squad.ID;
+                                }
+                                else if (squad.Type == "Enemy")
+                                {
+                                    Squad ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Selected_Token);
+                                    if (ally_squad != null)
+                                    {
+                                        Character leader = ally_squad.GetLeader();
+                                        leader.Target_ID = squad.ID;
+                                    }
                                 }
 
                                 InputManager.Mouse.Flush();
 
                                 break;
                             }
-                            else if (Handler.Selected_Token == squad.ID)
-                            {
-                                highlight.DrawColor = new Color(0, 255, 255, 255);
-                            }
-                            else
+                            else if (Handler.Selected_Token == -1)
                             {
                                 WorldUtil.DisplayPath_Squad(this, map, squad);
                             }
@@ -362,6 +460,7 @@ namespace DoS1.Menus
 
                     Picture select = GetPicture("Select");
                     select.Region = tile.Region;
+                    select.DrawColor = new Color(0, 255, 0, 255);
 
                     if (InputManager.Mouse_LB_Pressed)
                     {
@@ -387,6 +486,8 @@ namespace DoS1.Menus
         {
             AssetManager.PlaySound_Random("Click");
 
+            Handler.MoveGridDelay = 0;
+
             Layer ground = map.GetLayer("Ground");
             Tile ground_tile = ground.GetTile(new Vector2(tile.Location.X, tile.Location.Y));
 
@@ -405,13 +506,13 @@ namespace DoS1.Menus
                 TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm };
             }
 
-            Main.LocalMap = true;
+            Handler.LocalMap = true;
 
             GetButton("Worldmap").Visible = true;
             GetButton("PlayPause").Enabled = true;
             GetButton("Speed").Enabled = true;
 
-            Army allies = CharacterManager.GetArmy("Player");
+            Army allies = CharacterManager.GetArmy("Ally");
             Squad ally_squad = allies.Squads[0];
 
             Army enemies = CharacterManager.GetArmy("Enemy");
@@ -431,6 +532,8 @@ namespace DoS1.Menus
         {
             AssetManager.PlaySound_Random("Click");
 
+            Handler.MoveGridDelay = 0;
+
             //Select tile in local map for pathing
             Map map = world.Maps[0];
             ArmyUtil.SetPath(this, map, tile);
@@ -444,7 +547,7 @@ namespace DoS1.Menus
 
             if (button.Name == "PlayPause")
             {
-                LocalPauseToggle();
+                GameUtil.Toggle_Pause();
             }
             else if (button.Name == "Speed")
             {
@@ -453,6 +556,31 @@ namespace DoS1.Menus
             else if (button.Name == "Worldmap")
             {
                 BackToWorldmap();
+            }
+            else if (button.Name == "Alert")
+            {
+                if (Handler.AlertType == "Combat")
+                {
+                    button.Visible = false;
+                    GetLabel("Combat_Attacker").Visible = false;
+                    GetLabel("Combat_VS").Visible = false;
+                    GetLabel("Combat_Defender").Visible = false;
+
+                    Active = false;
+                    Visible = false;
+
+                    SoundManager.StopMusic();
+                    SoundManager.NeedMusic = true;
+
+                    Scene combat = SceneManager.GetScene("Combat");
+                    combat.Load();
+
+                    SceneManager.ChangeScene(combat);
+
+                    Handler.Combat = true;
+                    Handler.AlertType = "";
+                    SoundManager.AmbientPaused = false;
+                }
             }
             else
             {
@@ -521,32 +649,6 @@ namespace DoS1.Menus
             date.Text = "Day " + TimeManager.Now.Days.ToString();
         }
 
-        private void LocalPauseToggle()
-        {
-            Button button = GetButton("PlayPause");
-
-            if (button.Value == 0)
-            {
-                Main.LocalPause = true;
-                SoundManager.AmbientPaused = true;
-                button.Value = 1;
-                button.HoverText = "Play";
-                button.Texture = AssetManager.Textures["Button_Play"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
-            }
-            else if (button.Value == 1)
-            {
-                Main.LocalPause = false;
-                SoundManager.AmbientPaused = false;
-                button.Value = 0;
-                button.HoverText = "Pause";
-                button.Texture = AssetManager.Textures["Button_Pause"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
-            }
-        }
-
         private void SpeedToggle()
         {
             Button button = GetButton("Speed");
@@ -593,7 +695,7 @@ namespace DoS1.Menus
         {
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
 
-            Main.LocalMap = false;
+            Handler.LocalMap = false;
 
             GetButton("Worldmap").Visible = false;
             GetButton("PlayPause").Enabled = false;
@@ -609,31 +711,87 @@ namespace DoS1.Menus
         {
             Clear();
 
-            AddButton(Handler.GetID(), "Main", AssetManager.Textures["Button_Menu"], AssetManager.Textures["Button_Menu_Hover"], AssetManager.Textures["Button_Menu_Disabled"],
-                new Region(0, 0, 0, 0), Color.White * 0.8f, true);
-            GetButton("Main").HoverText = "System";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Main",
+                hover_text = "System",
+                texture = AssetManager.Textures["Button_Menu"],
+                texture_highlight = AssetManager.Textures["Button_Menu_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Menu_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Army", AssetManager.Textures["Button_Army"], AssetManager.Textures["Button_Army_Hover"], AssetManager.Textures["Button_Army_Disabled"],
-                new Region(0, 0, 0, 0), Color.White * 0.8f, true);
-            GetButton("Army").HoverText = "Army";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Army",
+                hover_text = "Army",
+                texture = AssetManager.Textures["Button_Army"],
+                texture_highlight = AssetManager.Textures["Button_Army_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Army_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Inventory", AssetManager.Textures["Button_Inventory"], AssetManager.Textures["Button_Inventory_Hover"], AssetManager.Textures["Button_Inventory_Disabled"],
-                new Region(0, 0, 0, 0), Color.White * 0.8f, true);
-            GetButton("Inventory").HoverText = "Inventory";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Inventory",
+                hover_text = "Inventory",
+                texture = AssetManager.Textures["Button_Inventory"],
+                texture_highlight = AssetManager.Textures["Button_Inventory_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Inventory_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Worldmap", AssetManager.Textures["Button_Exit"], AssetManager.Textures["Button_Exit_Hover"], null,
-                new Region(0, 0, 0, 0), Color.White * 0.8f, false);
-            GetButton("Worldmap").HoverText = "Back to Worldmap";
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Worldmap",
+                hover_text = "Return to Worldmap",
+                texture = AssetManager.Textures["Button_Exit"],
+                texture_highlight = AssetManager.Textures["Button_Exit_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = true
+            });
 
-            AddButton(Handler.GetID(), "PlayPause", AssetManager.Textures["Button_Pause"], AssetManager.Textures["Button_Pause_Hover"], AssetManager.Textures["Button_Pause_Disabled"],
-                new Region(0, 0, 0, 0), Color.White * 0.8f, true);
-            GetButton("PlayPause").HoverText = "Pause";
-            GetButton("PlayPause").Enabled = false;
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "PlayPause",
+                hover_text = "Pause",
+                texture = AssetManager.Textures["Button_Pause"],
+                texture_highlight = AssetManager.Textures["Button_Pause_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Pause_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = true,
+                visible = true
+            });
 
-            AddButton(Handler.GetID(), "Speed", AssetManager.Textures["Button_Speed1"], AssetManager.Textures["Button_Speed1_Hover"], AssetManager.Textures["Button_Speed1_Disabled"],
-                new Region(0, 0, 0, 0), Color.White * 0.8f, true);
-            GetButton("Speed").HoverText = "x1";
-            GetButton("Speed").Enabled = false;
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Speed",
+                hover_text = "x1",
+                texture = AssetManager.Textures["Button_Speed1"],
+                texture_highlight = AssetManager.Textures["Button_Speed1_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Speed1_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = false,
+                visible = true
+            });
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Date", "", Color.White, AssetManager.Textures["Frame_Small"],
                 new Region(0, 0, 0, 0), true);
@@ -642,6 +800,27 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Time", "", Color.White, AssetManager.Textures["Frame_Small"],
                 new Region(0, 0, 0, 0), true);
             GetLabel("Time").Opacity = 0.8f;
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Alert",
+                texture = AssetManager.Textures["TextFrame"],
+                texture_highlight = AssetManager.Textures["TextFrame"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                draw_color_selected = Color.Red,
+                text_color = Color.Red,
+                text_selected_color = Color.White,
+                enabled = true
+            });
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_Attacker", "", Color.Red, new Region(0, 0, 0, 0), false);
+            GetLabel("Combat_Attacker").Alignment_Horizontal = Alignment.Center;
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_VS", "VS", Color.Red, new Region(0, 0, 0, 0), false);
+            GetLabel("Combat_VS").Alignment_Horizontal = Alignment.Center;
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_Defender", "", Color.Red, new Region(0, 0, 0, 0), false);
+            GetLabel("Combat_Defender").Alignment_Horizontal = Alignment.Center;
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                 new Region(0, 0, 0, 0), false);
@@ -662,6 +841,8 @@ namespace DoS1.Menus
 
             GetLabel("Date").Region = new Region(Main.Game.ScreenWidth - (width * 2), 0, width * 2, height / 2);
             GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), width / 2, width * 2, height / 2);
+
+            GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
 
             GetButton("Main").Region = new Region(0, 0, width, height);
             GetButton("Army").Region = new Region(width, 0, width, height);

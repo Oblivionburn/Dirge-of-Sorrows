@@ -42,7 +42,7 @@ namespace DoS1.Util
             Inventory inventory = new Inventory
             {
                 ID = Handler.GetID(),
-                Name = "Player"
+                Name = "Ally"
             };
             InventoryManager.Inventories.Add(inventory);
         }
@@ -227,19 +227,19 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 35, 0));
+            properties.Add(NewProperty("Physical", "Damage", 20, 0));
             properties.Add(NewProperty("EP", "Cost", 4, 0));
             items.Add(NewItem(type, category, "Iron", properties));
 
-            properties[0].Value = 70;
+            properties[0].Value = 40;
             properties[1].Value = 6;
             items.Add(NewItem(type, category, "Copper", properties));
 
-            properties[0].Value = 105;
+            properties[0].Value = 60;
             properties[1].Value = 8;
             items.Add(NewItem(type, category, "Bronze", properties));
 
-            properties[0].Value = 140;
+            properties[0].Value = 80;
             properties[1].Value = 10;
             items.Add(NewItem(type, category, "Steel", properties));
 
@@ -254,22 +254,22 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 20, 0));
+            properties.Add(NewProperty("Physical", "Damage", 25, 0));
             properties.Add(NewProperty("Rune", "Slots", 3, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             items.Add(NewItem(type, category, "Iron", properties));
 
-            properties[0].Value = 40;
+            properties[0].Value = 50;
             properties[1].Value = 3;
             properties[2].Value = 2;
             items.Add(NewItem(type, category, "Copper", properties));
 
-            properties[0].Value = 60;
+            properties[0].Value = 75;
             properties[1].Value = 3;
             properties[2].Value = 3;
             items.Add(NewItem(type, category, "Bronze", properties));
 
-            properties[0].Value = 80;
+            properties[0].Value = 100;
             properties[1].Value = 3;
             properties[2].Value = 4;
             items.Add(NewItem(type, category, "Steel", properties));
@@ -286,22 +286,22 @@ namespace DoS1.Util
             List<Something> properties = new List<Something>();
 
             properties.Add(NewProperty("Physical", "Damage", 30, 0));
-            properties.Add(NewProperty("Rune", "Slots", 1, 0));
+            properties.Add(NewProperty("Rune", "Slots", 2, 0));
             properties.Add(NewProperty("EP", "Cost", 2, 0));
             items.Add(NewItem(type, category, "Iron", properties));
 
             properties[0].Value = 60;
-            properties[1].Value = 1;
+            properties[1].Value = 2;
             properties[2].Value = 3;
             items.Add(NewItem(type, category, "Copper", properties));
 
             properties[0].Value = 90;
-            properties[1].Value = 1;
+            properties[1].Value = 2;
             properties[2].Value = 4;
             items.Add(NewItem(type, category, "Bronze", properties));
 
             properties[0].Value = 120;
-            properties[1].Value = 1;
+            properties[1].Value = 2;
             properties[2].Value = 5;
             items.Add(NewItem(type, category, "Steel", properties));
 
@@ -316,23 +316,23 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 25, 0));
-            properties.Add(NewProperty("Rune", "Slots", 2, 0));
+            properties.Add(NewProperty("Physical", "Damage", 35, 0));
+            properties.Add(NewProperty("Rune", "Slots", 1, 0));
             properties.Add(NewProperty("EP", "Cost", 4, 0));
             items.Add(NewItem(type, category, "Elm", properties));
 
-            properties[0].Value = 50;
-            properties[1].Value = 2;
+            properties[0].Value = 70;
+            properties[1].Value = 1;
             properties[2].Value = 6;
             items.Add(NewItem(type, category, "Cedar", properties));
 
-            properties[0].Value = 75;
-            properties[1].Value = 2;
+            properties[0].Value = 105;
+            properties[1].Value = 1;
             properties[2].Value = 8;
             items.Add(NewItem(type, category, "Oak", properties));
 
-            properties[0].Value = 100;
-            properties[1].Value = 2;
+            properties[0].Value = 140;
+            properties[1].Value = 1;
             properties[2].Value = 10;
             items.Add(NewItem(type, category, "Ebony", properties));
 
@@ -397,6 +397,7 @@ namespace DoS1.Util
             item.Type = type;
             item.Materials.Add(material);
             item.Categories.Add(category);
+            item.Location = new Location();
 
             if (material == category)
             {
@@ -452,8 +453,8 @@ namespace DoS1.Util
             Inventory assets = InventoryManager.GetInventory("Assets");
             if (assets != null)
             {
-                Inventory player = InventoryManager.GetInventory("Player");
-                if (player != null)
+                Inventory ally = InventoryManager.GetInventory("Ally");
+                if (ally != null)
                 {
                     int x = 0;
                     int y = 0;
@@ -465,8 +466,8 @@ namespace DoS1.Util
                         if (item != null)
                         {
                             Item new_item = CopyItem(item, true);
-                            new_item.Location = new Vector3(x, y, 0);
-                            player.Items.Add(new_item);
+                            new_item.Location = new Location(x, y, 0);
+                            ally.Items.Add(new_item);
 
                             x++;
                             if (x > 9)
@@ -482,33 +483,33 @@ namespace DoS1.Util
 
         public static void BeginningInventory()
         {
-            Inventory player = InventoryManager.GetInventory("Player");
-            if (player != null)
+            Inventory ally = InventoryManager.GetInventory("Ally");
+            if (ally != null)
             {
-                AddItem(player, "Iron", "Axe", "Weapon");
-                AddItem(player, "Iron", "Mace", "Weapon");
-                AddItem(player, "Elm", "Bow", "Weapon");
-                AddItem(player, "Iron", "Sword", "Weapon");
-                AddItem(player, "Wood", "Round", "Shield");
-                AddItem(player, "Apprentice", "Apprentice", "Grimoire");
+                AddItem(ally, "Iron", "Axe", "Weapon");
+                AddItem(ally, "Iron", "Mace", "Weapon");
+                AddItem(ally, "Elm", "Bow", "Weapon");
+                AddItem(ally, "Iron", "Sword", "Weapon");
+                AddItem(ally, "Wood", "Round", "Shield");
+                AddItem(ally, "Apprentice", "Apprentice", "Grimoire");
 
                 CryptoRandom random = new CryptoRandom();
                 int choice = random.Next(0, 4);
                 if (choice == 0)
                 {
-                    AddItem(player, "Earth", "Earth", "Rune");
+                    AddItem(ally, "Earth", "Earth", "Rune");
                 }
                 else if (choice == 1)
                 {
-                    AddItem(player, "Wind", "Wind", "Rune");
+                    AddItem(ally, "Wind", "Wind", "Rune");
                 }
                 else if (choice == 2)
                 {
-                    AddItem(player, "Fire", "Fire", "Rune");
+                    AddItem(ally, "Fire", "Fire", "Rune");
                 }
                 else if (choice == 3)
                 {
-                    AddItem(player, "Water", "Water", "Rune");
+                    AddItem(ally, "Water", "Water", "Rune");
                 }
             }
         }
@@ -580,7 +581,7 @@ namespace DoS1.Util
                         }
                     }
 
-                    new_item.Location = new Vector3(x, y, 0);
+                    new_item.Location = new Location(x, y, 0);
                     inventory.Items.Add(new_item);
                 }
             }
@@ -723,6 +724,75 @@ namespace DoS1.Util
             return false;
         }
 
+        public static bool Weapon_IsAoE(Item weapon)
+        {
+            if (weapon != null)
+            {
+                Item area_rune = null;
+
+                for (int i = 0; i < weapon.Attachments.Count; i++)
+                {
+                    Item rune = weapon.Attachments[i];
+
+                    if (rune.Categories.Contains("Area"))
+                    {
+                        area_rune = rune;
+                        break;
+                    }
+                }
+
+                if (area_rune != null)
+                {
+                    Item paired_rune = GetPairedRune(weapon, area_rune);
+                    if (paired_rune != null &&
+                        Element_IsDamage(paired_rune.Categories[0]))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool Weapon_HasElement(Item weapon, string type)
+        {
+            foreach (Something property in weapon.Properties)
+            {
+                if (property.Name.Contains(type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static Item GetPairedRune(Item equipment, Item target_rune)
+        {
+            int index = -1;
+
+            int count = equipment.Attachments.Count;
+            for (int i = 0; i < count; i++)
+            {
+                Item rune = equipment.Attachments[i];
+                if (rune.ID == target_rune.ID)
+                {
+                    index = i;
+                }
+                else if (index != -1)
+                {
+                    if ((index % 2 == 0 && i == index + 1) ||
+                        (i == index - 1))
+                    {
+                        return rune;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static int Get_ItemIndex(Item item)
         {
             return (int)((item.Location.Y * 10) + item.Location.X);
@@ -863,6 +933,22 @@ namespace DoS1.Util
             return (int)total;
         }
 
+        public static int Get_TotalDefense(Item item, string type)
+        {
+            float total = 0;
+
+            foreach (Something property in item.Properties)
+            {
+                if (property.Name.Contains(type) &&
+                    property.Name.Contains("Defense"))
+                {
+                    total += property.Value;
+                }
+            }
+
+            return (int)total;
+        }
+
         public static int Get_TotalDamage(Item item)
         {
             float total = 0;
@@ -876,6 +962,45 @@ namespace DoS1.Util
             }
 
             return (int)total;
+        }
+
+        public static int Get_TotalDamage(Item item, string type)
+        {
+            float total = 0;
+
+            foreach (Something property in item.Properties)
+            {
+                if (property.Name.Contains(type) && 
+                    property.Name.Contains("Damage"))
+                {
+                    total += property.Value;
+                }
+            }
+
+            return (int)total;
+        }
+
+        public static int Get_EP_Cost(Character character)
+        {
+            int total = 0;
+
+            if (character != null)
+            {
+                Inventory inventory = character.Inventory;
+                foreach (Item item in inventory.Items)
+                {
+                    if (item.Equipped)
+                    {
+                        Something ep_cost = item.GetProperty("EP Cost");
+                        if (ep_cost != null)
+                        {
+                            total += (int)ep_cost.Value;
+                        }
+                    }
+                }
+            }
+
+            return total;
         }
     }
 }

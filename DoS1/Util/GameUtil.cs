@@ -144,6 +144,70 @@ namespace DoS1.Util
             examine.Visible = true;
         }
 
+        public static void Alert_Combat(string attacker_name, string defender_name)
+        {
+            Main.LocalPause = true;
+            SoundManager.AmbientPaused = true;
+
+            Menu ui = MenuManager.GetMenu("UI");
+
+            Button button = ui.GetButton("PlayPause");
+            button.Value = 1;
+            button.HoverText = "Play";
+            button.Texture = AssetManager.Textures["Button_Play"];
+            button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+            button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+
+            Handler.AlertType = "Combat";
+
+            int height = Main.Game.MenuSize.X;
+
+            Button alert = ui.GetButton("Alert");
+            alert.Selected = false;
+            alert.Opacity = 0.8f;
+            alert.Visible = true;
+
+            Label attacker = ui.GetLabel("Combat_Attacker");
+            attacker.Text = attacker_name;
+            attacker.Region = new Region(alert.Region.X, alert.Region.Y, alert.Region.Width, height);
+            attacker.Visible = true;
+
+            Label vs = ui.GetLabel("Combat_VS");
+            vs.Region = new Region(alert.Region.X, alert.Region.Y + height, alert.Region.Width, height);
+            vs.Visible = true;
+
+            Label defender = ui.GetLabel("Combat_Defender");
+            defender.Text = defender_name;
+            defender.Region = new Region(alert.Region.X, alert.Region.Y + (height * 2), alert.Region.Width, height);
+            defender.Visible = true;
+        }
+
+        public static void Toggle_Pause()
+        {
+            Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
+
+            if (button.Value == 0)
+            {
+                Main.LocalPause = true;
+                SoundManager.AmbientPaused = true;
+                button.Value = 1;
+                button.HoverText = "Play";
+                button.Texture = AssetManager.Textures["Button_Play"];
+                button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+                button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+            }
+            else if (button.Value == 1)
+            {
+                Main.LocalPause = false;
+                SoundManager.AmbientPaused = false;
+                button.Value = 0;
+                button.HoverText = "Pause";
+                button.Texture = AssetManager.Textures["Button_Pause"];
+                button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
+                button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
+            }
+        }
+
         public static void Toggle_MainMenu()
         {
             Menu menu = MenuManager.GetMenu("Main");
@@ -186,7 +250,7 @@ namespace DoS1.Util
 
         public static void SecondChanged(object sender, EventArgs e)
         {
-            ArmyUtil.MoveSquads();
+            WorldUtil.MoveSquads();
         }
 
         public static void MinuteChanged(object sender, EventArgs e)
