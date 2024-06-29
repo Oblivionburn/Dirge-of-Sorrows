@@ -27,6 +27,8 @@ namespace DoS1.Scenes
     {
         #region Variables
 
+        private int mouseClickDelay = 0;
+
         private Squad ally_squad;
         private Squad enemy_squad;
 
@@ -44,6 +46,8 @@ namespace DoS1.Scenes
 
         private int ally_total_damage;
         private int enemy_total_damage;
+
+        private bool won_battle;
 
         #endregion
 
@@ -87,6 +91,7 @@ namespace DoS1.Scenes
                 }
 
                 UpdateControls();
+                AnimateMouseClick();
             }
         }
 
@@ -104,7 +109,8 @@ namespace DoS1.Scenes
                     Picture picture = Menu.Pictures[i];
                     if (picture.Name != "Damage" &&
                         picture.Name != "Cast" &&
-                        picture.Name != "Result")
+                        picture.Name != "Result" &&
+                        picture.Name != "MouseClick")
                     {
                         picture.Draw(spriteBatch);
                     }
@@ -138,6 +144,7 @@ namespace DoS1.Scenes
                 }
 
                 Menu.GetPicture("Result").Draw(spriteBatch);
+                Menu.GetPicture("MouseClick").Draw(spriteBatch);
 
                 foreach (Button button in Menu.Buttons)
                 {
@@ -162,7 +169,11 @@ namespace DoS1.Scenes
                         {
                             CheckClick(button);
 
-                            button.Opacity = 0.9f;
+                            if (button.Name != "Result")
+                            {
+                                button.Opacity = 0.9f;
+                            }
+                            
                             button.Selected = false;
 
                             break;
@@ -170,7 +181,11 @@ namespace DoS1.Scenes
                     }
                     else if (InputManager.Mouse.Moved)
                     {
-                        button.Opacity = 0.9f;
+                        if (button.Name != "Result")
+                        {
+                            button.Opacity = 0.9f;
+                        }
+
                         button.Selected = false;
                     }
                 }
@@ -180,17 +195,14 @@ namespace DoS1.Scenes
         private void CheckClick(Button button)
         {
             AssetManager.PlaySound_Random("Click");
+            InputManager.Mouse.Flush();
 
             if (button.Name == "Result")
             {
-                InputManager.Mouse.Flush();
-
                 Army ally_army = CharacterManager.GetArmy("Ally");
                 if (ally_army.Squads.Any())
                 {
-                    Handler.Combat = false;
-                    SceneManager.ChangeScene("Localmap");
-                    Main.Timer.Start();
+                    Leave();
                 }
                 else
                 {
@@ -201,6 +213,10 @@ namespace DoS1.Scenes
 
                     SceneManager.ChangeScene("GameOver");
                 }
+            }
+            else if (button.Name == "Retreat")
+            {
+                Leave();
             }
         }
 
@@ -311,7 +327,7 @@ namespace DoS1.Scenes
                                 }
                                 break;
 
-                            case 4:
+                            default:
                                 if (AtTile(current_character, origin_tile))
                                 {
                                     FinishAttack();
@@ -547,7 +563,7 @@ namespace DoS1.Scenes
         {
             if (weapon != null)
             {
-                string[] damage_types = { "Physical", "Fire", "Wind", "Earth", "Water" };
+                string[] damage_types = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
 
                 for (int i = 0; i < damage_types.Length; i++)
                 {
@@ -595,7 +611,7 @@ namespace DoS1.Scenes
                                     damage_color = Color.Red;
                                     break;
 
-                                case "Wind":
+                                case "Lightning":
                                     damage_color = Color.Yellow;
                                     break;
 
@@ -603,7 +619,7 @@ namespace DoS1.Scenes
                                     damage_color = Color.Brown;
                                     break;
 
-                                case "Water":
+                                case "Ice":
                                     damage_color = Color.Blue;
                                     break;
                             }
@@ -644,6 +660,78 @@ namespace DoS1.Scenes
                     }
                 }
             }
+            else
+            {
+                //Unarmed attack
+                int damage = 10;
+
+                Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
+                if (helm != null)
+                {
+                    int defense = InventoryUtil.Get_TotalDefense(helm, "Physical");
+                    damage -= defense;
+                }
+
+                Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
+                if (armor != null)
+                {
+                    int defense = InventoryUtil.Get_TotalDefense(armor, "Physical");
+                    damage -= defense;
+                }
+
+                Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
+                if (shield != null)
+                {
+                    int defense = InventoryUtil.Get_TotalDefense(shield, "Physical");
+                    damage -= defense;
+                }
+
+                if (damage < 0)
+                {
+                    damage = 0;
+                }
+
+                if (damage > 0)
+                {
+                    defender.HealthBar.Value -= damage;
+                    defender.HealthBar.Update();
+
+                    Color damage_color = Color.White;
+
+                    AddEffect(defender, weapon, "Physical");
+
+                    if (defender.Type == "Ally")
+                    {
+                        enemy_total_damage += damage;
+                    }
+                    else if (defender.Type == "Enemy")
+                    {
+                        ally_total_damage += damage;
+                    }
+
+                    Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", damage.ToString(), damage_color,
+                        new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
+                            defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+
+                    if (defender.HealthBar.Value < 0)
+                    {
+                        defender.HealthBar.Value = 0;
+                    }
+
+                    if (defender.HealthBar.Value <= 0)
+                    {
+                        defender.Dead = true;
+                    }
+                }
+                else
+                {
+                    AssetManager.PlaySound_Random("Swing");
+
+                    Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "0", Color.Black,
+                        new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
+                            defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+                }
+            }
         }
 
         private void AddEffect(Character character, Item weapon, string type)
@@ -651,53 +739,64 @@ namespace DoS1.Scenes
             switch (type)
             {
                 case "Physical":
-                    if (weapon.Categories.Contains("Sword") ||
-                        weapon.Categories.Contains("Axe"))
+                    if (weapon != null)
                     {
-                        AssetManager.PlaySound_Random("IronSword");
-
-                        float x = character.Region.X - (character.Region.Width / 4);
-                        float y = character.Region.Y - (character.Region.Height / 8);
-                        float width = character.Region.Width + ((character.Region.Width / 4) * 2);
-                        float height = character.Region.Height + ((character.Region.Height / 8) * 2);
-
-                        if (character.Type == "Ally")
+                        if (weapon.Categories.Contains("Sword") ||
+                        weapon.Categories.Contains("Axe"))
                         {
-                            Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Right"],
-                                new Region(x, y, width, height),
-                                    RenderingManager.Lighting.DrawColor, true);
+                            AssetManager.PlaySound_Random("IronSword");
+
+                            float x = character.Region.X - (character.Region.Width / 4);
+                            float y = character.Region.Y - (character.Region.Height / 8);
+                            float width = character.Region.Width + ((character.Region.Width / 4) * 2);
+                            float height = character.Region.Height + ((character.Region.Height / 8) * 2);
+
+                            if (character.Type == "Ally")
+                            {
+                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Right"],
+                                    new Region(x, y, width, height),
+                                        RenderingManager.Lighting.DrawColor, true);
+                            }
+                            else if (character.Type == "Enemy")
+                            {
+                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Left"],
+                                    new Region(x, y, width, height),
+                                        RenderingManager.Lighting.DrawColor, true);
+                            }
                         }
-                        else if (character.Type == "Enemy")
+                        else if (weapon.Categories.Contains("Bow"))
                         {
-                            Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Left"],
-                                new Region(x, y, width, height),
+                            AssetManager.PlaySound_Random("Bow");
+
+                            if (character.Type == "Ally")
+                            {
+                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Right"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                                        RenderingManager.Lighting.DrawColor, true);
+                            }
+                            else if (character.Type == "Enemy")
+                            {
+                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Left"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                                        RenderingManager.Lighting.DrawColor, true);
+                            }
+                        }
+                        else
+                        {
+                            AssetManager.PlaySound_Random("Thump");
+
+                            Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
+                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
                                     RenderingManager.Lighting.DrawColor, true);
                         }
                     }
-                    else if (weapon.Categories.Contains("Mace"))
+                    else
                     {
                         AssetManager.PlaySound_Random("Thump");
 
                         Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
                             new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
                                 RenderingManager.Lighting.DrawColor, true);
-                    }
-                    else if (weapon.Categories.Contains("Bow"))
-                    {
-                        AssetManager.PlaySound_Random("Bow");
-
-                        if (character.Type == "Ally")
-                        {
-                            Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Right"],
-                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    RenderingManager.Lighting.DrawColor, true);
-                        }
-                        else if (character.Type == "Enemy")
-                        {
-                            Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Left"],
-                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    RenderingManager.Lighting.DrawColor, true);
-                        }
                     }
                     break;
 
@@ -709,7 +808,7 @@ namespace DoS1.Scenes
                             RenderingManager.Lighting.DrawColor * 0.8f, true);
                     break;
 
-                case "Wind":
+                case "Lightning":
                     AssetManager.PlaySound_Random("Shock");
 
                     Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
@@ -725,7 +824,7 @@ namespace DoS1.Scenes
                             RenderingManager.Lighting.DrawColor, true);
                     break;
 
-                case "Water":
+                case "Ice":
                     AssetManager.PlaySound_Random("Ice");
 
                     Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Ice"],
@@ -1342,6 +1441,30 @@ namespace DoS1.Scenes
             }
         }
 
+        private void AnimateMouseClick()
+        {
+            Picture mouseClick = Menu.GetPicture("MouseClick");
+            if (mouseClick.Visible)
+            {
+                if (mouseClickDelay >= 10)
+                {
+                    mouseClickDelay = 0;
+
+                    int X = mouseClick.Image.X + mouseClick.Image.Height;
+                    if (X >= mouseClick.Texture.Width)
+                    {
+                        X = 0;
+                    }
+
+                    mouseClick.Image = new Rectangle(X, mouseClick.Image.Y, mouseClick.Image.Width, mouseClick.Image.Height);
+                }
+                else
+                {
+                    mouseClickDelay++;
+                }
+            }
+        }
+
         private void RemoveEffects()
         {
             for (int i = 0; i < Menu.Labels.Count; i++)
@@ -1455,41 +1578,28 @@ namespace DoS1.Scenes
         {
             Handler.CombatTimer.Stop();
 
-            bool ally_defeat = true;
-            if (ally_squad.Characters.Any())
-            {
-                ally_defeat = false;
-            }
-            else
+            if (!ally_squad.Characters.Any())
             {
                 CharacterManager.GetArmy("Ally").Squads.Remove(ally_squad);
             }
 
-            bool enemy_defeat = true;
-            if (enemy_squad.Characters.Any())
-            {
-                enemy_defeat = false;
-            }
-            else
-            {
-                CharacterManager.GetArmy("Enemy").Squads.Remove(enemy_squad);
-            }
-
             Button button = Menu.GetButton("Result");
 
-            if (ally_defeat)
+            if (!enemy_squad.Characters.Any())
             {
-                Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                button.Text = ally_squad.Name + " lost!";
-            }
-            else if (enemy_defeat)
-            {
+                won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
                 button.Text = ally_squad.Name + " won!";
             }
+            else if (!ally_squad.Characters.Any())
+            {
+                won_battle = false;
+                Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
+                button.Text = ally_squad.Name + " lost!";
+            }
             else if (enemy_total_damage > ally_total_damage)
             {
-                ally_defeat = true;
+                won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
                 button.Text = ally_squad.Name + " lost!\n\n" +
                     ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
@@ -1497,7 +1607,7 @@ namespace DoS1.Scenes
             }
             else if (ally_total_damage > enemy_total_damage)
             {
-                enemy_defeat = true;
+                won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
                 button.Text = ally_squad.Name + " won!\n\n" +
                     ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
@@ -1509,15 +1619,80 @@ namespace DoS1.Scenes
                 button.Text = "Both parties are retreating.";
             }
 
-            button.Text += "\n\n(Clear here to continue)";
-
+            Menu.GetButton("Retreat").Visible = false;
             Menu.GetPicture("Result").Visible = true;
+            Menu.GetPicture("MouseClick").Visible = true;
             button.Visible = true;
 
-            if (enemy_defeat)
+            if (won_battle)
             {
-                //Reward
+                int gold = enemy_squad.Characters.Count * 100;
+                Handler.Gold += gold;
+
+                button.Text += "\n\nYou looted " + gold + " Gold!";
+
+                //Move squad to tile enemy was at
+                ally_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y, 0);
+                ally_squad.Region = new Region(enemy_squad.Region.X, enemy_squad.Region.Y, enemy_squad.Region.Width, enemy_squad.Region.Height);
+
+                Character leader = ally_squad.GetLeader();
+                if (leader == null)
+                {
+                    ally_squad.Leader_ID = ally_squad.Characters[0].ID;
+                }
+                else
+                {
+                    leader.Target_ID = 0;
+                }
+                
+                CharacterManager.GetArmy("Enemy").Squads.Remove(enemy_squad);
             }
+        }
+
+        private void Leave()
+        {
+            Scene localmap = SceneManager.GetScene("Localmap");
+            Map map = localmap.World.Maps[Handler.Level];
+            Layer ground = map.GetLayer("Ground");
+
+            if (!won_battle &&
+                ally_squad.Characters.Any())
+            {
+                //Bump squad away from enemy
+                if (ally_squad.Direction == Direction.North)
+                {
+                    ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
+                }
+                else if (ally_squad.Direction == Direction.East)
+                {
+                    ally_squad.Location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
+                }
+                else if (ally_squad.Direction == Direction.South)
+                {
+                    ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
+                }
+                else if (ally_squad.Direction == Direction.West)
+                {
+                    ally_squad.Location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
+                }
+
+                Tile tile = ground.GetTile(new Vector2(ally_squad.Location.X, ally_squad.Location.Y));
+                ally_squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
+            }
+
+            Handler.CombatTimer.Stop();
+            Handler.Combat = false;
+
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.Active = true;
+            ui.Visible = true;
+
+            SoundManager.StopMusic();
+            SoundManager.NeedMusic = true;
+
+            SceneManager.ChangeScene("Localmap");
+            
+            Main.Timer.Start();
         }
 
         public override void Load()
@@ -1531,12 +1706,13 @@ namespace DoS1.Scenes
 
                 Menu.AddPicture(Handler.GetID(), "Light", AssetManager.Textures["White"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
 
-                if (TimeManager.Now.Hours >= 10 ||
+                if (TimeManager.Now.Hours >= 22 ||
                     TimeManager.Now.Hours <= 5)
                 {
                     Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Sky_Night"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
-                else if (Handler.Combat_Terrain == "Grass")
+                else if (Handler.Combat_Terrain == "Grass" ||
+                         Handler.Combat_Terrain == "Water")
                 {
                     Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Sky_Day"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
@@ -1567,7 +1743,25 @@ namespace DoS1.Scenes
                     Menu.AddPicture(Handler.GetID(), "Base", AssetManager.Textures["Base_Enemy"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
 
+                Menu.AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    font = AssetManager.Fonts["ControlFont"],
+                    name = "Retreat",
+                    text = "Retreat",
+                    texture = AssetManager.Textures["ButtonFrame"],
+                    texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    draw_color_selected = Color.White,
+                    text_color = Color.White,
+                    text_selected_color = Color.Red,
+                    enabled = true,
+                    visible = true
+                });
+
                 Menu.AddPicture(Handler.GetID(), "Result", AssetManager.Textures["Victory"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, false);
+                Menu.AddPicture(Handler.GetID(), "MouseClick", AssetManager.Textures["LeftClick"], new Region(0, 0, 0, 0), Color.White, false);
 
                 Menu.AddButton(new ButtonOptions
                 {
@@ -1577,7 +1771,7 @@ namespace DoS1.Scenes
                     texture = AssetManager.Textures["TextFrame"],
                     texture_highlight = AssetManager.Textures["TextFrame"],
                     region = new Region(0, 0, 0, 0),
-                    draw_color = Color.White * 0.9f,
+                    draw_color = Color.White,
                     draw_color_selected = Color.Red,
                     text_color = Color.Red,
                     text_selected_color = Color.White,
@@ -1661,12 +1855,19 @@ namespace DoS1.Scenes
             {
                 WorldUtil.Resize_OnCombat(World.Maps[0]);
 
+                int height = Main.Game.MenuSize.X;
+
                 Menu.GetPicture("Light").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
                 Menu.GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
                 Menu.GetPicture("Result").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
-                Menu.GetButton("Result").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 4), 
-                    Main.Game.ScreenHeight - (Main.Game.MenuSize.X * 5), Main.Game.MenuSize.X * 8, Main.Game.MenuSize.X * 3);
+                Button result = Menu.GetButton("Result");
+                result.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 4), 
+                    Main.Game.ScreenHeight - (Main.Game.MenuSize.X * 5), Main.Game.MenuSize.X * 8, height * 3);
+
+                Menu.GetButton("Retreat").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2), result.Region.Y + result.Region.Height, Main.Game.MenuSize.X * 4, height);
+
+                Menu.GetPicture("MouseClick").Region = new Region(result.Region.X + result.Region.Width, result.Region.Y + result.Region.Height - height, height, height);
 
                 Picture base_image = Menu.GetPicture("Base");
                 if (base_image != null)

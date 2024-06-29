@@ -282,6 +282,7 @@ namespace DoS1
             MenuManager.Menus.Add(new Menu_Character(Content));
             MenuManager.Menus.Add(new Menu_Inventory(Content));
             MenuManager.Menus.Add(new Menu_Item(Content));
+            MenuManager.Menus.Add(new Menu_Shop(Content));
         }
 
         public static void Timer_Elapsed(object sender, ElapsedEventArgs e)

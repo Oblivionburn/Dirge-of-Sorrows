@@ -7,11 +7,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using OP_Engine.Characters;
 using OP_Engine.Sounds;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
 using OP_Engine.Inputs;
 using OP_Engine.Time;
+using OP_Engine.Inventories;
 
 using DoS1.Util;
 
@@ -22,7 +24,9 @@ namespace DoS1
         #region Variables
 
         public static long ID;
+        public static int Gold = 1000;
         public static bool LocalMap;
+        public static int Level;
         public static bool MovingGrid;
         public static int MoveGridDelay;
         public static string AlertType;
@@ -33,14 +37,20 @@ namespace DoS1
         public static long Selected_Item;
 
         public static string ItemFilter;
+        public static Dictionary<int, Inventory> ShopInventories = new Dictionary<int, Inventory>();
+        public static Inventory TradingInventory;
 
         public static Timer CombatTimer = new Timer(1);
         public static bool Combat;
+        public static int Element_Multiplier = 8;
         public static string Combat_Terrain;
         public static bool Combat_Ally_Base;
         public static bool Combat_Enemy_Base;
         public static long Combat_Ally_Squad = -1;
         public static long Combat_Enemy_Squad = -1;
+
+        public static Character Dialogue_Character1;
+        public static Character Dialogue_Character2;
 
         public static string[] SkinTones = new string[] { "Light", "Tan", "Dark", "Darkest" };
         public static string[] HeadStyles = new string[] { "Head1", "Head2", "Head3", "Head4" };

@@ -585,10 +585,26 @@ namespace DoS1.Menus
 
         private void ExamineItem(Item item)
         {
-            int width = Main.Game.MenuSize.X * 5;
+            int width = (Main.Game.MenuSize.X * 4) + (Main.Game.MenuSize.X / 2);
+            if (item.Type == "Rune")
+            {
+                width = (Main.Game.MenuSize.X * 9) + (Main.Game.MenuSize.X / 2);
+            }
+            else if (item.Type == "Weapon" &&
+                     item.Categories.Contains("Grimoire"))
+            {
+                width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
+            }
+
             int height = Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
 
-            string text = item.Name + "\n";
+            string text = item.Name + "\n\n";
+
+            if (!string.IsNullOrEmpty(item.Description))
+            {
+                text += item.Description + "\n";
+                height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
+            }
 
             if (item.Type == "Weapon")
             {
@@ -596,7 +612,7 @@ namespace DoS1.Menus
                     item.Categories.Contains("Bow") ||
                     item.Categories.Contains("Grimoire"))
                 {
-                    text = item.Name + " (2H)\n";
+                    text = item.Name + " (2H)\n\n";
                 }
 
                 List<Something> properties = new List<Something>();

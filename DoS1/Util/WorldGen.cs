@@ -68,19 +68,11 @@ namespace DoS1.Util
             SceneManager.GetScene("Worldmap").World = world;
         }
 
-        public static void GenLocalmap(Tile tile, int depth)
+        public static Map GenLocalmap(World world, Tile tile, int depth)
         {
-            World world = new World
-            {
-                ID = Handler.GetID(),
-                Visible = true,
-                DrawColor = Color.White
-            };
-
             Map local_map = NewMap(world, tile.Name, true);
             local_map.ID = tile.ID;
             local_map.Type = tile.Type;
-            world.Maps.Add(local_map);
 
             Layer local_ground = NewLayer(local_map, "Ground", depth);
             GenGround(local_ground, tile.Type, true);
@@ -101,7 +93,7 @@ namespace DoS1.Util
 
             AlignRegions(local_map);
 
-            SceneManager.GetScene("Localmap").World = world;
+            return local_map;
         }
 
         public static void GenCombatMap()
@@ -231,7 +223,37 @@ namespace DoS1.Util
                     for (int x = 0; x < layer.Columns; x++)
                     {
                         Region region = new Region(x * width, starting_y + (y * height), width, height);
-                        layer.Tiles.Add(NewTile(layer, type, new Vector2(x, y), region));
+
+                        if (type.Contains("Forest"))
+                        {
+                            if (type.Contains("Snow"))
+                            {
+                                layer.Tiles.Add(NewTile(layer, "Snow", new Vector2(x, y), region));
+                            }
+                            else
+                            {
+                                layer.Tiles.Add(NewTile(layer, "Grass", new Vector2(x, y), region));
+                            }
+                        }
+                        else if (type.Contains("Mountains"))
+                        {
+                            if (type.Contains("Snow"))
+                            {
+                                layer.Tiles.Add(NewTile(layer, "Snow", new Vector2(x, y), region));
+                            }
+                            else if (type.Contains("Desert"))
+                            {
+                                layer.Tiles.Add(NewTile(layer, "Desert", new Vector2(x, y), region));
+                            }
+                            else
+                            {
+                                layer.Tiles.Add(NewTile(layer, "Grass", new Vector2(x, y), region));
+                            }
+                        }
+                        else
+                        {
+                            layer.Tiles.Add(NewTile(layer, type, new Vector2(x, y), region));
+                        }
                     }
                 }
             }
@@ -249,7 +271,7 @@ namespace DoS1.Util
                 Add_EnemyBase(ground, layer);
                 ScatterLocations(ground, layer, "Town_Neutral", count);
 
-                ScatterLocations(ground, layer, "Merchant_Neutral", 1);
+                ScatterLocations(ground, layer, "Shop_Neutral", 1);
                 ScatterLocations(ground, layer, "Academy_Neutral", 1);
 
                 foreach (Tile location in layer.Tiles)

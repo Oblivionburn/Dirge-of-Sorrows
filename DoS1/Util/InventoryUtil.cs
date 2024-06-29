@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 
@@ -58,49 +59,69 @@ namespace DoS1.Util
             properties.Add(NewProperty("Physical", "Defense", 5, 0));
             properties.Add(NewProperty("Rune", "Slots", 8, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
-            items.Add(NewItem(type, category, "Cloth", properties));
+            Item item = NewItem(type, category, "Cloth", properties);
+            item.Buy_Price = 50;
+            items.Add(item);
 
             category = "Leather";
             properties[0].Value = 10;
             properties[1].Value = 4;
             properties[2].Value = 2;
-            items.Add(NewItem(type, category, "Leather", properties));
+            item = NewItem(type, category, "Leather", properties);
+            item.Buy_Price = 100;
+            items.Add(item);
 
             category = "Chainmail";
             properties[0].Value = 15;
             properties[1].Value = 2;
             properties[2].Value = 3;
-            items.Add(NewItem(type, category, "Iron", properties));
+            item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 150;
+            items.Add(item);
 
             properties[0].Value = 20;
             properties[2].Value = 4;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 200;
+            items.Add(item);
 
             properties[0].Value = 25;
             properties[2].Value = 5;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 250;
+            items.Add(item);
 
             properties[0].Value = 30;
             properties[2].Value = 6;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 300;
+            items.Add(item);
 
             category = "Platemail";
             properties[0].Value = 35;
             properties[1].Value = 0;
             properties[2].Value = 7;
-            items.Add(NewItem(type, category, "Iron", properties));
+            item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 350;
+            items.Add(item);
 
             properties[0].Value = 40;
             properties[2].Value = 8;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 400;
+            items.Add(item);
 
             properties[0].Value = 45;
             properties[2].Value = 9;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 450;
+            items.Add(item);
 
             properties[0].Value = 50;
             properties[2].Value = 10;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 500;
+            items.Add(item);
 
             return items;
         }
@@ -116,49 +137,69 @@ namespace DoS1.Util
             properties.Add(NewProperty("Physical", "Defense", 1, 0));
             properties.Add(NewProperty("Rune", "Slots", 8, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
-            items.Add(NewItem(type, category, "Cloth", properties));
+            Item item = NewItem(type, category, "Cloth", properties);
+            item.Buy_Price = 10;
+            items.Add(item);
 
             category = "Leather";
             properties[0].Value = 2;
             properties[1].Value = 4;
             properties[2].Value = 1;
-            items.Add(NewItem(type, category, "Leather", properties));
+            item = NewItem(type, category, "Leather", properties);
+            item.Buy_Price = 20;
+            items.Add(item);
 
             category = "Chainmail";
             properties[0].Value = 3;
             properties[1].Value = 2;
             properties[2].Value = 2;
-            items.Add(NewItem(type, category, "Iron", properties));
+            item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 30;
+            items.Add(item);
 
             properties[0].Value = 4;
             properties[2].Value = 2;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 40;
+            items.Add(item);
 
             properties[0].Value = 5;
             properties[2].Value = 3;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 50;
+            items.Add(item);
 
             properties[0].Value = 6;
             properties[2].Value = 3;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 60;
+            items.Add(item);
 
             category = "Platemail";
             properties[0].Value = 7;
             properties[1].Value = 0;
             properties[2].Value = 4;
-            items.Add(NewItem(type, category, "Iron", properties));
+            item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 70;
+            items.Add(item);
 
             properties[0].Value = 8;
             properties[2].Value = 4;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 80;
+            items.Add(item);
 
             properties[0].Value = 9;
             properties[2].Value = 5;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 90;
+            items.Add(item);
 
             properties[0].Value = 10;
             properties[2].Value = 5;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 100;
+            items.Add(item);
 
             return items;
         }
@@ -173,23 +214,33 @@ namespace DoS1.Util
             string category = "Round";
             properties.Add(NewProperty("Physical", "Defense", 5, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
-            items.Add(NewItem(type, category, "Wood", properties));
+            Item item = NewItem(type, category, "Wood", properties);
+            item.Buy_Price = 20;
+            items.Add(item);
 
             properties[0].Value = 10;
             properties[1].Value = 1;
-            items.Add(NewItem(type, category, "Iron", properties));
+            item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 40;
+            items.Add(item);
 
             properties[0].Value = 15;
             properties[1].Value = 2;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 60;
+            items.Add(item);
 
             properties[0].Value = 20;
             properties[1].Value = 2;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 80;
+            items.Add(item);
 
             properties[0].Value = 25;
             properties[1].Value = 3;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 100;
+            items.Add(item);
 
             category = "Kite";
             List<Something> special_properties = new List<Something>()
@@ -198,23 +249,38 @@ namespace DoS1.Util
                 NewProperty("Rune", "Slots", 4, 0),
                 NewProperty("EP", "Cost", 3, 0)
             };
-            items.Add(NewItem(type, category, "Wood", special_properties));
+            item = NewItem(type, category, "Wood", properties);
+            item.Buy_Price = 120;
+            item.Sell_Price = 120;
+            items.Add(item);
 
             properties[0].Value = 35;
             properties[1].Value = 4;
-            items.Add(NewItem(type, category, "Iron", properties));
+            item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 140;
+            item.Sell_Price = 140;
+            items.Add(item);
 
             properties[0].Value = 40;
             properties[1].Value = 4;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 160;
+            item.Sell_Price = 160;
+            items.Add(item);
 
             properties[0].Value = 45;
             properties[1].Value = 5;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 180;
+            item.Sell_Price = 180;
+            items.Add(item);
 
             properties[0].Value = 50;
             properties[1].Value = 5;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 200;
+            item.Sell_Price = 200;
+            items.Add(item);
 
             return items;
         }
@@ -229,19 +295,27 @@ namespace DoS1.Util
 
             properties.Add(NewProperty("Physical", "Damage", 20, 0));
             properties.Add(NewProperty("EP", "Cost", 4, 0));
-            items.Add(NewItem(type, category, "Iron", properties));
+            Item item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 100;
+            items.Add(item);
 
             properties[0].Value = 40;
             properties[1].Value = 6;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 200;
+            items.Add(item);
 
             properties[0].Value = 60;
             properties[1].Value = 8;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 300;
+            items.Add(item);
 
             properties[0].Value = 80;
             properties[1].Value = 10;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 400;
+            items.Add(item);
 
             return items;
         }
@@ -257,22 +331,30 @@ namespace DoS1.Util
             properties.Add(NewProperty("Physical", "Damage", 25, 0));
             properties.Add(NewProperty("Rune", "Slots", 3, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
-            items.Add(NewItem(type, category, "Iron", properties));
+            Item item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 125;
+            items.Add(item);
 
             properties[0].Value = 50;
             properties[1].Value = 3;
             properties[2].Value = 2;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 250;
+            items.Add(item);
 
             properties[0].Value = 75;
             properties[1].Value = 3;
             properties[2].Value = 3;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 375;
+            items.Add(item);
 
             properties[0].Value = 100;
             properties[1].Value = 3;
             properties[2].Value = 4;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 500;
+            items.Add(item);
 
             return items;
         }
@@ -288,22 +370,30 @@ namespace DoS1.Util
             properties.Add(NewProperty("Physical", "Damage", 30, 0));
             properties.Add(NewProperty("Rune", "Slots", 2, 0));
             properties.Add(NewProperty("EP", "Cost", 2, 0));
-            items.Add(NewItem(type, category, "Iron", properties));
+            Item item = NewItem(type, category, "Iron", properties);
+            item.Buy_Price = 150;
+            items.Add(item);
 
             properties[0].Value = 60;
             properties[1].Value = 2;
             properties[2].Value = 3;
-            items.Add(NewItem(type, category, "Copper", properties));
+            item = NewItem(type, category, "Copper", properties);
+            item.Buy_Price = 300;
+            items.Add(item);
 
             properties[0].Value = 90;
             properties[1].Value = 2;
             properties[2].Value = 4;
-            items.Add(NewItem(type, category, "Bronze", properties));
+            item = NewItem(type, category, "Bronze", properties);
+            item.Buy_Price = 450;
+            items.Add(item);
 
             properties[0].Value = 120;
             properties[1].Value = 2;
             properties[2].Value = 5;
-            items.Add(NewItem(type, category, "Steel", properties));
+            item = NewItem(type, category, "Steel", properties);
+            item.Buy_Price = 600;
+            items.Add(item);
 
             return items;
         }
@@ -319,22 +409,30 @@ namespace DoS1.Util
             properties.Add(NewProperty("Physical", "Damage", 35, 0));
             properties.Add(NewProperty("Rune", "Slots", 1, 0));
             properties.Add(NewProperty("EP", "Cost", 4, 0));
-            items.Add(NewItem(type, category, "Elm", properties));
+            Item item = NewItem(type, category, "Elm", properties);
+            item.Buy_Price = 175;
+            items.Add(item);
 
             properties[0].Value = 70;
             properties[1].Value = 1;
             properties[2].Value = 6;
-            items.Add(NewItem(type, category, "Cedar", properties));
+            item = NewItem(type, category, "Cedar", properties);
+            item.Buy_Price = 350;
+            items.Add(item);
 
             properties[0].Value = 105;
             properties[1].Value = 1;
             properties[2].Value = 8;
-            items.Add(NewItem(type, category, "Oak", properties));
+            item = NewItem(type, category, "Oak", properties);
+            item.Buy_Price = 525;
+            items.Add(item);
 
             properties[0].Value = 140;
             properties[1].Value = 1;
             properties[2].Value = 10;
-            items.Add(NewItem(type, category, "Ebony", properties));
+            item = NewItem(type, category, "Ebony", properties);
+            item.Buy_Price = 700;
+            items.Add(item);
 
             return items;
         }
@@ -348,16 +446,24 @@ namespace DoS1.Util
             List<Something> properties = new List<Something>();
 
             properties.Add(NewProperty("Rune", "Slots", 4, 0));
-            items.Add(NewItem(type, category, "Apprentice", properties));
+            Item item = NewItem(type, category, "Apprentice", properties);
+            item.Buy_Price = 400;
+            items.Add(item);
 
             properties[0].Value = 6;
-            items.Add(NewItem(type, category, "Novice", properties));
+            item = NewItem(type, category, "Novice", properties);
+            item.Buy_Price = 600;
+            items.Add(item);
 
             properties[0].Value = 8;
-            items.Add(NewItem(type, category, "Expert", properties));
+            item = NewItem(type, category, "Expert", properties);
+            item.Buy_Price = 800;
+            items.Add(item);
 
             properties[0].Value = 10;
-            items.Add(NewItem(type, category, "Master", properties));
+            item = NewItem(type, category, "Master", properties);
+            item.Buy_Price = 1000;
+            items.Add(item);
 
             return items;
         }
@@ -371,21 +477,75 @@ namespace DoS1.Util
 
             properties.Add(NewProperty("XP", "Value", 0, 10));
             properties.Add(NewProperty("Level", "Value", 1, 10));
+            Item item = NewItem(type, "Area", "Area", properties);
+            item.Buy_Price = 800;
+            item.Description = "On Weapon: applies paired rune's On Weapon effect to whole enemy squad on attack.\nOn Armor: passively applies paired rune's On Armor effect to your whole squad.";
+            items.Add(item);
 
-            items.Add(NewItem(type, "Area", "Area", properties));
-            items.Add(NewItem(type, "Counter", "Counter", properties));
-            items.Add(NewItem(type, "Death", "Death", properties));
-            items.Add(NewItem(type, "Disarm", "Disarm", properties));
-            items.Add(NewItem(type, "Drain", "Drain", properties));
-            items.Add(NewItem(type, "Earth", "Earth", properties));
-            items.Add(NewItem(type, "Effect", "Effect", properties));
-            items.Add(NewItem(type, "Fire", "Fire", properties));
-            items.Add(NewItem(type, "Life", "Life", properties));
-            items.Add(NewItem(type, "Mind", "Mind", properties));
-            items.Add(NewItem(type, "Physical", "Physical", properties));
-            items.Add(NewItem(type, "Time", "Time", properties));
-            items.Add(NewItem(type, "Water", "Water", properties));
-            items.Add(NewItem(type, "Wind", "Wind", properties));
+            item = NewItem(type, "Counter", "Counter", properties);
+            item.Buy_Price = 200;
+            item.Description = "On Weapon: 10% chance per Level for damage to bypass all defenses.\nOn Armor: 10% chance per Level to counter attack with weapon when hit.\nStatus: Weak.";
+            items.Add(item);
+
+            item = NewItem(type, "Death", "Death", properties);
+            item.Buy_Price = 600;
+            item.Description = "On Weapon: 10% chance per Level to instant kill target.\nOn Armor: 10% chance per Level to resist instant kill.\nStatus: Cursed.";
+            items.Add(item);
+
+            item = NewItem(type, "Disarm", "Disarm", properties);
+            item.Buy_Price = 400;
+            item.Description = "On Weapon: 10% chance per Level to destroy target's weapon.\nOn Armor: 10% chance per Level to destroy attacker's weapon when hit.\nStatus: Melting.";
+            items.Add(item);
+
+            item = NewItem(type, "Drain", "Drain", properties);
+            item.Buy_Price = 200;
+            item.Description = "On Weapon: 10% chance per Level to restore HP by amount of damage inflicted with paired rune.\nOn Armor: 10% chance per Level to restore EP by amount of damage received.\nStatus: Poisoned.";
+            items.Add(item);
+
+            item = NewItem(type, "Earth", "Earth", properties);
+            item.Buy_Price = 100;
+            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Earth damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Earth damage per Level.\nStatus: Petrified.";
+            items.Add(item);
+
+            item = NewItem(type, "Effect", "Effect", properties);
+            item.Buy_Price = 400;
+            item.Description = "On Weapon: 10% chance per Level to apply paired rune's Status effect on target.\nOn Armor: 10% chance per Level to resist paired rune's Status effect.";
+            items.Add(item);
+
+            item = NewItem(type, "Fire", "Fire", properties);
+            item.Buy_Price = 100;
+            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Fire damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Fire damage per Level.\nStatus: Burning.";
+            items.Add(item);
+
+            item = NewItem(type, "Life", "Life", properties);
+            item.Buy_Price = 200;
+            item.Description = "On Weapon: restore " + Handler.Element_Multiplier + " HP per Level on ally with lowest HP.\nOn Armor: restore extra " + Handler.Element_Multiplier + " HP per Level when HP is restored.\nStatus: Regenerating.";
+            items.Add(item);
+
+            item = NewItem(type, "Mind", "Mind", properties);
+            item.Buy_Price = 200;
+            item.Description = "On Weapon: restore " + Handler.Element_Multiplier + " EP per Level on ally with lowest EP.\nOn Armor: restore extra " + Handler.Element_Multiplier + " EP per Level when EP is restored.\nStatus: Charging.";
+            items.Add(item);
+
+            item = NewItem(type, "Physical", "Physical", properties);
+            item.Buy_Price = 100;
+            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Physical damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Physical damage per Level.\nStatus: Stunned.";
+            items.Add(item);
+
+            item = NewItem(type, "Time", "Time", properties);
+            item.Buy_Price = 200;
+            item.Description = "On Weapon: 10% chance per Level to skip target's next turn.\nOn Armor: 10% chance per Level to attack twice.\nStatus: Slow.";
+            items.Add(item);
+
+            item = NewItem(type, "Ice", "Ice", properties);
+            item.Buy_Price = 100;
+            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Ice damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Ice damage per Level.\nStatus: Frozen.";
+            items.Add(item);
+
+            item = NewItem(type, "Lightning", "Lightning", properties);
+            item.Buy_Price = 100;
+            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Lightning damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Lightning damage per Level.\nStatus: Confused.";
+            items.Add(item);
 
             return items;
         }
@@ -501,7 +661,7 @@ namespace DoS1.Util
                 }
                 else if (choice == 1)
                 {
-                    AddItem(ally, "Wind", "Wind", "Rune");
+                    AddItem(ally, "Lightning", "Lightning", "Rune");
                 }
                 else if (choice == 2)
                 {
@@ -509,7 +669,7 @@ namespace DoS1.Util
                 }
                 else if (choice == 3)
                 {
-                    AddItem(ally, "Water", "Water", "Rune");
+                    AddItem(ally, "Ice", "Ice", "Rune");
                 }
             }
         }
@@ -612,11 +772,13 @@ namespace DoS1.Util
             }
 
             copy.Name = original.Name;
+            copy.Description = original.Description;
             copy.Categories.AddRange(original.Categories);
             copy.Type = original.Type;
             copy.Materials.AddRange(original.Materials);
             copy.Task = original.Task;
             copy.Time = original.Time;
+            copy.Buy_Price = original.Buy_Price;
 
             foreach (Something property in original.Properties)
             {
@@ -711,12 +873,360 @@ namespace DoS1.Util
             return spell;
         }
 
+        public static Inventory Gen_Shop(int depth)
+        {
+            Inventory inventory = new Inventory();
+
+            CryptoRandom random = new CryptoRandom();
+            int min_tier = (int)Math.Ceiling(depth / 2.5);
+            int max_tier = (int)Math.Ceiling(depth / 1.5);
+            if (max_tier > 10)
+            {
+                max_tier = 10;
+            }
+
+            for (int i = 0; i < 20; i++)
+            {
+                #region Helms
+
+                random = new CryptoRandom();
+                int helm_tier = random.Next(min_tier, max_tier + 1);
+                switch (helm_tier)
+                {
+                    case 1:
+                        AddItem(inventory, "Cloth", "Cloth", "Helm");
+                        break;
+
+                    case 2:
+                        AddItem(inventory, "Leather", "Leather", "Helm");
+                        break;
+
+                    case 3:
+                        AddItem(inventory, "Iron", "Chainmail", "Helm");
+                        break;
+
+                    case 4:
+                        AddItem(inventory, "Copper", "Chainmail", "Helm");
+                        break;
+
+                    case 5:
+                        AddItem(inventory, "Bronze", "Chainmail", "Helm");
+                        break;
+
+                    case 6:
+                        AddItem(inventory, "Steel", "Chainmail", "Helm");
+                        break;
+
+                    case 7:
+                        AddItem(inventory, "Iron", "Platemail", "Helm");
+                        break;
+
+                    case 8:
+                        AddItem(inventory, "Copper", "Platemail", "Helm");
+                        break;
+
+                    case 9:
+                        AddItem(inventory, "Bronze", "Platemail", "Helm");
+                        break;
+
+                    case 10:
+                        AddItem(inventory, "Steel", "Platemail", "Helm");
+                        break;
+                }
+
+                #endregion
+
+                #region Armor
+
+                random = new CryptoRandom();
+                int armor_tier = random.Next(min_tier, max_tier + 1);
+                switch (armor_tier)
+                {
+                    case 1:
+                        AddItem(inventory, "Cloth", "Cloth", "Armor");
+                        break;
+
+                    case 2:
+                        AddItem(inventory, "Leather", "Leather", "Armor");
+                        break;
+
+                    case 3:
+                        AddItem(inventory, "Iron", "Chainmail", "Armor");
+                        break;
+
+                    case 4:
+                        AddItem(inventory, "Copper", "Chainmail", "Armor");
+                        break;
+
+                    case 5:
+                        AddItem(inventory, "Bronze", "Chainmail", "Armor");
+                        break;
+
+                    case 6:
+                        AddItem(inventory, "Steel", "Chainmail", "Armor");
+                        break;
+
+                    case 7:
+                        AddItem(inventory, "Iron", "Platemail", "Armor");
+                        break;
+
+                    case 8:
+                        AddItem(inventory, "Copper", "Platemail", "Armor");
+                        break;
+
+                    case 9:
+                        AddItem(inventory, "Bronze", "Platemail", "Armor");
+                        break;
+
+                    case 10:
+                        AddItem(inventory, "Steel", "Platemail", "Armor");
+                        break;
+                }
+
+                #endregion
+
+                #region Shields
+
+                random = new CryptoRandom();
+                int shield_tier = random.Next(min_tier, max_tier + 1);
+                switch (shield_tier)
+                {
+                    case 1:
+                        AddItem(inventory, "Wood", "Round", "Shield");
+                        break;
+
+                    case 2:
+                        AddItem(inventory, "Iron", "Round", "Shield");
+                        break;
+
+                    case 3:
+                        AddItem(inventory, "Copper", "Round", "Shield");
+                        break;
+
+                    case 4:
+                        AddItem(inventory, "Bronze", "Round", "Shield");
+                        break;
+
+                    case 5:
+                        AddItem(inventory, "Steel", "Round", "Shield");
+                        break;
+
+                    case 6:
+                        AddItem(inventory, "Wood", "Kite", "Shield");
+                        break;
+
+                    case 7:
+                        AddItem(inventory, "Iron", "Kite", "Shield");
+                        break;
+
+                    case 8:
+                        AddItem(inventory, "Copper", "Kite", "Shield");
+                        break;
+
+                    case 9:
+                        AddItem(inventory, "Bronze", "Kite", "Shield");
+                        break;
+
+                    case 10:
+                        AddItem(inventory, "Steel", "Kite", "Shield");
+                        break;
+                }
+
+                #endregion
+
+                #region Weapons
+
+                string weapon_type = "";
+
+                random = new CryptoRandom();
+                int weapon_choice = random.Next(0, 5);
+                switch (weapon_choice)
+                {
+                    case 0:
+                        weapon_type = "Sword";
+                        break;
+
+                    case 1:
+                        weapon_type = "Mace";
+                        break;
+
+                    case 2:
+                        weapon_type = "Axe";
+                        break;
+
+                    case 3:
+                        weapon_type = "Bow";
+                        break;
+
+                    case 4:
+                        weapon_type = "Grimoire";
+                        break;
+                }
+
+                random = new CryptoRandom();
+                int weapon_tier = random.Next(min_tier, max_tier + 1);
+
+                if (weapon_type == "Sword" ||
+                    weapon_type == "Mace" ||
+                    weapon_type == "Axe")
+                {
+                    switch (weapon_tier)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            AddItem(inventory, "Iron", weapon_type, "Weapon");
+                            break;
+
+                        case 4:
+                        case 5:
+                            AddItem(inventory, "Copper", weapon_type, "Weapon");
+                            break;
+
+                        case 6:
+                        case 7:
+                        case 8:
+                            AddItem(inventory, "Bronze", weapon_type, "Weapon");
+                            break;
+
+                        case 9:
+                        case 10:
+                            AddItem(inventory, "Steel", weapon_type, "Weapon");
+                            break;
+                    }
+                }
+                else if (weapon_type == "Bow")
+                {
+                    switch (weapon_tier)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            AddItem(inventory, "Elm", weapon_type, "Weapon");
+                            break;
+
+                        case 4:
+                        case 5:
+                        case 6:
+                            AddItem(inventory, "Cedar", weapon_type, "Weapon");
+                            break;
+
+                        case 7:
+                        case 8:
+                            AddItem(inventory, "Oak", weapon_type, "Weapon");
+                            break;
+
+                        case 9:
+                        case 10:
+                            AddItem(inventory, "Ebony", weapon_type, "Weapon");
+                            break;
+                    }
+                }
+                else if (weapon_type == "Grimoire")
+                {
+                    switch (weapon_tier)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            AddItem(inventory, "Apprentice", weapon_type, "Weapon");
+                            break;
+
+                        case 4:
+                        case 5:
+                        case 6:
+                            AddItem(inventory, "Novice", weapon_type, "Weapon");
+                            break;
+
+                        case 7:
+                        case 8:
+                            AddItem(inventory, "Expert", weapon_type, "Weapon");
+                            break;
+
+                        case 9:
+                        case 10:
+                            AddItem(inventory, "Master", weapon_type, "Weapon");
+                            break;
+                    }
+                }
+
+                #endregion
+
+                #region Runes
+
+                random = new CryptoRandom();
+                int rune_choice = random.Next(0, 4);
+                switch (rune_choice)
+                {
+                    case 0:
+                        AddItem(inventory, "Earth", "Earth", "Rune");
+                        break;
+
+                    case 1:
+                        AddItem(inventory, "Lightning", "Lightning", "Rune");
+                        break;
+
+                    case 2:
+                        AddItem(inventory, "Ice", "Ice", "Rune");
+                        break;
+
+                    case 3:
+                        AddItem(inventory, "Fire", "Fire", "Rune");
+                        break;
+
+                    case 4:
+                        AddItem(inventory, "Drain", "Drain", "Rune");
+                        break;
+
+                    case 5:
+                        AddItem(inventory, "Area", "Area", "Rune");
+                        break;
+
+                    case 6:
+                        AddItem(inventory, "Effect", "Effect", "Rune");
+                        break;
+
+                    case 7:
+                        AddItem(inventory, "Disarm", "Disarm", "Rune");
+                        break;
+
+                    case 8:
+                        AddItem(inventory, "Life", "Life", "Rune");
+                        break;
+
+                    case 9:
+                        AddItem(inventory, "Mind", "Mind", "Rune");
+                        break;
+
+                    case 10:
+                        AddItem(inventory, "Physical", "Physical", "Rune");
+                        break;
+
+                    case 11:
+                        AddItem(inventory, "Time", "Time", "Rune");
+                        break;
+
+                    case 12:
+                        AddItem(inventory, "Death", "Death", "Rune");
+                        break;
+
+                    case 13:
+                        AddItem(inventory, "Counter", "Counter", "Rune");
+                        break;
+                }
+
+                #endregion
+            }
+
+            return inventory;
+        }
+
         public static bool Element_IsDamage(string type)
         {
             if (type == "Fire" ||
-                type == "Wind" ||
+                type == "Lightning" ||
                 type == "Earth" ||
-                type == "Water")
+                type == "Ice")
             {
                 return true;
             }
@@ -796,6 +1306,35 @@ namespace DoS1.Util
         public static int Get_ItemIndex(Item item)
         {
             return (int)((item.Location.Y * 10) + item.Location.X);
+        }
+
+        public static int GetPrice(Item item)
+        {
+            Inventory assets = InventoryManager.GetInventory("Assets");
+            if (assets != null)
+            {
+                Item asset = null;
+
+                if (item.Type == "Weapon")
+                {
+                    asset = assets.GetItem(item.Materials[0] + " " + item.Categories[0]);
+                }
+                else if (item.Materials[0] == item.Categories[0])
+                {
+                    asset = assets.GetItem(item.Categories[0] + " " + item.Type);
+                }
+                else
+                {
+                    asset = assets.GetItem(item.Materials[0] + " " + item.Categories[0] + " " + item.Type);
+                }
+
+                if (asset != null)
+                {
+                    return (int)asset.Buy_Price;
+                }
+            }
+
+            return 0;
         }
 
         public static Item Get_LastItem(Inventory inventory)

@@ -8,6 +8,7 @@ using OP_Engine.Inventories;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
+using OP_Engine.Scenes;
 
 namespace DoS1.Util
 {
@@ -749,6 +750,22 @@ namespace DoS1.Util
             return null;
         }
 
+        public static Squad Get_Squad(Character leader)
+        {
+            foreach (Army army in CharacterManager.Armies)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    if (squad.GetLeader().ID == leader.ID)
+                    {
+                        return squad;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static int Get_CharacterIndex(Character character)
         {
             return (int)((character.Formation.Y * 10) + character.Formation.X);
@@ -839,6 +856,7 @@ namespace DoS1.Util
 
                     if (!enemy_targeted)
                     {
+                        squad.GetLeader().Target_ID = 0;
                         squad.Coordinates = destination.Location;
                     }
                 }

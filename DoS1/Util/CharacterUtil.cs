@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Characters;
 
@@ -67,6 +68,48 @@ namespace DoS1.Util
                 if (character.ManaBar.Visible)
                 {
                     character.ManaBar.Draw(spriteBatch);
+                }
+            }
+        }
+
+        public static void DrawCharacter_Portrait(SpriteBatch spriteBatch, Picture portraitBox, Character character)
+        {
+            if (character != null &&
+                !character.Dead)
+            {
+                int x = 0;
+                int width = 0;
+                int height = 0;
+
+                int margin = (int)(portraitBox.Region.Width * 3.125f / 100);
+                Rectangle region = new Rectangle((int)portraitBox.Region.X + margin, (int)portraitBox.Region.Y + margin, (int)portraitBox.Region.Width - (margin * 2), (int)portraitBox.Region.Height - (margin * 2));
+
+                Item item = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (item != null)
+                {
+                    x = (item.Texture.Width / 32) * 3;
+                    width = item.Texture.Width / 16;
+                    height = item.Texture.Height / 4;
+
+                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (item != null)
+                {
+                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), item.DrawColor);
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (item != null)
+                {
+                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), item.DrawColor);
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (item != null)
+                {
+                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
             }
         }

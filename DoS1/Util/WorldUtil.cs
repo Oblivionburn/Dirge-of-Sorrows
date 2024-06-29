@@ -803,31 +803,54 @@ namespace DoS1.Util
             return null;
         }
 
+        public static Tile GetLocation(Squad squad)
+        {
+            if (squad != null)
+            {
+                Scene scene = SceneManager.GetScene("Localmap");
+                if (scene.World.Maps.Any())
+                {
+                    Map map = scene.World.Maps[0];
+                    if (map != null)
+                    {
+                        Layer locations = map.GetLayer("Locations");
+                        if (locations != null)
+                        {
+                            foreach (Tile location in locations.Tiles)
+                            {
+                                if (squad.Location.X == location.Location.X &&
+                                    squad.Location.Y == location.Location.Y)
+                                {
+                                    return location;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static void AllyToken_Start(Squad squad, Map map)
         {
-            if (squad.Type == "Ally")
+            Tile ally_base = Get_Base(map, "Ally");
+            if (ally_base != null)
             {
-                Tile ally_base = Get_Base(map, "Ally");
-                if (ally_base != null)
-                {
-                    squad.Location = new Location(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
-                    squad.Region = new Region(ally_base.Region.X, ally_base.Region.Y, ally_base.Region.Width, ally_base.Region.Height);
-                    squad.Visible = true;
-                }
+                squad.Location = new Location(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
+                squad.Region = new Region(ally_base.Region.X, ally_base.Region.Y, ally_base.Region.Width, ally_base.Region.Height);
+                squad.Visible = true;
             }
         }
 
         public static void EnemyToken_Start(Squad squad, Map map)
         {
-            if (squad.Type == "Enemy")
+            Tile enemy_base = Get_Base(map, "Enemy");
+            if (enemy_base != null)
             {
-                Tile enemy_base = Get_Base(map, "Enemy");
-                if (enemy_base != null)
-                {
-                    squad.Location = new Location(enemy_base.Location.X, enemy_base.Location.Y, enemy_base.Location.Z);
-                    squad.Region = new Region(enemy_base.Region.X, enemy_base.Region.Y, enemy_base.Region.Width, enemy_base.Region.Height);
-                    squad.Visible = true;
-                }
+                squad.Location = new Location(enemy_base.Location.X, enemy_base.Location.Y, enemy_base.Location.Z);
+                squad.Region = new Region(enemy_base.Region.X, enemy_base.Region.Y, enemy_base.Region.Width, enemy_base.Region.Height);
+                squad.Visible = true;
             }
         }
 
@@ -884,7 +907,25 @@ namespace DoS1.Util
                             Vector2 path_location = new Vector2(path.X, path.Y);
                             Vector2 squad_location = new Vector2(squad.Location.X, squad.Location.Y);
 
+                            if (squad_location.X < path_location.X)
+                            {
+                                squad.Direction = Direction.East;
+                            }
+                            else if (squad_location.X > path_location.X)
+                            {
+                                squad.Direction = Direction.West;
+                            }
+                            else if (squad_location.Y < path_location.Y)
+                            {
+                                squad.Direction = Direction.South;
+                            }
+                            else if (squad_location.Y > path_location.Y)
+                            {
+                                squad.Direction = Direction.North;
+                            }
+
                             Tile destination = ground.GetTile(path_location);
+                            Tile location = ground.GetTile(squad_location);
 
                             squad.Move_TotalDistance = Main.Game.TileSize.X;
                             squad.Moving = true;
@@ -895,47 +936,8 @@ namespace DoS1.Util
                             Squad other_squad = CheckSquadCollision(squad);
                             if (other_squad != null)
                             {
-                                Vector2 other_squad_location = new Vector2(other_squad.Location.X, other_squad.Location.Y);
-
-                                Handler.Combat_Terrain = Get_Terrain(map, other_squad_location);
-
-                                Handler.Combat_Ally_Base = false;
-                                Handler.Combat_Enemy_Base = false;
-
-                                if (squad.Type == "Ally")
-                                {
-                                    Handler.Combat_Ally_Squad = squad.ID;
-                                    Handler.Combat_Enemy_Squad = other_squad.ID;
-
-                                    Tile enemy_base = Get_Base(map, "Enemy");
-                                    if (enemy_base != null)
-                                    {
-                                        if (other_squad_location.X == enemy_base.Location.X &&
-                                            other_squad_location.Y == enemy_base.Location.Y)
-                                        {
-                                            Handler.Combat_Enemy_Base = true;
-                                        }
-                                    }
-                                }
-                                else if (squad.Type == "Enemy")
-                                {
-                                    Handler.Combat_Ally_Squad = other_squad.ID;
-                                    Handler.Combat_Enemy_Squad = squad.ID;
-
-                                    Tile ally_base = Get_Base(map, "Ally");
-                                    if (ally_base != null)
-                                    {
-                                        if (other_squad_location.X == ally_base.Location.X &&
-                                            other_squad_location.Y == ally_base.Location.Y)
-                                        {
-                                            Handler.Combat_Ally_Base = true;
-                                        }
-                                    }
-                                }
-
-                                Main.Timer.Stop();
-                                CameraToTile(map, ground, destination);
-                                GameUtil.Alert_Combat(squad.Name, other_squad.Name);
+                                squad.Region = new Region(location.Region.X, location.Region.Y, location.Region.Width, location.Region.Height);
+                                GameUtil.StartCombat(map, ground, destination, squad, other_squad);
                             }
 
                             if (squad.Location.X == squad.Destination.X &&
@@ -952,6 +954,17 @@ namespace DoS1.Util
                                     if (target_location != null)
                                     {
                                         ArmyUtil.SetPath(MenuManager.GetMenu("UI"), map, target_location);
+                                    }
+                                }
+
+                                //Check if landing at location
+                                if (!squad.Path.Any())
+                                {
+                                    Layer locations = map.GetLayer("Locations");
+                                    Tile location_tile = locations.GetTile(squad.Destination);
+                                    if (location_tile != null)
+                                    {
+                                        GameUtil.Alert_Location(squad, location_tile);
                                     }
                                 }
                             }

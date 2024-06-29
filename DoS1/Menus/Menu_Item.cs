@@ -486,7 +486,7 @@ namespace DoS1.Menus
                 Something property = selectedItem.GetProperty(element + " " + effect);
                 if (property != null)
                 {
-                    property.Value += level.Value * 8;
+                    property.Value += level.Value * Handler.Element_Multiplier;
                 }
                 else
                 {
@@ -495,7 +495,7 @@ namespace DoS1.Menus
                         Name = element + " " + effect,
                         Type = element,
                         Assignment = effect,
-                        Value = level.Value * 8
+                        Value = level.Value * Handler.Element_Multiplier
                     });
                 }
 
@@ -514,6 +514,8 @@ namespace DoS1.Menus
                         Value = level.Value
                     });
                 }
+
+                selectedItem.Buy_Price += InventoryUtil.GetPrice(item);
             }
         }
 
@@ -547,7 +549,7 @@ namespace DoS1.Menus
                 Something property = selectedItem.GetProperty(element + " " + effect);
                 if (property != null)
                 {
-                    property.Value -= level.Value * 8;
+                    property.Value -= level.Value * Handler.Element_Multiplier;
                     if (property.Value <= 0)
                     {
                         selectedItem.Properties.Remove(property);
@@ -563,6 +565,8 @@ namespace DoS1.Menus
                         selectedItem.Properties.Remove(cost);
                     }
                 }
+
+                selectedItem.Buy_Price -= InventoryUtil.GetPrice(item);
             }
         }
 
@@ -597,9 +601,25 @@ namespace DoS1.Menus
         private void ExamineItem(Item item)
         {
             int width = (Main.Game.MenuSize.X * 4) + (Main.Game.MenuSize.X / 2);
+            if (item.Type == "Rune")
+            {
+                width = (Main.Game.MenuSize.X * 10) + (Main.Game.MenuSize.X / 2);
+            }
+            else if (item.Type == "Weapon" &&
+                     item.Categories.Contains("Grimoire"))
+            {
+                width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
+            }
+
             int height = Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
 
-            string text = item.Name + "\n";
+            string text = item.Name + "\n\n";
+
+            if (!string.IsNullOrEmpty(item.Description))
+            {
+                text += item.Description + "\n";
+                height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
+            }
 
             for (int i = 0; i < item.Properties.Count; i++)
             {

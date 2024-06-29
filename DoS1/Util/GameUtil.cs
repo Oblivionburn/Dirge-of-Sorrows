@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
+
+using Microsoft.Xna.Framework;
 
 using OP_Engine.Menus;
 using OP_Engine.Controls;
@@ -11,6 +14,8 @@ using OP_Engine.Weathers;
 using OP_Engine.Utility;
 using OP_Engine.Time;
 using OP_Engine.Tiles;
+
+using OP_Engine.Characters;
 
 namespace DoS1.Util
 {
@@ -112,6 +117,35 @@ namespace DoS1.Util
             }
         }
 
+        public static void ReturnToWorldmap()
+        {
+            Handler.TradingInventory.Items.Clear();
+            Handler.TradingInventory = null;
+
+            TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
+
+            Handler.LocalMap = false;
+
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.GetButton("Worldmap").Visible = false;
+            ui.GetButton("PlayPause").Enabled = false;
+            ui.GetButton("Speed").Enabled = false;
+
+            Main.TimeSpeed = 1;
+
+            Button speed = ui.GetButton("Speed");
+            speed.Value = 0;
+            speed.HoverText = "x1";
+            speed.Texture = AssetManager.Textures["Button_Speed1"];
+            speed.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
+            speed.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
+
+            SceneManager.ChangeScene("Worldmap");
+
+            SoundManager.StopMusic();
+            SoundManager.NeedMusic = true;
+        }
+
         public static void Examine(Menu menu, string text)
         {
             Label examine = menu.GetLabel("Examine");
@@ -144,6 +178,100 @@ namespace DoS1.Util
             examine.Visible = true;
         }
 
+        public static string WrapText(string text)
+        {
+            string result = "";
+
+            List<string> text_parts = new List<string>();
+            int max_length = 39;
+
+            string full_text = text;
+            if (full_text.Length > max_length)
+            {
+                for (int m = 0; m < full_text.Length; m++)
+                {
+                    int index_break = 0;
+                    for (int i = max_length; i > 0; i--)
+                    {
+                        if (full_text[i] == ' ')
+                        {
+                            index_break = i;
+                            break;
+                        }
+                    }
+
+                    string text_part = full_text.Substring(0, index_break);
+                    text_parts.Add(text_part);
+
+                    full_text = full_text.Remove(0, index_break);
+                    m = 0;
+
+                    if (full_text.Length < max_length)
+                    {
+                        text_parts.Add(full_text);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                text_parts.Add(full_text);
+            }
+
+            for (int i = 0; i < text_parts.Count; i++)
+            {
+                result += text_parts[i] + "\n";
+            }
+
+            return result;
+        }
+
+        public static void StartCombat(Map map, Layer ground, Tile destination, Squad squad, Squad other_squad)
+        {
+            Vector2 other_squad_location = new Vector2(other_squad.Location.X, other_squad.Location.Y);
+
+            Handler.Combat_Terrain = WorldUtil.Get_Terrain(map, other_squad_location);
+
+            Handler.Combat_Ally_Base = false;
+            Handler.Combat_Enemy_Base = false;
+
+            if (squad.Type == "Ally")
+            {
+                Handler.Combat_Ally_Squad = squad.ID;
+                Handler.Combat_Enemy_Squad = other_squad.ID;
+
+                Tile enemy_base = WorldUtil.Get_Base(map, "Enemy");
+                if (enemy_base != null)
+                {
+                    if (other_squad_location.X == enemy_base.Location.X &&
+                        other_squad_location.Y == enemy_base.Location.Y)
+                    {
+                        Handler.Combat_Enemy_Base = true;
+                    }
+                }
+            }
+            else if (squad.Type == "Enemy")
+            {
+                Handler.Combat_Ally_Squad = other_squad.ID;
+                Handler.Combat_Enemy_Squad = squad.ID;
+
+                Tile ally_base = WorldUtil.Get_Base(map, "Ally");
+                if (ally_base != null)
+                {
+                    if (other_squad_location.X == ally_base.Location.X &&
+                        other_squad_location.Y == ally_base.Location.Y)
+                    {
+                        Handler.Combat_Ally_Base = true;
+                    }
+                }
+            }
+
+            squad.Path.Clear();
+            Main.Timer.Stop();
+            WorldUtil.CameraToTile(map, ground, destination);
+            Alert_Combat(squad.Name, other_squad.Name);
+        }
+
         public static void Alert_Combat(string attacker_name, string defender_name)
         {
             Main.LocalPause = true;
@@ -164,7 +292,7 @@ namespace DoS1.Util
 
             Button alert = ui.GetButton("Alert");
             alert.Selected = false;
-            alert.Opacity = 0.8f;
+            alert.Opacity = 1;
             alert.Visible = true;
 
             Label attacker = ui.GetLabel("Combat_Attacker");
@@ -180,6 +308,129 @@ namespace DoS1.Util
             defender.Text = defender_name;
             defender.Region = new Region(alert.Region.X, alert.Region.Y + (height * 2), alert.Region.Width, height);
             defender.Visible = true;
+
+            Picture mouseClick = ui.GetPicture("MouseClick");
+            mouseClick.Region = new Region(alert.Region.X + alert.Region.Width, alert.Region.Y + alert.Region.Height - height, height, height);
+            mouseClick.Image = new Rectangle(0, 0, mouseClick.Texture.Width / 4, mouseClick.Texture.Height);
+            mouseClick.Visible = true;
+        }
+
+        public static void Alert_Location(Squad squad, Tile tile)
+        {
+            Main.LocalPause = true;
+            SoundManager.AmbientPaused = true;
+
+            bool captured = false;
+            bool liberated = false;
+            bool has_shop = false;
+            bool has_academy = false;
+
+            Scene scene = SceneManager.GetScene("Localmap");
+            if (scene.World.Maps.Any())
+            {
+                Map map = scene.World.Maps[0];
+                if (map != null)
+                {
+                    Layer ground = map.GetLayer("Ground");
+                    Layer locations = map.GetLayer("Locations");
+
+                    foreach (Tile location in locations.Tiles)
+                    {
+                        if (squad.Location.X == location.Location.X &&
+                            squad.Location.Y == location.Location.Y)
+                        {
+                            if (location.Type.Contains("Enemy"))
+                            {
+                                liberated = true;
+                            }
+                            else if (location.Type.Contains("Neutral"))
+                            {
+                                captured = true;
+                            }
+
+                            if (location.Type.Contains("Academy"))
+                            {
+                                has_academy = true;
+                                location.Type = "Academy_Ally";
+                                location.Texture = AssetManager.Textures["Tile_Academy_Ally"];
+                            }
+                            else if (location.Type.Contains("Shop"))
+                            {
+                                has_shop = true;
+                                location.Type = "Shop_Ally";
+                                location.Texture = AssetManager.Textures["Tile_Shop_Ally"];
+                            }
+                            else
+                            {
+                                location.Type = "Town_Ally";
+                                location.Texture = AssetManager.Textures["Tile_Town_Ally"];
+                            }
+
+                            WorldUtil.CameraToTile(map, ground, location);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            Handler.Dialogue_Character1 = squad.GetLeader();
+
+            Menu ui = MenuManager.GetMenu("UI");
+
+            //Local pause
+            Button button = ui.GetButton("PlayPause");
+            button.Value = 1;
+            button.HoverText = "Play";
+            button.Texture = AssetManager.Textures["Button_Play"];
+            button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+            button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+
+            Handler.AlertType = "Location";
+
+            string message;
+            if (liberated)
+            {
+                message = squad.Name + ": \"We liberated " + tile.Name + ".";
+            }
+            else if (captured)
+            {
+                message = squad.Name + ": \"We captured " + tile.Name + ".";
+            }
+            else
+            {
+                message = squad.Name + ": \"We arrived at " + tile.Name + ".";
+            }
+
+            if (has_academy)
+            {
+                message += " There's an academy here we could recruit some people from.";
+            }
+            else if (has_shop)
+            {
+                message += " There's a shop here we could buy some equipment from.";
+            }
+
+            message += "\"";
+
+            Label dialogue = ui.GetLabel("Dialogue");
+            dialogue.Visible = true;
+            dialogue.Text = WrapText(message);
+
+            int height = Main.Game.MenuSize.X;
+
+            Picture picture = ui.GetPicture("Dialogue_Portrait1");
+            picture.Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 2), height * 3, height * 3);
+            picture.Visible = true;
+
+            Button option1 = ui.GetButton("Dialogue_Option1");
+            option1.Text = "Enter Town";
+            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+            option1.Visible = true;
+
+            Button option2 = ui.GetButton("Dialogue_Option2");
+            option2.Text = "Move Out";
+            option2.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+            option2.Visible = true;
         }
 
         public static void Toggle_Pause()
