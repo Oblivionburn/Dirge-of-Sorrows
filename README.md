@@ -19,6 +19,7 @@
 - Menu for viewing general inventory of player army
 - Menu for buying/selling items in shops
 - Combat screen and basic combat mechanics
+- Single enemy squad for combat testing
 #
 ### Planned features not yet implemented:
 - Menu for purchasing more characters at academy towns
@@ -26,6 +27,7 @@
 - Right-clicking squads on map to view their characters/formation
 - Context menu to handle selection of a squad when there's multiple in one location
 - Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
+- Generation of enemy squads on maps with increasing amount/difficulty/equipment
 - AI to control enemy squad movement on map
 - Enemy squads capturing towns
 - Losing game (or just the level?) if enemy squad reaches player base
