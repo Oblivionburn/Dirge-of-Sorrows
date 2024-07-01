@@ -46,7 +46,7 @@ namespace DoS1.Util
             GenLocations(world, world_ground, world_locations, 0, false);
             world_map.Layers.Add(world_locations);
 
-            Layer world_pathing = NewLayer(world_map, "Pathing", 0);
+            Layer world_pathing = NewLayer(world_map, "Roads", 0);
             world_map.Layers.Add(world_pathing);
 
             AlignRegions(world_map);
@@ -154,7 +154,7 @@ namespace DoS1.Util
                 DrawColor = Color.White,
                 Name = name,
                 Rows = 5,
-                Columns = 21
+                Columns = 11
             };
         }
 
@@ -190,9 +190,9 @@ namespace DoS1.Util
 
         public static void GenCombatGround(Layer layer, string type)
         {
-            int width = Main.Game.Resolution.X / layer.Columns;
-            int height = width;
-            int starting_y = Main.Game.Resolution.Y - (height * layer.Rows);
+            float starting_y = ((float)Main.Game.Resolution.Y / 8) * 5;
+            float width = (float)Main.Game.Resolution.X / layer.Columns;
+            float height = (Main.Game.Resolution.Y - starting_y) / layer.Rows;
 
             if (type == "Water")
             {
@@ -200,7 +200,7 @@ namespace DoS1.Util
                 {
                     for (int x = 0; x < layer.Columns; x++)
                     {
-                        Region region = new Region(x * width, starting_y + (y * height), width, height);
+                        Region region = new Region(x * width, y * height, width, height);
 
                         if (y == 0 ||
                             y == layer.Rows - 1 ||
@@ -222,7 +222,7 @@ namespace DoS1.Util
                 {
                     for (int x = 0; x < layer.Columns; x++)
                     {
-                        Region region = new Region(x * width, starting_y + (y * height), width, height);
+                        Region region = new Region(x * width, y * height, width, height);
 
                         if (type.Contains("Forest"))
                         {
@@ -276,31 +276,20 @@ namespace DoS1.Util
 
                 foreach (Tile location in layer.Tiles)
                 {
-                    if (location.Name == "Base_Ally")
-                    {
-                        location.Name = "Ally Base";
-                    }
-                    else if (location.Name == "Base_Enemy")
-                    {
-                        location.Name = "Enemy Base";
-                    }
-                    else
-                    {
-                        random = new CryptoRandom();
-                        location.Name = world.Names[random.Next(0, world.Names.Count)];
-                    }
+                    random = new CryptoRandom();
+                    location.Name = world.Names[random.Next(0, world.Names.Count)];
                 }
             }
         }
 
-        public static void GenRoads(Layer ground, Layer locations, Layer layer)
+        public static void GenRoads(Layer ground, Layer locations, Layer roads)
         {
             for (int i = 0; i < locations.Tiles.Count - 1; i++)
             {
-                GenRoad(ground, layer, locations.Tiles[i], locations.Tiles[i + 1], 0);
+                GenRoad(ground, roads, locations.Tiles[i], locations.Tiles[i + 1], 0);
             }
 
-            foreach (Tile road in layer.Tiles)
+            foreach (Tile road in roads.Tiles)
             {
                 Tile location = WorldUtil.Get_Tile(locations, new Vector2(road.Location.X, road.Location.Y));
                 if (location != null)
@@ -936,7 +925,7 @@ namespace DoS1.Util
             }
         }
 
-        public static void GenRoad(Layer ground, Layer layer, Tile current, Tile destination, Direction previous_direction)
+        public static void GenRoad(Layer ground, Layer roads, Tile current, Tile destination, Direction previous_direction)
         {
             random = new CryptoRandom();
 
@@ -1286,7 +1275,7 @@ namespace DoS1.Util
 
                 if (!string.IsNullOrEmpty(road))
                 {
-                    layer.Tiles.Add(NewTile(layer, road, new Vector2(current.Location.X, current.Location.Y), current.Region));
+                    roads.Tiles.Add(NewTile(roads, road, new Vector2(current.Location.X, current.Location.Y), current.Region));
                 }
 
                 if (next_coord != default)
@@ -1294,7 +1283,7 @@ namespace DoS1.Util
                     Tile next_tile = ground.GetTile(next_coord);
                     if (next_tile != null)
                     {
-                        GenRoad(ground, layer, next_tile, destination, previous_direction);
+                        GenRoad(ground, roads, next_tile, destination, previous_direction);
                     }
                 }
             }

@@ -8,7 +8,6 @@ using OP_Engine.Inventories;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
-using OP_Engine.Scenes;
 
 namespace DoS1.Util
 {

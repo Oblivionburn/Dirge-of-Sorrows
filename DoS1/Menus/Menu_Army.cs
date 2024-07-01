@@ -179,8 +179,10 @@ namespace DoS1.Menus
                 Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
                 {
-                    foreach (Squad squad in army.Squads)
+                    for (int i = 0; i < army.Squads.Count; i++)
                     {
+                        Squad squad = army.Squads[i];
+
                         foreach (Picture picture in Pictures)
                         {
                             if (picture.ID == squad.ID &&
@@ -205,7 +207,8 @@ namespace DoS1.Menus
                                         SelectSquad(squad.ID);
                                         break;
                                     }
-                                    else if (InputManager.Mouse_LB_Pressed)
+                                    else if (InputManager.Mouse_LB_Pressed &&
+                                             i > 0) //Prevent removing last squad
                                     {
                                         SelectedSquad = squad.ID;
                                         GetButton("Remove").Enabled = true;

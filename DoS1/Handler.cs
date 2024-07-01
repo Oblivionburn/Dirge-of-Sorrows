@@ -25,11 +25,16 @@ namespace DoS1
 
         public static long ID;
         public static int Gold = 1000;
+        public static long MainCharacter_ID;
+        public static string AlertType;
+
         public static bool LocalMap;
         public static int Level;
         public static bool MovingGrid;
         public static int MoveGridDelay;
-        public static string AlertType;
+
+        public static bool ManualPause;
+        public static bool LocalPause;
 
         public static long Selected_Token = -1;
         public static long Selected_Squad;
@@ -206,8 +211,6 @@ namespace DoS1
                 "Combat",
                 "Desert",
                 "GameOver",
-                "Loading",
-                "Night",
                 "Plains",
                 "Snowy",
                 "Title",

@@ -226,55 +226,9 @@ namespace DoS1.Util
             return result;
         }
 
-        public static void StartCombat(Map map, Layer ground, Tile destination, Squad squad, Squad other_squad)
-        {
-            Vector2 other_squad_location = new Vector2(other_squad.Location.X, other_squad.Location.Y);
-
-            Handler.Combat_Terrain = WorldUtil.Get_Terrain(map, other_squad_location);
-
-            Handler.Combat_Ally_Base = false;
-            Handler.Combat_Enemy_Base = false;
-
-            if (squad.Type == "Ally")
-            {
-                Handler.Combat_Ally_Squad = squad.ID;
-                Handler.Combat_Enemy_Squad = other_squad.ID;
-
-                Tile enemy_base = WorldUtil.Get_Base(map, "Enemy");
-                if (enemy_base != null)
-                {
-                    if (other_squad_location.X == enemy_base.Location.X &&
-                        other_squad_location.Y == enemy_base.Location.Y)
-                    {
-                        Handler.Combat_Enemy_Base = true;
-                    }
-                }
-            }
-            else if (squad.Type == "Enemy")
-            {
-                Handler.Combat_Ally_Squad = other_squad.ID;
-                Handler.Combat_Enemy_Squad = squad.ID;
-
-                Tile ally_base = WorldUtil.Get_Base(map, "Ally");
-                if (ally_base != null)
-                {
-                    if (other_squad_location.X == ally_base.Location.X &&
-                        other_squad_location.Y == ally_base.Location.Y)
-                    {
-                        Handler.Combat_Ally_Base = true;
-                    }
-                }
-            }
-
-            squad.Path.Clear();
-            Main.Timer.Stop();
-            WorldUtil.CameraToTile(map, ground, destination);
-            Alert_Combat(squad.Name, other_squad.Name);
-        }
-
         public static void Alert_Combat(string attacker_name, string defender_name)
         {
-            Main.LocalPause = true;
+            Handler.LocalPause = true;
             SoundManager.AmbientPaused = true;
 
             Menu ui = MenuManager.GetMenu("UI");
@@ -317,18 +271,22 @@ namespace DoS1.Util
 
         public static void Alert_Location(Squad squad, Tile tile)
         {
-            Main.LocalPause = true;
-            SoundManager.AmbientPaused = true;
+            LocalPause();
+
+            Handler.Dialogue_Character1 = squad.GetLeader();
+            Handler.AlertType = "Location";
 
             bool captured = false;
             bool liberated = false;
-            bool has_shop = false;
-            bool has_academy = false;
+            bool is_shop = false;
+            bool is_academy = false;
+            bool is_base = false;
+            bool captured_enemy_base = false;
 
             Scene scene = SceneManager.GetScene("Localmap");
             if (scene.World.Maps.Any())
             {
-                Map map = scene.World.Maps[0];
+                Map map = scene.World.Maps[Handler.Level];
                 if (map != null)
                 {
                     Layer ground = map.GetLayer("Ground");
@@ -350,22 +308,28 @@ namespace DoS1.Util
 
                             if (location.Type.Contains("Academy"))
                             {
-                                has_academy = true;
-                                location.Type = "Academy_Ally";
-                                location.Texture = AssetManager.Textures["Tile_Academy_Ally"];
+                                is_academy = true;
                             }
                             else if (location.Type.Contains("Shop"))
                             {
-                                has_shop = true;
-                                location.Type = "Shop_Ally";
-                                location.Texture = AssetManager.Textures["Tile_Shop_Ally"];
+                                is_shop = true;
                             }
-                            else
+                            else if (location.Type.Contains("Base"))
                             {
-                                location.Type = "Town_Ally";
-                                location.Texture = AssetManager.Textures["Tile_Town_Ally"];
+                                is_base = true;
                             }
 
+                            if (liberated &&
+                                is_base)
+                            {
+                                captured_enemy_base = true;
+                            }
+
+                            if (!is_base)
+                            {
+                                WorldUtil.ChangeLocation(location, squad);
+                            }
+                            
                             WorldUtil.CameraToTile(map, ground, location);
                             break;
                         }
@@ -373,24 +337,10 @@ namespace DoS1.Util
                 }
             }
 
-            Handler.Dialogue_Character1 = squad.GetLeader();
-
-            Menu ui = MenuManager.GetMenu("UI");
-
-            //Local pause
-            Button button = ui.GetButton("PlayPause");
-            button.Value = 1;
-            button.HoverText = "Play";
-            button.Texture = AssetManager.Textures["Button_Play"];
-            button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
-            button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
-
-            Handler.AlertType = "Location";
-
             string message;
             if (liberated)
             {
-                message = squad.Name + ": \"We liberated " + tile.Name + ".";
+                message = squad.Name + ": \"We liberated " + tile.Name + "!";
             }
             else if (captured)
             {
@@ -401,16 +351,64 @@ namespace DoS1.Util
                 message = squad.Name + ": \"We arrived at " + tile.Name + ".";
             }
 
-            if (has_academy)
+            if (is_academy)
             {
                 message += " There's an academy here we could recruit some people from.";
             }
-            else if (has_shop)
+            else if (is_shop)
             {
                 message += " There's a shop here we could buy some equipment from.";
             }
+            else if (captured_enemy_base)
+            {
+                message += " The enemy will no longer hold control over this region... it's ours now!";
+            }
 
             message += "\"";
+
+            Menu ui = MenuManager.GetMenu("UI");
+
+            Label dialogue = ui.GetLabel("Dialogue");
+            dialogue.Visible = true;
+            dialogue.Text = WrapText(message);
+
+            int height = Main.Game.MenuSize.X;
+
+            Picture picture = ui.GetPicture("Dialogue_Portrait1");
+            picture.Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 2), height * 3, height * 3);
+            picture.Visible = true;
+
+            if (!captured_enemy_base)
+            {
+                Button option1 = ui.GetButton("Dialogue_Option1");
+                option1.Text = "Enter Town";
+                option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+                option1.Visible = true;
+
+                Button option2 = ui.GetButton("Dialogue_Option2");
+                option2.Text = "Move Out";
+                option2.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+                option2.Visible = true;
+            }
+            else
+            {
+                Button option1 = ui.GetButton("Dialogue_Option1");
+                option1.Text = "Claim Region";
+                option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+                option1.Visible = true;
+            }
+        }
+
+        public static void Alert_MoveFinished(Squad squad)
+        {
+            LocalPause();
+
+            Handler.Dialogue_Character1 = squad.GetLeader();
+            Handler.AlertType = "MoveFinished";
+
+            string message = squad.Name + ": \"We have arrived at our destination.\"";
+
+            Menu ui = MenuManager.GetMenu("UI");
 
             Label dialogue = ui.GetLabel("Dialogue");
             dialogue.Visible = true;
@@ -423,40 +421,59 @@ namespace DoS1.Util
             picture.Visible = true;
 
             Button option1 = ui.GetButton("Dialogue_Option1");
-            option1.Text = "Enter Town";
-            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+            option1.Text = "(Continue)";
+            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
             option1.Visible = true;
-
-            Button option2 = ui.GetButton("Dialogue_Option2");
-            option2.Text = "Move Out";
-            option2.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
-            option2.Visible = true;
         }
 
-        public static void Toggle_Pause()
+        public static void Toggle_Pause(bool manual)
         {
-            Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
+            if (Handler.LocalPause)
+            {
+                if (manual)
+                {
+                    Handler.ManualPause = false;
+                    LocalUnpause();
+                }
+                else if (!Handler.ManualPause)
+                {
+                    //Don't auto-unpause if player had intentionally paused
+                    LocalUnpause();
+                }
+            }
+            else
+            {
+                if (manual)
+                {
+                    Handler.ManualPause = true;
+                }
 
-            if (button.Value == 0)
-            {
-                Main.LocalPause = true;
-                SoundManager.AmbientPaused = true;
-                button.Value = 1;
-                button.HoverText = "Play";
-                button.Texture = AssetManager.Textures["Button_Play"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+                LocalPause();
             }
-            else if (button.Value == 1)
-            {
-                Main.LocalPause = false;
-                SoundManager.AmbientPaused = false;
-                button.Value = 0;
-                button.HoverText = "Pause";
-                button.Texture = AssetManager.Textures["Button_Pause"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
-            }
+        }
+
+        public static void LocalPause()
+        {
+            Handler.LocalPause = true;
+            SoundManager.AmbientPaused = true;
+
+            Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
+            button.HoverText = "Play";
+            button.Texture = AssetManager.Textures["Button_Play"];
+            button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+            button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+        }
+
+        public static void LocalUnpause()
+        {
+            Handler.LocalPause = false;
+            SoundManager.AmbientPaused = false;
+
+            Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
+            button.HoverText = "Pause";
+            button.Texture = AssetManager.Textures["Button_Pause"];
+            button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
+            button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
         }
 
         public static void Toggle_MainMenu()

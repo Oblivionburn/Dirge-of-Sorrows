@@ -48,7 +48,7 @@ namespace DoS1.Scenes
 
                     if (World.Maps.Any())
                     {
-                        Map map = World.Maps[0];
+                        Map map = World.Maps[Handler.Level];
 
                         if (map.Type.Contains("Snow") ||
                             map.Type.Contains("Ice"))
@@ -72,7 +72,23 @@ namespace DoS1.Scenes
         {
             if (Visible)
             {
-                base.DrawWorld(spriteBatch, resolution, color);
+                foreach (Map map in World.Maps)
+                {
+                    if (map.Visible)
+                    {
+                        foreach (Layer layer in map.Layers)
+                        {
+                            if (layer.Name == "Pathing")
+                            {
+                                layer.Draw(spriteBatch, resolution, Color.White);
+                            }
+                            else
+                            {
+                                layer.Draw(spriteBatch, resolution, color);
+                            }
+                        }
+                    }
+                }
 
                 foreach (Army army in CharacterManager.Armies)
                 {
@@ -97,7 +113,7 @@ namespace DoS1.Scenes
         {
             if (World.Maps.Any())
             {
-                WorldUtil.Resize_OnZoom(World.Maps[0]);
+                WorldUtil.Resize_OnZoom(World.Maps[Handler.Level]);
             }
         }
 

@@ -393,6 +393,7 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
             MenuManager.ChangeMenu_Previous();
+            GameUtil.Toggle_Pause(false);
         }
 
         private void BuyItem(Item item)

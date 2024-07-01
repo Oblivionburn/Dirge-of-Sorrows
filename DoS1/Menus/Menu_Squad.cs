@@ -472,6 +472,12 @@ namespace DoS1.Menus
                 {
                     AddToSquad();
                 }
+                else if (moving_character.ID == Handler.MainCharacter_ID)
+                {
+                    //Prevent removing hero from first squad
+                    moving_character.Formation = new Vector2(starting_pos.X, starting_pos.Y);
+                    moving_character.Region = new Region(starting_region.X, starting_region.Y, starting_region.Width, starting_region.Height);
+                }
                 else if (found_grid)
                 {
                     AddToReserves();

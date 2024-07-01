@@ -23,6 +23,7 @@ namespace DoS1.Menus
         private Character leader;
         private string LeaderName;
         private int warning = 0;
+        private bool Shift = false;
 
         private int Head;
         private int Skin;
@@ -141,9 +142,10 @@ namespace DoS1.Menus
                         found = false;
                         input.Active = true;
 
-                        InputManager.Keyboard.OnKeyStateChange += Keyboard_OnKeyStateChange;
                         InputManager.Mouse.Flush();
 
+                        InputManager.Keyboard.OnKeyStateChange += Keyboard_OnKeyStateChange;
+                        Main.Game.Window.TextInput += Window_TextInput;
                         break;
                     }
                 }
@@ -163,6 +165,7 @@ namespace DoS1.Menus
             {
                 if (InputManager.Mouse_LB_Pressed)
                 {
+                    Main.Game.Window.TextInput -= Window_TextInput;
                     InputManager.Keyboard.OnKeyStateChange -= Keyboard_OnKeyStateChange;
 
                     InputBox nameBox = GetInput("Name");
@@ -177,41 +180,49 @@ namespace DoS1.Menus
             }
         }
 
+        private void Window_TextInput(object sender, TextInputEventArgs e)
+        {
+            if (e.Key == Keys.Back)
+            {
+                if (!string.IsNullOrEmpty(LeaderName))
+                {
+                    LeaderName = LeaderName.Remove(LeaderName.Length - 1, 1);
+                }
+            }
+            else if (InputManager.Keyboard.KeysMapped.ContainsValue(e.Key) &&
+                     e.Key != Keys.LeftShift &&
+                     e.Key != Keys.RightShift &&
+                     e.Key != Keys.Escape &&
+                     e.Key.ToString().Length == 1)
+            {
+                if (Shift)
+                {
+                    LeaderName += e.Key.ToString().ToUpper();
+                }
+                else
+                {
+                    LeaderName += e.Key.ToString().ToLower();
+                }
+            }
+        }
+
         private void Keyboard_OnKeyStateChange(object sender, KeyEventArgs e)
         {
-            bool shift = false;
+            foreach (var key in e.KeysPressed)
+            {
+                if (key == Keys.LeftShift ||
+                    key == Keys.RightShift)
+                {
+                    Shift = false;
+                }
+            }
+
             foreach (var key in e.KeysDown)
             {
                 if (key == Keys.LeftShift ||
                     key == Keys.RightShift)
                 {
-                    shift = true;
-                }
-            }
-
-            foreach (var key in e.KeysPressed)
-            {
-                if (key == Keys.Space)
-                {
-                    LeaderName += " ";
-                }
-                else if (key == Keys.Back)
-                {
-                    LeaderName = LeaderName.Remove(LeaderName.Length - 1, 1);
-                }
-                else if (key != Keys.LeftShift &&
-                         key != Keys.RightShift &&
-                         key != Keys.Escape &&
-                         key.ToString().Length == 1)
-                {
-                    if (shift)
-                    {
-                        LeaderName += key.ToString().ToUpper();
-                    }
-                    else
-                    {
-                        LeaderName += key.ToString().ToLower();
-                    }
+                    Shift = true;
                 }
             }
         }
@@ -429,6 +440,7 @@ namespace DoS1.Menus
             leader = ArmyUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles[HairStyle], HairColors[HairColor], Handler.HeadStyles[Head], EyeColors[EyeColor], Handler.SkinTones[Skin]);
             squad.Characters.Add(leader);
             squad.Leader_ID = leader.ID;
+            Handler.MainCharacter_ID = leader.ID;
 
             InventoryUtil.AddItem(leader.Inventory, "Cloth", "Cloth", "Armor");
             InventoryUtil.EquipItem(leader, leader.Inventory.Items[leader.Inventory.Items.Count - 1]);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Timers;
 using System.Collections.Generic;
 
@@ -18,6 +17,7 @@ using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
+using OP_Engine.Weathers;
 
 using DoS1.Util;
 
@@ -35,11 +35,13 @@ namespace DoS1.Scenes
         private List<Character> targets = new List<Character>();
         private Character current_character = null;
         private string attack_type = "";
+        private bool hero_killed = false;
         private int ep_cost = 0;
 
         private int character_frame = 1;
+        private float move_speed = 0;
         private int effect_frame = 1;
-        private int move_speed = 8;
+        private int animation_speed = 8;
 
         private int round = 0;
         private int combat_step = 0;
@@ -48,6 +50,7 @@ namespace DoS1.Scenes
         private int enemy_total_damage;
 
         private bool won_battle;
+        private int gold;
 
         #endregion
 
@@ -120,12 +123,32 @@ namespace DoS1.Scenes
 
                 if (ally_squad != null)
                 {
-                    CharacterUtil.DrawSquad(spriteBatch, ally_squad, RenderingManager.Lighting.DrawColor);
+                    for (int y = 0; y < 3; y++)
+                    {
+                        for (int x = 0; x < 3; x++)
+                        {
+                            Character character = ally_squad.GetCharacter(new Vector2(x, y));
+                            if (character != null)
+                            {
+                                CharacterUtil.DrawCharacter(spriteBatch, character, RenderingManager.Lighting.DrawColor);
+                            }
+                        }
+                    }
                 }
 
                 if (enemy_squad != null)
                 {
-                    CharacterUtil.DrawSquad(spriteBatch, enemy_squad, RenderingManager.Lighting.DrawColor);
+                    for (int y = 0; y < 3; y++)
+                    {
+                        for (int x = 0; x < 3; x++)
+                        {
+                            Character character = enemy_squad.GetCharacter(new Vector2(x, y));
+                            if (character != null)
+                            {
+                                CharacterUtil.DrawCharacter(spriteBatch, character, RenderingManager.Lighting.DrawColor);
+                            }
+                        }
+                    }
                 }
 
                 for (int i = 0; i < Menu.Pictures.Count; i++)
@@ -142,6 +165,8 @@ namespace DoS1.Scenes
                 {
                     Menu.Labels[i].Draw(spriteBatch);
                 }
+
+                WeatherManager.Draw(spriteBatch);
 
                 Menu.GetPicture("Result").Draw(spriteBatch);
                 Menu.GetPicture("MouseClick").Draw(spriteBatch);
@@ -200,11 +225,9 @@ namespace DoS1.Scenes
             if (button.Name == "Result")
             {
                 Army ally_army = CharacterManager.GetArmy("Ally");
-                if (ally_army.Squads.Any())
-                {
-                    Leave();
-                }
-                else
+
+                if (hero_killed ||
+                    !ally_army.Squads.Any())
                 {
                     Handler.Combat = false;
 
@@ -213,10 +236,14 @@ namespace DoS1.Scenes
 
                     SceneManager.ChangeScene("GameOver");
                 }
+                else
+                {
+                    Leave();
+                }
             }
             else if (button.Name == "Retreat")
             {
-                Leave();
+                Retreat();
             }
         }
 
@@ -226,8 +253,8 @@ namespace DoS1.Scenes
             {
                 if (current_character != null)
                 {
-                    Tile origin_tile = OriginTile(current_character);
-                    Tile target_tile = TargetTile(current_character);
+                    Tile origin_tile = CombatUtil.OriginTile(World, current_character);
+                    Tile target_tile = CombatUtil.TargetTile(World, current_character);
 
                     if (origin_tile != null &&
                         target_tile != null)
@@ -246,7 +273,7 @@ namespace DoS1.Scenes
                                     }
                                 }
 
-                                targets = GetTargets(current_character);
+                                targets = CombatUtil.GetTargets(current_character, ally_squad, enemy_squad);
                                 if (!targets.Any())
                                 {
                                     can_attack = false;
@@ -256,7 +283,7 @@ namespace DoS1.Scenes
                                 if (can_attack)
                                 {
                                     attack_type = CharacterUtil.AttackType(current_character);
-                                    SwitchAnimation(current_character, attack_type);
+                                    CombatUtil.SwitchAnimation(current_character, attack_type);
 
                                     combat_step++;
                                 }
@@ -265,13 +292,13 @@ namespace DoS1.Scenes
                             case 1:
                                 if (attack_type == "Attack")
                                 {
-                                    if (AtTile(current_character, target_tile))
+                                    if (CombatUtil.AtTile(current_character, target_tile, move_speed))
                                     {
                                         combat_step++;
                                     }
                                     else
                                     {
-                                        MoveForward(current_character);
+                                        CombatUtil.MoveForward(current_character, move_speed);
                                     }
                                 }
                                 else if (attack_type == "Cast")
@@ -287,18 +314,22 @@ namespace DoS1.Scenes
                                 break;
 
                             case 2:
-                                if (character_frame >= current_character.Animator.Frames * 10)
-                                {
-                                    Attack();
-                                    combat_step++;
-                                }
-                                else if (character_frame % 10 == 0)
+                                if (character_frame % animation_speed == 0)
                                 {
                                     CharacterUtil.Animate(current_character);
 
                                     if (attack_type == "Cast")
                                     {
                                         AnimateCastEffect();
+                                    }
+
+                                    if (character_frame == animation_speed * 3)
+                                    {
+                                        Attack();
+                                    }
+                                    else if (character_frame >= animation_speed * 4)
+                                    {
+                                        combat_step++;
                                     }
 
                                     character_frame++;
@@ -310,31 +341,31 @@ namespace DoS1.Scenes
                                 break;
 
                             case 3:
-                                if (effect_frame >= 40)
+                                if (effect_frame >= 20)
                                 {
                                     combat_step++;
                                 }
                                 else if (effect_frame % 4 == 0)
                                 {
-                                    //Animate hit effects
-                                    AnimateDamageLabels();
                                     AnimateDamageEffects();
+                                    AnimateDamageLabels();
                                     effect_frame++;
                                 }
                                 else
                                 {
+                                    AnimateDamageLabels();
                                     effect_frame++;
                                 }
                                 break;
 
                             default:
-                                if (AtTile(current_character, origin_tile))
+                                if (CombatUtil.AtTile(current_character, origin_tile, move_speed))
                                 {
                                     FinishAttack();
                                 }
                                 else
                                 {
-                                    MoveBack(current_character);
+                                    CombatUtil.MoveBack(current_character, move_speed);
                                 }
                                 break;
                         }
@@ -409,119 +440,6 @@ namespace DoS1.Scenes
             }
         }
 
-        private Tile TargetTile(Character character)
-        {
-            Map map = World.Maps[0];
-            Layer ground = map.GetLayer("Ground");
-
-            if (character.Type == "Ally")
-            {
-                int x = ground.Columns % 2 == 0 ? (int)Math.Ceiling((double)ground.Columns / 2) - 1 : 
-                    (int)Math.Ceiling((double)ground.Columns / 2);
-
-                Tile tile = ground.GetTile(new Vector2(x, character.Formation.Y + 1));
-                if (tile != null)
-                {
-                    return tile;
-                }
-            }
-            else if (character.Type == "Enemy")
-            {
-                int x = ground.Columns % 2 == 0 ? (int)Math.Ceiling((double)ground.Columns / 2) - 1 : 
-                    (int)Math.Ceiling((double)ground.Columns / 2) - 2;
-
-                Tile tile = ground.GetTile(new Vector2(x, character.Formation.Y + 1));
-                if (tile != null)
-                {
-                    return tile;
-                }
-            }
-
-            return null;
-        }
-
-        private Tile OriginTile(Character character)
-        {
-            Map map = World.Maps[0];
-
-            Layer ground = map.GetLayer("Ground");
-            if (ground != null)
-            {
-                if (character.Type == "Ally")
-                {
-                    int x = ground.Columns % 2 == 0 ? (int)Math.Ceiling((double)ground.Columns / 2) + 1 :
-                        (int)Math.Ceiling((double)ground.Columns / 2) + 2;
-
-                    Tile tile = ground.GetTile(new Vector2(character.Formation.X + x, character.Formation.Y + 1));
-                    if (tile != null)
-                    {
-                        return tile;
-                    }
-                }
-                else if (character.Type == "Enemy")
-                {
-                    int x = ground.Columns % 2 == 0 ? (int)Math.Ceiling((double)ground.Columns / 2) - 5 :
-                        (int)Math.Ceiling((double)ground.Columns / 2) - 6;
-
-                    Tile tile = ground.GetTile(new Vector2(character.Formation.X + x, character.Formation.Y + 1));
-                    if (tile != null)
-                    {
-                        return tile;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private bool AtTile(Character character, Tile tile)
-        {
-            if (character.Region != null &&
-                tile.Region != null)
-            {
-                if (character.Region.X >= tile.Region.X - (move_speed / 2) &&
-                    character.Region.X <= tile.Region.X + (move_speed / 2))
-                {
-                    character.Region = new Region(tile.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void MoveForward(Character character)
-        {
-            if (character != null &&
-                character.Region != null)
-            {
-                if (character.Type == "Ally")
-                {
-                    character.Region.X -= move_speed;
-                }
-                else if (character.Type == "Enemy")
-                {
-                    character.Region.X += move_speed;
-                }
-            }
-        }
-
-        private void MoveBack(Character character)
-        {
-            if (character != null &&
-                character.Region != null)
-            {
-                if (character.Type == "Ally")
-                {
-                    character.Region.X += move_speed;
-                }
-                else if (character.Type == "Enemy")
-                {
-                    character.Region.X -= move_speed;
-                }
-            }
-        }
-
         private void StartCast()
         {
             AssetManager.PlaySound_Random("Cast");
@@ -530,13 +448,13 @@ namespace DoS1.Scenes
             {
                 Menu.AddPicture(Handler.GetID(), "Cast", AssetManager.Textures["Cast"],
                     new Region(current_character.Region.X, current_character.Region.Y, current_character.Region.Width, current_character.Region.Height),
-                        RenderingManager.Lighting.DrawColor * 0.8f, true);
+                        RenderingManager.Lighting.DrawColor * 0.9f, true);
             }
             else if (current_character.Type == "Enemy")
             {
                 Menu.AddPicture(Handler.GetID(), "Cast", AssetManager.Textures["EvilCast"],
                     new Region(current_character.Region.X, current_character.Region.Y, current_character.Region.Width, current_character.Region.Height),
-                        RenderingManager.Lighting.DrawColor * 0.8f, true);
+                        RenderingManager.Lighting.DrawColor * 0.9f, true);
             }
 
             Picture cast = Menu.GetPicture("Cast");
@@ -554,812 +472,20 @@ namespace DoS1.Scenes
 
                 foreach (Character target in targets)
                 {
-                    DoDamage(target, weapon);
-                }
-            }
-        }
+                    CombatUtil.DoDamage(Menu, target, weapon, ref ally_total_damage, ref enemy_total_damage);
 
-        private void DoDamage(Character defender, Item weapon)
-        {
-            if (weapon != null)
-            {
-                string[] damage_types = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
-
-                for (int i = 0; i < damage_types.Length; i++)
-                {
-                    string type = damage_types[i];
-
-                    if (InventoryUtil.Weapon_HasElement(weapon, type))
+                    if (target.Dead)
                     {
-                        int damage = InventoryUtil.Get_TotalDamage(weapon, type);
-
-                        Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
-                        if (helm != null)
+                        if (target.Type == "Enemy")
                         {
-                            int defense = InventoryUtil.Get_TotalDefense(helm, type);
-                            damage -= defense;
+                            gold += 100;
                         }
-
-                        Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
-                        if (armor != null)
+                        else if (target.ID == Handler.MainCharacter_ID)
                         {
-                            int defense = InventoryUtil.Get_TotalDefense(armor, type);
-                            damage -= defense;
-                        }
-
-                        Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
-                        if (shield != null)
-                        {
-                            int defense = InventoryUtil.Get_TotalDefense(shield, type);
-                            damage -= defense;
-                        }
-
-                        if (damage < 0)
-                        {
-                            damage = 0;
-                        }
-
-                        if (damage > 0)
-                        {
-                            defender.HealthBar.Value -= damage;
-                            defender.HealthBar.Update();
-
-                            Color damage_color = Color.White;
-                            switch (type)
-                            {
-                                case "Fire":
-                                    damage_color = Color.Red;
-                                    break;
-
-                                case "Lightning":
-                                    damage_color = Color.Yellow;
-                                    break;
-
-                                case "Earth":
-                                    damage_color = Color.Brown;
-                                    break;
-
-                                case "Ice":
-                                    damage_color = Color.Blue;
-                                    break;
-                            }
-
-                            AddEffect(defender, weapon, type);
-
-                            if (defender.Type == "Ally")
-                            {
-                                enemy_total_damage += damage;
-                            }
-                            else if (defender.Type == "Enemy")
-                            {
-                                ally_total_damage += damage;
-                            }
-
-                            Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", damage.ToString(), damage_color,
-                                new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
-                                    defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
-
-                            if (defender.HealthBar.Value < 0)
-                            {
-                                defender.HealthBar.Value = 0;
-                            }
-
-                            if (defender.HealthBar.Value <= 0)
-                            {
-                                defender.Dead = true;
-                            }
-                        }
-                        else
-                        {
-                            AssetManager.PlaySound_Random("Swing");
-
-                            Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "0", Color.Black,
-                                new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
-                                    defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+                            MainCharacterKilled();
+                            break;
                         }
                     }
-                }
-            }
-            else
-            {
-                //Unarmed attack
-                int damage = 10;
-
-                Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
-                if (helm != null)
-                {
-                    int defense = InventoryUtil.Get_TotalDefense(helm, "Physical");
-                    damage -= defense;
-                }
-
-                Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
-                if (armor != null)
-                {
-                    int defense = InventoryUtil.Get_TotalDefense(armor, "Physical");
-                    damage -= defense;
-                }
-
-                Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
-                if (shield != null)
-                {
-                    int defense = InventoryUtil.Get_TotalDefense(shield, "Physical");
-                    damage -= defense;
-                }
-
-                if (damage < 0)
-                {
-                    damage = 0;
-                }
-
-                if (damage > 0)
-                {
-                    defender.HealthBar.Value -= damage;
-                    defender.HealthBar.Update();
-
-                    Color damage_color = Color.White;
-
-                    AddEffect(defender, weapon, "Physical");
-
-                    if (defender.Type == "Ally")
-                    {
-                        enemy_total_damage += damage;
-                    }
-                    else if (defender.Type == "Enemy")
-                    {
-                        ally_total_damage += damage;
-                    }
-
-                    Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", damage.ToString(), damage_color,
-                        new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
-                            defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
-
-                    if (defender.HealthBar.Value < 0)
-                    {
-                        defender.HealthBar.Value = 0;
-                    }
-
-                    if (defender.HealthBar.Value <= 0)
-                    {
-                        defender.Dead = true;
-                    }
-                }
-                else
-                {
-                    AssetManager.PlaySound_Random("Swing");
-
-                    Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "0", Color.Black,
-                        new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
-                            defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
-                }
-            }
-        }
-
-        private void AddEffect(Character character, Item weapon, string type)
-        {
-            switch (type)
-            {
-                case "Physical":
-                    if (weapon != null)
-                    {
-                        if (weapon.Categories.Contains("Sword") ||
-                        weapon.Categories.Contains("Axe"))
-                        {
-                            AssetManager.PlaySound_Random("IronSword");
-
-                            float x = character.Region.X - (character.Region.Width / 4);
-                            float y = character.Region.Y - (character.Region.Height / 8);
-                            float width = character.Region.Width + ((character.Region.Width / 4) * 2);
-                            float height = character.Region.Height + ((character.Region.Height / 8) * 2);
-
-                            if (character.Type == "Ally")
-                            {
-                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Right"],
-                                    new Region(x, y, width, height),
-                                        RenderingManager.Lighting.DrawColor, true);
-                            }
-                            else if (character.Type == "Enemy")
-                            {
-                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Left"],
-                                    new Region(x, y, width, height),
-                                        RenderingManager.Lighting.DrawColor, true);
-                            }
-                        }
-                        else if (weapon.Categories.Contains("Bow"))
-                        {
-                            AssetManager.PlaySound_Random("Bow");
-
-                            if (character.Type == "Ally")
-                            {
-                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Right"],
-                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        RenderingManager.Lighting.DrawColor, true);
-                            }
-                            else if (character.Type == "Enemy")
-                            {
-                                Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Left"],
-                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        RenderingManager.Lighting.DrawColor, true);
-                            }
-                        }
-                        else
-                        {
-                            AssetManager.PlaySound_Random("Thump");
-
-                            Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
-                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    RenderingManager.Lighting.DrawColor, true);
-                        }
-                    }
-                    else
-                    {
-                        AssetManager.PlaySound_Random("Thump");
-
-                        Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
-                            new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                RenderingManager.Lighting.DrawColor, true);
-                    }
-                    break;
-
-                case "Fire":
-                    AssetManager.PlaySound_Random("Fire");
-
-                    Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Fire"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor * 0.8f, true);
-                    break;
-
-                case "Lightning":
-                    AssetManager.PlaySound_Random("Shock");
-
-                    Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor * 0.8f, true);
-                    break;
-
-                case "Earth":
-                    AssetManager.PlaySound_Random("Earth");
-
-                    Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Earth"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor, true);
-                    break;
-
-                case "Ice":
-                    AssetManager.PlaySound_Random("Ice");
-
-                    Menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Ice"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor, true);
-                    break;
-            }
-
-            Picture effect = Get_LastDamagePicture();
-            effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
-        }
-
-        private List<Character> GetTargets(Character character)
-        {
-            List<Character> targets = new List<Character>();
-
-            Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
-            Squad target_squad = null;
-
-            if (character.Type == "Ally")
-            {
-                target_squad = enemy_squad;
-            }
-            else if (character.Type == "Enemy")
-            {
-                target_squad = ally_squad;
-            }
-
-            if (target_squad != null)
-            {
-                if (weapon != null)
-                {
-                    if (InventoryUtil.Weapon_IsAoE(weapon))
-                    {
-                        foreach (Character target in target_squad.Characters)
-                        {
-                            if (!target.Dead)
-                            {
-                                targets.Add(target);
-                            }
-                        }
-                    }
-                    else if (weapon.Categories.Contains("Axe"))
-                    {
-                        Character target = GetMeleeTarget(character, target_squad);
-                        if (target != null)
-                        {
-                            targets.Add(target);
-
-                            Character side_target = null;
-
-                            if (character.Formation.Y == 0 &&
-                                target.Formation.Y == 0)
-                            {
-                                side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y + 1));
-                            }
-                            else if (character.Formation.Y == 1 &&
-                                     target.Formation.Y == 1)
-                            {
-                                side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y - 1));
-                                if (side_target != null &&
-                                    side_target.Dead)
-                                {
-                                    side_target = null;
-                                }
-
-                                if (side_target == null)
-                                {
-                                    side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y + 1));
-                                }
-                            }
-                            else if (character.Formation.Y == 2 &&
-                                     target.Formation.Y == 2)
-                            {
-                                side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y - 1));
-                            }
-
-                            if (side_target != null &&
-                                side_target.Dead)
-                            {
-                                side_target = null;
-                            }
-
-                            if (side_target != null)
-                            {
-                                targets.Add(side_target);
-                            }
-                        }
-                    }
-                    else if (weapon.Categories.Contains("Bow") ||
-                             weapon.Categories.Contains("Grimoire"))
-                    {
-                        Character target = GetRangedTarget(character, target_squad);
-                        if (target != null &&
-                            !target.Dead)
-                        {
-                            targets.Add(target);
-                        }
-                    }
-                }
-                
-                if (!targets.Any())
-                {
-                    Character target = GetMeleeTarget(character, target_squad);
-                    if (target != null)
-                    {
-                        targets.Add(target);
-                    }
-                }
-            }
-
-            return targets;
-        }
-
-        private Character GetMeleeTarget(Character character, Squad target_squad)
-        {
-            Character target = null;
-
-            if (character.Type == "Ally")
-            {
-                for (int x = 2; x >= 0; x--)
-                {
-                    target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y));
-                    if (target != null &&
-                        !target.Dead)
-                    {
-                        return target;
-                    }
-                }
-
-                if (target == null)
-                {
-                    if (character.Formation.Y == 0)
-                    {
-                        for (int x = 2; x >= 0; x--)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 2; x >= 0; x--)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 1)
-                    {
-                        for (int x = 2; x >= 0; x--)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 2; x >= 0; x--)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 2)
-                    {
-                        for (int x = 2; x >= 0; x--)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 2; x >= 0; x--)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else if (character.Type == "Enemy")
-            {
-                for (int x = 0; x < 3; x++)
-                {
-                    target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y));
-                    if (target != null &&
-                        !target.Dead)
-                    {
-                        return target;
-                    }
-                }
-
-                if (target == null)
-                {
-                    if (character.Formation.Y == 0)
-                    {
-                        for (int x = 0; x < 3; x++)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 1)
-                    {
-                        for (int x = 0; x < 3; x++)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 2)
-                    {
-                        for (int x = 0; x < 3; x++)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (target != null &&
-                target.Dead)
-            {
-                target = null;
-            }
-
-            return target;
-        }
-
-        private Character GetRangedTarget(Character character, Squad target_squad)
-        {
-            Character target = null;
-
-            if (character.Type == "Ally")
-            {
-                for (int x = 0; x < 3; x++)
-                {
-                    target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y));
-                    if (target != null &&
-                        !target.Dead)
-                    {
-                        return target;
-                    }
-                }
-
-                if (target == null)
-                {
-                    if (character.Formation.Y == 0)
-                    {
-                        for (int x = 0; x < 3; x++)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 1)
-                    {
-                        for (int x = 0; x < 3; x++)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 2)
-                    {
-                        for (int x = 0; x < 3; x++)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else if (character.Type == "Enemy")
-            {
-                for (int x = 2; x >= 0; x--)
-                {
-                    target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y));
-                    if (target != null &&
-                        !target.Dead)
-                    {
-                        return target;
-                    }
-                }
-
-                if (target == null)
-                {
-                    if (character.Formation.Y == 0)
-                    {
-                        for (int x = 2; x >= 0; x--)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 2; x >= 0; x--)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 1)
-                    {
-                        for (int x = 2; x >= 0; x--)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 2; x >= 0; x--)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y + 1));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                    else if (character.Formation.Y == 2)
-                    {
-                        for (int x = 2; x >= 0; x--)
-                        {
-                            target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 1));
-                            if (target != null &&
-                                !target.Dead)
-                            {
-                                return target;
-                            }
-                        }
-
-                        if (target == null)
-                        {
-                            for (int x = 2; x >= 0; x--)
-                            {
-                                target = target_squad.GetCharacter(new Vector2(x, (int)character.Formation.Y - 2));
-                                if (target != null &&
-                                    !target.Dead)
-                                {
-                                    return target;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (target != null &&
-                target.Dead)
-            {
-                target = null;
-            }
-
-            return target;
-        }
-
-        private void SwitchAnimation(Character character, string type)
-        {
-            if (character.Texture != null)
-            {
-                string[] parts = character.Texture.Name.Split('_');
-                string direction = parts[0];
-                string category = parts[1];
-                string skin_tone = parts[2];
-
-                string texture = direction + "_" + category + "_" + skin_tone + "_" + type;
-
-                character.Texture = AssetManager.Textures[texture];
-                if (character.Texture != null)
-                {
-                    Item item = InventoryUtil.Get_EquippedItem(character, "Armor");
-                    if (item != null)
-                    {
-                        texture = direction + "_Armor_" + item.Categories[0] + "_" + item.Materials[0] + "_" + type;
-                        item.Texture = AssetManager.Textures[texture];
-                    }
-
-                    item = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                    if (item != null)
-                    {
-                        texture = direction + "_Weapon_" + item.Categories[0] + "_" + item.Materials[0] + "_" + type;
-                        item.Texture = AssetManager.Textures[texture];
-                    }
-
-                    CharacterUtil.ResetAnimation(current_character);
                 }
             }
         }
@@ -1372,8 +498,8 @@ namespace DoS1.Scenes
                 if (label.Name == "Damage" &&
                     label.Region != null)
                 {
-                    label.Region.Y -= 2;
-                    label.Opacity -= 0.1f;
+                    label.Region.Y -= 1;
+                    label.Opacity -= 0.05f;
 
                     if (label.Opacity <= 0)
                     {
@@ -1382,20 +508,6 @@ namespace DoS1.Scenes
                     }
                 }
             }
-        }
-
-        private Picture Get_LastDamagePicture()
-        {
-            for (int i = Menu.Pictures.Count - 1; i >= 0; i--)
-            {
-                Picture picture = Menu.Pictures[i];
-                if (picture.Name == "Damage")
-                {
-                    return picture;
-                }
-            }
-
-            return null;
         }
 
         private void AnimateDamageEffects()
@@ -1494,7 +606,7 @@ namespace DoS1.Scenes
             if (current_character != null)
             {
                 RemoveEffects();
-                SwitchAnimation(current_character, "Idle");
+                CombatUtil.SwitchAnimation(current_character, "Idle");
 
                 if (ally_squad != null)
                 {
@@ -1583,38 +695,44 @@ namespace DoS1.Scenes
                 CharacterManager.GetArmy("Ally").Squads.Remove(ally_squad);
             }
 
+            if (!enemy_squad.Characters.Any())
+            {
+                CharacterManager.GetArmy("Enemy").Squads.Remove(enemy_squad);
+            }
+
             Button button = Menu.GetButton("Result");
 
             if (!enemy_squad.Characters.Any())
             {
                 won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
-                button.Text = ally_squad.Name + " won!";
+                button.Text = ally_squad.Name + " was victorious!";
             }
             else if (!ally_squad.Characters.Any())
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                button.Text = ally_squad.Name + " lost!";
+                button.Text = ally_squad.Name + " was defeated!";
             }
             else if (enemy_total_damage > ally_total_damage)
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                button.Text = ally_squad.Name + " lost!\n\n" +
-                    ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
-                    enemy_squad.Name + " Total Damage: " + enemy_total_damage;
+                button.Text = ally_squad.Name + " was defeated!\n\n" +
+                    "Allies Total Damage: " + ally_total_damage + "\n" +
+                    "Enemies Total Damage: " + enemy_total_damage;
             }
             else if (ally_total_damage > enemy_total_damage)
             {
                 won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
-                button.Text = ally_squad.Name + " won!\n\n" +
-                    ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
-                    enemy_squad.Name + " Total Damage: " + enemy_total_damage;
+                button.Text = ally_squad.Name + " was victorious!\n\n" +
+                    "Allies Total Damage: " + ally_total_damage + "\n" +
+                    "Enemies Total Damage: " + enemy_total_damage;
             }
             else
             {
+                won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Draw"];
                 button.Text = "Both parties are retreating.";
             }
@@ -1626,27 +744,42 @@ namespace DoS1.Scenes
 
             if (won_battle)
             {
-                int gold = enemy_squad.Characters.Count * 100;
                 Handler.Gold += gold;
-
-                button.Text += "\n\nYou looted " + gold + " Gold!";
-
-                //Move squad to tile enemy was at
-                ally_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y, 0);
-                ally_squad.Region = new Region(enemy_squad.Region.X, enemy_squad.Region.Y, enemy_squad.Region.Width, enemy_squad.Region.Height);
+                button.Text += "\n\n" + gold + " Gold was looted!";
 
                 Character leader = ally_squad.GetLeader();
                 if (leader == null)
                 {
+                    //If leader was killed, assign new leader
                     ally_squad.Leader_ID = ally_squad.Characters[0].ID;
                 }
                 else
                 {
+                    //If leader was not killed, remove enemy as target
                     leader.Target_ID = 0;
                 }
-                
-                CharacterManager.GetArmy("Enemy").Squads.Remove(enemy_squad);
             }
+        }
+
+        private void Retreat()
+        {
+            Handler.CombatTimer.Stop();
+
+            won_battle = false;
+
+            Picture battleResult = Menu.GetPicture("Result");
+            battleResult.Texture = AssetManager.Textures["Defeat"];
+            battleResult.Visible = true;
+
+            Button button = Menu.GetButton("Result");
+            button.Text = ally_squad.Name + " is retreating.";
+
+            Menu.GetButton("Retreat").Visible = false;
+            Menu.GetPicture("MouseClick").Visible = true;
+            button.Visible = true;
+
+            Handler.Gold += gold;
+            button.Text += "\n\n" + gold + " Gold was looted!";
         }
 
         private void Leave()
@@ -1691,8 +824,23 @@ namespace DoS1.Scenes
             SoundManager.NeedMusic = true;
 
             SceneManager.ChangeScene("Localmap");
-            
+
             Main.Timer.Start();
+            GameUtil.Toggle_Pause(false);
+        }
+
+        private void MainCharacterKilled()
+        {
+            Handler.CombatTimer.Stop();
+            hero_killed = true;
+
+            Button button = Menu.GetButton("Result");
+            button.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
+
+            Menu.GetButton("Retreat").Visible = false;
+            Menu.GetPicture("Result").Visible = true;
+            Menu.GetPicture("MouseClick").Visible = true;
+            button.Visible = true;
         }
 
         public override void Load()
@@ -1702,45 +850,60 @@ namespace DoS1.Scenes
             if (!string.IsNullOrEmpty(Handler.Combat_Terrain))
             {
                 WorldGen.GenCombatMap();
-                LoadCharacters();
 
-                Menu.AddPicture(Handler.GetID(), "Light", AssetManager.Textures["White"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Combat_Ally_Squad);
+                enemy_squad = CharacterManager.GetArmy("Enemy").GetSquad(Handler.Combat_Enemy_Squad);
 
-                if (TimeManager.Now.Hours >= 22 ||
-                    TimeManager.Now.Hours <= 5)
+                if (Handler.Combat_Terrain == "Grass")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Sky_Night"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Grass"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
-                else if (Handler.Combat_Terrain == "Grass" ||
-                         Handler.Combat_Terrain == "Water")
+                else if (Handler.Combat_Terrain == "Water")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Sky_Day"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    if (TimeManager.Now.Hours >= 22 ||
+                        TimeManager.Now.Hours <= 5)
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Sky_Night2"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
+                    else
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Sky_Day"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
                 }
                 else if (Handler.Combat_Terrain == "Desert")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Desert"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Desert"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
                 else if (Handler.Combat_Terrain == "Snow" ||
                          Handler.Combat_Terrain == "Ice")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
                 else if (Handler.Combat_Terrain.Contains("Forest"))
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Forest"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    if (Handler.Combat_Terrain.Contains("Snow"))
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Forest_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
+                    else
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Forest"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
                 }
                 else if (Handler.Combat_Terrain.Contains("Mountains"))
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Mountains"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
-                }
-
-                if (Handler.Combat_Ally_Base)
-                {
-                    Menu.AddPicture(Handler.GetID(), "Base", AssetManager.Textures["Base_Ally"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
-                }
-                else if (Handler.Combat_Enemy_Base)
-                {
-                    Menu.AddPicture(Handler.GetID(), "Base", AssetManager.Textures["Base_Enemy"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    if (Handler.Combat_Terrain.Contains("Snow"))
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
+                    else if (Handler.Combat_Terrain.Contains("Desert"))
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains_Desert"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
+                    else
+                    {
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    }
                 }
 
                 Menu.AddButton(new ButtonOptions
@@ -1761,7 +924,10 @@ namespace DoS1.Scenes
                 });
 
                 Menu.AddPicture(Handler.GetID(), "Result", AssetManager.Textures["Victory"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, false);
+
                 Menu.AddPicture(Handler.GetID(), "MouseClick", AssetManager.Textures["LeftClick"], new Region(0, 0, 0, 0), Color.White, false);
+                Picture mouseClick = Menu.GetPicture("MouseClick");
+                mouseClick.Image = new Rectangle(0, 0, mouseClick.Texture.Width / 4, mouseClick.Texture.Height);
 
                 Menu.AddButton(new ButtonOptions
                 {
@@ -1787,78 +953,24 @@ namespace DoS1.Scenes
             }
         }
 
-        private void LoadCharacters()
-        {
-            if (World.Maps.Any())
-            {
-                enemy_squad = CharacterManager.GetArmy("Enemy").GetSquad(Handler.Combat_Enemy_Squad);
-                if (enemy_squad != null)
-                {
-                    foreach (Character character in enemy_squad.Characters)
-                    {
-                        Tile tile = OriginTile(character);
-                        if (tile != null)
-                        {
-                            character.Region = new Region(tile.Region.X, tile.Region.Y - tile.Region.Height, tile.Region.Width, tile.Region.Height * 1.5f);
-
-                            float bar_x = character.Region.X + (character.Region.Width / 8);
-                            float bar_width = (character.Region.Width / 8) * 6;
-                            float bar_height = character.Region.Width / 8;
-
-                            character.HealthBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height, bar_width, bar_height);
-                            character.HealthBar.Visible = true;
-                            character.HealthBar.Update();
-
-                            character.ManaBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height + bar_height, bar_width, bar_height);
-                            character.ManaBar.Visible = true;
-                            character.ManaBar.Update();
-
-                            CharacterUtil.UpdateGear(character);
-                        }
-                    }
-                }
-
-                ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Combat_Ally_Squad);
-                if (ally_squad != null)
-                {
-                    foreach (Character character in ally_squad.Characters)
-                    {
-                        Tile tile = OriginTile(character);
-                        if (tile != null)
-                        {
-                            character.Region = new Region(tile.Region.X, tile.Region.Y - tile.Region.Height, tile.Region.Width, tile.Region.Height * 1.5f);
-
-                            float bar_x = character.Region.X + (character.Region.Width / 8);
-                            float bar_width = (character.Region.Width / 8) * 6;
-                            float bar_height = character.Region.Width / 8;
-
-                            character.HealthBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height, bar_width, bar_height);
-                            character.HealthBar.Visible = true;
-                            character.HealthBar.Update();
-
-                            character.ManaBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height + bar_height, bar_width, bar_height);
-                            character.ManaBar.Visible = true;
-                            character.ManaBar.Update();
-
-                            CharacterUtil.UpdateGear(character);
-                        }
-                    }
-                }
-            }
-        }
-
         public override void Resize(Point point)
         {
             base.Resize(point);
 
             if (World.Maps.Any())
             {
-                WorldUtil.Resize_OnCombat(World.Maps[0]);
+                Map map = World.Maps[0];
+
+                WorldUtil.Resize_OnCombat(World);
 
                 int height = Main.Game.MenuSize.X;
 
-                Menu.GetPicture("Light").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
-                Menu.GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+                Layer ground = map.GetLayer("Ground");
+                Tile tile = ground.Tiles[0];
+                Menu.GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, tile.Region.Y);
+
+                move_speed = tile.Region.Width / 8;
+
                 Menu.GetPicture("Result").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
                 Button result = Menu.GetButton("Result");
@@ -1872,7 +984,7 @@ namespace DoS1.Scenes
                 Picture base_image = Menu.GetPicture("Base");
                 if (base_image != null)
                 {
-                    base_image.Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+                    base_image.Region = new Region(0, 0, Main.Game.Resolution.X, tile.Region.Y + (tile.Region.Height / 2));
                 }
             }
         }

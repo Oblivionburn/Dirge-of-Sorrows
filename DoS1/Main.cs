@@ -21,6 +21,7 @@ using OP_Engine.Time;
 
 using DoS1.Scenes;
 using DoS1.Menus;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DoS1
 {
@@ -30,8 +31,6 @@ namespace DoS1
 
         public static OP_Game Game;
         public static string Version;
-
-        public static bool LocalPause = false;
 
         public static long TimeSpeed = 1;
         public static double GameTime;
@@ -154,7 +153,7 @@ namespace DoS1
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
 
-                            if (!LocalPause ||
+                            if (!Handler.LocalPause ||
                                 Handler.Combat)
                             {
                                 WeatherManager.Update(Game.Resolution);
@@ -219,8 +218,9 @@ namespace DoS1
                             SceneManager.Draw_MenusOnly(Game.SpriteBatch);
 
                             //Render weather ontop of scene but underneath standalone menus
-                            if (Handler.LocalMap ||
-                                SceneManager.GetScene("Title").Visible)
+                            if ((Handler.LocalMap ||
+                                SceneManager.GetScene("Title").Visible) &&
+                                !Handler.Combat)
                             {
                                 WeatherManager.Draw(Game.SpriteBatch);
                             }
@@ -288,7 +288,7 @@ namespace DoS1
         public static void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (!TimeManager.Paused &&
-                !LocalPause)
+                !Handler.LocalPause)
             {
                 GameTime++;
 
