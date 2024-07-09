@@ -31,8 +31,8 @@
 - AI to control enemy squad movement on map
 - Enemy squads capturing towns
 - Losing game (or just the level?) if enemy squad reaches player base
-- Story/lore
 - Character stat/xp/level progression
 - Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
 - Adding more music for variety
 - Hopefully some graphical improvements, since I'm a terrible graphics artist
+- Story/lore and tutorial
