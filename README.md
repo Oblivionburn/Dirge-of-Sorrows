@@ -6,7 +6,9 @@
 # 
 ### Features currently in the game:
 - Random generation of worldmap with levels to progress through marked on the map (click location to enter map for that level)
-- Random generation of levels with starting player base/town, enemy base, neutral towns, merchant town, academy town
+- Random generation of levels/local-maps with starting player base/town, enemy base, neutral towns, merchant town, academy town
+- Capturing/liberating neutral towns (flipping them to player-controlled)
+- Level/area/map progression, displaying next location(s) on worldmap
 - A* pathing for player squad token movement on map
 - Starting character generation screen
 - Equippable items and viewing equipment stats
@@ -15,24 +17,22 @@
 - Menu for managing character equipped gear
 - Menu for managing rune attachments in items/gear
 - Menu for viewing general inventory of player army
+- Menu for buying/selling items in shops
+- Combat screen and basic combat mechanics
+- Single enemy squad for combat testing
 #
 ### Planned features not yet implemented:
-- Context menu to handle multiple possible interactions at a location (e.g. selecting a squad or entering town the squad is at)
-- Menu for possible locations within a town to interact with (e.g. item shop, character recruitment, tavern to get story/lore bits from, etc)
-- Menu for item trading in shops at merchant towns
 - Menu for purchasing more characters at academy towns
 - Dispatching additional squads to player base on map
 - Right-clicking squads on map to view their characters/formation
 - Context menu to handle selection of a squad when there's multiple in one location
-- Capturing/liberating neutral towns (flipping them to player-controlled)
 - Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
-- Combat screen and general combat mechanics
+- Generation of enemy squads on maps with increasing amount/difficulty/equipment
 - AI to control enemy squad movement on map
 - Enemy squads capturing towns
 - Losing game (or just the level?) if enemy squad reaches player base
-- Story/lore
-- Level/area/map progression, displaying next location(s) on worldmap
 - Character stat/xp/level progression
 - Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
-- Replacing more of the placeholder music with better stuff
+- Adding more music for variety
 - Hopefully some graphical improvements, since I'm a terrible graphics artist
+- Story/lore and tutorial
