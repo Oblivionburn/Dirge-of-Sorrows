@@ -115,27 +115,31 @@ namespace DoS1.Util
                         Squad ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Combat_Ally_Squad);
                         Squad enemy_squad = CharacterManager.GetArmy("Enemy").GetSquad(Handler.Combat_Enemy_Squad);
 
-                        for (int y = 0; y < 3; y++)
+                        if (ally_squad != null &&
+                            enemy_squad != null)
                         {
-                            for (int x = 0; x < 3; x++)
+                            for (int y = 0; y < 3; y++)
                             {
-                                Character ally = ally_squad.GetCharacter(new Vector2(x, y));
-                                if (ally != null)
+                                for (int x = 0; x < 3; x++)
                                 {
-                                    Tile tile = CombatUtil.OriginTile(world, ally);
-                                    if (tile != null)
+                                    Character ally = ally_squad.GetCharacter(new Vector2(x, y));
+                                    if (ally != null)
                                     {
-                                        Resize_CharacterCombat(tile, ally);
+                                        Tile tile = CombatUtil.OriginTile(world, ally);
+                                        if (tile != null)
+                                        {
+                                            Resize_CharacterCombat(tile, ally);
+                                        }
                                     }
-                                }
 
-                                Character enemy = enemy_squad.GetCharacter(new Vector2(x, y));
-                                if (enemy != null)
-                                {
-                                    Tile tile = CombatUtil.OriginTile(world, enemy);
-                                    if (tile != null)
+                                    Character enemy = enemy_squad.GetCharacter(new Vector2(x, y));
+                                    if (enemy != null)
                                     {
-                                        Resize_CharacterCombat(tile, enemy);
+                                        Tile tile = CombatUtil.OriginTile(world, enemy);
+                                        if (tile != null)
+                                        {
+                                            Resize_CharacterCombat(tile, enemy);
+                                        }
                                     }
                                 }
                             }

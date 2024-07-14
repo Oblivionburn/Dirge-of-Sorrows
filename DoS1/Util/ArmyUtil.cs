@@ -51,7 +51,6 @@ namespace DoS1.Util
             CharacterManager.Armies.Add(reserves);
 
             Squad reserves_squad = NewSquad("Reserves");
-            Gen_Reserves_Test(reserves_squad);
             reserves.Squads.Add(reserves_squad);
 
             //Academy
@@ -673,11 +672,15 @@ namespace DoS1.Util
             }
         }
 
-        public static void Gen_Reserves_Test(Squad squad)
+        public static Squad Gen_Academy()
         {
-            CryptoRandom random;
+            Squad squad = new Squad();
 
-            for (int i = 0; i < 4; i++)
+            CryptoRandom random;
+            int x = 0;
+            int y = 0;
+
+            for (int i = 0; i < 20; i++)
             {
                 string name = "";
 
@@ -693,7 +696,7 @@ namespace DoS1.Util
                 }
                 name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
 
-                Character character = NewCharacter_Random(name, new Vector2(i, 0), false);
+                Character character = NewCharacter_Random(name, new Vector2(x, y), false);
                 if (gender == 0)
                 {
                     character.Gender = "Male";
@@ -706,11 +709,17 @@ namespace DoS1.Util
                 InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                 InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
-                InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
-                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
-
                 squad.Characters.Add(character);
+
+                x++;
+                if (x >= 10)
+                {
+                    x = 0;
+                    y++;
+                }
             }
+
+            return squad;
         }
 
         public static Squad Get_TargetSquad(long target_id)

@@ -43,7 +43,11 @@ namespace DoS1
 
         public static string ItemFilter;
         public static Dictionary<int, Inventory> ShopInventories = new Dictionary<int, Inventory>();
-        public static Inventory TradingInventory;
+        public static Inventory TradingShop;
+
+        public static int RecruitPrice = 100;
+        public static Dictionary<int, Squad> AcademyRecruits = new Dictionary<int, Squad>();
+        public static Squad TradingAcademy;
 
         public static Timer CombatTimer = new Timer(1);
         public static bool Combat;

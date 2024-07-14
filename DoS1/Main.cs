@@ -21,7 +21,6 @@ using OP_Engine.Time;
 
 using DoS1.Scenes;
 using DoS1.Menus;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DoS1
 {
@@ -217,10 +216,11 @@ namespace DoS1
                             //Render scene specific menus
                             SceneManager.Draw_MenusOnly(Game.SpriteBatch);
 
-                            //Render weather ontop of scene but underneath standalone menus
+                            //Render weather ontop of scene but underneath menus
                             if ((Handler.LocalMap ||
                                 SceneManager.GetScene("Title").Visible) &&
-                                !Handler.Combat)
+                                !Handler.Combat &&
+                                !SceneManager.GetScene("GameOver").Visible)
                             {
                                 WeatherManager.Draw(Game.SpriteBatch);
                             }
@@ -283,6 +283,7 @@ namespace DoS1
             MenuManager.Menus.Add(new Menu_Inventory(Content));
             MenuManager.Menus.Add(new Menu_Item(Content));
             MenuManager.Menus.Add(new Menu_Shop(Content));
+            MenuManager.Menus.Add(new Menu_Academy(Content));
         }
 
         public static void Timer_Elapsed(object sender, ElapsedEventArgs e)

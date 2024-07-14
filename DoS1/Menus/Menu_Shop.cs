@@ -105,9 +105,9 @@ namespace DoS1.Menus
                     }
                 }
 
-                if (Handler.TradingInventory != null)
+                if (Handler.TradingShop != null)
                 {
-                    foreach (Item item in Handler.TradingInventory.Items)
+                    foreach (Item item in Handler.TradingShop.Items)
                     {
                         if (item.Icon_Visible)
                         {
@@ -265,7 +265,7 @@ namespace DoS1.Menus
 
                         if (InputManager.Mouse_ScrolledDown)
                         {
-                            if (Handler.TradingInventory != null)
+                            if (Handler.TradingShop != null)
                             {
                                 Item last_item = null;
                                 if (ItemList_Shop.Count > 0)
@@ -339,9 +339,9 @@ namespace DoS1.Menus
             }
 
             if (!found &&
-                Handler.TradingInventory != null)
+                Handler.TradingShop != null)
             {
-                foreach (Item item in Handler.TradingInventory.Items)
+                foreach (Item item in Handler.TradingShop.Items)
                 {
                     if (item.Icon_Visible)
                     {
@@ -405,7 +405,7 @@ namespace DoS1.Menus
                 Inventory inventory = InventoryManager.GetInventory("Ally");
                 inventory.Items.Add(item);
 
-                Handler.TradingInventory.Items.Remove(item);
+                Handler.TradingShop.Items.Remove(item);
 
                 Handler.Gold -= (int)item.Buy_Price;
                 GetLabel("Gold").Text = "Gold: " + Handler.Gold;
@@ -421,7 +421,7 @@ namespace DoS1.Menus
             Inventory inventory = InventoryManager.GetInventory("Ally");
             inventory.Items.Remove(item);
 
-            Handler.TradingInventory.Items.Add(item);
+            Handler.TradingShop.Items.Add(item);
 
             Handler.Gold += (int)item.Buy_Price;
             GetLabel("Gold").Text = "Gold: " + Handler.Gold;
@@ -638,14 +638,14 @@ namespace DoS1.Menus
                 }
             }
 
-            if (Handler.TradingInventory != null)
+            if (Handler.TradingShop != null)
             {
-                foreach (Item item in Handler.TradingInventory.Items)
+                foreach (Item item in Handler.TradingShop.Items)
                 {
                     item.Icon_Visible = false;
                 }
 
-                foreach (Item item in Handler.TradingInventory.Items)
+                foreach (Item item in Handler.TradingShop.Items)
                 {
                     if (item.Type == type)
                     {
@@ -845,9 +845,9 @@ namespace DoS1.Menus
         {
             ResizeGrids();
 
-            if (Handler.TradingInventory != null)
+            if (Handler.TradingShop != null)
             {
-                foreach (Item item in Handler.TradingInventory.Items)
+                foreach (Item item in Handler.TradingShop.Items)
                 {
                     item.Icon_Visible = false;
                 }
@@ -920,7 +920,7 @@ namespace DoS1.Menus
 
         private void DisplayArrows_Shop()
         {
-            if (Handler.TradingInventory != null)
+            if (Handler.TradingShop != null)
             {
                 Picture arrow_down = GetPicture("Arrow_Down_Shop");
 

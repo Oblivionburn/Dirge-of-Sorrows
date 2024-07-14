@@ -585,7 +585,13 @@ namespace DoS1.Menus
                 {
                     Handler.ShopInventories.Add(Handler.Level, InventoryUtil.Gen_Shop(Handler.Level + 1));
                 }
-                Handler.TradingInventory = Handler.ShopInventories[Handler.Level];
+                Handler.TradingShop = Handler.ShopInventories[Handler.Level];
+
+                if (!Handler.AcademyRecruits.ContainsKey(Handler.Level))
+                {
+                    Handler.AcademyRecruits.Add(Handler.Level, ArmyUtil.Gen_Academy());
+                }
+                Handler.TradingAcademy = Handler.AcademyRecruits[Handler.Level];
 
                 if (ground_tile.Type.Contains("Snow") ||
                     ground_tile.Type.Contains("Ice"))
@@ -829,6 +835,10 @@ namespace DoS1.Menus
                     {
                         type = "Shop";
                     }
+                    else if (location.Type.Contains("Academy"))
+                    {
+                        type = "Academy";
+                    }
                 }
             }
 
@@ -837,6 +847,10 @@ namespace DoS1.Menus
             if (type == "Shop")
             {
                 MenuManager.ChangeMenu("Shop");
+            }
+            else if (type == "Academy")
+            {
+                MenuManager.ChangeMenu("Academy");
             }
         }
 

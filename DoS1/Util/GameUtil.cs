@@ -119,8 +119,8 @@ namespace DoS1.Util
 
         public static void ReturnToWorldmap()
         {
-            Handler.TradingInventory.Items.Clear();
-            Handler.TradingInventory = null;
+            Handler.TradingShop.Items.Clear();
+            Handler.TradingShop = null;
 
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
 

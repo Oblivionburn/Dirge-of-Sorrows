@@ -834,6 +834,8 @@ namespace DoS1.Scenes
             Handler.CombatTimer.Stop();
             hero_killed = true;
 
+            Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
+
             Button button = Menu.GetButton("Result");
             button.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
 
