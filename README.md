@@ -18,11 +18,11 @@
 - Menu for managing rune attachments in items/gear
 - Menu for viewing general inventory of player army
 - Menu for buying/selling items in shops
+- Menu for purchasing more characters at academy towns
 - Combat screen and basic combat mechanics
 - Single enemy squad for combat testing
 #
 ### Planned features not yet implemented:
-- Menu for purchasing more characters at academy towns
 - Dispatching additional squads to player base on map
 - Right-clicking squads on map to view their characters/formation
 - Context menu to handle selection of a squad when there's multiple in one location
