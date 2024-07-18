@@ -21,11 +21,11 @@
 - Menu for purchasing more characters at academy towns
 - Combat screen and basic combat mechanics
 - Single enemy squad for combat testing
+- Dispatching additional squads to player base on map
+- Context menu to handle selection of a squad when there's multiple in one location
 #
 ### Planned features not yet implemented:
-- Dispatching additional squads to player base on map
 - Right-clicking squads on map to view their characters/formation
-- Context menu to handle selection of a squad when there's multiple in one location
 - Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
 - AI to control enemy squad movement on map
