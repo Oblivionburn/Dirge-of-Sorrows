@@ -11,8 +11,12 @@ using OP_Engine.Controls;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
 using OP_Engine.Time;
+using OP_Engine.Scenes;
+using OP_Engine.Tiles;
+using OP_Engine.Sounds;
 
 using DoS1.Util;
+using System.Linq;
 
 namespace DoS1.Menus
 {
@@ -208,10 +212,18 @@ namespace DoS1.Menus
                                         break;
                                     }
                                     else if (InputManager.Mouse_LB_Pressed &&
-                                             i > 0) //Prevent removing last squad
+                                             i > 0 && //Prevent removing last squad
+                                             !squad.Active) //Prevent removing deployed squad
                                     {
                                         SelectedSquad = squad.ID;
+
                                         GetButton("Remove").Enabled = true;
+
+                                        if (Handler.LocalMap &&
+                                            squad.Characters.Any())
+                                        {
+                                            GetButton("Deploy").Enabled = true;
+                                        }
                                     }
                                 }
                             }
@@ -229,6 +241,7 @@ namespace DoS1.Menus
                 {
                     SelectedSquad = 0;
                     GetButton("Remove").Enabled = false;
+                    GetButton("Deploy").Enabled = false;
                 }
             }
 
@@ -263,14 +276,21 @@ namespace DoS1.Menus
                 RemoveSquad();
                 Load();
             }
+            else if (button.Name == "Deploy")
+            {
+                DeploySquad();
+            }
         }
 
         private void Back()
         {
             SelectedSquad = 0;
             TimeManager.Paused = false;
+            SoundManager.AmbientPaused = false;
+
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
+
             MenuManager.ChangeMenu_Previous();
         }
 
@@ -352,6 +372,19 @@ namespace DoS1.Menus
             MenuManager.ChangeMenu("Squad");
         }
 
+        private void DeploySquad()
+        {
+            Army army = CharacterManager.GetArmy("Ally");
+            Squad squad = army.GetSquad(Handler.Selected_Squad);
+
+            World world = SceneManager.GetScene("Localmap").World;
+            Map map = world.Maps[Handler.Level];
+
+            WorldUtil.AllyToken_Start(squad, map);
+
+            GetButton("Deploy").Enabled = false;
+        }
+
         public override void Load(ContentManager content)
         {
             Clear();
@@ -397,6 +430,19 @@ namespace DoS1.Menus
                 texture = AssetManager.Textures["Button_Remove"],
                 texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
                 texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Deploy",
+                hover_text = "Deploy Squad",
+                texture = AssetManager.Textures["Button_Next"],
+                texture_highlight = AssetManager.Textures["Button_Next_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Next_Disabled"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White,
                 visible = true
@@ -612,6 +658,7 @@ namespace DoS1.Menus
             GetButton("Back").Region = new Region(X, Y, width, height);
             GetButton("Add").Region = new Region(X + width, Y, width, height);
             GetButton("Remove").Region = new Region(X + (width * 2), Y, width, height);
+            GetButton("Deploy").Region = new Region(X + (width * 3), Y, width, height);
 
             GetPicture("Arrow_Up").Region = new Region(X, height, width, height);
             GetPicture("Arrow_Down").Region = new Region(X, Main.Game.ScreenHeight - height, width, height);

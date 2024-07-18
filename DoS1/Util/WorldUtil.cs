@@ -612,19 +612,47 @@ namespace DoS1.Util
                     switch (direction)
                     {
                         case Direction.North:
-                            texture = AssetManager.Textures["Path_NS"];
+                            if (previous_direction == Direction.Nowhere)
+                            {
+                                texture = AssetManager.Textures["Path_N"];
+                            }
+                            else
+                            {
+                                texture = AssetManager.Textures["Path_NS"];
+                            }
                             break;
 
                         case Direction.East:
-                            texture = AssetManager.Textures["Path_WE"];
+                            if (previous_direction == Direction.Nowhere)
+                            {
+                                texture = AssetManager.Textures["Path_E"];
+                            }
+                            else
+                            {
+                                texture = AssetManager.Textures["Path_WE"];
+                            }
                             break;
 
                         case Direction.South:
-                            texture = AssetManager.Textures["Path_NS"];
+                            if (previous_direction == Direction.Nowhere)
+                            {
+                                texture = AssetManager.Textures["Path_S"];
+                            }
+                            else
+                            {
+                                texture = AssetManager.Textures["Path_NS"];
+                            }
                             break;
 
                         case Direction.West:
-                            texture = AssetManager.Textures["Path_WE"];
+                            if (previous_direction == Direction.Nowhere)
+                            {
+                                texture = AssetManager.Textures["Path_W"];
+                            }
+                            else
+                            {
+                                texture = AssetManager.Textures["Path_WE"];
+                            }
                             break;
 
                         case Direction.NorthEast:
@@ -733,21 +761,6 @@ namespace DoS1.Util
                         Region = tile.Region
                     });
                 }
-            }
-        }
-
-        public static void DeselectToken(Map map, Menu menu)
-        {
-            Handler.Selected_Token = -1;
-
-            menu.GetPicture("Select").Visible = false;
-            menu.GetPicture("Highlight").Visible = true;
-            menu.GetPicture("Highlight").DrawColor = new Color(255, 255, 255, 255);
-
-            if (map != null)
-            {
-                Layer pathing = map.GetLayer("Pathing");
-                pathing.Visible = false;
             }
         }
 
@@ -950,6 +963,7 @@ namespace DoS1.Util
                 squad.Location = new Location(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
                 squad.Region = new Region(ally_base.Region.X, ally_base.Region.Y, ally_base.Region.Width, ally_base.Region.Height);
                 squad.Visible = true;
+                squad.Active = true;
             }
         }
 
@@ -961,6 +975,7 @@ namespace DoS1.Util
                 squad.Location = new Location(enemy_base.Location.X, enemy_base.Location.Y, enemy_base.Location.Z);
                 squad.Region = new Region(enemy_base.Region.X, enemy_base.Region.Y, enemy_base.Region.Width, enemy_base.Region.Height);
                 squad.Visible = true;
+                squad.Active = true;
             }
         }
 
@@ -1054,6 +1069,16 @@ namespace DoS1.Util
                                 squad.Location.Y == squad.Destination.Y)
                             {
                                 squad.Region = new Region(destination.Region.X, destination.Region.Y, destination.Region.Width, destination.Region.Height);
+
+                                if (Handler.Hovering_Squad != null &&
+                                    Handler.Hovering_Squad.ID == squad.ID)
+                                {
+                                    //Fix highlight region reference breaking after setting new Region on squad
+                                    Menu menu = MenuManager.GetMenu("UI");
+                                    Picture highlight = menu.GetPicture("Highlight");
+                                    highlight.Region = squad.Region;
+                                }
+
                                 squad.Path.Remove(path);
 
                                 Squad target = ArmyUtil.Get_TargetSquad(squad.GetLeader().Target_ID);

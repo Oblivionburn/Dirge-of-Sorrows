@@ -128,6 +128,7 @@ namespace DoS1
                                 !TimeManager.Paused)
                             {
                                 TimeManager.Paused = true;
+                                SoundManager.AmbientPaused = true;
 
                                 if (Handler.Combat)
                                 {
@@ -152,7 +153,7 @@ namespace DoS1
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
 
-                            if (!Handler.LocalPause ||
+                            if ((!Handler.LocalPause && !TimeManager.Paused) ||
                                 Handler.Combat)
                             {
                                 WeatherManager.Update(Game.Resolution);

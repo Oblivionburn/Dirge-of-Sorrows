@@ -12,6 +12,7 @@ using OP_Engine.Utility;
 using OP_Engine.Time;
 
 using DoS1.Util;
+using OP_Engine.Sounds;
 
 namespace DoS1.Menus
 {
@@ -306,8 +307,11 @@ namespace DoS1.Menus
         private void Back()
         {
             TimeManager.Paused = false;
+            SoundManager.AmbientPaused = false;
+
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
+
             MenuManager.ChangeMenu_Previous();
         }
 

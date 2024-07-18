@@ -833,8 +833,19 @@ namespace DoS1.Util
 
                     if (remaining != null)
                     {
-                        //Finish movement to current destination
-                        squad.Path.Insert(0, remaining);
+                        if (remaining.X == squad.Path[1].X &&
+                            remaining.Y == squad.Path[1].Y &&
+                            squad.Moved > 0)
+                        {
+                            //Exclude starting location if already moving to next location
+                            squad.Path.RemoveAt(0);
+                        }
+                        else
+                        {
+                            //Reverse direction towards new starting location
+                            squad.Location = new Location(remaining.X, remaining.Y, 0);
+                            squad.Moved = squad.Move_TotalDistance - squad.Moved;
+                        }
                     }
 
                     ALocation start = squad.Path[0];
@@ -868,7 +879,15 @@ namespace DoS1.Util
                         squad.Coordinates = destination.Location;
                     }
                 }
-                
+                else if (remaining != null &&
+                         squad.Moved > 0)
+                {
+                    //Reverse direction back towards current location if already moved away from it
+                    squad.Path.Insert(0, new ALocation((int)squad.Location.X, (int)squad.Location.Y));
+                    squad.Location = new Location(remaining.X, remaining.Y, 0);
+                    squad.Moved = squad.Move_TotalDistance - squad.Moved;
+                }
+
                 Handler.Selected_Token = -1;
 
                 menu.GetPicture("Select").Visible = false;

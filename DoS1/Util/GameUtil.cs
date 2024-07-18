@@ -72,6 +72,7 @@ namespace DoS1.Util
         public static void ReturnToTitle()
         {
             Main.Game.GameStarted = false;
+            Handler.LocalMap = false;
             TimeManager.Paused = false;
             TimeManager.Interval = 0;
 
@@ -83,6 +84,9 @@ namespace DoS1.Util
 
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");
+
+            SceneManager.GetScene("Worldmap").World.Maps.Clear();
+            SceneManager.GetScene("Localmap").World.Maps.Clear();
 
             SoundManager.StopAll();
             SoundManager.MusicLooping = true;

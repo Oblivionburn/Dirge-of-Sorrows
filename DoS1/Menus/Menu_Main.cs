@@ -9,6 +9,7 @@ using OP_Engine.Time;
 using OP_Engine.Utility;
 
 using DoS1.Util;
+using OP_Engine.Sounds;
 
 namespace DoS1.Menus
 {
@@ -137,6 +138,7 @@ namespace DoS1.Menus
         public override void Close()
         {
             TimeManager.Paused = false;
+            SoundManager.AmbientPaused = false;
 
             if (Handler.Combat)
             {

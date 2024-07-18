@@ -142,7 +142,10 @@ namespace DoS1.Menus
                 {
                     foreach (Squad squad in army.Squads)
                     {
-                        CharacterUtil.DrawSquad(spriteBatch, squad, Color.White);
+                        if (squad.ID == Handler.Selected_Squad)
+                        {
+                            CharacterUtil.DrawSquad(spriteBatch, squad, Color.White);
+                        }
                     }
                 }
 
@@ -565,6 +568,7 @@ namespace DoS1.Menus
                         if (ally_squad.Characters.Count == 1)
                         {
                             ally_squad.Name = moving_character.Name;
+                            ally_squad.Leader_ID = moving_character.ID;
                         }
                     }
                 }

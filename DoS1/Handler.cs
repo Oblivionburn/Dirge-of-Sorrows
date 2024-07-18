@@ -36,6 +36,7 @@ namespace DoS1
         public static bool ManualPause;
         public static bool LocalPause;
 
+        public static Squad Hovering_Squad = null;
         public static long Selected_Token = -1;
         public static long Selected_Squad;
         public static long Selected_Character;
