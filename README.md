@@ -23,14 +23,15 @@
 - Single enemy squad for combat testing
 - Dispatching additional squads to player base on map
 - Context menu to handle selection of a squad when there's multiple in one location
-#
-### Planned features not yet implemented:
-- Right-clicking squads on map to view their characters/formation
-- Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
 - AI to control enemy squad movement on map
 - Enemy squads capturing towns
-- Losing game (or just the level?) if enemy squad reaches player base
+- Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
+#
+### Planned features not yet implemented:
+- Additional runes for combat
+- Right-clicking squads on map to view their characters/formation
+- Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
 - Character stat/xp/level progression
 - Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
 - Adding more music for variety
