@@ -332,6 +332,8 @@ namespace DoS1.Menus
                                                     starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
                                                     starting_region = character.Region.ToRectangle;
                                                     moving_character = character;
+                                                    character.HealthBar.Visible = false;
+                                                    character.ManaBar.Visible = false;
 
                                                     break;
                                                 }
@@ -548,7 +550,11 @@ namespace DoS1.Menus
                             SwapCharacters(reserves, moving_character, ally_squad, existing);
 
                             ReserveList.Add(existing);
+                            existing.HealthBar.Visible = false;
+                            existing.ManaBar.Visible = false;
+
                             ReserveList.Remove(moving_character);
+                            CharacterUtil.ResizeBars(moving_character);
                         }
                         
                         break;
@@ -562,7 +568,9 @@ namespace DoS1.Menus
                     if (!inSquad)
                     {
                         reserves.Characters.Remove(moving_character);
+
                         ReserveList.Remove(moving_character);
+                        CharacterUtil.ResizeBars(moving_character);
 
                         ally_squad.Characters.Add(moving_character);
                         if (ally_squad.Characters.Count == 1)
@@ -630,7 +638,11 @@ namespace DoS1.Menus
                             SwapCharacters(ally_squad, moving_character, reserves, existing);
 
                             ReserveList.Add(moving_character);
+                            moving_character.HealthBar.Visible = false;
+                            moving_character.ManaBar.Visible = false;
+
                             ReserveList.Remove(existing);
+                            CharacterUtil.ResizeBars(existing);
                         }
                         
                         break;
@@ -644,9 +656,13 @@ namespace DoS1.Menus
                     if (!inReserves)
                     {
                         reserves.Characters.Add(moving_character);
+
                         ReserveList.Add(moving_character);
+                        moving_character.HealthBar.Visible = false;
+                        moving_character.ManaBar.Visible = false;
 
                         ally_squad.Characters.Remove(moving_character);
+
                         if (ally_squad.Characters.Count == 0)
                         {
                             ally_squad.Name = "";
@@ -824,6 +840,7 @@ namespace DoS1.Menus
                                 {
                                     character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
                                     character.Visible = true;
+                                    CharacterUtil.ResizeBars(character);
                                 }
                             }
                         }
@@ -904,6 +921,7 @@ namespace DoS1.Menus
                                     id = character.ID;
                                     character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
                                     character.Visible = true;
+                                    CharacterUtil.ResizeBars(character);
                                 }
 
                                 AddPicture(id, "squad_x:" + x.ToString() + ",squad_y:" + y.ToString(), AssetManager.Textures["Grid"],

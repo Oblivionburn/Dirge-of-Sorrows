@@ -415,13 +415,13 @@ namespace DoS1.Util
         public static void AnimateTiles()
         {
             Scene scene = SceneManager.GetScene("Worldmap");
-            if (Handler.LocalMap)
-            {
-                scene = SceneManager.GetScene("Localmap");
-            }
-            else if (Handler.Combat)
+            if (Handler.Combat)
             {
                 scene = SceneManager.GetScene("Combat");
+            }
+            else if (Handler.LocalMap)
+            {
+                scene = SceneManager.GetScene("Localmap");
             }
 
             foreach (Map map in scene.World.Maps)
@@ -813,6 +813,23 @@ namespace DoS1.Util
             return direction;
         }
 
+        public static int GetDistance(Location origin, Location target)
+        {
+            int x_diff = (int)origin.X - (int)target.X;
+            if (x_diff < 0)
+            {
+                x_diff *= -1;
+            }
+
+            int y_diff = (int)origin.Y - (int)target.Y;
+            if (y_diff < 0)
+            {
+                y_diff *= -1;
+            }
+
+            return x_diff + y_diff;
+        }
+
         public static string Get_Terrain(Map map, Vector2 location)
         {
             Layer ground = map.GetLayer("Ground");
@@ -913,6 +930,97 @@ namespace DoS1.Util
             return null;
         }
 
+        public static List<Tile> GetTowns(Map map)
+        {
+            List<Tile> towns = new List<Tile>();
+
+            Layer locations = map.GetLayer("Locations");
+            if (locations != null)
+            {
+                foreach (Tile location in locations.Tiles)
+                {
+                    if (!location.Type.Contains("Base"))
+                    {
+                        towns.Add(location);
+                    }
+                }
+            }
+
+            return towns;
+        }
+
+        public static Tile GetNearest_Town(Map map, Layer ground, Army army, Squad squad, bool to_guard)
+        {
+            if (squad != null &&
+                map != null)
+            {
+                List<Tile> Towns = GetTowns(map);
+
+                Tile nearest = null;
+
+                //Get first unoccupied town
+                foreach (Tile town in Towns)
+                {
+                    if (!town.Type.Contains("Enemy") || to_guard)
+                    {
+                        Squad existing = ArmyUtil.Get_Squad(map, army, town.Location);
+                        if (existing == null)
+                        {
+                            nearest = town;
+                            break;
+                        }
+                    }
+                }
+
+                if (nearest != null)
+                {
+                    int distance = GetDistance(squad.Location, nearest.Location);
+
+                    //Check for closer unoccupied town
+                    foreach (Tile town in Towns)
+                    {
+                        if (!town.Type.Contains("Enemy") || to_guard)
+                        {
+                            Squad existing = ArmyUtil.Get_Squad(map, army, town.Location);
+                            int new_distance = GetDistance(squad.Location, town.Location);
+
+                            if (new_distance < distance &&
+                                existing == null)
+                            {
+                                distance = new_distance;
+                                nearest = town;
+                            }
+                        }
+                    }
+
+                    Tile nearest_ground = ground.GetTile(new Vector2(nearest.Location.X, nearest.Location.Y));
+                    return nearest_ground;
+                }
+            }
+
+            return null;
+        }
+
+        public static Squad GetNearest_Squad(Squad squad)
+        {
+            Army ally_army = CharacterManager.GetArmy("Ally");
+
+            Squad nearest = ally_army.Squads[0];
+            int distance = GetDistance(squad.Location, nearest.Location);
+
+            foreach (Squad ally_squad in ally_army.Squads)
+            {
+                int new_distance = GetDistance(squad.Location, ally_squad.Location);
+                if (new_distance < distance)
+                {
+                    distance = new_distance;
+                    nearest = ally_squad;
+                }
+            }
+
+            return nearest;
+        }
+
         public static void ChangeLocation(Tile location, Squad squad)
         {
             if (location.Type.Contains("Academy"))
@@ -923,7 +1031,8 @@ namespace DoS1.Util
             {
                 location.Type = "Shop_" + squad.Type;
             }
-            else if (location.Type.Contains("Base"))
+            else if (location.Type.Contains("Base") &&
+                     !location.Type.Contains("Ally"))
             {
                 location.Type = "Base_" + squad.Type;
             }
@@ -1088,27 +1197,48 @@ namespace DoS1.Util
                                     Tile target_location = ground.GetTile(new Vector2(target.Location.X, target.Location.Y));
                                     if (target_location != null)
                                     {
-                                        ArmyUtil.SetPath(MenuManager.GetMenu("UI"), map, target_location);
+                                        ArmyUtil.SetPath(map, squad, target_location);
                                     }
                                 }
                                 else
                                 {
+                                    //Check if landing at location
                                     if (!squad.Path.Any())
                                     {
-                                        //Check if landing at location
                                         Layer locations = map.GetLayer("Locations");
                                         Tile location_tile = locations.GetTile(squad.Destination);
-                                        if (location_tile != null)
+
+                                        if (squad.Type == "Ally")
                                         {
-                                            GameUtil.Alert_Location(squad, location_tile);
+                                            if (location_tile != null)
+                                            {
+                                                GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                            }
+                                            else
+                                            {
+                                                GameUtil.Alert_MoveFinished(squad);
+                                            }
                                         }
-                                        else
+                                        else if (squad.Type == "Enemy")
                                         {
-                                            GameUtil.Alert_MoveFinished(squad);
+                                            if (location_tile != null)
+                                            {
+                                                ChangeLocation(location_tile, squad);
+                                                GameUtil.Alert_Capture(map, ground, location_tile);
+                                            }
+                                            else if (squad.Assignment != "Guard Base")
+                                            {
+                                                AI_Util.Set_NextTarget(map, ground, army, squad);
+                                            }
                                         }
                                     }
                                 }
                             }
+                        }
+                        else if (squad.Type == "Enemy" &&
+                                 squad.Assignment != "Guard Base")
+                        {
+                            AI_Util.Set_NextTarget(map, ground, army, squad);
                         }
                     }
                 }

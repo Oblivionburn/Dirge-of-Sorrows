@@ -51,6 +51,7 @@ namespace DoS1
         public static Squad TradingAcademy;
 
         public static Timer CombatTimer = new Timer(1);
+        public static Timer CombatTimer_Tiles = new Timer(200);
         public static bool Combat;
         public static int Element_Multiplier = 8;
         public static string Combat_Terrain;

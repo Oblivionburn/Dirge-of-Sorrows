@@ -133,6 +133,7 @@ namespace DoS1
                                 if (Handler.Combat)
                                 {
                                     Handler.CombatTimer.Stop();
+                                    Handler.CombatTimer_Tiles.Stop();
                                 }
 
                                 OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");
@@ -153,8 +154,7 @@ namespace DoS1
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
 
-                            if ((!Handler.LocalPause && !TimeManager.Paused) ||
-                                Handler.Combat)
+                            if (!SoundManager.AmbientPaused)
                             {
                                 WeatherManager.Update(Game.Resolution);
                             }

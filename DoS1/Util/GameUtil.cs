@@ -72,7 +72,11 @@ namespace DoS1.Util
         public static void ReturnToTitle()
         {
             Main.Game.GameStarted = false;
+
             Handler.LocalMap = false;
+            Handler.LocalPause = false;
+            Handler.Gold = 1000;
+
             TimeManager.Paused = false;
             TimeManager.Interval = 0;
 
@@ -81,6 +85,20 @@ namespace DoS1.Util
             Menu main = MenuManager.GetMenu("Main");
             main.Visible = true;
             main.Active = true;
+
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.GetButton("Worldmap").Visible = false;
+            ui.GetButton("PlayPause").Enabled = false;
+            ui.GetButton("Speed").Enabled = false;
+
+            Main.TimeSpeed = 1;
+
+            Button speed = ui.GetButton("Speed");
+            speed.Value = 0;
+            speed.HoverText = "x1";
+            speed.Texture = AssetManager.Textures["Button_Speed1"];
+            speed.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
+            speed.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
 
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");
@@ -126,9 +144,13 @@ namespace DoS1.Util
             Handler.TradingShop.Items.Clear();
             Handler.TradingShop = null;
 
+            Handler.TradingAcademy.Characters.Clear();
+            Handler.TradingAcademy = null;
+
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
 
             Handler.LocalMap = false;
+            Handler.LocalPause = false;
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.GetButton("Worldmap").Visible = false;
@@ -143,6 +165,18 @@ namespace DoS1.Util
             speed.Texture = AssetManager.Textures["Button_Speed1"];
             speed.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
             speed.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
+
+            Army army = CharacterManager.GetArmy("Ally");
+            foreach (Squad squad in army.Squads)
+            {
+                squad.Active = false;
+
+                foreach (Character character in squad.Characters)
+                {
+                    character.HealthBar.Value = character.HealthBar.Max_Value;
+                    character.ManaBar.Value = character.ManaBar.Max_Value;
+                }
+            }
 
             SceneManager.ChangeScene("Worldmap");
 
@@ -273,7 +307,7 @@ namespace DoS1.Util
             mouseClick.Visible = true;
         }
 
-        public static void Alert_Location(Squad squad, Tile tile)
+        public static void Alert_Location(Map map, Layer ground, Squad squad, Tile location)
         {
             LocalPause();
 
@@ -287,72 +321,53 @@ namespace DoS1.Util
             bool is_base = false;
             bool captured_enemy_base = false;
 
-            Scene scene = SceneManager.GetScene("Localmap");
-            if (scene.World.Maps.Any())
+            if (location.Type.Contains("Enemy"))
             {
-                Map map = scene.World.Maps[Handler.Level];
-                if (map != null)
-                {
-                    Layer ground = map.GetLayer("Ground");
-                    Layer locations = map.GetLayer("Locations");
-
-                    foreach (Tile location in locations.Tiles)
-                    {
-                        if (squad.Location.X == location.Location.X &&
-                            squad.Location.Y == location.Location.Y)
-                        {
-                            if (location.Type.Contains("Enemy"))
-                            {
-                                liberated = true;
-                            }
-                            else if (location.Type.Contains("Neutral"))
-                            {
-                                captured = true;
-                            }
-
-                            if (location.Type.Contains("Academy"))
-                            {
-                                is_academy = true;
-                            }
-                            else if (location.Type.Contains("Shop"))
-                            {
-                                is_shop = true;
-                            }
-                            else if (location.Type.Contains("Base"))
-                            {
-                                is_base = true;
-                            }
-
-                            if (liberated &&
-                                is_base)
-                            {
-                                captured_enemy_base = true;
-                            }
-
-                            if (!is_base)
-                            {
-                                WorldUtil.ChangeLocation(location, squad);
-                            }
-                            
-                            WorldUtil.CameraToTile(map, ground, location);
-                            break;
-                        }
-                    }
-                }
+                liberated = true;
             }
+            else if (location.Type.Contains("Neutral"))
+            {
+                captured = true;
+            }
+
+            if (location.Type.Contains("Academy"))
+            {
+                is_academy = true;
+            }
+            else if (location.Type.Contains("Shop"))
+            {
+                is_shop = true;
+            }
+            else if (location.Type.Contains("Base"))
+            {
+                is_base = true;
+            }
+
+            if (liberated &&
+                is_base)
+            {
+                captured_enemy_base = true;
+            }
+
+            if (!is_base)
+            {
+                WorldUtil.ChangeLocation(location, squad);
+            }
+
+            WorldUtil.CameraToTile(map, ground, location);
 
             string message;
             if (liberated)
             {
-                message = squad.Name + ": \"We liberated " + tile.Name + "!";
+                message = squad.Name + ": \"We liberated " + location.Name + "!";
             }
             else if (captured)
             {
-                message = squad.Name + ": \"We captured " + tile.Name + ".";
+                message = squad.Name + ": \"We captured " + location.Name + ".";
             }
             else
             {
-                message = squad.Name + ": \"We arrived at " + tile.Name + ".";
+                message = squad.Name + ": \"We arrived at " + location.Name + ".";
             }
 
             if (is_academy)
@@ -371,6 +386,7 @@ namespace DoS1.Util
             message += "\"";
 
             Menu ui = MenuManager.GetMenu("UI");
+            Button worldmap = ui.GetButton("Worldmap");
 
             Label dialogue = ui.GetLabel("Dialogue");
             dialogue.Visible = true;
@@ -397,7 +413,16 @@ namespace DoS1.Util
             else
             {
                 Button option1 = ui.GetButton("Dialogue_Option1");
-                option1.Text = "Claim Region";
+
+                if (worldmap.Enabled)
+                {
+                    option1.Text = "(Continue)";
+                }
+                else
+                {
+                    option1.Text = "Claim Region";
+                }
+                
                 option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
                 option1.Visible = true;
             }
@@ -427,6 +452,47 @@ namespace DoS1.Util
             Button option1 = ui.GetButton("Dialogue_Option1");
             option1.Text = "(Continue)";
             option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+            option1.Visible = true;
+        }
+
+        public static void Alert_Capture(Map map, Layer ground, Tile location)
+        {
+            LocalPause();
+
+            Handler.AlertType = "Capture";
+
+            WorldUtil.CameraToTile(map, ground, location);
+
+            string message = "";
+
+            if (location.Type == "Base_Ally")
+            {
+                message = "The enemy has captured our base!";
+            }
+            else
+            {
+                message = "The enemy has captured " + location.Name + "!";
+            }
+
+            int height = Main.Game.MenuSize.X;
+            Menu ui = MenuManager.GetMenu("UI");
+
+            Label dialogue = ui.GetLabel("Dialogue");
+            dialogue.Visible = true;
+            dialogue.Text = WrapText(message);
+
+            Button option1 = ui.GetButton("Dialogue_Option1");
+
+            if (location.Type == "Base_Ally")
+            {
+                option1.Text = "(Retreat)";
+            }
+            else
+            {
+                option1.Text = "(Continue)";
+            }
+            
+            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
             option1.Visible = true;
         }
 

@@ -63,6 +63,7 @@ namespace DoS1.Scenes
             Load(content);
 
             Handler.CombatTimer.Elapsed += Timer_Elapsed;
+            Handler.CombatTimer_Tiles.Elapsed += TileTimer_Elapsed;
         }
 
         #endregion
@@ -79,8 +80,6 @@ namespace DoS1.Scenes
                     SoundManager.MusicLooping = true;
                     AssetManager.PlayMusic_Random("Combat", true);
                 }
-
-                WorldUtil.AnimateTiles();
 
                 foreach (Button button in Menu.Buttons)
                 {
@@ -380,6 +379,15 @@ namespace DoS1.Scenes
                         FinishRound();
                     }
                 }
+            }
+        }
+
+        private void TileTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (Visible ||
+                Active)
+            {
+                WorldUtil.AnimateTiles();
             }
         }
 
@@ -689,6 +697,7 @@ namespace DoS1.Scenes
         private void FinishCombat()
         {
             Handler.CombatTimer.Stop();
+            Handler.CombatTimer_Tiles.Stop();
 
             if (!ally_squad.Characters.Any())
             {
@@ -764,6 +773,7 @@ namespace DoS1.Scenes
         private void Retreat()
         {
             Handler.CombatTimer.Stop();
+            Handler.CombatTimer_Tiles.Stop();
 
             won_battle = false;
 
@@ -814,6 +824,7 @@ namespace DoS1.Scenes
             }
 
             Handler.CombatTimer.Stop();
+            Handler.CombatTimer_Tiles.Stop();
             Handler.Combat = false;
 
             Menu ui = MenuManager.GetMenu("UI");
@@ -832,6 +843,7 @@ namespace DoS1.Scenes
         private void MainCharacterKilled()
         {
             Handler.CombatTimer.Stop();
+            Handler.CombatTimer_Tiles.Stop();
             hero_killed = true;
 
             Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
@@ -952,6 +964,7 @@ namespace DoS1.Scenes
                 Resize(Main.Game.Resolution);
 
                 Handler.CombatTimer.Start();
+                Handler.CombatTimer_Tiles.Start();
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.Xna.Framework;
@@ -689,6 +690,48 @@ namespace DoS1.Util
             }
         }
 
+        public static bool FrontRow(Character character)
+        {
+            if (character.Type == "Ally" &&
+                character.Formation.X == 0)
+            {
+                return true;
+            }
+            else if (character.Type == "Enemy" &&
+                     character.Formation.X == 2)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool MiddleRow(Character character)
+        {
+            if (character.Formation.X == 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool BackRow(Character character)
+        {
+            if (character.Type == "Ally" &&
+                character.Formation.X == 2)
+            {
+                return true;
+            }
+            else if (character.Type == "Enemy" &&
+                     character.Formation.X == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public static void DoDamage(Menu menu, Character defender, Item weapon, ref int ally_total_damage, ref int enemy_total_damage)
         {
             if (weapon != null)
@@ -722,6 +765,20 @@ namespace DoS1.Util
                         {
                             int defense = InventoryUtil.Get_TotalDefense(shield, type);
                             damage -= defense;
+                        }
+
+                        if (type == "Physical")
+                        {
+                            if ((InventoryUtil.Weapon_IsMelee(weapon) && BackRow(defender)) ||
+                                (weapon.Categories.Contains("Bow") && FrontRow(defender)))
+                            {
+                                damage = (int)Math.Floor(damage * 0.5);
+                            }
+                            else if (MiddleRow(defender) &&
+                                     (InventoryUtil.Weapon_IsMelee(weapon) || weapon.Categories.Contains("Bow")))
+                            {
+                                damage = (int)Math.Floor(damage * 0.75);
+                            }
                         }
 
                         if (damage < 0)
@@ -872,7 +929,7 @@ namespace DoS1.Util
                     if (weapon != null)
                     {
                         if (weapon.Categories.Contains("Sword") ||
-                        weapon.Categories.Contains("Axe"))
+                            weapon.Categories.Contains("Axe"))
                         {
                             AssetManager.PlaySound_Random("IronSword");
 

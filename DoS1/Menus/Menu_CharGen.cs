@@ -431,7 +431,7 @@ namespace DoS1.Menus
             Visible = false;
 
             InventoryUtil.GenAssets();
-            ArmyUtil.Gen_StartingArmy();
+            ArmyUtil.InitArmies();
 
             Army army = CharacterManager.GetArmy("Ally");
             Squad squad = army.Squads[0];

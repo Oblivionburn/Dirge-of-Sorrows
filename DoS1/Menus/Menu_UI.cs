@@ -71,6 +71,7 @@ namespace DoS1.Menus
                 if (!Handler.LocalPause)
                 {
                     UpdateTime();
+                    UpdateGold();
                 }
 
                 base.Update(gameRef, content);
@@ -580,10 +581,12 @@ namespace DoS1.Menus
             World world = SceneManager.GetScene("Localmap").World;
             if (world.Maps.Count >= Handler.Level + 1)
             {
+                //Revisit map
                 localmap = world.Maps[Handler.Level];
             }
             else
             {
+                //Generate new map
                 if (!world.Maps.Any())
                 {
                     world = new World
@@ -598,8 +601,17 @@ namespace DoS1.Menus
 
                 localmap = WorldGen.GenLocalmap(world, ground_tile, Handler.Level);
                 world.Maps.Add(localmap);
+
+                //Generate enemies
+                Army enemies = CharacterManager.GetArmy("Enemy");
+                ArmyUtil.Gen_EnemySquads(enemies, Handler.Level);
+                foreach (Squad enemy_squad in enemies.Squads)
+                {
+                    WorldUtil.EnemyToken_Start(enemy_squad, localmap);
+                }
             }
 
+            //Hide other maps
             for (int i = 0; i < world.Maps.Count; i++)
             {
                 Map existing = world.Maps[i];
@@ -611,18 +623,21 @@ namespace DoS1.Menus
 
             if (localmap != null)
             {
+                //Set shop inventories
                 if (!Handler.ShopInventories.ContainsKey(Handler.Level))
                 {
                     Handler.ShopInventories.Add(Handler.Level, InventoryUtil.Gen_Shop(Handler.Level + 1));
                 }
                 Handler.TradingShop = Handler.ShopInventories[Handler.Level];
 
+                //Set academy units
                 if (!Handler.AcademyRecruits.ContainsKey(Handler.Level))
                 {
                     Handler.AcademyRecruits.Add(Handler.Level, ArmyUtil.Gen_Academy());
                 }
                 Handler.TradingAcademy = Handler.AcademyRecruits[Handler.Level];
 
+                //Set weather
                 if (ground_tile.Type.Contains("Snow") ||
                     ground_tile.Type.Contains("Ice"))
                 {
@@ -638,6 +653,7 @@ namespace DoS1.Menus
                 GetButton("PlayPause").Enabled = true;
                 GetButton("Speed").Enabled = true;
 
+                //Set "Return to Worldmap" button
                 Button worldMap = GetButton("Worldmap");
                 worldMap.Visible = true;
 
@@ -651,17 +667,12 @@ namespace DoS1.Menus
                     worldMap.Enabled = false;
                 }
 
+                //Set starting squad at base
                 Army allies = CharacterManager.GetArmy("Ally");
                 Squad ally_squad = allies.Squads[0];
                 WorldUtil.AllyToken_Start(ally_squad, localmap);
-
-                Army enemies = CharacterManager.GetArmy("Enemy");
-                if (enemies.Squads.Any())
-                {
-                    Squad enemy_squad = enemies.Squads[0];
-                    WorldUtil.EnemyToken_Start(enemy_squad, localmap);
-                }
                 
+                //Switch to local map
                 SceneManager.ChangeScene("Localmap");
                 WorldUtil.Resize_OnStart(localmap);
 
@@ -789,8 +800,6 @@ namespace DoS1.Menus
                 Character leader = ally_squad.GetLeader();
                 leader.Target_ID = enemy_squad.ID;
             }
-
-            InputManager.Mouse.Flush();
         }
 
         private void UpdateAlert(World world)
@@ -921,6 +930,10 @@ namespace DoS1.Menus
                 {
                     CloseDialogue();
                     GameUtil.Toggle_Pause(false);
+                }
+                else if (button.Text == "(Retreat)")
+                {
+                    GameUtil.ReturnToWorldmap();
                 }
             }
             else if (button.Name == "Dialogue_Option2")
@@ -1097,6 +1110,12 @@ namespace DoS1.Menus
             date.Text = "Day " + TimeManager.Now.Days.ToString();
         }
 
+        private void UpdateGold()
+        {
+            Label gold = GetLabel("Gold");
+            gold.Text = "Gold: " + Handler.Gold;
+        }
+
         private void AnimateMouseClick()
         {
             Picture mouseClick = GetPicture("MouseClick");
@@ -1256,6 +1275,8 @@ namespace DoS1.Menus
                 new Region(0, 0, 0, 0), true);
             GetLabel("Time").Opacity = 0.8f;
 
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Gold", "Gold: " + Handler.Gold, Color.Gold, new Region(0, 0, 0, 0), true);
+
             AddButton(new ButtonOptions
             {
                 id = Handler.GetID(),
@@ -1355,6 +1376,7 @@ namespace DoS1.Menus
 
             GetLabel("Date").Region = new Region(Main.Game.ScreenWidth - (width * 2), 0, width * 2, height / 2);
             GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), width / 2, width * 2, height / 2);
+            GetLabel("Gold").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), 0, width * 10, height);
 
             GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
             GetLabel("Dialogue").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Main.Game.ScreenHeight - (height * 5), width * 10, height * 4);

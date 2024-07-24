@@ -484,9 +484,7 @@ namespace DoS1.Menus
             ItemList.Remove(item);
 
             if (item.Type == "Weapon" &&
-                (item.Categories.Contains("Grimoire") ||
-                 item.Categories.Contains("Bow") ||
-                 item.Categories.Contains("Axe")))
+                InventoryUtil.Weapon_Is2H(item))
             {
                 foreach (Item existing in character.Inventory.Items)
                 {
@@ -505,9 +503,7 @@ namespace DoS1.Menus
                     if (existing.Equipped &&
                         existing.Type == "Weapon")
                     {
-                        if (existing.Categories.Contains("Grimoire") ||
-                            existing.Categories.Contains("Bow") ||
-                            existing.Categories.Contains("Axe"))
+                        if (InventoryUtil.Weapon_Is2H(item))
                         {
                             UnequipItem(main_inventory, existing);
                             break;
@@ -608,9 +604,7 @@ namespace DoS1.Menus
 
             if (item.Type == "Weapon")
             {
-                if (item.Categories.Contains("Axe") ||
-                    item.Categories.Contains("Bow") ||
-                    item.Categories.Contains("Grimoire"))
+                if (InventoryUtil.Weapon_Is2H(item))
                 {
                     text = item.Name + " (2H)\n\n";
                 }
@@ -794,8 +788,11 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
-            Color equip_color = new Color(96, 96, 96, 255) * 0.8f;
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "", Color.White, new Region(0, 0, 0, 0), true);
+
             AddPicture(Handler.GetID(), "Character", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White, false);
+
+            Color equip_color = new Color(96, 96, 96, 255) * 0.8f;
             AddPicture(Handler.GetID(), "Helm", AssetManager.Textures["Helm"], new Region(0, 0, 0, 0), equip_color, true);
             AddPicture(Handler.GetID(), "Armor", AssetManager.Textures["Armor"], new Region(0, 0, 0, 0), equip_color, true);
             AddPicture(Handler.GetID(), "Shield", AssetManager.Textures["Shield"], new Region(0, 0, 0, 0), equip_color, true);
@@ -941,6 +938,9 @@ namespace DoS1.Menus
                 Picture char_pic = GetPicture("Character");
                 character.Region = new Region(char_pic.Region.X, char_pic.Region.Y, char_pic.Region.Width, char_pic.Region.Height);
                 character.Visible = true;
+
+                CharacterUtil.ResizeBars(character);
+                GetLabel("Name").Text = character.Name;
 
                 Item equip = InventoryUtil.Get_EquippedItem(character, "Helm");
                 if (equip != null)
@@ -1149,6 +1149,8 @@ namespace DoS1.Menus
 
             Picture character = GetPicture("Character");
             character.Region = new Region(starting_X - (width * 8), starting_Y + (height * 2), (width * 4), (height * 6));
+
+            GetLabel("Name").Region = new Region(character.Region.X, character.Region.Y - height, character.Region.Width, height);
 
             float X = character.Region.X + character.Region.Width;
             float Y = character.Region.Y + height;

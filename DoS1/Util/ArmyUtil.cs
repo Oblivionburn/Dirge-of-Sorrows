@@ -27,7 +27,7 @@ namespace DoS1.Util
 
         #region Methods
 
-        public static void Gen_StartingArmy()
+        public static void InitArmies()
         {
             CharacterManager.Armies.Clear();
 
@@ -71,11 +71,6 @@ namespace DoS1.Util
                 Name = "Enemy"
             };
             CharacterManager.Armies.Add(enemies);
-
-            Squad enemy_squad = NewSquad("Enemy");
-            //Gen_EnemySquad(enemy_squad, 1);
-            Gen_EnemySquad_Test(enemy_squad);
-            enemies.Squads.Add(enemy_squad);
         }
 
         public static Squad NewSquad(string type)
@@ -266,107 +261,59 @@ namespace DoS1.Util
             return character;
         }
 
-        public static void Gen_EnemySquad_Test(Squad squad)
+        public static void Gen_EnemySquads(Army army, int depth)
         {
-            CryptoRandom random;
+            army.Squads.Clear();
 
-            for (int i = 0; i < 5; i++)
+            int squads = 1;
+            for (int i = 0; i < depth; i++)
             {
-                Vector2 formation = new Vector2(-1, -1);
-
-                for (int z = 0; z < 80; z++)
+                if (i == 1)
                 {
-                    bool found = false;
-
-                    random = new CryptoRandom();
-                    int x = random.Next(0, 3);
-                    int y = random.Next(0, 3);
-
-                    for (int j = 0; j < squad.Characters.Count; j++)
-                    {
-                        Character existing = squad.Characters[j];
-                        if (existing.Formation.X == x &&
-                            existing.Formation.Y == y)
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        formation = new Vector2(x, y);
-                        break;
-                    }
+                    squads = 2;
                 }
-
-                if (formation.X == -1)
+                else if (i % 2 == 0)
                 {
-                    continue;
+                    squads++;
                 }
-
-                string name = "";
-
-                random = new CryptoRandom();
-                int gender = random.Next(0, 2);
-                if (gender == 0)
-                {
-                    name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
-                }
-                else
-                {
-                    name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
-                }
-                name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
-
-                Character character = NewCharacter_Random(name, formation, true);
-                if (gender == 0)
-                {
-                    character.Gender = "Male";
-                }
-                else
-                {
-                    character.Gender = "Female";
-                }
-
-                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
-                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
-
-                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
-                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
-
-                string weapon_type = "";
-
-                random = new CryptoRandom();
-                int weapon_choice = random.Next(0, 3);
-                switch (weapon_choice)
-                {
-                    case 0:
-                        weapon_type = "Sword";
-                        break;
-
-                    case 1:
-                        weapon_type = "Mace";
-                        break;
-
-                    case 2:
-                        weapon_type = "Axe";
-                        break;
-                }
-
-                InventoryUtil.AddItem(character.Inventory, "Iron", weapon_type, "Weapon");
-                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
-
-                if (weapon_type != "Axe")
-                {
-                    InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
-                }
-
-                squad.Characters.Add(character);
             }
 
-            squad.Name = squad.Characters[0].Name;
+            for (int i = 1; i <= squads; i++)
+            {
+                Squad enemy_squad = NewSquad("Enemy");
+                if (i == 1)
+                {
+                    enemy_squad.Assignment = "Guard Base";
+                }
+                else if (i == 2)
+                {
+                    enemy_squad.Assignment = "Attack Base";
+                }
+                else
+                {
+                    CryptoRandom random = new CryptoRandom();
+                    int task = random.Next(0, 4);
+                    if (task == 0)
+                    {
+                        enemy_squad.Assignment = "Attack Base";
+                    }
+                    else if (task == 1)
+                    {
+                        enemy_squad.Assignment = "Capture Nearest Town";
+                    }
+                    else if (task == 2)
+                    {
+                        enemy_squad.Assignment = "Guard Nearest Town";
+                    }
+                    else if (task == 3)
+                    {
+                        enemy_squad.Assignment = "Attack Nearest Squad";
+                    }
+                }
+
+                Gen_EnemySquad(enemy_squad, depth + 1);
+                army.Squads.Add(enemy_squad);
+            }
         }
 
         public static void Gen_EnemySquad(Squad squad, int depth)
@@ -428,7 +375,7 @@ namespace DoS1.Util
                 {
                     name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
                 }
-                name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
+                //name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
 
                 Character character = NewCharacter_Random(name, formation, true);
                 if (gender == 0)
@@ -449,8 +396,7 @@ namespace DoS1.Util
                 }
 
                 random = new CryptoRandom();
-                int class_type = 0;
-                //int class_type = random.Next(0, 3);
+                int class_type = random.Next(0, 2);
                 if (class_type == 0)
                 {
                     #region Warrior Gear
@@ -499,6 +445,7 @@ namespace DoS1.Util
                             InventoryUtil.AddItem(character.Inventory, "Steel", "Platemail", "Armor");
                             break;
                     }
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
                     random = new CryptoRandom();
                     int helm_chance = random.Next(min_tier, max_tier + 1);
@@ -548,6 +495,7 @@ namespace DoS1.Util
                                 InventoryUtil.AddItem(character.Inventory, "Steel", "Platemail", "Helm");
                                 break;
                         }
+                        InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
                     }
 
                     string weapon_type = "";
@@ -581,10 +529,10 @@ namespace DoS1.Util
 
                         case 4:
                         case 5:
+                        case 6:
                             InventoryUtil.AddItem(character.Inventory, "Copper", weapon_type, "Weapon");
                             break;
-
-                        case 6:
+                        
                         case 7:
                         case 8:
                             InventoryUtil.AddItem(character.Inventory, "Bronze", weapon_type, "Weapon");
@@ -595,6 +543,7 @@ namespace DoS1.Util
                             InventoryUtil.AddItem(character.Inventory, "Steel", weapon_type, "Weapon");
                             break;
                     }
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
                     if (weapon_type != "Axe")
                     {
@@ -646,6 +595,7 @@ namespace DoS1.Util
                                     InventoryUtil.AddItem(character.Inventory, "Steel", "Kite", "Shield");
                                     break;
                             }
+                            InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
                         }
                     }
 
@@ -655,7 +605,134 @@ namespace DoS1.Util
                 {
                     #region Ranger Gear
 
+                    random = new CryptoRandom();
+                    int armor_tier = random.Next(min_tier, max_tier + 1);
+                    switch (armor_tier)
+                    {
+                        case 1:
+                            InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            break;
 
+                        case 2:
+                            InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            break;
+
+                        case 3:
+                            InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            break;
+
+                        case 4:
+                            InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            break;
+
+                        case 5:
+                            InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            break;
+
+                        case 6:
+                            InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            break;
+
+                        case 7:
+                            InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            break;
+
+                        case 8:
+                            InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            break;
+
+                        case 9:
+                            InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Armor");
+                            break;
+
+                        case 10:
+                            InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Armor");
+                            break;
+                    }
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+
+                    random = new CryptoRandom();
+                    int helm_chance = random.Next(min_tier, max_tier + 1);
+                    if (helm_chance >= (int)Math.Ceiling((double)(min_tier + max_tier) / 2))
+                    {
+                        random = new CryptoRandom();
+                        int helm_tier = random.Next(min_tier, max_tier + 1);
+                        switch (helm_tier)
+                        {
+                            case 1:
+                                //No helm
+                                break;
+
+                            case 2:
+                                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                                break;
+
+                            case 3:
+                                InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                break;
+
+                            case 4:
+                                InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                break;
+
+                            case 5:
+                                InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                break;
+
+                            case 6:
+                                InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                break;
+
+                            case 7:
+                                InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                break;
+
+                            case 8:
+                                InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                break;
+
+                            case 9:
+                                InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Helm");
+                                break;
+
+                            case 10:
+                                InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Helm");
+                                break;
+                        }
+
+                        if (helm_tier > 1)
+                        {
+                            InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                        }
+                    }
+
+                    random = new CryptoRandom();
+                    int weapon_tier = random.Next(min_tier, max_tier + 1);
+                    switch (weapon_tier)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            InventoryUtil.AddItem(character.Inventory, "Elm", "Bow", "Weapon");
+                            break;
+
+                        case 4:
+                        case 5:
+                        case 6:
+                            InventoryUtil.AddItem(character.Inventory, "Cedar", "Bow", "Weapon");
+                            break;
+                        
+                        case 7:
+                        case 8:
+                            InventoryUtil.AddItem(character.Inventory, "Oak", "Bow", "Weapon");
+                            break;
+
+                        case 9:
+                        case 10:
+                            InventoryUtil.AddItem(character.Inventory, "Ebony", "Bow", "Weapon");
+                            break;
+                    }
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
                     #endregion
                 }
@@ -669,6 +746,13 @@ namespace DoS1.Util
                 }
 
                 squad.Characters.Add(character);
+
+                if (i == 0)
+                {
+                    //Set Leader
+                    squad.Leader_ID = character.ID;
+                    squad.Name = character.Name;
+                }
             }
         }
 
@@ -694,7 +778,7 @@ namespace DoS1.Util
                 {
                     name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
                 }
-                name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
+                //name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
 
                 Character character = NewCharacter_Random(name, new Vector2(x, y), false);
                 if (gender == 0)
@@ -738,20 +822,17 @@ namespace DoS1.Util
             return null;
         }
 
-        public static Squad Get_Squad(Map map, Vector2 location)
+        public static Squad Get_Squad(Map map, Army army, Location location)
         {
             Layer ground = map.GetLayer("Ground");
-            Tile tile = ground.GetTile(location);
+            Tile tile = ground.GetTile(new Vector2(location.X, location.Y));
 
-            foreach (Army army in CharacterManager.Armies)
+            foreach (Squad squad in army.Squads)
             {
-                foreach (Squad squad in army.Squads)
+                if (squad.Location.X == tile.Location.X &&
+                    squad.Location.Y == tile.Location.Y)
                 {
-                    if (squad.Location.X == tile.Location.X &&
-                        squad.Location.Y == tile.Location.Y)
-                    {
-                        return squad;
-                    }
+                    return squad;
                 }
             }
 
@@ -805,6 +886,93 @@ namespace DoS1.Util
             return null;
         }
 
+        public static void SetPath(Map map, Squad squad, Tile destination)
+        {
+            if (map != null &&
+                squad != null &&
+                destination != null)
+            {
+                Layer ground = map.GetLayer("Ground");
+                Layer roads = map.GetLayer("Roads");
+
+                ALocation remaining = null;
+
+                if (squad.Path.Any())
+                {
+                    remaining = new ALocation(squad.Path[0].X, squad.Path[0].Y);
+                }
+
+                squad.Path = Handler.Pathing.Get_Path(ground, roads, squad, destination, ground.Columns * ground.Rows, false);
+                if (squad.Path.Any())
+                {
+                    squad.Path.Reverse();
+
+                    if (remaining != null)
+                    {
+                        if (remaining.X == squad.Path[1].X &&
+                            remaining.Y == squad.Path[1].Y &&
+                            squad.Moved > 0)
+                        {
+                            //Exclude starting location if already moving to next location
+                            squad.Path.RemoveAt(0);
+                        }
+                        else
+                        {
+                            //Reverse direction towards new starting location
+                            squad.Location = new Location(remaining.X, remaining.Y, 0);
+                            squad.Moved = squad.Move_TotalDistance - squad.Moved;
+                        }
+                    }
+
+                    ALocation start = squad.Path[0];
+                    Tile start_tile = ground.GetTile(new Vector2(start.X, start.Y));
+
+                    if (squad.Region.X == start_tile.Region.X &&
+                        squad.Region.Y == start_tile.Region.Y)
+                    {
+                        //Exclude starting location if already there
+                        squad.Path.RemoveAt(0);
+                        squad.Moved = 0;
+                    }
+
+                    long target_id = squad.GetLeader().Target_ID;
+                    if (target_id != 0)
+                    {
+                        bool found = false;
+                        foreach (Army army in CharacterManager.Armies)
+                        {
+                            foreach (Squad existing in army.Squads)
+                            {
+                                if (target_id == existing.ID)
+                                {
+                                    found = true;
+                                    squad.Coordinates = existing.Location;
+                                    break;
+                                }
+                            }
+
+                            if (found)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        squad.Coordinates = destination.Location;
+                    }
+                }
+                else if (remaining != null &&
+                         squad.Moved > 0)
+                {
+                    //Reverse direction back towards current location if already moved away from it
+                    squad.Path.Insert(0, new ALocation((int)squad.Location.X, (int)squad.Location.Y));
+                    squad.Location = new Location(remaining.X, remaining.Y, 0);
+                    squad.Moved = squad.Move_TotalDistance - squad.Moved;
+                }
+            }
+        }
+
         public static void SetPath(Menu menu, Map map, Tile destination)
         {
             Layer ground = map.GetLayer("Ground");
@@ -826,7 +994,6 @@ namespace DoS1.Util
                 }
 
                 squad.Path = Handler.Pathing.Get_Path(ground, roads, squad, destination, ground.Columns * ground.Rows, false);
-
                 if (squad.Path.Any())
                 {
                     squad.Path.Reverse();

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Characters;
+using OP_Engine.Utility;
 
 namespace DoS1.Util
 {
@@ -127,6 +128,21 @@ namespace DoS1.Util
                     }
                 }
             }
+        }
+
+        public static void ResizeBars(Character character)
+        {
+            float bar_x = character.Region.X + (character.Region.Width / 8);
+            float bar_width = (character.Region.Width / 8) * 6;
+            float bar_height = character.Region.Width / 16;
+
+            character.HealthBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height, bar_width, bar_height);
+            character.HealthBar.Visible = true;
+            character.HealthBar.Update();
+
+            character.ManaBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height + bar_height, bar_width, bar_height);
+            character.ManaBar.Visible = true;
+            character.ManaBar.Update();
         }
 
         public static void Animate(Character character)

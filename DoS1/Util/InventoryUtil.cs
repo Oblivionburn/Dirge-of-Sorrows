@@ -408,7 +408,7 @@ namespace DoS1.Util
 
             properties.Add(NewProperty("Physical", "Damage", 35, 0));
             properties.Add(NewProperty("Rune", "Slots", 1, 0));
-            properties.Add(NewProperty("EP", "Cost", 4, 0));
+            properties.Add(NewProperty("EP", "Cost", 3, 0));
             Item item = NewItem(type, category, "Elm", properties);
             item.Buy_Price = 175;
             items.Add(item);
@@ -1260,6 +1260,30 @@ namespace DoS1.Util
                         return true;
                     }
                 }
+            }
+
+            return false;
+        }
+
+        public static bool Weapon_IsMelee(Item weapon)
+        {
+            if (weapon.Categories.Contains("Sword") ||
+                weapon.Categories.Contains("Axe") ||
+                weapon.Categories.Contains("Mace"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool Weapon_Is2H(Item weapon)
+        {
+            if (weapon.Categories.Contains("Axe") ||
+                weapon.Categories.Contains("Bow") ||
+                weapon.Categories.Contains("Grimoire"))
+            {
+                return true;
             }
 
             return false;

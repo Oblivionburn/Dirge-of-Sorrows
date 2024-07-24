@@ -92,6 +92,7 @@
     <Compile Include="Scenes\Localmap.cs" />
     <Compile Include="Scenes\Logo.cs" />
     <Compile Include="Scenes\Title.cs" />
+    <Compile Include="Util\AI_Util.cs" />
     <Compile Include="Util\ArmyUtil.cs" />
     <Compile Include="Util\CharacterUtil.cs" />
     <Compile Include="Util\CombatUtil.cs" />

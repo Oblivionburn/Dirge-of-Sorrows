@@ -375,7 +375,7 @@ namespace DoS1.Menus
         private void DeploySquad()
         {
             Army army = CharacterManager.GetArmy("Ally");
-            Squad squad = army.GetSquad(Handler.Selected_Squad);
+            Squad squad = army.GetSquad(SelectedSquad);
 
             World world = SceneManager.GetScene("Localmap").World;
             Map map = world.Maps[Handler.Level];
@@ -497,6 +497,7 @@ namespace DoS1.Menus
                                         if (character != null)
                                         {
                                             character.Region = new Region(X + (Main.Game.MenuSize.X * x), Y + (Main.Game.MenuSize.Y * y) - Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2));
+                                            CharacterUtil.ResizeBars(character);
                                         }
                                     }
                                 }
@@ -615,6 +616,7 @@ namespace DoS1.Menus
                             {
                                 character.Region = new Region(X + (Main.Game.MenuSize.X * x), Y + (Main.Game.MenuSize.Y * y) - Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2));
                                 character.Visible = true;
+                                CharacterUtil.ResizeBars(character);
                             }
                         }
                     }

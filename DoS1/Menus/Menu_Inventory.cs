@@ -357,9 +357,7 @@ namespace DoS1.Menus
 
             if (item.Type == "Weapon")
             {
-                if (item.Categories.Contains("Axe") ||
-                    item.Categories.Contains("Bow") ||
-                    item.Categories.Contains("Grimoire"))
+                if (InventoryUtil.Weapon_Is2H(item))
                 {
                     text = item.Name + " (2H)\n\n";
                 }
@@ -789,10 +787,10 @@ namespace DoS1.Menus
             int width = Main.Game.MenuSize.X;
             int height = Main.Game.MenuSize.X;
 
+            GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+
             int X = 0;
             int Y = 0;
-
-            GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
             GetButton("Back").Region = new Region(X, Y, width, height);
 

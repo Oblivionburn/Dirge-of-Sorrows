@@ -463,9 +463,7 @@ namespace DoS1.Menus
 
             if (item.Type == "Weapon")
             {
-                if (item.Categories.Contains("Axe") ||
-                    item.Categories.Contains("Bow") ||
-                    item.Categories.Contains("Grimoire"))
+                if (InventoryUtil.Weapon_Is2H(item))
                 {
                     text = item.Name + " (2H)\n\n";
 
