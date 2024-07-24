@@ -20,7 +20,6 @@
 - Menu for buying/selling items in shops
 - Menu for purchasing more characters at academy towns
 - Combat screen and basic combat mechanics
-- Single enemy squad for combat testing
 - Dispatching additional squads to player base on map
 - Context menu to handle selection of a squad when there's multiple in one location
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
