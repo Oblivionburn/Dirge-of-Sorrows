@@ -28,12 +28,12 @@
 - Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
 #
 ### Planned features not yet implemented:
-- Additional runes for combat
-- Recovering HP/EP at towns
 - Right-clicking squads on map to view their characters/formation
+- Recovering HP/EP at towns
 - Collecting gold from controlled towns
+- Additional runes for combat
 - Character stat/xp/level progression
-- Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
+- Saving/loading game state
+- Story/lore and tutorial
 - Adding more music for variety
 - Hopefully some graphical improvements, since I'm a terrible graphics artist
-- Story/lore and tutorial
