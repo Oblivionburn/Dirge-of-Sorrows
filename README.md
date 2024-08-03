@@ -31,7 +31,7 @@
 - Additional runes for combat
 - Recovering HP/EP at towns
 - Right-clicking squads on map to view their characters/formation
-- Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
+- Collecting gold from controlled towns
 - Character stat/xp/level progression
 - Maybe character skill progression (e.g. an Armor skill that increases Physical Defense and decreases EP Cost of armor)
 - Adding more music for variety
