@@ -29,6 +29,7 @@
 #
 ### Planned features not yet implemented:
 - Additional runes for combat
+- Recovering HP/EP at towns
 - Right-clicking squads on map to view their characters/formation
 - Maybe very slow income/gold generation from controlled towns (not sure about this yet since it can easily break the game economy/progression)
 - Character stat/xp/level progression
