@@ -36,4 +36,4 @@
 - Saving/loading game state
 - Story/lore and tutorial
 - Adding more music for variety
-- Hopefully some graphical improvements, since I'm a terrible graphics artist
+- Hopefully some graphical improvements
