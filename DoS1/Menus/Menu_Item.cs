@@ -307,7 +307,8 @@ namespace DoS1.Menus
                         ExamineItem(item);
 
                         if (InputManager.Mouse_LB_Held &&
-                            InputManager.Mouse.Moved)
+                            InputManager.Mouse.Moved &&
+                            !Handler.ViewOnly_Item)
                         {
                             found = false;
                             attachment = false;
@@ -338,7 +339,8 @@ namespace DoS1.Menus
                             ExamineItem(item);
 
                             if (InputManager.Mouse_LB_Held &&
-                                InputManager.Mouse.Moved)
+                                InputManager.Mouse.Moved &&
+                                !Handler.ViewOnly_Item)
                             {
                                 found = false;
                                 attachment = true;
@@ -444,6 +446,7 @@ namespace DoS1.Menus
 
                     Filter("Runes");
                     ResizeInventory();
+                    ResizeSlots();
                 }
 
                 if (!found_grid &&
@@ -595,7 +598,15 @@ namespace DoS1.Menus
             width = Main.Game.MenuSize.X;
             height = Main.Game.MenuSize.Y;
             starting_Y = (Main.Game.ScreenHeight / 2) - (height * 5);
-            starting_X = (Main.Game.ScreenWidth / 2) + width;
+
+            if (!Handler.ViewOnly_Item)
+            {
+                starting_X = (Main.Game.ScreenWidth / 2) + width;
+            }
+            else
+            {
+                starting_X = (Main.Game.ScreenWidth / 2) + (width * 9) + (width / 2);
+            }
         }
 
         private void ExamineItem(Item item)
@@ -740,15 +751,31 @@ namespace DoS1.Menus
             {
                 Character character = null;
 
-                Army army = CharacterManager.GetArmy("Ally");
-                if (army != null)
+                Army ally_army = CharacterManager.GetArmy("Ally");
+                if (ally_army != null)
                 {
-                    foreach (Squad squad in army.Squads)
+                    foreach (Squad squad in ally_army.Squads)
                     {
                         character = squad.GetCharacter(Handler.Selected_Character);
                         if (character != null)
                         {
                             break;
+                        }
+                    }
+                }
+
+                if (character == null)
+                {
+                    Army enemy_army = CharacterManager.GetArmy("Enemy");
+                    if (enemy_army != null)
+                    {
+                        foreach (Squad squad in enemy_army.Squads)
+                        {
+                            character = squad.GetCharacter(Handler.Selected_Character);
+                            if (character != null)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
@@ -790,15 +817,34 @@ namespace DoS1.Menus
                 }
 
                 Picture item = GetPicture("SelectedItem");
+                item.Region = new Region(starting_X - (width * 12), starting_Y, width * 5, height * 5);
                 item.Texture = selectedItem.Icon;
                 item.Image = new Rectangle(0, 0, item.Texture.Width, item.Texture.Height);
 
-                AddSlots();
+                GetPicture("SelectedItem_Spot").Region = item.Region;
+
+                LoadSlots();
+            }
+        }
+        
+        private void ClearSlots()
+        {
+            for (int i = 0; i < Pictures.Count; i++)
+            {
+                Picture picture = Pictures[i];
+                if (picture.Name.Contains("Slot") ||
+                    picture.Name.Contains("Link"))
+                {
+                    Pictures.Remove(picture);
+                    i--;
+                }
             }
         }
 
-        private void AddSlots()
+        private void LoadSlots()
         {
+            ClearSlots();
+
             Something slots = selectedItem.GetProperty("Rune Slots");
             if (slots != null)
             {
@@ -846,6 +892,9 @@ namespace DoS1.Menus
 
         private void ResizeSlots()
         {
+            ResetPos();
+            GetSelectedItem();
+
             Something slots = selectedItem.GetProperty("Rune Slots");
             if (slots != null)
             {
@@ -955,7 +1004,6 @@ namespace DoS1.Menus
         private void ResizeInventory()
         {
             ResizeGrid();
-            ResizeSlots();
 
             Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
@@ -1033,17 +1081,6 @@ namespace DoS1.Menus
 
         private void ClearGrid()
         {
-            for (int i = 0; i < Pictures.Count; i++)
-            {
-                Picture picture = Pictures[i];
-                if (picture.Name.Contains("Slot") ||
-                    picture.Name.Contains("Link"))
-                {
-                    Pictures.Remove(picture);
-                    i--;
-                }
-            }
-
             for (int y = 0; y < 10; y++)
             {
                 for (int x = 0; x < 10; x++)
@@ -1070,8 +1107,6 @@ namespace DoS1.Menus
         {
             ClearGrid();
             ResetPos();
-
-            GetSelectedItem();
 
             for (int y = 0; y < 10; y++)
             {
@@ -1107,9 +1142,18 @@ namespace DoS1.Menus
 
         public override void Load()
         {
-            LoadGrid();
-            Filter("Runes");
-            ResizeInventory();
+            if (!Handler.ViewOnly_Item)
+            {
+                LoadGrid();
+                Filter("Runes");
+                ResizeInventory();
+            }
+            else
+            {
+                ClearGrid();
+            }
+
+            ResizeSlots();
         }
 
         public override void Resize(Point point)
@@ -1118,12 +1162,9 @@ namespace DoS1.Menus
 
             ResetPos();
 
-            Picture item = GetPicture("SelectedItem");
-            item.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 11), starting_Y, width * 5, height * 5);
-            GetPicture("SelectedItem_Spot").Region = item.Region;
-
             if (Visible)
             {
+                ResizeSlots();
                 ResizeInventory();
             }
 

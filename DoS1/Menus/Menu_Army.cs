@@ -288,6 +288,9 @@ namespace DoS1.Menus
             TimeManager.Paused = false;
             SoundManager.AmbientPaused = false;
 
+            InputManager.Mouse.OnWheelUp -= ScrollUp;
+            InputManager.Mouse.OnWheelDown -= ScrollDown;
+
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
@@ -369,6 +372,14 @@ namespace DoS1.Menus
 
             Handler.Selected_Squad = id;
 
+            Handler.ViewOnly_Squad = false;
+            Handler.ViewOnly_Character = false;
+            Handler.ViewOnly_Item = false;
+
+            InputManager.Mouse.OnWheelUp -= ScrollUp;
+            InputManager.Mouse.OnWheelDown -= ScrollDown;
+
+            InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Squad");
         }
 

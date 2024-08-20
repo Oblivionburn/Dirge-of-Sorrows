@@ -36,11 +36,17 @@ namespace DoS1
         public static bool ManualPause;
         public static bool LocalPause;
 
-        public static Squad Hovering_Squad = null;
         public static long Selected_Token = -1;
+
+        public static Squad Hovering_Squad = null;
         public static long Selected_Squad;
+        public static bool ViewOnly_Squad = false;
+
         public static long Selected_Character;
+        public static bool ViewOnly_Character = false;
+
         public static long Selected_Item;
+        public static bool ViewOnly_Item = false;
 
         public static string ItemFilter;
         public static Dictionary<int, Inventory> ShopInventories = new Dictionary<int, Inventory>();

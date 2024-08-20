@@ -19,6 +19,8 @@ namespace DoS1.Menus
     {
         #region Variables
 
+        Character character = null;
+
         int Top;
         List<Picture> GridList = new List<Picture>();
         List<Item> ItemList = new List<Item>();
@@ -30,8 +32,6 @@ namespace DoS1.Menus
         int height;
         int starting_Y;
         int starting_X;
-
-        Character character = null;
 
         #endregion
 
@@ -331,7 +331,8 @@ namespace DoS1.Menus
                             ExamineItem(item);
 
                             if (InputManager.Mouse_LB_Held &&
-                                InputManager.Mouse.Moved)
+                                InputManager.Mouse.Moved &&
+                                !Handler.ViewOnly_Character)
                             {
                                 found = false;
                                 moving = true;
@@ -568,6 +569,7 @@ namespace DoS1.Menus
 
             Handler.Selected_Item = id;
 
+            InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Item");
         }
 
@@ -576,7 +578,15 @@ namespace DoS1.Menus
             width = Main.Game.MenuSize.X;
             height = Main.Game.MenuSize.Y;
             starting_Y = (Main.Game.ScreenHeight / 2) - (height * 5);
-            starting_X = (Main.Game.ScreenHeight / 2) + (width * 2);
+
+            if (!Handler.ViewOnly_Character)
+            {
+                starting_X = (Main.Game.ScreenWidth / 2) - (width * 5);
+            }
+            else
+            {
+                starting_X = (Main.Game.ScreenWidth / 2) + (width * 5);
+            }
         }
 
         private void ExamineItem(Item item)
@@ -871,48 +881,36 @@ namespace DoS1.Menus
             Resize(Main.Game.Resolution);
         }
 
-        private void ResizeGrid()
+        private void LoadCharacter()
         {
             ResetPos();
+            character = null;
 
-            for (int y = 0; y < 10; y++)
+            Army ally_army = CharacterManager.GetArmy("Ally");
+            if (ally_army != null)
             {
-                for (int x = 0; x < 10; x++)
-                {
-                    Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
-                    if (grid != null)
-                    {
-                        grid.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
-                        grid.Location = new Location(x, y + Top, 0);
-                    }
-                }
-            }
-
-            int X = starting_X + (width * 2);
-            int Y = starting_Y - height;
-
-            GetButton("Helms").Region = new Region(X + width, Y, width, height);
-            GetButton("Armors").Region = new Region(X + (width * 2), Y, width, height);
-            GetButton("Shields").Region = new Region(X + (width * 3), Y, width, height);
-            GetButton("Weapons").Region = new Region(X + (width * 4), Y, width, height);
-
-            GetPicture("Arrow_Up").Region = new Region(starting_X - width, starting_Y, width, height);
-            GetPicture("Arrow_Down").Region = new Region(starting_X - width, starting_Y + (height * 9), width, height);
-        }
-
-        private void ResizeInventory()
-        {
-            ResizeGrid();
-
-            Army army = CharacterManager.GetArmy("Ally");
-            if (army != null)
-            {
-                foreach (Squad squad in army.Squads)
+                foreach (Squad squad in ally_army.Squads)
                 {
                     character = squad.GetCharacter(Handler.Selected_Character);
                     if (character != null)
                     {
                         break;
+                    }
+                }
+            }
+
+            if (character == null)
+            {
+                Army enemy_army = CharacterManager.GetArmy("Enemy");
+                if (enemy_army != null)
+                {
+                    foreach (Squad squad in enemy_army.Squads)
+                    {
+                        character = squad.GetCharacter(Handler.Selected_Character);
+                        if (character != null)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -936,8 +934,20 @@ namespace DoS1.Menus
             if (character != null)
             {
                 Picture char_pic = GetPicture("Character");
+                char_pic.Region = new Region(starting_X - (width * 8), starting_Y + (height * 2), (width * 4), (height * 6));
+
                 character.Region = new Region(char_pic.Region.X, char_pic.Region.Y, char_pic.Region.Width, char_pic.Region.Height);
                 character.Visible = true;
+
+                GetLabel("Name").Region = new Region(char_pic.Region.X, char_pic.Region.Y - height, char_pic.Region.Width, height);
+
+                float X = char_pic.Region.X + char_pic.Region.Width;
+                float Y = char_pic.Region.Y + height;
+
+                GetPicture("Helm").Region = new Region(X, Y, width, height);
+                GetPicture("Armor").Region = new Region(X, Y + height, width, height);
+                GetPicture("Shield").Region = new Region(X, Y + (height * 2), width, height);
+                GetPicture("Weapon").Region = new Region(X, Y + (height * 3), width, height);
 
                 CharacterUtil.ResizeBars(character);
                 GetLabel("Name").Text = character.Name;
@@ -978,6 +988,40 @@ namespace DoS1.Menus
                     equip.Icon_Visible = true;
                 }
             }
+        }
+
+        private void ResizeGrid()
+        {
+            ResetPos();
+
+            for (int y = 0; y < 10; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
+                    if (grid != null)
+                    {
+                        grid.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
+                        grid.Location = new Location(x, y + Top, 0);
+                    }
+                }
+            }
+
+            int X = starting_X + (width * 2);
+            int Y = starting_Y - height;
+
+            GetButton("Helms").Region = new Region(X + width, Y, width, height);
+            GetButton("Armors").Region = new Region(X + (width * 2), Y, width, height);
+            GetButton("Shields").Region = new Region(X + (width * 3), Y, width, height);
+            GetButton("Weapons").Region = new Region(X + (width * 4), Y, width, height);
+
+            GetPicture("Arrow_Up").Region = new Region(starting_X - width, starting_Y, width, height);
+            GetPicture("Arrow_Down").Region = new Region(starting_X - width, starting_Y + (height * 9), width, height);
+        }
+
+        private void ResizeInventory()
+        {
+            ResizeGrid();
 
             Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
@@ -1055,16 +1099,35 @@ namespace DoS1.Menus
 
         public override void Load()
         {
-            LoadGrid();
+            LoadCharacter();
 
-            if (string.IsNullOrEmpty(Handler.ItemFilter))
+            if (!Handler.ViewOnly_Character)
             {
-                Handler.ItemFilter = "Helms";
+                LoadGrid();
+
+                if (string.IsNullOrEmpty(Handler.ItemFilter))
+                {
+                    Handler.ItemFilter = "Helms";
+                }
+
+                Filter(Handler.ItemFilter);
+
+                ResizeInventory();
+
+                GetButton("Helms").Visible = true;
+                GetButton("Armors").Visible = true;
+                GetButton("Shields").Visible = true;
+                GetButton("Weapons").Visible = true;
             }
+            else
+            {
+                ClearGrid();
 
-            Filter(Handler.ItemFilter);
-
-            ResizeInventory();
+                GetButton("Helms").Visible = false;
+                GetButton("Armors").Visible = false;
+                GetButton("Shields").Visible = false;
+                GetButton("Weapons").Visible = false;
+            }
         }
 
         private void ClearGrid()
@@ -1132,39 +1195,16 @@ namespace DoS1.Menus
         {
             if (Visible)
             {
+                LoadCharacter();
                 ResizeInventory();
             }
 
-            int width = Main.Game.MenuSize.X;
-            int height = Main.Game.MenuSize.Y;
-
             GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
-            GetButton("Back").Region = new Region(0, 0, width, height);
+            GetButton("Back").Region = new Region(0, 0, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
 
             GetPicture("Highlight").Region = new Region(0, 0, 0, 0);
             GetLabel("Examine").Region = new Region(0, 0, 0, 0);
-
-            ResetPos();
-
-            Picture character = GetPicture("Character");
-            character.Region = new Region(starting_X - (width * 8), starting_Y + (height * 2), (width * 4), (height * 6));
-
-            GetLabel("Name").Region = new Region(character.Region.X, character.Region.Y - height, character.Region.Width, height);
-
-            float X = character.Region.X + character.Region.Width;
-            float Y = character.Region.Y + height;
-
-            GetPicture("Helm").Region = new Region(X, Y, width, height);
-            GetPicture("Armor").Region = new Region(X, Y + height, width, height);
-            GetPicture("Shield").Region = new Region(X, Y + (height * 2), width, height);
-            GetPicture("Weapon").Region = new Region(X, Y + (height * 3), width, height);
-
-            Y = starting_Y - height;
-            GetButton("Helms").Region = new Region(starting_X + width, Y, width, height);
-            GetButton("Armors").Region = new Region(starting_X + (width * 2), Y, width, height);
-            GetButton("Shields").Region = new Region(starting_X + (width * 3), Y, width, height);
-            GetButton("Weapons").Region = new Region(starting_X + (width * 4), Y, width, height);
         }
 
         #endregion

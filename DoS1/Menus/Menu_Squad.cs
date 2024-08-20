@@ -18,6 +18,8 @@ namespace DoS1.Menus
     {
         #region Variables
 
+        Squad squad = null;
+
         int Top = 0;
 
         bool examining;
@@ -71,17 +73,42 @@ namespace DoS1.Menus
                     UpdateControls();
                 }
 
-                Army army = CharacterManager.GetArmy("Ally");
-                if (army != null)
+                Army ally_army = CharacterManager.GetArmy("Ally");
+                if (ally_army != null)
                 {
-                    foreach (Squad squad in army.Squads)
+                    foreach (Squad ally_squad in ally_army.Squads)
                     {
-                        foreach (Character character in squad.Characters)
+                        if (ally_squad.ID == Handler.Selected_Squad)
                         {
-                            if (character.Visible)
+                            foreach (Character character in ally_squad.Characters)
                             {
-                                CharacterUtil.UpdateGear(character);
+                                if (character.Visible)
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                }
                             }
+
+                            break;
+                        }
+                    }
+                }
+
+                Army enemy_army = CharacterManager.GetArmy("Enemy");
+                if (enemy_army != null)
+                {
+                    foreach (Squad enemy_squad in enemy_army.Squads)
+                    {
+                        if (enemy_squad.ID == Handler.Selected_Squad)
+                        {
+                            foreach (Character character in enemy_squad.Characters)
+                            {
+                                if (character.Visible)
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                }
+                            }
+
+                            break;
                         }
                     }
                 }
@@ -89,9 +116,9 @@ namespace DoS1.Menus
                 Army reserve_army = CharacterManager.GetArmy("Reserves");
                 if (reserve_army != null)
                 {
-                    foreach (Squad squad in reserve_army.Squads)
+                    foreach (Squad reserve_squad in reserve_army.Squads)
                     {
-                        foreach (Character character in squad.Characters)
+                        foreach (Character character in reserve_squad.Characters)
                         {
                             if (character.Visible)
                             {
@@ -137,14 +164,26 @@ namespace DoS1.Menus
                     }
                 }
 
-                Army army = CharacterManager.GetArmy("Ally");
-                if (army != null)
+                Army ally_army = CharacterManager.GetArmy("Ally");
+                if (ally_army != null)
                 {
-                    foreach (Squad squad in army.Squads)
+                    foreach (Squad ally_squad in ally_army.Squads)
                     {
-                        if (squad.ID == Handler.Selected_Squad)
+                        if (ally_squad.ID == Handler.Selected_Squad)
                         {
-                            CharacterUtil.DrawSquad(spriteBatch, squad, Color.White);
+                            CharacterUtil.DrawSquad(spriteBatch, ally_squad, Color.White);
+                        }
+                    }
+                }
+
+                Army enemy_army = CharacterManager.GetArmy("Enemy");
+                if (enemy_army != null)
+                {
+                    foreach (Squad enemy_squad in enemy_army.Squads)
+                    {
+                        if (enemy_squad.ID == Handler.Selected_Squad)
+                        {
+                            CharacterUtil.DrawSquad(spriteBatch, enemy_squad, Color.White);
                         }
                     }
                 }
@@ -152,9 +191,9 @@ namespace DoS1.Menus
                 Army reserve_army = CharacterManager.GetArmy("Reserves");
                 if (reserve_army != null)
                 {
-                    foreach (Squad squad in reserve_army.Squads)
+                    foreach (Squad reserve_squad in reserve_army.Squads)
                     {
-                        foreach (Character character in squad.Characters)
+                        foreach (Character character in reserve_squad.Characters)
                         {
                             if (character.Visible)
                             {
@@ -204,39 +243,42 @@ namespace DoS1.Menus
                 GetPicture("Highlight").Visible = false;
             }
 
-            if (InputManager.Mouse_ScrolledDown)
+            if (!Handler.ViewOnly_Squad)
             {
-                Army army = CharacterManager.GetArmy("Reserves");
-                if (army != null)
+                if (InputManager.Mouse_ScrolledDown)
                 {
-                    Character last_character = null;
-                    if (ReserveList.Count > 0)
+                    Army army = CharacterManager.GetArmy("Reserves");
+                    if (army != null)
                     {
-                        last_character = ReserveList[ReserveList.Count - 1];
-                    }
-
-                    if (last_character != null)
-                    {
-                        Top++;
-
-                        if (Top > last_character.Formation.Y)
+                        Character last_character = null;
+                        if (ReserveList.Count > 0)
                         {
-                            Top = (int)last_character.Formation.Y;
+                            last_character = ReserveList[ReserveList.Count - 1];
                         }
+
+                        if (last_character != null)
+                        {
+                            Top++;
+
+                            if (Top > last_character.Formation.Y)
+                            {
+                                Top = (int)last_character.Formation.Y;
+                            }
+                        }
+
+                        ResizeGrid();
+                    }
+                }
+                else if (InputManager.Mouse_ScrolledUp)
+                {
+                    Top--;
+                    if (Top <= 0)
+                    {
+                        Top = 0;
                     }
 
                     ResizeGrid();
                 }
-            }
-            else if (InputManager.Mouse_ScrolledUp)
-            {
-                Top--;
-                if (Top <= 0)
-                {
-                    Top = 0;
-                }
-
-                ResizeGrid();
             }
 
             if (InputManager.KeyPressed("Esc"))
@@ -295,79 +337,68 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            Army army = CharacterManager.GetArmy("Ally");
-            if (army != null)
+            for (int y = 0; y < 3; y++)
             {
-                foreach (Squad squad in army.Squads)
+                for (int x = 0; x < 3; x++)
                 {
-                    if (squad.ID == Handler.Selected_Squad)
+                    Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                    if (tile != null)
                     {
-                        for (int y = 0; y < 3; y++)
+                        if (InputManager.MouseWithin(tile.Region.ToRectangle))
                         {
-                            for (int x = 0; x < 3; x++)
+                            found = true;
+
+                            if (!moving)
                             {
-                                Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
-                                if (tile != null)
+                                Character character = squad.GetCharacter(new Vector2(x, y));
+                                if (character != null)
                                 {
-                                    if (InputManager.MouseWithin(tile.Region.ToRectangle))
+                                    examining = true;
+
+                                    GameUtil.Examine(this, character.Name);
+
+                                    if (InputManager.Mouse_LB_Held &&
+                                        InputManager.Mouse.Moved &&
+                                        !Handler.ViewOnly_Squad)
                                     {
-                                        found = true;
+                                        found = false;
+                                        examining = false;
+                                        moving = true;
 
-                                        if (!moving)
-                                        {
-                                            Character character = squad.GetCharacter(new Vector2(x, y));
-                                            if (character != null)
-                                            {
-                                                examining = true;
-
-                                                GameUtil.Examine(this, character.Name);
-
-                                                if (InputManager.Mouse_LB_Held &&
-                                                    InputManager.Mouse.Moved)
-                                                {
-                                                    found = false;
-                                                    examining = false;
-                                                    moving = true;
-
-                                                    starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
-                                                    starting_region = character.Region.ToRectangle;
-                                                    moving_character = character;
-                                                    character.HealthBar.Visible = false;
-                                                    character.ManaBar.Visible = false;
-
-                                                    break;
-                                                }
-                                                else if (InputManager.Mouse_RB_Pressed)
-                                                {
-                                                    found = false;
-                                                    examining = false;
-
-                                                    SelectCharacter(character.ID);
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            new_pos = new Vector2(x, y);
-                                        }
-
-                                        Picture highlight = GetPicture("Highlight");
-                                        highlight.Region = tile.Region;
-                                        highlight.Visible = true;
+                                        starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
+                                        starting_region = character.Region.ToRectangle;
+                                        moving_character = character;
+                                        character.HealthBar.Visible = false;
+                                        character.ManaBar.Visible = false;
 
                                         break;
                                     }
+                                    else if (InputManager.Mouse_RB_Pressed)
+                                    {
+                                        found = false;
+                                        examining = false;
+
+                                        SelectCharacter(character.ID);
+                                    }
                                 }
                             }
-
-                            if (found)
+                            else
                             {
-                                break;
+                                new_pos = new Vector2(x, y);
                             }
-                        }
 
-                        break;
+                            Picture highlight = GetPicture("Highlight");
+                            highlight.Region = tile.Region;
+                            highlight.Visible = true;
+
+                            break;
+                        }
                     }
+                }
+
+                if (found)
+                {
+                    break;
                 }
             }
 
@@ -714,7 +745,9 @@ namespace DoS1.Menus
         private void SelectCharacter(long id)
         {
             AssetManager.PlaySound_Random("Click");
+
             Handler.Selected_Character = id;
+
             InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Character");
         }
@@ -724,7 +757,15 @@ namespace DoS1.Menus
             width = Main.Game.MenuSize.X * 3;
             height = Main.Game.MenuSize.Y * 3;
             starting_Y = (Main.Game.ScreenHeight / 2) + (grid_height * 5) - (height * 3);
-            starting_X = (Main.Game.ScreenWidth / 2) - (width / 2) - (width * 3);
+
+            if (!Handler.ViewOnly_Squad)
+            {
+                starting_X = (Main.Game.ScreenWidth / 2) - (width / 2) - (width * 3);
+            }
+            else
+            {
+                starting_X = (Main.Game.ScreenWidth / 2) - (width / 2) - width;
+            }
         }
 
         private void ResetGridPos()
@@ -817,35 +858,26 @@ namespace DoS1.Menus
         {
             ResetPos();
 
-            Army army = CharacterManager.GetArmy("Ally");
-            if (army != null)
+            if (squad != null)
             {
-                foreach (Squad squad in army.Squads)
+                for (int y = 0; y < 3; y++)
                 {
-                    if (squad.ID == Handler.Selected_Squad)
+                    for (int x = 0; x < 3; x++)
                     {
-                        for (int y = 0; y < 3; y++)
+                        Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                        if (tile != null)
                         {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
-                                if (tile != null)
-                                {
-                                    tile.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
-                                    tile.Location = new Location(x, y, 0);
-                                }
-
-                                Character character = squad.GetCharacter(new Vector2(x, y));
-                                if (character != null)
-                                {
-                                    character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
-                                    character.Visible = true;
-                                    CharacterUtil.ResizeBars(character);
-                                }
-                            }
+                            tile.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
+                            tile.Location = new Location(x, y, 0);
                         }
 
-                        break;
+                        Character character = squad.GetCharacter(new Vector2(x, y));
+                        if (character != null)
+                        {
+                            character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
+                            character.Visible = true;
+                            CharacterUtil.ResizeBars(character);
+                        }
                     }
                 }
             }
@@ -853,47 +885,40 @@ namespace DoS1.Menus
 
         private void ClearSquad()
         {
-            Army army = CharacterManager.GetArmy("Ally");
-            if (army != null)
+            if (squad != null)
             {
-                foreach (Squad squad in army.Squads)
+                for (int i = 0; i < Pictures.Count; i++)
                 {
-                    if (squad.ID == Handler.Selected_Squad)
+                    bool found = false;
+
+                    Picture picture = Pictures[i];
+                    for (int y = 0; y < 3; y++)
                     {
-                        for (int i = 0; i < Pictures.Count; i++)
+                        for (int x = 0; x < 3; x++)
                         {
-                            bool found = false;
-
-                            Picture picture = Pictures[i];
-                            for (int y = 0; y < 3; y++)
+                            Character character = squad.GetCharacter(new Vector2(x, y));
+                            if (character != null)
                             {
-                                for (int x = 0; x < 3; x++)
-                                {
-                                    Character character = squad.GetCharacter(new Vector2(x, y));
-                                    if (character != null)
-                                    {
-                                        character.Visible = false;
-                                    }
+                                character.Visible = false;
+                            }
 
-                                    if (picture.Name == "squad_x:" + x.ToString() + ",squad_y:" + y.ToString())
-                                    {
-                                        found = true;
-                                        Pictures.Remove(picture);
-                                        i--;
-                                        break;
-                                    }
-                                }
-
-                                if (found)
-                                {
-                                    break;
-                                }
+                            if (picture.Name == "squad_x:" + x.ToString() + ",squad_y:" + y.ToString())
+                            {
+                                found = true;
+                                Pictures.Remove(picture);
+                                i--;
+                                break;
                             }
                         }
 
-                        break;
+                        if (found)
+                        {
+                            break;
+                        }
                     }
                 }
+
+                squad = null;
             }
         }
 
@@ -902,34 +927,54 @@ namespace DoS1.Menus
             ClearSquad();
             ResetPos();
 
-            Army army = CharacterManager.GetArmy("Ally");
-            if (army != null)
+            Army ally_army = CharacterManager.GetArmy("Ally");
+            if (ally_army != null)
             {
-                foreach (Squad squad in army.Squads)
+                foreach (Squad ally_squad in ally_army.Squads)
                 {
-                    if (squad.ID == Handler.Selected_Squad)
+                    if (ally_squad.ID == Handler.Selected_Squad)
                     {
-                        for (int y = 0; y < 3; y++)
+                        squad = ally_squad;
+                        break;
+                    }
+                }
+            }
+
+            if (squad == null)
+            {
+                Army enemy_army = CharacterManager.GetArmy("Enemy");
+                if (enemy_army != null)
+                {
+                    foreach (Squad enemy_squad in enemy_army.Squads)
+                    {
+                        if (enemy_squad.ID == Handler.Selected_Squad)
                         {
-                            for (int x = 0; x < 3; x++)
-                            {
-                                long id = Handler.GetID();
+                            squad = enemy_squad;
+                            break;
+                        }
+                    }
+                }
+            }
 
-                                Character character = squad.GetCharacter(new Vector2(x, y));
-                                if (character != null)
-                                {
-                                    id = character.ID;
-                                    character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
-                                    character.Visible = true;
-                                    CharacterUtil.ResizeBars(character);
-                                }
+            if (squad != null)
+            {
+                for (int y = 0; y < 3; y++)
+                {
+                    for (int x = 0; x < 3; x++)
+                    {
+                        long id = Handler.GetID();
 
-                                AddPicture(id, "squad_x:" + x.ToString() + ",squad_y:" + y.ToString(), AssetManager.Textures["Grid"],
-                                    new Region(starting_X + (width * x), starting_Y + (height * y), width, height), Color.White, true);
-                            }
+                        Character character = squad.GetCharacter(new Vector2(x, y));
+                        if (character != null)
+                        {
+                            id = character.ID;
+                            character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
+                            character.Visible = true;
+                            CharacterUtil.ResizeBars(character);
                         }
 
-                        break;
+                        AddPicture(id, "squad_x:" + x.ToString() + ",squad_y:" + y.ToString(), AssetManager.Textures["Grid"],
+                            new Region(starting_X + (width * x), starting_Y + (height * y), width, height), Color.White, true);
                     }
                 }
             }
@@ -939,13 +984,13 @@ namespace DoS1.Menus
         {
             ResetGridPos();
 
-            Army army = CharacterManager.GetArmy("Reserves");
-            if (army != null)
+            Army reserve_army = CharacterManager.GetArmy("Reserves");
+            if (reserve_army != null)
             {
-                Squad squad = army.Squads[0];
-                if (squad != null)
+                Squad reserve_squad = reserve_army.Squads[0];
+                if (reserve_squad != null)
                 {
-                    foreach (Character character in squad.Characters)
+                    foreach (Character character in reserve_squad.Characters)
                     {
                         character.Visible = false;
                     }
@@ -1077,7 +1122,15 @@ namespace DoS1.Menus
         public override void Load()
         {
             LoadSquad();
-            LoadGrid();
+
+            if (!Handler.ViewOnly_Squad)
+            {
+                LoadGrid();
+            }
+            else
+            {
+                ClearGrid();
+            }
         }
 
         public override void Resize(Point point)

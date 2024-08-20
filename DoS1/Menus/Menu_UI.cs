@@ -451,6 +451,17 @@ namespace DoS1.Menus
 
                                     break;
                                 }
+                                else if (InputManager.Mouse_RB_Pressed)
+                                {
+                                    Handler.Selected_Squad = squad.ID;
+
+                                    Handler.ViewOnly_Squad = true;
+                                    Handler.ViewOnly_Character = true;
+                                    Handler.ViewOnly_Item = true;
+
+                                    InputManager.Mouse.Flush();
+                                    MenuManager.ChangeMenu("Squad");
+                                }
                                 else if (Handler.Selected_Token == -1)
                                 {
                                     WorldUtil.DisplayPath_Squad(this, map, squad);
