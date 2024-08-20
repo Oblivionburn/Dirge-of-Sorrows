@@ -19,6 +19,7 @@
 - Menu for viewing general inventory of player army
 - Menu for buying/selling items in shops
 - Menu for purchasing more characters at academy towns
+- Right-clicking squads on map to view their characters/formation
 - Combat screen and basic combat mechanics
 - Dispatching additional squads to player base on map
 - Context menu to handle selection of a squad when there's multiple in one location
@@ -28,7 +29,6 @@
 - Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
 #
 ### Planned features not yet implemented:
-- Right-clicking squads on map to view their characters/formation
 - Recovering HP/EP at towns
 - Collecting gold from controlled towns
 - Additional runes for combat
