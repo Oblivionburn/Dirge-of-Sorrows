@@ -27,10 +27,10 @@
 - AI to control enemy squad movement on map
 - Enemy squads capturing towns
 - Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
+- Recovering HP/EP at towns
+- Collecting gold from owned towns
 #
 ### Planned features not yet implemented:
-- Recovering HP/EP at towns
-- Collecting gold from controlled towns
 - Additional runes for combat
 - Character stat/xp/level progression
 - Finding unique items hidden in the world
