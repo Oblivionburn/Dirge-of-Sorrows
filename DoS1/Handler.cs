@@ -32,6 +32,8 @@ namespace DoS1
         public static int Level;
         public static bool MovingGrid;
         public static int MoveGridDelay;
+        public static bool MovingSquads = false;
+        public static bool RestingSquads = false;
 
         public static bool ManualPause;
         public static bool LocalPause;

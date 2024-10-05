@@ -47,6 +47,9 @@ namespace DoS1.Util
             TimeManager.Now.OnMinutesChange -= MinuteChanged;
             TimeManager.Now.OnMinutesChange += MinuteChanged;
 
+            TimeManager.Now.OnHoursChange -= HourChanged;
+            TimeManager.Now.OnHoursChange += HourChanged;
+
             Main.Game.GameStarted = true;
             Toggle_MainMenu();
 
@@ -594,6 +597,12 @@ namespace DoS1.Util
         public static void MinuteChanged(object sender, EventArgs e)
         {
             WorldUtil.AnimateTiles();
+            WorldUtil.RestSquads();
+        }
+
+        private static void HourChanged(object sender, EventArgs e)
+        {
+            WorldUtil.Collect_Tax();
         }
     }
 }

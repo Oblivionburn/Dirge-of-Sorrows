@@ -594,6 +594,7 @@ namespace DoS1.Menus
             {
                 //Revisit map
                 localmap = world.Maps[Handler.Level];
+                localmap.Visible = true;
             }
             else
             {

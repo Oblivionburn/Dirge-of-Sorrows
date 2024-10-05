@@ -907,11 +907,11 @@ namespace DoS1.Util
                 {
                     squad.Path.Reverse();
 
-                    if (remaining != null)
+                    if (remaining != null &&
+                        squad.Moved > 0)
                     {
                         if (remaining.X == squad.Path[1].X &&
-                            remaining.Y == squad.Path[1].Y &&
-                            squad.Moved > 0)
+                            remaining.Y == squad.Path[1].Y)
                         {
                             //Exclude starting location if already moving to next location
                             squad.Path.RemoveAt(0);

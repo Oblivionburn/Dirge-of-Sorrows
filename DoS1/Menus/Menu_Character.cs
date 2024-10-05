@@ -463,6 +463,7 @@ namespace DoS1.Menus
                         }
 
                         Filter(Handler.ItemFilter);
+                        LoadCharacter();
                         ResizeInventory();
                     }
                 }
@@ -504,7 +505,7 @@ namespace DoS1.Menus
                     if (existing.Equipped &&
                         existing.Type == "Weapon")
                     {
-                        if (InventoryUtil.Weapon_Is2H(item))
+                        if (InventoryUtil.Weapon_Is2H(existing))
                         {
                             UnequipItem(main_inventory, existing);
                             break;
