@@ -8,6 +8,7 @@ using OP_Engine.Inventories;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DoS1.Util
 {
@@ -855,6 +856,25 @@ namespace DoS1.Util
             return null;
         }
 
+        public static Squad Get_Squad(long character_id)
+        {
+            foreach (Army army in CharacterManager.Armies)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    foreach (Character character in squad.Characters)
+                    {
+                        if (character.ID == character_id)
+                        {
+                            return squad;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static int Get_CharacterIndex(Character character)
         {
             return (int)((character.Formation.Y * 10) + character.Formation.X);
@@ -884,6 +904,37 @@ namespace DoS1.Util
             }
 
             return null;
+        }
+
+        public static int Get_AoE_Defense(Squad squad, Character defender, string element)
+        {
+            int defense = 0;
+
+            foreach (Character character in squad.Characters)
+            {
+                if (character.ID != defender.ID)
+                {
+                    Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                    if (helm != null)
+                    {
+                        defense += InventoryUtil.Get_Item_AoE_Level(helm, element);
+                    }
+
+                    Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                    if (armor != null)
+                    {
+                        defense += InventoryUtil.Get_Item_AoE_Level(armor, element);
+                    }
+
+                    Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+                    if (shield != null)
+                    {
+                        defense += InventoryUtil.Get_Item_AoE_Level(shield, element);
+                    }
+                }
+            }
+
+            return defense;
         }
 
         public static void SetPath(Map map, Squad squad, Tile destination)

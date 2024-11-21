@@ -467,58 +467,7 @@ namespace DoS1.Menus
                 inventory.Items.Remove(item);
                 selectedItem.Attachments.Add(item);
 
-                string element = item.Categories[0];
-                string effect = "";
-
-                bool damage = InventoryUtil.Element_IsDamage(element);
-                if (damage)
-                {
-                    if (selectedItem.Type == "Weapon")
-                    {
-                        effect = "Damage";
-                    }
-                    else if (selectedItem.Type == "Shield" ||
-                             selectedItem.Type == "Armor")
-                    {
-                        effect = "Defense";
-                    }
-                }
-
-                Something level = item.GetProperty("Level Value");
-
-                Something property = selectedItem.GetProperty(element + " " + effect);
-                if (property != null)
-                {
-                    property.Value += level.Value * Handler.Element_Multiplier;
-                }
-                else
-                {
-                    selectedItem.Properties.Add(new Something
-                    {
-                        Name = element + " " + effect,
-                        Type = element,
-                        Assignment = effect,
-                        Value = level.Value * Handler.Element_Multiplier
-                    });
-                }
-
-                Something cost = selectedItem.GetProperty("EP Cost");
-                if (cost != null)
-                {
-                    cost.Value += level.Value;
-                }
-                else
-                {
-                    selectedItem.Properties.Add(new Something
-                    {
-                        Name = "EP Cost",
-                        Type = "EP",
-                        Assignment = "Cost",
-                        Value = level.Value
-                    });
-                }
-
-                selectedItem.Buy_Price += InventoryUtil.GetPrice(item);
+                InventoryUtil.UpdateItem(selectedItem);
             }
         }
 
@@ -530,46 +479,7 @@ namespace DoS1.Menus
                 inventory.Items.Add(item);
                 selectedItem.Attachments.Remove(item);
 
-                string element = item.Categories[0];
-                string effect = "";
-
-                bool damage = InventoryUtil.Element_IsDamage(element);
-                if (damage)
-                {
-                    if (selectedItem.Type == "Weapon")
-                    {
-                        effect = "Damage";
-                    }
-                    else if (selectedItem.Type == "Shield" ||
-                             selectedItem.Type == "Armor")
-                    {
-                        effect = "Defense";
-                    }
-                }
-
-                Something level = item.GetProperty("Level Value");
-
-                Something property = selectedItem.GetProperty(element + " " + effect);
-                if (property != null)
-                {
-                    property.Value -= level.Value * Handler.Element_Multiplier;
-                    if (property.Value <= 0)
-                    {
-                        selectedItem.Properties.Remove(property);
-                    }
-                }
-
-                Something cost = selectedItem.GetProperty("EP Cost");
-                if (cost != null)
-                {
-                    cost.Value -= level.Value;
-                    if (cost.Value <= 0)
-                    {
-                        selectedItem.Properties.Remove(cost);
-                    }
-                }
-
-                selectedItem.Buy_Price -= InventoryUtil.GetPrice(item);
+                InventoryUtil.UpdateItem(selectedItem);
             }
         }
 

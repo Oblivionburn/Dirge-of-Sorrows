@@ -739,6 +739,12 @@ namespace DoS1.Menus
         {
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
+
+            if (Handler.ViewOnly_Squad)
+            {
+                GameUtil.Toggle_Pause(false);
+            }
+
             MenuManager.ChangeMenu_Previous();
         }
 

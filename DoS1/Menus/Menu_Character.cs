@@ -561,6 +561,9 @@ namespace DoS1.Menus
                 item.Icon_Visible = false;
             }
 
+            character.HealthBar.Visible = false;
+            character.ManaBar.Visible = false;
+
             MenuManager.ChangeMenu_Previous();
         }
 

@@ -479,72 +479,58 @@ namespace DoS1.Util
             properties.Add(NewProperty("Level", "Value", 1, 10));
             Item item = NewItem(type, "Area", "Area", properties);
             item.Buy_Price = 800;
-            item.Description = "On Weapon: applies paired rune's On Weapon effect to whole enemy squad on attack.\nOn Armor: passively applies paired rune's On Armor effect to your whole squad.";
             items.Add(item);
 
             item = NewItem(type, "Counter", "Counter", properties);
             item.Buy_Price = 200;
-            item.Description = "On Weapon: 10% chance per Level for damage to bypass all defenses.\nOn Armor: 10% chance per Level to counter attack with weapon when hit.\nStatus: Weak.";
             items.Add(item);
 
             item = NewItem(type, "Death", "Death", properties);
             item.Buy_Price = 600;
-            item.Description = "On Weapon: 10% chance per Level to instant kill target.\nOn Armor: 10% chance per Level to resist instant kill.\nStatus: Cursed.";
             items.Add(item);
 
             item = NewItem(type, "Disarm", "Disarm", properties);
             item.Buy_Price = 400;
-            item.Description = "On Weapon: 10% chance per Level to destroy target's weapon.\nOn Armor: 10% chance per Level to destroy attacker's weapon when hit.\nStatus: Melting.";
             items.Add(item);
 
             item = NewItem(type, "Drain", "Drain", properties);
             item.Buy_Price = 200;
-            item.Description = "On Weapon: 10% chance per Level to restore HP by amount of damage inflicted with paired rune.\nOn Armor: 10% chance per Level to restore EP by amount of damage received.\nStatus: Poisoned.";
             items.Add(item);
 
             item = NewItem(type, "Earth", "Earth", properties);
             item.Buy_Price = 100;
-            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Earth damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Earth damage per Level.\nStatus: Petrified.";
             items.Add(item);
 
             item = NewItem(type, "Effect", "Effect", properties);
             item.Buy_Price = 400;
-            item.Description = "On Weapon: 10% chance per Level to apply paired rune's Status effect on target.\nOn Armor: 10% chance per Level to resist paired rune's Status effect.";
             items.Add(item);
 
             item = NewItem(type, "Fire", "Fire", properties);
             item.Buy_Price = 100;
-            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Fire damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Fire damage per Level.\nStatus: Burning.";
             items.Add(item);
 
             item = NewItem(type, "Life", "Life", properties);
             item.Buy_Price = 200;
-            item.Description = "On Weapon: restore " + Handler.Element_Multiplier + " HP per Level on ally with lowest HP.\nOn Armor: restore extra " + Handler.Element_Multiplier + " HP per Level when HP is restored.\nStatus: Regenerating.";
             items.Add(item);
 
             item = NewItem(type, "Mind", "Mind", properties);
             item.Buy_Price = 200;
-            item.Description = "On Weapon: restore " + Handler.Element_Multiplier + " EP per Level on ally with lowest EP.\nOn Armor: restore extra " + Handler.Element_Multiplier + " EP per Level when EP is restored.\nStatus: Charging.";
             items.Add(item);
 
             item = NewItem(type, "Physical", "Physical", properties);
             item.Buy_Price = 100;
-            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Physical damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Physical damage per Level.\nStatus: Stunned.";
             items.Add(item);
 
             item = NewItem(type, "Time", "Time", properties);
             item.Buy_Price = 200;
-            item.Description = "On Weapon: 10% chance per Level to skip target's next turn.\nOn Armor: 10% chance per Level to attack twice.\nStatus: Slow.";
             items.Add(item);
 
             item = NewItem(type, "Ice", "Ice", properties);
             item.Buy_Price = 100;
-            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Ice damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Ice damage per Level.\nStatus: Frozen.";
             items.Add(item);
 
             item = NewItem(type, "Lightning", "Lightning", properties);
             item.Buy_Price = 100;
-            item.Description = "On Weapon: inflict " + Handler.Element_Multiplier + " Lightning damage per Level.\nOn Armor: resist " + Handler.Element_Multiplier + " Lightning damage per Level.\nStatus: Confused.";
             items.Add(item);
 
             return items;
@@ -592,6 +578,8 @@ namespace DoS1.Util
                 something.Rate = existing.Rate;
                 item.Properties.Add(something);
             }
+
+            UpdateRune_Description(item);
 
             return item;
         }
@@ -698,6 +686,218 @@ namespace DoS1.Util
             item.Equipped = false;
             item.Visible = false;
             item.Region = character.Region;
+        }
+
+        public static void UpdateItem(Item item)
+        {
+            //Reset
+            Something physical_damage = item.GetProperty("Physical Damage");
+            if (physical_damage != null)
+            {
+                physical_damage.Value = GetBaseProperty(item, physical_damage.Name);
+            }
+
+            Something physical_defense = item.GetProperty("Physical Defense");
+            if (physical_defense != null)
+            {
+                physical_defense.Value = GetBaseProperty(item, physical_defense.Name);
+            }
+
+            Something cost = item.GetProperty("EP Cost");
+            if (cost != null)
+            {
+                cost.Value = GetBaseProperty(item, cost.Name);
+            }
+
+            item.Buy_Price = GetBasePrice(item);
+
+            //Reset non-base properties
+            for (int i = 0; i < item.Properties.Count; i++)
+            {
+                Something property = item.Properties[i];
+                if (!property.Name.Contains("Physical") &&
+                    property.Name != "Rune Slots" &&
+                    property.Name != "EP Cost")
+                {
+                    item.Properties.Remove(property);
+                    i--;
+                }
+            }
+
+            //Get properties from runes
+            for (int i = 0; i < item.Attachments.Count; i++)
+            {
+                Item rune = item.Attachments[i];
+
+                string element = rune.Categories[0];
+                string effect = "";
+
+                if (Element_IsDamage(element))
+                {
+                    if (item.Type == "Weapon")
+                    {
+                        effect = "Damage";
+                    }
+                    else if (item.Type == "Shield" ||
+                             item.Type == "Armor" ||
+                             item.Type == "Helm")
+                    {
+                        effect = "Defense";
+                    }
+                }
+                else if (element == "Life")
+                {
+                    effect = "Heal";
+                }
+
+                Something level = rune.GetProperty("Level Value");
+
+                Something property = item.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    property.Value += level.Value * Handler.Element_Multiplier;
+                }
+                else
+                {
+                    item.Properties.Add(new Something
+                    {
+                        Name = element + " " + effect,
+                        Type = element,
+                        Assignment = effect,
+                        Value = level.Value * Handler.Element_Multiplier
+                    });
+                }
+
+                if (cost != null)
+                {
+                    cost.Value += level.Value;
+                }
+                else
+                {
+                    item.Properties.Add(new Something
+                    {
+                        Name = "EP Cost",
+                        Type = "EP",
+                        Assignment = "Cost",
+                        Value = level.Value
+                    });
+                }
+
+                //Increase price per rune
+                item.Buy_Price += GetBasePrice(item);
+            }
+        }
+
+        public static void UpdateRune_Level(Item rune)
+        {
+            Something level = rune.GetProperty("Level Value");
+            if (level != null &&
+                level.Value < level.Max_Value) //Don't increase XP if we've hit max level
+            {
+                Something xp = rune.GetProperty("XP Value");
+                if (xp != null)
+                {
+                    //Check if rune can increase level
+                    float left_over = xp.Max_Value - xp.Value;
+                    while (left_over <= 0)
+                    {
+                        if (level != null)
+                        {
+                            //Increase rune level
+                            level.Value++;
+                            UpdateRune_Description(rune);
+
+                            if (level.Value >= level.Max_Value)
+                            {
+                                //We've hit max level
+                                level.Value = level.Max_Value;
+                                xp.Value = xp.Max_Value;
+                                break;
+                            }
+                            else
+                            {
+                                xp.Value -= xp.Max_Value;
+                                left_over = xp.Max_Value - xp.Value;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void UpdateRune_Description(Item rune)
+        {
+            if (rune.Categories.Count > 0)
+            {
+                string type = rune.Categories[0];
+
+                Something level = rune.GetProperty("Level Value");
+                if (level != null)
+                {
+                    switch (type)
+                    {
+                        case "Area":
+                            rune.Description = "On Weapon: paired rune effect on whole squad.\nOn Armor: paired rune effect on whole squad.";
+                            break;
+
+                        case "Counter":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to ignore defenses.\nOn Armor: " + (level.Value * 10) + "% chance to counter attack.\nStatus: Weak.";
+                            break;
+
+                        case "Death":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to instant kill target.\nOn Armor: " + (level.Value * 10) + "% chance to resist instant kill.\nStatus: Cursed.";
+                            break;
+
+                        case "Disarm":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to destroy target's weapon.\nOn Armor: " + (level.Value * 10) + "% chance to destroy attacker's weapon when hit.\nStatus: Melting.";
+                            break;
+
+                        case "Drain":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to restore HP by paired damage.\nOn Armor: " + (level.Value * 10) + "% chance to restore EP by damage received.\nStatus: Poisoned.";
+                            break;
+
+                        case "Earth":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Earth damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Earth damage.\nStatus: Petrified.";
+                            break;
+
+                        case "Effect":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to apply paired Status.\nOn Armor: " + (level.Value * 10) + "% chance to resist paired Status.";
+                            break;
+
+                        case "Fire":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Fire damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Fire damage.\nStatus: Burning.";
+                            break;
+
+                        case "Life":
+                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " HP.\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " HP.\nStatus: Regenerating.";
+                            break;
+
+                        case "Mind":
+                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " EP.\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " EP.\nStatus: Charging.";
+                            break;
+
+                        case "Physical":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Physical damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Physical damage.\nStatus: Stunned.";
+                            break;
+
+                        case "Time":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to attack twice.\nOn Armor: " + (level.Value * 10) + "% chance to dodge attack.\nStatus: Slow.";
+                            break;
+
+                        case "Ice":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Ice damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Ice damage.\nStatus: Frozen.";
+                            break;
+
+                        case "Lightning":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Lightning damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Lightning damage.\nStatus: Shocked.";
+                            break;
+                    }
+                }
+            }
         }
 
         public static void AddItem(Inventory inventory, string material, string category, string type)
@@ -1155,7 +1355,7 @@ namespace DoS1.Util
                 #region Runes
 
                 random = new CryptoRandom();
-                int rune_choice = random.Next(0, 4);
+                int rune_choice = random.Next(0, 6);
                 switch (rune_choice)
                 {
                     case 0:
@@ -1175,15 +1375,15 @@ namespace DoS1.Util
                         break;
 
                     case 4:
-                        AddItem(inventory, "Drain", "Drain", "Rune");
-                        break;
-
-                    case 5:
                         AddItem(inventory, "Area", "Area", "Rune");
                         break;
 
+                    case 5:
+                        AddItem(inventory, "Life", "Life", "Rune");
+                        break;
+
                     case 6:
-                        AddItem(inventory, "Effect", "Effect", "Rune");
+                        AddItem(inventory, "Physical", "Physical", "Rune");
                         break;
 
                     case 7:
@@ -1191,7 +1391,7 @@ namespace DoS1.Util
                         break;
 
                     case 8:
-                        AddItem(inventory, "Life", "Life", "Rune");
+                        AddItem(inventory, "Drain", "Drain", "Rune");
                         break;
 
                     case 9:
@@ -1199,7 +1399,7 @@ namespace DoS1.Util
                         break;
 
                     case 10:
-                        AddItem(inventory, "Physical", "Physical", "Rune");
+                        AddItem(inventory, "Effect", "Effect", "Rune");
                         break;
 
                     case 11:
@@ -1234,35 +1434,77 @@ namespace DoS1.Util
             return false;
         }
 
-        public static bool Weapon_IsAoE(Item weapon)
+        public static bool Weapon_IsAoE_Offense(Item weapon)
         {
             if (weapon != null)
             {
-                Item area_rune = null;
-
-                for (int i = 0; i < weapon.Attachments.Count; i++)
+                for (int i = 0; i < weapon.Attachments.Count; i += 2)
                 {
                     Item rune = weapon.Attachments[i];
 
                     if (rune.Categories.Contains("Area"))
                     {
-                        area_rune = rune;
-                        break;
-                    }
-                }
-
-                if (area_rune != null)
-                {
-                    Item paired_rune = GetPairedRune(weapon, area_rune);
-                    if (paired_rune != null &&
-                        Element_IsDamage(paired_rune.Categories[0]))
-                    {
-                        return true;
+                        Item paired_rune = GetPairedRune(weapon, rune);
+                        if (paired_rune != null &&
+                            Element_IsDamage(paired_rune.Categories[0]))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
 
             return false;
+        }
+
+        public static bool Item_IsAoE(Item item, string type)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains("Area"))
+                    {
+                        Item paired_rune = GetPairedRune(item, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == type)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static int Get_Item_AoE_Level(Item item, string element)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains("Area"))
+                    {
+                        Item paired_rune = GetPairedRune(item, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == element)
+                        {
+                            Something level = paired_rune.GetProperty("Level Value");
+                            if (level != null)
+                            {
+                                return (int)level.Value * Handler.Element_Multiplier;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return 0;
         }
 
         public static bool Weapon_IsMelee(Item weapon)
@@ -1289,37 +1531,61 @@ namespace DoS1.Util
             return false;
         }
 
-        public static bool Weapon_HasElement(Item weapon, string type)
+        public static bool Item_HasElement(Item item, string type)
         {
-            foreach (Something property in weapon.Properties)
+            if (item != null)
             {
-                if (property.Name.Contains(type))
+                foreach (Something property in item.Properties)
                 {
-                    return true;
+                    if (property.Name.Contains(type))
+                    {
+                        return true;
+                    }
                 }
             }
 
             return false;
         }
 
-        public static Item GetPairedRune(Item equipment, Item target_rune)
+        public static Item GetPairedRune(Item item, Item area_rune)
         {
-            int index = -1;
-
-            int count = equipment.Attachments.Count;
-            for (int i = 0; i < count; i++)
+            Something slots = item.GetProperty("Rune Slots");
+            if (slots != null)
             {
-                Item rune = equipment.Attachments[i];
-                if (rune.ID == target_rune.ID)
+                for (int s = 0; s < slots.Value; s++)
                 {
-                    index = i;
-                }
-                else if (index != -1)
-                {
-                    if ((index % 2 == 0 && i == index + 1) ||
-                        (i == index - 1))
+                    for (int a = 0; a < item.Attachments.Count; a++)
                     {
-                        return rune;
+                        Item rune = item.Attachments[a];
+                        if (rune.Location.X == s &&
+                            rune.ID == area_rune.ID)
+                        {
+                            if (s % 2 == 0)
+                            {
+                                //Get rune to the right
+                                for (int r = 0; r < item.Attachments.Count; r++)
+                                {
+                                    Item attachment = item.Attachments[r];
+                                    if (attachment.Location.X == s + 1)
+                                    {
+                                        return attachment;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                //Get rune to the left
+                                for (int r = 0; r < item.Attachments.Count; r++)
+                                {
+                                    Item attachment = item.Attachments[r];
+                                    if (attachment.Location.X == s - 1)
+                                    {
+                                        return attachment;
+                                    }
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -1332,12 +1598,32 @@ namespace DoS1.Util
             return (int)((item.Location.Y * 10) + item.Location.X);
         }
 
-        public static int GetPrice(Item item)
+        public static int Get_RuneCount(Item item, string type)
+        {
+            int total = 0;
+
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains(type))
+                    {
+                        total++;
+                    }
+                }
+            }
+
+            return total;
+        }
+
+        public static int GetBasePrice(Item item)
         {
             Inventory assets = InventoryManager.GetInventory("Assets");
             if (assets != null)
             {
-                Item asset = null;
+                Item asset;
 
                 if (item.Type == "Weapon")
                 {
@@ -1355,6 +1641,39 @@ namespace DoS1.Util
                 if (asset != null)
                 {
                     return (int)asset.Buy_Price;
+                }
+            }
+
+            return 0;
+        }
+
+        public static int GetBaseProperty(Item item, string type)
+        {
+            Inventory assets = InventoryManager.GetInventory("Assets");
+            if (assets != null)
+            {
+                Item asset;
+
+                if (item.Type == "Weapon")
+                {
+                    asset = assets.GetItem(item.Materials[0] + " " + item.Categories[0]);
+                }
+                else if (item.Materials[0] == item.Categories[0])
+                {
+                    asset = assets.GetItem(item.Categories[0] + " " + item.Type);
+                }
+                else
+                {
+                    asset = assets.GetItem(item.Materials[0] + " " + item.Categories[0] + " " + item.Type);
+                }
+
+                if (asset != null)
+                {
+                    Something cost = asset.GetProperty(type);
+                    if (cost != null)
+                    {
+                        return (int)cost.Value;
+                    }
                 }
             }
 

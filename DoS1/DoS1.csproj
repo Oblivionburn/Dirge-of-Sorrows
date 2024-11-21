@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handler.cs" />
+    <Compile Include="LightingRenderer.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\Menu_Academy.cs" />
     <Compile Include="Menus\Menu_Army.cs" />

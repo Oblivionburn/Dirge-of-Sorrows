@@ -11,6 +11,7 @@ using OP_Engine.Menus;
 using OP_Engine.Rendering;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DoS1.Util
 {
@@ -64,7 +65,8 @@ namespace DoS1.Util
 
         public static void SwitchAnimation(Character character, string type)
         {
-            if (character.Texture != null)
+            if (character != null &&
+                character.Texture != null)
             {
                 string[] parts = character.Texture.Name.Split('_');
                 string direction = parts[0];
@@ -115,7 +117,7 @@ namespace DoS1.Util
             {
                 if (weapon != null)
                 {
-                    if (InventoryUtil.Weapon_IsAoE(weapon))
+                    if (InventoryUtil.Weapon_IsAoE_Offense(weapon))
                     {
                         foreach (Character target in target_squad.Characters)
                         {
@@ -127,7 +129,7 @@ namespace DoS1.Util
                     }
                     else if (weapon.Categories.Contains("Axe"))
                     {
-                        Character target = GetMeleeTarget(character, target_squad);
+                        Character target = GetTarget_Melee(character, target_squad);
                         if (target != null)
                         {
                             targets.Add(target);
@@ -175,7 +177,7 @@ namespace DoS1.Util
                     else if (weapon.Categories.Contains("Bow") ||
                              weapon.Categories.Contains("Grimoire"))
                     {
-                        Character target = GetRangedTarget(character, target_squad);
+                        Character target = GetTarget_Ranged(character, target_squad);
                         if (target != null &&
                             !target.Dead)
                         {
@@ -186,7 +188,7 @@ namespace DoS1.Util
 
                 if (!targets.Any())
                 {
-                    Character target = GetMeleeTarget(character, target_squad);
+                    Character target = GetTarget_Melee(character, target_squad);
                     if (target != null)
                     {
                         targets.Add(target);
@@ -197,7 +199,7 @@ namespace DoS1.Util
             return targets;
         }
 
-        public static Character GetMeleeTarget(Character character, Squad target_squad)
+        public static Character GetTarget_Melee(Character character, Squad target_squad)
         {
             Character target = null;
 
@@ -393,7 +395,7 @@ namespace DoS1.Util
             return target;
         }
 
-        public static Character GetRangedTarget(Character character, Squad target_squad)
+        public static Character GetTarget_Ranged(Character character, Squad target_squad)
         {
             Character target = null;
 
@@ -584,6 +586,33 @@ namespace DoS1.Util
                 target.Dead)
             {
                 target = null;
+            }
+
+            return target;
+        }
+
+        public static Character GetTarget_LeastHP(Squad target_squad)
+        {
+            Character target = null;
+
+            foreach (Character character in target_squad.Characters)
+            {
+                if (!character.Dead)
+                {
+                    target = character;
+                    break;
+                }
+            }
+
+            foreach (Character character in target_squad.Characters)
+            {
+                if (!character.Dead)
+                {
+                    if (character.HealthBar.Value < target.HealthBar.Value)
+                    {
+                        target = character;
+                    }
+                }
             }
 
             return target;
@@ -742,7 +771,7 @@ namespace DoS1.Util
                 {
                     string type = damage_types[i];
 
-                    if (InventoryUtil.Weapon_HasElement(weapon, type))
+                    if (InventoryUtil.Item_HasElement(weapon, type))
                     {
                         int damage = InventoryUtil.Get_TotalDamage(weapon, type);
 
@@ -767,6 +796,9 @@ namespace DoS1.Util
                             damage -= defense;
                         }
 
+                        Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
+                        damage -= ArmyUtil.Get_AoE_Defense(defender_squad, defender, type);
+
                         if (type == "Physical")
                         {
                             if ((InventoryUtil.Weapon_IsMelee(weapon) && BackRow(defender)) ||
@@ -786,12 +818,16 @@ namespace DoS1.Util
                             damage = 0;
                         }
 
-                        if (damage > 0)
+                        if (damage >= 0)
                         {
                             defender.HealthBar.Value -= damage;
+                            if (defender.HealthBar.Value < 0)
+                            {
+                                defender.HealthBar.Value = 0;
+                            }
                             defender.HealthBar.Update();
 
-                            Color damage_color = Color.White;
+                            Color damage_color = new Color(81, 68, 47, 255);
                             switch (type)
                             {
                                 case "Fire":
@@ -799,11 +835,11 @@ namespace DoS1.Util
                                     break;
 
                                 case "Lightning":
-                                    damage_color = Color.Yellow;
+                                    damage_color = Color.Cyan;
                                     break;
 
                                 case "Earth":
-                                    damage_color = Color.Brown;
+                                    damage_color = Color.Lime;
                                     break;
 
                                 case "Ice":
@@ -822,9 +858,18 @@ namespace DoS1.Util
                                 ally_total_damage += damage;
                             }
 
-                            menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", damage.ToString(), damage_color,
+                            menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "-" + damage.ToString(), damage_color,
                                 new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
                                     defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+
+                            Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+                            defender.StatusEffects.Add(new Something
+                            {
+                                ID = new_damage_label.ID,
+                                Name = "Damage",
+                                DrawColor = damage_color
+                            });
 
                             if (defender.HealthBar.Value < 0)
                             {
@@ -843,6 +888,15 @@ namespace DoS1.Util
                             menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "0", Color.Black,
                                 new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
                                     defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+
+                            Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+                            defender.StatusEffects.Add(new Something
+                            {
+                                ID = new_damage_label.ID,
+                                Name = "Damage",
+                                DrawColor = Color.Black
+                            });
                         }
                     }
                 }
@@ -881,9 +935,13 @@ namespace DoS1.Util
                 if (damage > 0)
                 {
                     defender.HealthBar.Value -= damage;
+                    if (defender.HealthBar.Value < 0)
+                    {
+                        defender.HealthBar.Value = 0;
+                    }
                     defender.HealthBar.Update();
 
-                    Color damage_color = Color.White;
+                    Color damage_color = new Color(81, 68, 47, 255);
 
                     AddEffect(menu, defender, weapon, "Physical");
 
@@ -899,6 +957,15 @@ namespace DoS1.Util
                     menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", damage.ToString(), damage_color,
                         new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
                             defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+
+                    Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+                    defender.StatusEffects.Add(new Something
+                    {
+                        ID = new_damage_label.ID,
+                        Name = "Damage",
+                        DrawColor = damage_color
+                    });
 
                     if (defender.HealthBar.Value < 0)
                     {
@@ -917,7 +984,88 @@ namespace DoS1.Util
                     menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "0", Color.Black,
                         new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
                             defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
+
+                    Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+                    defender.StatusEffects.Add(new Something
+                    {
+                        ID = new_damage_label.ID,
+                        Name = "Damage",
+                        DrawColor = Color.Black
+                    });
                 }
+            }
+        }
+
+        public static void DoHeal(Menu menu, Character character, Item weapon)
+        {
+            string element = "Life";
+            string effect = "Heal";
+
+            int heal = 0;
+            Something heal_property = weapon.GetProperty(element + " " + effect);
+            if (heal_property != null)
+            {
+                heal = (int)heal_property.Value;
+            }
+
+            //Check for armor extra healing
+            Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+            if (helm != null)
+            {
+                Something property = helm.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    heal += (int)property.Value;
+                }
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+            if (armor != null)
+            {
+                Something property = armor.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    heal += (int)property.Value;
+                }
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+            if (shield != null)
+            {
+                Something property = shield.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    heal += (int)property.Value;
+                }
+            }
+
+            Squad squad = ArmyUtil.Get_Squad(character.ID);
+            heal += ArmyUtil.Get_AoE_Defense(squad, character, element);
+
+            if (heal > 0)
+            {
+                character.HealthBar.Value += heal;
+                if (character.HealthBar.Value > character.HealthBar.Max_Value)
+                {
+                    character.HealthBar.Value = character.HealthBar.Max_Value;
+                }
+                character.HealthBar.Update();
+
+                AddEffect(menu, character, weapon, element);
+
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "+" + heal.ToString(), Color.White,
+                    new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
+                        character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), true);
+
+                Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+                character.StatusEffects.Add(new Something
+                {
+                    ID = new_damage_label.ID,
+                    Name = "Damage",
+                    DrawColor = Color.White
+                });
             }
         }
 
@@ -1018,10 +1166,67 @@ namespace DoS1.Util
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
                             RenderingManager.Lighting.DrawColor, true);
                     break;
+
+                case "Life":
+                    AssetManager.PlaySound_Random("Heal");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Heal"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            RenderingManager.Lighting.DrawColor, true);
+                    break;
             }
 
             Picture effect = Get_LastDamagePicture(menu);
             effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
+        }
+
+        public static void GainExp(Character character, int amount)
+        {
+            //Increase rune XP on equipment
+            Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+            if (weapon != null)
+            {
+                GainExp_Item(weapon, 1);
+            }
+
+            Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+            if (helm != null)
+            {
+                GainExp_Item(helm, 1);
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+            if (armor != null)
+            {
+                GainExp_Item(armor, 1);
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+            if (shield != null)
+            {
+                GainExp_Item(shield, 1);
+            }
+        }
+
+        public static void GainExp_Item(Item item, int amount)
+        {
+            if (item != null &&
+                amount > 0)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    Something xp = rune.GetProperty("XP Value");
+                    if (xp != null)
+                    {
+                        xp.Value += amount;
+                        InventoryUtil.UpdateRune_Level(rune);
+                    }
+                }
+
+                InventoryUtil.UpdateItem(item);
+            }
         }
 
         public static Picture Get_LastDamagePicture(Menu menu)

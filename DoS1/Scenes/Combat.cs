@@ -51,6 +51,7 @@ namespace DoS1.Scenes
 
         private bool won_battle;
         private int gold;
+        private int xp;
 
         #endregion
 
@@ -94,31 +95,17 @@ namespace DoS1.Scenes
 
                 UpdateControls();
                 AnimateMouseClick();
+                UpdateGrids();
             }
         }
 
         public override void DrawWorld(SpriteBatch spriteBatch, Point resolution, Color color)
         {
-            
-        }
-
-        public override void DrawMenu(SpriteBatch spriteBatch)
-        {
             if (Visible)
             {
-                for (int i = 0; i < Menu.Pictures.Count; i++)
-                {
-                    Picture picture = Menu.Pictures[i];
-                    if (picture.Name != "Damage" &&
-                        picture.Name != "Cast" &&
-                        picture.Name != "Result" &&
-                        picture.Name != "MouseClick")
-                    {
-                        picture.Draw(spriteBatch);
-                    }
-                }
+                Menu.GetPicture("Background").Draw(spriteBatch);
 
-                World.Draw(spriteBatch, Main.Game.Resolution, RenderingManager.Lighting.DrawColor);
+                World.Draw(spriteBatch, Main.Game.Resolution, color);
 
                 if (ally_squad != null)
                 {
@@ -129,7 +116,24 @@ namespace DoS1.Scenes
                             Character character = ally_squad.GetCharacter(new Vector2(x, y));
                             if (character != null)
                             {
-                                CharacterUtil.DrawCharacter(spriteBatch, character, RenderingManager.Lighting.DrawColor);
+                                bool received_damage = false;
+
+                                Something damage = character.GetStatusEffect("Damage");
+                                if (damage != null)
+                                {
+                                    Label damage_label = Menu.GetLabel(damage.ID);
+                                    if (damage_label != null)
+                                    {
+                                        received_damage = true;
+                                        CharacterUtil.DrawCharacter(spriteBatch, character, damage.DrawColor);
+                                        damage.DrawColor = Color.Lerp(damage.DrawColor, color, 0.025f);
+                                    }
+                                }
+
+                                if (!received_damage)
+                                {
+                                    CharacterUtil.DrawCharacter(spriteBatch, character, color);
+                                }
                             }
                         }
                     }
@@ -144,9 +148,48 @@ namespace DoS1.Scenes
                             Character character = enemy_squad.GetCharacter(new Vector2(x, y));
                             if (character != null)
                             {
-                                CharacterUtil.DrawCharacter(spriteBatch, character, RenderingManager.Lighting.DrawColor);
+                                bool received_damage = false;
+
+                                Something damage = character.GetStatusEffect("Damage");
+                                if (damage != null)
+                                {
+                                    Label damage_label = Menu.GetLabel(damage.ID);
+                                    if (damage_label != null)
+                                    {
+                                        received_damage = true;
+                                        CharacterUtil.DrawCharacter(spriteBatch, character, damage.DrawColor);
+                                        damage.DrawColor = Color.Lerp(damage.DrawColor, color, 0.05f);
+                                    }
+                                }
+
+                                if (!received_damage)
+                                {
+                                    CharacterUtil.DrawCharacter(spriteBatch, character, color);
+                                }
                             }
                         }
+                    }
+                }
+
+                WeatherManager.Draw(spriteBatch);
+            }
+        }
+
+        public override void DrawMenu(SpriteBatch spriteBatch)
+        {
+            if (Visible)
+            {
+                for (int i = 0; i < Menu.Pictures.Count; i++)
+                {
+                    Picture picture = Menu.Pictures[i];
+                    if (picture != null &&
+                        picture.Name != "Damage" &&
+                        picture.Name != "Cast" &&
+                        picture.Name != "Result" &&
+                        picture.Name != "MouseClick" &&
+                        picture.Name != "Background")
+                    {
+                        picture.Draw(spriteBatch);
                     }
                 }
 
@@ -164,8 +207,6 @@ namespace DoS1.Scenes
                 {
                     Menu.Labels[i].Draw(spriteBatch);
                 }
-
-                WeatherManager.Draw(spriteBatch);
 
                 Menu.GetPicture("Result").Draw(spriteBatch);
                 Menu.GetPicture("MouseClick").Draw(spriteBatch);
@@ -474,24 +515,83 @@ namespace DoS1.Scenes
             if (current_character != null)
             {
                 current_character.ManaBar.Value -= ep_cost;
+                if (current_character.ManaBar.Value < 0)
+                {
+                    current_character.ManaBar.Value = 0;
+                }
                 current_character.ManaBar.Update();
 
                 Item weapon = InventoryUtil.Get_EquippedItem(current_character, "Weapon");
 
-                foreach (Character target in targets)
-                {
-                    CombatUtil.DoDamage(Menu, target, weapon, ref ally_total_damage, ref enemy_total_damage);
+                Defense(weapon);
+                Offense(weapon);
+            }
+        }
 
-                    if (target.Dead)
+        private void Defense(Item weapon)
+        {
+            if (InventoryUtil.Item_IsAoE(weapon, "Life"))
+            {
+                //Full party heal
+                if (current_character.Type == "Enemy")
+                {
+                    foreach (Character character in enemy_squad.Characters)
                     {
-                        if (target.Type == "Enemy")
+                        CombatUtil.DoHeal(Menu, character, weapon);
+                    }
+                }
+                else
+                {
+                    foreach (Character character in ally_squad.Characters)
+                    {
+                        CombatUtil.DoHeal(Menu, character, weapon);
+                    }
+                }
+            }
+            else if (InventoryUtil.Item_HasElement(weapon, "Life"))
+            {
+                //Single target heal
+                Character target;
+
+                if (current_character.Type == "Enemy")
+                {
+                    target = CombatUtil.GetTarget_LeastHP(enemy_squad);
+                }
+                else
+                {
+                    target = CombatUtil.GetTarget_LeastHP(ally_squad);
+                }
+
+                if (target != null)
+                {
+                    CombatUtil.DoHeal(Menu, target, weapon);
+                }
+            }
+        }
+
+        private void Offense(Item weapon)
+        {
+            foreach (Character target in targets)
+            {
+                CombatUtil.DoDamage(Menu, target, weapon, ref ally_total_damage, ref enemy_total_damage);
+
+                if (target.Dead)
+                {
+                    if (target.Type == "Enemy")
+                    {
+                        gold += 100;
+                        xp += 1;
+                    }
+                    else if (target.ID == Handler.MainCharacter_ID)
+                    {
+                        MainCharacterKilled();
+                        break;
+                    }
+                    else
+                    {
+                        foreach (Character character in enemy_squad.Characters)
                         {
-                            gold += 100;
-                        }
-                        else if (target.ID == Handler.MainCharacter_ID)
-                        {
-                            MainCharacterKilled();
-                            break;
+                            CombatUtil.GainExp(character, 1);
                         }
                     }
                 }
@@ -594,6 +694,15 @@ namespace DoS1.Scenes
                 {
                     Menu.Labels.Remove(label);
                     i--;
+                }
+            }
+
+            foreach (Character target in targets)
+            {
+                Something damage = target.GetStatusEffect("Damage");
+                if (damage != null)
+                {
+                    target.StatusEffects.Remove(damage);
                 }
             }
 
@@ -753,8 +862,18 @@ namespace DoS1.Scenes
 
             if (won_battle)
             {
-                Handler.Gold += gold;
-                button.Text += "\n\n" + gold + " Gold was looted!";
+                if (gold > 0 ||
+                xp > 0)
+                {
+                    Handler.Gold += gold;
+                    button.Text += "\n\n" + gold + " Gold was looted!";
+
+                    foreach (Character character in ally_squad.Characters)
+                    {
+                        CombatUtil.GainExp(character, xp);
+                    }
+                    button.Text += "\n" + xp + " XP was gained!";
+                }
 
                 Character leader = ally_squad.GetLeader();
                 if (leader == null)
@@ -768,6 +887,9 @@ namespace DoS1.Scenes
                     leader.Target_ID = 0;
                 }
             }
+
+            gold = 0;
+            xp = 0;
         }
 
         private void Retreat()
@@ -788,8 +910,21 @@ namespace DoS1.Scenes
             Menu.GetPicture("MouseClick").Visible = true;
             button.Visible = true;
 
-            Handler.Gold += gold;
-            button.Text += "\n\n" + gold + " Gold was looted!";
+            if (gold > 0 ||
+                xp > 0)
+            {
+                Handler.Gold += gold;
+                button.Text += "\n\n" + gold + " Gold was looted!";
+
+                foreach (Character character in ally_squad.Characters)
+                {
+                    CombatUtil.GainExp(character, xp);
+                }
+                button.Text += "\n" + xp + " XP was gained!";
+            }
+
+            gold = 0;
+            xp = 0;
         }
 
         private void Leave()
@@ -937,7 +1072,7 @@ namespace DoS1.Scenes
                     visible = true
                 });
 
-                Menu.AddPicture(Handler.GetID(), "Result", AssetManager.Textures["Victory"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, false);
+                Menu.AddPicture(Handler.GetID(), "Result", AssetManager.Textures["Victory"], new Region(0, 0, 0, 0), Color.White, false);
 
                 Menu.AddPicture(Handler.GetID(), "MouseClick", AssetManager.Textures["LeftClick"], new Region(0, 0, 0, 0), Color.White, false);
                 Picture mouseClick = Menu.GetPicture("MouseClick");
@@ -959,12 +1094,159 @@ namespace DoS1.Scenes
                     visible = false
                 });
 
+                LoadGrids();
+
                 Menu.Visible = true;
 
                 Resize(Main.Game.Resolution);
 
                 Handler.CombatTimer.Start();
                 Handler.CombatTimer_Tiles.Start();
+            }
+        }
+
+        public void UpdateGrids()
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Character character = enemy_squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        Label hp_label = Menu.GetLabel(character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (hp_label != null)
+                        {
+                            hp_label.Text = character.HealthBar.Value + "/" + character.HealthBar.Max_Value + " HP";
+                        }
+
+                        Label ep_label = Menu.GetLabel(character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (ep_label != null)
+                        {
+                            ep_label.Text = character.ManaBar.Value + "/" + character.ManaBar.Max_Value + " EP";
+                        }
+                    }
+                }
+            }
+
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Character character = ally_squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        Label hp_label = Menu.GetLabel(character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (hp_label != null)
+                        {
+                            hp_label.Text = character.HealthBar.Value + "/" + character.HealthBar.Max_Value + " HP";
+                        }
+
+                        Label ep_label = Menu.GetLabel(character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (ep_label != null)
+                        {
+                            ep_label.Text = character.ManaBar.Value + "/" + character.ManaBar.Max_Value + " EP";
+                        }
+                    }
+                }
+            }
+        }
+
+        public void LoadGrids()
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Menu.AddPicture(Handler.GetID(), "Enemy,x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
+                        new Region(0, 0, 0, 0), Color.White * 0.8f, true);
+
+                    Character character = enemy_squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString(), character.HealthBar.Value + "/" + character.HealthBar.Max_Value + " HP", Color.Red,
+                            new Region(0, 0, 0, 0), true);
+
+                        Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString(), character.ManaBar.Value + "/" + character.ManaBar.Max_Value + " EP", Color.Blue,
+                            new Region(0, 0, 0, 0), true);
+                    }
+                }
+            }
+
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Menu.AddPicture(Handler.GetID(), "Ally,x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
+                        new Region(0, 0, 0, 0), Color.White * 0.8f, true);
+
+                    Character character = ally_squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString(), character.HealthBar.Value + "/" + character.HealthBar.Max_Value + " HP", Color.Red,
+                            new Region(0, 0, 0, 0), true);
+
+                        Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString(), character.ManaBar.Value + "/" + character.ManaBar.Max_Value + " EP", Color.Blue,
+                            new Region(0, 0, 0, 0), true);
+                    }
+                }
+            }
+        }
+
+        public void ResizeGrids()
+        {
+            int width = Main.Game.MenuSize.X * 2;
+            int height = Main.Game.MenuSize.Y * 2;
+            int starting_x = 0;
+            int starting_y = 0;
+
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Menu.GetPicture("Enemy,x:" + x.ToString() + ",y:" + y.ToString()).Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height);
+
+                    Character character = enemy_squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        Label hp_label = Menu.GetLabel(character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (hp_label != null)
+                        {
+                            hp_label.Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height / 2);
+                        }
+
+                        Label ep_label = Menu.GetLabel(character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (ep_label != null)
+                        {
+                            ep_label.Region = new Region(starting_x + (width * x), starting_y + (height * y) + (height / 2), width, height / 2);
+                        }
+                    }
+                }
+            }
+
+            starting_x = Main.Game.Resolution.X - (width * 3);
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Menu.GetPicture("Ally,x:" + x.ToString() + ",y:" + y.ToString()).Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height);
+
+                    Character character = ally_squad.GetCharacter(new Vector2(x, y));
+                    if (character != null)
+                    {
+                        Label hp_label = Menu.GetLabel(character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (hp_label != null)
+                        {
+                            hp_label.Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height / 2);
+                        }
+
+                        Label ep_label = Menu.GetLabel(character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString());
+                        if (ep_label != null)
+                        {
+                            ep_label.Region = new Region(starting_x + (width * x), starting_y + (height * y) + (height / 2), width, height / 2);
+                        }
+                    }
+                }
             }
         }
 
@@ -1001,6 +1283,8 @@ namespace DoS1.Scenes
                 {
                     base_image.Region = new Region(0, 0, Main.Game.Resolution.X, tile.Region.Y + (tile.Region.Height / 2));
                 }
+
+                ResizeGrids();
             }
         }
 

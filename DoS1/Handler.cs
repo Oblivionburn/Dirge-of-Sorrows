@@ -103,6 +103,9 @@ namespace DoS1
             { "Gray", new Color(160, 160, 160, 255) }
         };
 
+        public static List<Something> light_maps = new List<Something>();
+        public static int light_tile_distance = 1;
+
         public static List<string> Saves;
         public static string Selected_Save;
 
@@ -168,6 +171,7 @@ namespace DoS1
                 "Icons",
                 "Particles",
                 "Screens",
+                "Shaders",
                 "Shields",
                 "Tiles",
                 "Weapons"

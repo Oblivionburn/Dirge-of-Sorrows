@@ -459,6 +459,7 @@ namespace DoS1.Menus
                                     Handler.ViewOnly_Character = true;
                                     Handler.ViewOnly_Item = true;
 
+                                    GameUtil.Toggle_Pause(false);
                                     InputManager.Mouse.Flush();
                                     MenuManager.ChangeMenu("Squad");
                                 }

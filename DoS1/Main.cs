@@ -80,6 +80,16 @@ namespace DoS1
                 Game.SpriteBatch = new SpriteBatch(Game.GraphicsManager.GraphicsDevice);
 
                 RenderingManager.InitDefaults(Game.GraphicsManager, Game.Resolution);
+                RenderingManager.LightingRenderer = new LightingRenderer
+                {
+                    Name = "Lighting",
+                    SetRenderTarget_BeforeDraw = true,
+                    ClearGraphics_BeforeDraw = true,
+                    ClearRenderTarget_AfterDraw = true,
+                    BlendState = BlendState.Additive
+                };
+                RenderingManager.LightingRenderer.Init(Game.GraphicsManager, Game.Resolution);
+                RenderingManager.AddLightingRenderer.RenderTarget = RenderingManager.LightingRenderer.RenderTarget;
 
                 Handler.Init(this);
                 Game.Zoom = 1.5f;
