@@ -383,7 +383,26 @@ namespace DoS1.Scenes
                             case 3:
                                 if (effect_frame >= 20)
                                 {
-                                    combat_step++;
+                                    bool continue_attacking = false;
+                                    Item weapon = InventoryUtil.Get_EquippedItem(current_character, "Weapon");
+                                    if (InventoryUtil.Item_HasElement(weapon, "Time"))
+                                    {
+                                        int chance = InventoryUtil.Get_Item_Element_Level(weapon, "Time");
+                                        if (Utility.RandomPercent(chance))
+                                        {
+                                            continue_attacking = true;
+                                        }
+                                    }
+
+                                    if (continue_attacking)
+                                    {
+                                        RemoveEffects();
+                                        ResetCombat();
+                                    }
+                                    else
+                                    {
+                                        combat_step++;
+                                    }
                                 }
                                 else if (effect_frame % 4 == 0)
                                 {
@@ -530,27 +549,28 @@ namespace DoS1.Scenes
 
         private void Defense(Item weapon)
         {
-            if (InventoryUtil.Item_IsAoE(weapon, "Life"))
+            if (InventoryUtil.Item_IsAoE(weapon, "Health"))
             {
-                //Full party heal
+                //Full party heal HP
+                int hp = InventoryUtil.Get_Item_AoE_Level(weapon, "Health");
                 if (current_character.Type == "Enemy")
                 {
                     foreach (Character character in enemy_squad.Characters)
                     {
-                        CombatUtil.DoHeal(Menu, character, weapon);
+                        CombatUtil.DoHeal_HP(Menu, character, weapon, hp);
                     }
                 }
                 else
                 {
                     foreach (Character character in ally_squad.Characters)
                     {
-                        CombatUtil.DoHeal(Menu, character, weapon);
+                        CombatUtil.DoHeal_HP(Menu, character, weapon, hp);
                     }
                 }
             }
-            else if (InventoryUtil.Item_HasElement(weapon, "Life"))
+            else if (InventoryUtil.Item_HasElement(weapon, "Health"))
             {
-                //Single target heal
+                //Single target heal HP
                 Character target;
 
                 if (current_character.Type == "Enemy")
@@ -564,7 +584,47 @@ namespace DoS1.Scenes
 
                 if (target != null)
                 {
-                    CombatUtil.DoHeal(Menu, target, weapon);
+                    int hp = InventoryUtil.Get_Item_Element_Level(weapon, "Health") * Handler.Element_Multiplier;
+                    CombatUtil.DoHeal_HP(Menu, target, weapon, hp);
+                }
+            }
+            else if (InventoryUtil.Item_IsAoE(weapon, "Energy"))
+            {
+                //Full party heal EP
+                int ep = InventoryUtil.Get_Item_AoE_Level(weapon, "Energy");
+                if (current_character.Type == "Enemy")
+                {
+                    foreach (Character character in enemy_squad.Characters)
+                    {
+                        CombatUtil.DoHeal_EP(Menu, character, weapon, ep);
+                    }
+                }
+                else
+                {
+                    foreach (Character character in ally_squad.Characters)
+                    {
+                        CombatUtil.DoHeal_EP(Menu, character, weapon, ep);
+                    }
+                }
+            }
+            else if (InventoryUtil.Item_HasElement(weapon, "Energy"))
+            {
+                //Single target heal EP
+                Character target;
+
+                if (current_character.Type == "Enemy")
+                {
+                    target = CombatUtil.GetTarget_LeastEP(enemy_squad);
+                }
+                else
+                {
+                    target = CombatUtil.GetTarget_LeastEP(ally_squad);
+                }
+
+                if (target != null)
+                {
+                    int ep = InventoryUtil.Get_Item_Element_Level(weapon, "Energy") * Handler.Element_Multiplier;
+                    CombatUtil.DoHeal_EP(Menu, target, weapon, ep);
                 }
             }
         }
@@ -573,25 +633,65 @@ namespace DoS1.Scenes
         {
             foreach (Character target in targets)
             {
-                CombatUtil.DoDamage(Menu, target, weapon, ref ally_total_damage, ref enemy_total_damage);
+                Squad defender_squad = ArmyUtil.Get_Squad(target.ID);
 
-                if (target.Dead)
+                bool dodge = false;
+
+                int dodge_chance = CombatUtil.GetArmor_Resistance(target, "Time");
+                dodge_chance += ArmyUtil.Get_AoE_Defense(defender_squad, target, "Time");
+
+                if (Utility.RandomPercent(dodge_chance))
                 {
-                    if (target.Type == "Enemy")
+                    dodge = true;
+                }
+
+                if (dodge)
+                {
+                    CombatUtil.DoDodge(Menu, target);
+                }
+                else
+                {
+                    if (InventoryUtil.Item_HasElement(weapon, "Death"))
                     {
-                        gold += 100;
-                        xp += 1;
-                    }
-                    else if (target.ID == Handler.MainCharacter_ID)
-                    {
-                        MainCharacterKilled();
-                        break;
-                    }
-                    else
-                    {
-                        foreach (Character character in enemy_squad.Characters)
+                        //Instant kill
+                        int chance = InventoryUtil.Get_Item_Element_Level(weapon, "Death");
+                        if (Utility.RandomPercent(chance))
                         {
-                            CombatUtil.GainExp(character, 1);
+                            int resist_chance = CombatUtil.GetArmor_Resistance(target, "Death");
+                            resist_chance += ArmyUtil.Get_AoE_Defense(defender_squad, target, "Death");
+
+                            if (!Utility.RandomPercent(resist_chance))
+                            {
+                                CombatUtil.AddEffect(Menu, target, weapon, "Death");
+                                target.HealthBar.Value = 0;
+                                target.Dead = true;
+                            }
+                        }
+                    }
+
+                    if (!target.Dead)
+                    {
+                        CombatUtil.DoDamage(Menu, current_character, target, weapon, ref ally_total_damage, ref enemy_total_damage);
+
+                        if (target.Dead)
+                        {
+                            if (target.Type == "Enemy")
+                            {
+                                gold += 100;
+                                xp += 1;
+                            }
+                            else if (target.ID == Handler.MainCharacter_ID)
+                            {
+                                MainCharacterKilled();
+                                break;
+                            }
+                            else
+                            {
+                                foreach (Character character in enemy_squad.Characters)
+                                {
+                                    CombatUtil.GainExp(character, 1);
+                                }
+                            }
                         }
                     }
                 }
@@ -718,6 +818,16 @@ namespace DoS1.Scenes
             }
         }
 
+        private void ResetCombat()
+        {
+            combat_step = 0;
+            character_frame = 1;
+            effect_frame = 1;
+            attack_type = "";
+            ep_cost = 0;
+            targets.Clear();
+        }
+
         private void FinishAttack()
         {
             if (current_character != null)
@@ -772,12 +882,7 @@ namespace DoS1.Scenes
                 current_character = null;
             }
 
-            combat_step = 0;
-            character_frame = 1;
-            effect_frame = 1;
-            attack_type = "";
-            ep_cost = 0;
-            targets.Clear();
+            ResetCombat();
         }
 
         private void FinishRound()

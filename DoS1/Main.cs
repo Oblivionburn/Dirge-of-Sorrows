@@ -217,7 +217,10 @@ namespace DoS1
                             Game.SpriteBatch.End();
 
                             //Add lighting to world
-                            RenderingManager.AddLightingRenderer.Draw(Game.SpriteBatch, Game.Resolution);
+                            if (!Handler.Combat)
+                            {
+                                RenderingManager.AddLightingRenderer.Draw(Game.SpriteBatch, Game.Resolution);
+                            }
 
                             Game.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
 

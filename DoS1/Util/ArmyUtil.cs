@@ -8,7 +8,6 @@ using OP_Engine.Inventories;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DoS1.Util
 {

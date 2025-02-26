@@ -618,6 +618,118 @@ namespace DoS1.Util
             return target;
         }
 
+        public static Character GetTarget_LeastEP(Squad target_squad)
+        {
+            Character target = null;
+
+            foreach (Character character in target_squad.Characters)
+            {
+                if (!character.Dead)
+                {
+                    target = character;
+                    break;
+                }
+            }
+
+            foreach (Character character in target_squad.Characters)
+            {
+                if (!character.Dead)
+                {
+                    if (character.ManaBar.Value < target.ManaBar.Value)
+                    {
+                        target = character;
+                    }
+                }
+            }
+
+            return target;
+        }
+
+        public static int GetArmor_Resistance(Character character, string type)
+        {
+            int total = 0;
+
+            Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+            if (helm != null)
+            {
+                total += InventoryUtil.Get_Item_Element_Level(helm, type);
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+            if (armor != null)
+            {
+                total += InventoryUtil.Get_Item_Element_Level(armor, type);
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+            if (shield != null)
+            {
+                total += InventoryUtil.Get_Item_Element_Level(shield, type);
+            }
+
+            if (type == "Death" ||
+                type == "Effect")
+            {
+                total *= 10;
+            }
+            else if (type != "Time")
+            {
+                total *= Handler.Element_Multiplier;
+            }
+
+            return total;
+        }
+
+        public static int GetArmor_Drain_Chance(Character character, string type)
+        {
+            int total = 0;
+
+            Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+            if (helm != null)
+            {
+                total += InventoryUtil.Get_Item_Drain_Chance(helm, type);
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+            if (armor != null)
+            {
+                total += InventoryUtil.Get_Item_Drain_Chance(armor, type);
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+            if (shield != null)
+            {
+                total += InventoryUtil.Get_Item_Drain_Chance(shield, type);
+            }
+
+            return total;
+        }
+
+        public static int GetArmor_Drain_Amount(Character character, string type)
+        {
+            int total = 0;
+
+            Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+            if (helm != null)
+            {
+                total += InventoryUtil.Get_Item_Drain_Level(helm, type);
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+            if (armor != null)
+            {
+                total += InventoryUtil.Get_Item_Drain_Level(armor, type);
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+            if (shield != null)
+            {
+                total += InventoryUtil.Get_Item_Drain_Level(shield, type);
+            }
+
+            return total;
+        }
+
         public static Tile TargetTile(World world, Character character)
         {
             Map map = world.Maps[0];
@@ -761,7 +873,7 @@ namespace DoS1.Util
             return false;
         }
 
-        public static void DoDamage(Menu menu, Character defender, Item weapon, ref int ally_total_damage, ref int enemy_total_damage)
+        public static void DoDamage(Menu menu, Character attacker, Character defender, Item weapon, ref int ally_total_damage, ref int enemy_total_damage)
         {
             if (weapon != null)
             {
@@ -774,27 +886,7 @@ namespace DoS1.Util
                     if (InventoryUtil.Item_HasElement(weapon, type))
                     {
                         int damage = InventoryUtil.Get_TotalDamage(weapon, type);
-
-                        Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
-                        if (helm != null)
-                        {
-                            int defense = InventoryUtil.Get_TotalDefense(helm, type);
-                            damage -= defense;
-                        }
-
-                        Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
-                        if (armor != null)
-                        {
-                            int defense = InventoryUtil.Get_TotalDefense(armor, type);
-                            damage -= defense;
-                        }
-
-                        Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
-                        if (shield != null)
-                        {
-                            int defense = InventoryUtil.Get_TotalDefense(shield, type);
-                            damage -= defense;
-                        }
+                        damage -= GetArmor_Resistance(defender, type);
 
                         Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
                         damage -= ArmyUtil.Get_AoE_Defense(defender_squad, defender, type);
@@ -880,6 +972,15 @@ namespace DoS1.Util
                             {
                                 defender.Dead = true;
                             }
+
+                            if (InventoryUtil.Item_HasDrain(weapon, type))
+                            {
+                                int weapon_drain_chance = InventoryUtil.Get_Item_Drain_Chance(weapon, type);
+                                if (Utility.RandomPercent(weapon_drain_chance))
+                                {
+                                    DoHeal_HP(menu, attacker, weapon, damage);
+                                }
+                            }
                         }
                         else
                         {
@@ -898,34 +999,26 @@ namespace DoS1.Util
                                 DrawColor = Color.Black
                             });
                         }
+
+                        int armor_drain_chance = GetArmor_Drain_Chance(defender, type);
+                        if (armor_drain_chance > 0)
+                        {
+                            if (Utility.RandomPercent(armor_drain_chance))
+                            {
+                                int armor_drain_amount = GetArmor_Drain_Chance(defender, type);
+                                DoHeal_EP(menu, defender, weapon, armor_drain_amount);
+                            }
+                        }
                     }
                 }
             }
             else
             {
+                string type = "Physical";
+
                 //Unarmed attack
                 int damage = 10;
-
-                Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
-                if (helm != null)
-                {
-                    int defense = InventoryUtil.Get_TotalDefense(helm, "Physical");
-                    damage -= defense;
-                }
-
-                Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
-                if (armor != null)
-                {
-                    int defense = InventoryUtil.Get_TotalDefense(armor, "Physical");
-                    damage -= defense;
-                }
-
-                Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
-                if (shield != null)
-                {
-                    int defense = InventoryUtil.Get_TotalDefense(shield, "Physical");
-                    damage -= defense;
-                }
+                damage -= GetArmor_Resistance(defender, type);
 
                 if (damage < 0)
                 {
@@ -994,20 +1087,39 @@ namespace DoS1.Util
                         DrawColor = Color.Black
                     });
                 }
+
+                int armor_drain_chance = GetArmor_Drain_Chance(defender, type);
+                if (armor_drain_chance > 0)
+                {
+                    if (Utility.RandomPercent(armor_drain_chance))
+                    {
+                        int armor_drain_amount = GetArmor_Drain_Chance(defender, type);
+                        DoHeal_EP(menu, defender, weapon, armor_drain_amount);
+                    }
+                }
             }
         }
 
-        public static void DoHeal(Menu menu, Character character, Item weapon)
+        public static void DoDodge(Menu menu, Character defender)
         {
-            string element = "Life";
-            string effect = "Heal";
+            menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "Dodged!", Color.Black,
+                new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
+                    defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), true);
 
-            int heal = 0;
-            Something heal_property = weapon.GetProperty(element + " " + effect);
-            if (heal_property != null)
+            Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+            defender.StatusEffects.Add(new Something
             {
-                heal = (int)heal_property.Value;
-            }
+                ID = new_damage_label.ID,
+                Name = "Damage",
+                DrawColor = new_damage_label.TextColor
+            });
+        }
+
+        public static void DoHeal_HP(Menu menu, Character character, Item weapon, int heal)
+        {
+            string element = "Health";
+            string effect = "Restore";
 
             //Check for armor extra healing
             Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
@@ -1064,7 +1176,72 @@ namespace DoS1.Util
                 {
                     ID = new_damage_label.ID,
                     Name = "Damage",
-                    DrawColor = Color.White
+                    DrawColor = new_damage_label.TextColor
+                });
+            }
+        }
+
+        public static void DoHeal_EP(Menu menu, Character character, Item weapon, int heal)
+        {
+            string element = "Energy";
+            string effect = "Restore";
+
+            //Check for armor extra healing
+            Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+            if (helm != null)
+            {
+                Something property = helm.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    heal += (int)property.Value;
+                }
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+            if (armor != null)
+            {
+                Something property = armor.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    heal += (int)property.Value;
+                }
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+            if (shield != null)
+            {
+                Something property = shield.GetProperty(element + " " + effect);
+                if (property != null)
+                {
+                    heal += (int)property.Value;
+                }
+            }
+
+            Squad squad = ArmyUtil.Get_Squad(character.ID);
+            heal += ArmyUtil.Get_AoE_Defense(squad, character, element);
+
+            if (heal > 0)
+            {
+                character.ManaBar.Value += heal;
+                if (character.ManaBar.Value > character.ManaBar.Max_Value)
+                {
+                    character.ManaBar.Value = character.ManaBar.Max_Value;
+                }
+                character.ManaBar.Update();
+
+                AddEffect(menu, character, weapon, element);
+
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Damage", "+" + heal.ToString(), new Color(255, 174, 201, 255),
+                    new Region(character.ManaBar.Base_Region.X, character.Region.Y - ((character.ManaBar.Base_Region.Width / 4) * 3),
+                        character.ManaBar.Base_Region.Width, character.ManaBar.Base_Region.Width), true);
+
+                Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+                character.StatusEffects.Add(new Something
+                {
+                    ID = new_damage_label.ID,
+                    Name = "Damage",
+                    DrawColor = new_damage_label.TextColor
                 });
             }
         }
@@ -1089,14 +1266,12 @@ namespace DoS1.Util
                             if (character.Type == "Ally")
                             {
                                 menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Right"],
-                                    new Region(x, y, width, height),
-                                        RenderingManager.Lighting.DrawColor, true);
+                                    new Region(x, y, width, height), Color.White, true);
                             }
                             else if (character.Type == "Enemy")
                             {
                                 menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Left"],
-                                    new Region(x, y, width, height),
-                                        RenderingManager.Lighting.DrawColor, true);
+                                    new Region(x, y, width, height), Color.White, true);
                             }
                         }
                         else if (weapon.Categories.Contains("Bow"))
@@ -1107,13 +1282,13 @@ namespace DoS1.Util
                             {
                                 menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Right"],
                                     new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        RenderingManager.Lighting.DrawColor, true);
+                                        Color.White, true);
                             }
                             else if (character.Type == "Enemy")
                             {
                                 menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Left"],
                                     new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        RenderingManager.Lighting.DrawColor, true);
+                                        Color.White, true);
                             }
                         }
                         else
@@ -1122,7 +1297,7 @@ namespace DoS1.Util
 
                             menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
                                 new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    RenderingManager.Lighting.DrawColor, true);
+                                    Color.White, true);
                         }
                     }
                     else
@@ -1131,7 +1306,7 @@ namespace DoS1.Util
 
                         menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
                             new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                RenderingManager.Lighting.DrawColor, true);
+                                Color.White, true);
                     }
                     break;
 
@@ -1140,7 +1315,7 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Fire"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor * 0.9f, true);
+                            Color.White * 0.9f, true);
                     break;
 
                 case "Lightning":
@@ -1148,7 +1323,7 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor * 0.9f, true);
+                            Color.White * 0.9f, true);
                     break;
 
                 case "Earth":
@@ -1156,7 +1331,7 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Earth"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor, true);
+                            Color.White, true);
                     break;
 
                 case "Ice":
@@ -1164,15 +1339,48 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Ice"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor, true);
+                            Color.White * 0.9f, true);
                     break;
 
-                case "Life":
+                case "Health":
+                case "Energy":
                     AssetManager.PlaySound_Random("Heal");
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Heal"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            RenderingManager.Lighting.DrawColor, true);
+                            Color.White, true);
+                    break;
+
+                case "Death":
+                    AssetManager.PlaySound_Random("Death");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Death"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "Poison":
+                    AssetManager.PlaySound_Random("Poison");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Poison"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "HP Drain":
+                    AssetManager.PlaySound_Random("Leech");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["HP Drain"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "EP Drain":
+                    AssetManager.PlaySound_Random("Siphon");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["EP Drain"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
                     break;
             }
 

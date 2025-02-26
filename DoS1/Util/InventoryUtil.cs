@@ -509,11 +509,11 @@ namespace DoS1.Util
             item.Buy_Price = 100;
             items.Add(item);
 
-            item = NewItem(type, "Life", "Life", properties);
+            item = NewItem(type, "Health", "Health", properties);
             item.Buy_Price = 200;
             items.Add(item);
 
-            item = NewItem(type, "Mind", "Mind", properties);
+            item = NewItem(type, "Energy", "Energy", properties);
             item.Buy_Price = 200;
             items.Add(item);
 
@@ -734,20 +734,52 @@ namespace DoS1.Util
 
                 if (Element_IsDamage(element))
                 {
-                    if (item.Type == "Weapon")
+                    if (IsWeapon(item))
                     {
                         effect = "Damage";
                     }
-                    else if (item.Type == "Shield" ||
-                             item.Type == "Armor" ||
-                             item.Type == "Helm")
+                    else if (IsArmor(item))
                     {
                         effect = "Defense";
                     }
                 }
-                else if (element == "Life")
+                else if (element == "Health" ||
+                         element == "Energy")
                 {
-                    effect = "Heal";
+                    effect = "Restore";
+                }
+                else if (element == "Death")
+                {
+                    if (IsWeapon(item))
+                    {
+                        effect = "Chance";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "Resist";
+                    }
+                }
+                else if (element == "Time")
+                {
+                    if (IsWeapon(item))
+                    {
+                        effect = "Haste";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "Dodge";
+                    }
+                }
+                else if (element == "Drain")
+                {
+                    if (IsWeapon(item))
+                    {
+                        effect = "HP";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "EP";
+                    }
                 }
 
                 Something level = rune.GetProperty("Level Value");
@@ -755,17 +787,85 @@ namespace DoS1.Util
                 Something property = item.GetProperty(element + " " + effect);
                 if (property != null)
                 {
-                    property.Value += level.Value * Handler.Element_Multiplier;
+                    if (element == "Death")
+                    {
+                        if (IsWeapon(item))
+                        {
+                            property.Value += level.Value;
+                        }
+                        else if (IsArmor(item))
+                        {
+                            property.Value += level.Value * 10;
+                        }
+                    }
+                    else if (element == "Time")
+                    {
+                        property.Value += level.Value;
+                    }
+                    else if (element == "Drain")
+                    {
+                        property.Value += level.Value * 10;
+                    }
+                    else
+                    {
+                        property.Value += level.Value * Handler.Element_Multiplier;
+                    }
                 }
                 else
                 {
-                    item.Properties.Add(new Something
+                    if (element == "Death")
                     {
-                        Name = element + " " + effect,
-                        Type = element,
-                        Assignment = effect,
-                        Value = level.Value * Handler.Element_Multiplier
-                    });
+                        if (IsWeapon(item))
+                        {
+                            item.Properties.Add(new Something
+                            {
+                                Name = element + " " + effect,
+                                Type = element,
+                                Assignment = effect,
+                                Value = level.Value
+                            });
+                        }
+                        else if (IsArmor(item))
+                        {
+                            item.Properties.Add(new Something
+                            {
+                                Name = element + " " + effect,
+                                Type = element,
+                                Assignment = effect,
+                                Value = level.Value * 10
+                            });
+                        }
+                    }
+                    else if (element == "Time")
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value
+                        });
+                    }
+                    else if (element == "Drain")
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value * 10
+                        });
+                    }
+                    else
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = element + " " + effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value * Handler.Element_Multiplier
+                        });
+                    }
                 }
 
                 if (cost != null)
@@ -841,59 +941,59 @@ namespace DoS1.Util
                     switch (type)
                     {
                         case "Area":
-                            rune.Description = "On Weapon: paired rune effect on whole squad.\nOn Armor: paired rune effect on whole squad.";
+                            rune.Description = "On Weapon: paired rune weapon property on whole squad\nOn Armor: paired rune armor property on whole squad";
                             break;
 
                         case "Counter":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to ignore defenses.\nOn Armor: " + (level.Value * 10) + "% chance to counter attack.\nStatus: Weak.";
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to ignore defenses\nOn Armor: " + (level.Value * 10) + "% chance to counter attack\nStatus: Weak";
                             break;
 
                         case "Death":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to instant kill target.\nOn Armor: " + (level.Value * 10) + "% chance to resist instant kill.\nStatus: Cursed.";
+                            rune.Description = "On Weapon: " + level.Value + "% chance to instant kill target\nOn Armor: " + (level.Value * 10) + "% chance to resist instant kill\nStatus: Cursed";
                             break;
 
                         case "Disarm":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to destroy target's weapon.\nOn Armor: " + (level.Value * 10) + "% chance to destroy attacker's weapon when hit.\nStatus: Melting.";
+                            rune.Description = "On Weapon: " + level.Value + "% chance to destroy target's weapon\nOn Armor: " + level.Value + "% chance to destroy attacker's weapon when hit\nStatus: Melting";
                             break;
 
                         case "Drain":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to restore HP by paired damage.\nOn Armor: " + (level.Value * 10) + "% chance to restore EP by damage received.\nStatus: Poisoned.";
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to restore HP by paired damage\nOn Armor: " + (level.Value * 10) + "% chance to restore EP by paired resistance\nStatus: Poisoned";
                             break;
 
                         case "Earth":
-                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Earth damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Earth damage.\nStatus: Petrified.";
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Earth damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Earth damage\nStatus: Petrified";
                             break;
 
                         case "Effect":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to apply paired Status.\nOn Armor: " + (level.Value * 10) + "% chance to resist paired Status.";
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to apply paired Status\nOn Armor: " + (level.Value * 10) + "% chance to resist paired Status";
                             break;
 
                         case "Fire":
-                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Fire damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Fire damage.\nStatus: Burning.";
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Fire damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Fire damage\nStatus: Burning";
                             break;
 
-                        case "Life":
-                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " HP.\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " HP.\nStatus: Regenerating.";
+                        case "Health":
+                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " HP\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " HP\nStatus: Regenerating";
                             break;
 
-                        case "Mind":
-                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " EP.\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " EP.\nStatus: Charging.";
+                        case "Energy":
+                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " EP\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " EP\nStatus: Charging";
                             break;
 
                         case "Physical":
-                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Physical damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Physical damage.\nStatus: Stunned.";
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Physical damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Physical damage\nStatus: Stunned";
                             break;
 
                         case "Time":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to attack twice.\nOn Armor: " + (level.Value * 10) + "% chance to dodge attack.\nStatus: Slow.";
+                            rune.Description = "On Weapon: " + level.Value + "% chance to attack again\nOn Armor: " + level.Value + "% chance to dodge attack\nStatus: Slow";
                             break;
 
                         case "Ice":
-                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Ice damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Ice damage.\nStatus: Frozen.";
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Ice damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Ice damage\nStatus: Frozen";
                             break;
 
                         case "Lightning":
-                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Lightning damage.\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Lightning damage.\nStatus: Shocked.";
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Lightning damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Lightning damage\nStatus: Shocked";
                             break;
                     }
                 }
@@ -1355,7 +1455,7 @@ namespace DoS1.Util
                 #region Runes
 
                 random = new CryptoRandom();
-                int rune_choice = random.Next(0, 6);
+                int rune_choice = random.Next(0, 11);
                 switch (rune_choice)
                 {
                     case 0:
@@ -1379,39 +1479,39 @@ namespace DoS1.Util
                         break;
 
                     case 5:
-                        AddItem(inventory, "Life", "Life", "Rune");
+                        AddItem(inventory, "Health", "Health", "Rune");
                         break;
 
                     case 6:
-                        AddItem(inventory, "Physical", "Physical", "Rune");
+                        AddItem(inventory, "Energy", "Energy", "Rune");
                         break;
 
                     case 7:
-                        AddItem(inventory, "Disarm", "Disarm", "Rune");
+                        AddItem(inventory, "Physical", "Physical", "Rune");
                         break;
 
                     case 8:
-                        AddItem(inventory, "Drain", "Drain", "Rune");
-                        break;
-
-                    case 9:
-                        AddItem(inventory, "Mind", "Mind", "Rune");
-                        break;
-
-                    case 10:
-                        AddItem(inventory, "Effect", "Effect", "Rune");
-                        break;
-
-                    case 11:
-                        AddItem(inventory, "Time", "Time", "Rune");
-                        break;
-
-                    case 12:
                         AddItem(inventory, "Death", "Death", "Rune");
                         break;
 
-                    case 13:
+                    case 9:
+                        AddItem(inventory, "Time", "Time", "Rune");
+                        break;
+
+                    case 10:
+                        AddItem(inventory, "Drain", "Drain", "Rune");
+                        break;
+
+                    case 11:
+                        AddItem(inventory, "Disarm", "Disarm", "Rune");
+                        break;
+
+                    case 12:
                         AddItem(inventory, "Counter", "Counter", "Rune");
+                        break;
+
+                    case 13:
+                        AddItem(inventory, "Effect", "Effect", "Rune");
                         break;
                 }
 
@@ -1427,6 +1527,32 @@ namespace DoS1.Util
                 type == "Lightning" ||
                 type == "Earth" ||
                 type == "Ice")
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsWeapon(Item item)
+        {
+            if (item.Categories.Contains("Sword") ||
+                item.Categories.Contains("Axe") ||
+                item.Categories.Contains("Mace") ||
+                item.Categories.Contains("Bow") ||
+                item.Categories.Contains("Grimoire"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsArmor(Item item)
+        {
+            if (item.Type == "Helm" ||
+                item.Type == "Armor" ||
+                item.Type == "Shield")
             {
                 return true;
             }
@@ -1482,6 +1608,8 @@ namespace DoS1.Util
 
         public static int Get_Item_AoE_Level(Item item, string element)
         {
+            int total = 0;
+
             if (item != null)
             {
                 for (int i = 0; i < item.Attachments.Count; i++)
@@ -1497,14 +1625,112 @@ namespace DoS1.Util
                             Something level = paired_rune.GetProperty("Level Value");
                             if (level != null)
                             {
-                                return (int)level.Value * Handler.Element_Multiplier;
+                                if (element == "Death")
+                                {
+                                    if (IsWeapon(item))
+                                    {
+                                        total += (int)level.Value;
+                                    }
+                                    else if (IsArmor(item))
+                                    {
+                                        total += (int)level.Value * 10;
+                                    }
+                                }
+                                else if (element == "Time")
+                                {
+                                    total += (int)level.Value;
+                                }
+                                else
+                                {
+                                    total += (int)level.Value * Handler.Element_Multiplier;
+                                }
                             }
                         }
                     }
                 }
             }
 
-            return 0;
+            return total;
+        }
+
+        public static bool Item_HasDrain(Item item, string element)
+        {
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+                    if (rune.Categories.Contains("Drain"))
+                    {
+                        Item paired_rune = GetPairedRune(item, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == element)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static int Get_Item_Drain_Chance(Item item, string element)
+        {
+            int total = 0;
+
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains("Drain"))
+                    {
+                        Item paired_rune = GetPairedRune(item, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == element)
+                        {
+                            Something level = rune.GetProperty("Level Value");
+                            if (level != null)
+                            {
+                                total += (int)level.Value * 10;
+                            }
+                        } 
+                    }
+                }
+            }
+
+            return total;
+        }
+
+        public static int Get_Item_Drain_Level(Item item, string element)
+        {
+            int total = 0;
+
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains("Drain"))
+                    {
+                        Item paired_rune = GetPairedRune(item, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == element)
+                        {
+                            Something level = paired_rune.GetProperty("Level Value");
+                            if (level != null)
+                            {
+                                total += (int)level.Value * Handler.Element_Multiplier;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return total;
         }
 
         public static bool Weapon_IsMelee(Item weapon)
@@ -1545,6 +1771,30 @@ namespace DoS1.Util
             }
 
             return false;
+        }
+
+        public static int Get_Item_Element_Level(Item item, string element)
+        {
+            int total = 0;
+
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories[0] == element)
+                    {
+                        Something level = rune.GetProperty("Level Value");
+                        if (level != null)
+                        {
+                            total += (int)level.Value;
+                        }
+                    }
+                }
+            }
+
+            return total;
         }
 
         public static Item GetPairedRune(Item item, Item area_rune)
