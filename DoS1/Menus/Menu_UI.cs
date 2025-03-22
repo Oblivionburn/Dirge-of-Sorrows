@@ -1165,32 +1165,34 @@ namespace DoS1.Menus
 
             if (Main.TimeSpeed == 1)
             {
-                button.HoverText = "x1";
+                button.HoverText = "Time x1";
                 button.Texture = AssetManager.Textures["Button_Speed1"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
             }
             else if (Main.TimeSpeed == 2)
             {
-                button.HoverText = "x2";
+                button.HoverText = "Time x2";
                 button.Texture = AssetManager.Textures["Button_Speed2"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
             }
             else if (Main.TimeSpeed == 3)
             {
-                button.HoverText = "x3";
+                button.HoverText = "Time x3";
                 button.Texture = AssetManager.Textures["Button_Speed3"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
             }
             else if (Main.TimeSpeed == 4)
             {
-                button.HoverText = "x4";
+                button.HoverText = "Time x4";
                 button.Texture = AssetManager.Textures["Button_Speed4"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
             }
+
+            Save.ExportINI();
         }
 
         public override void Load(ContentManager content)
@@ -1270,7 +1272,7 @@ namespace DoS1.Menus
             {
                 id = Handler.GetID(),
                 name = "Speed",
-                hover_text = "x1",
+                hover_text = "Time x1",
                 texture = AssetManager.Textures["Button_Speed1"],
                 texture_highlight = AssetManager.Textures["Button_Speed1_Hover"],
                 texture_disabled = AssetManager.Textures["Button_Speed1_Disabled"],
@@ -1279,6 +1281,36 @@ namespace DoS1.Menus
                 enabled = false,
                 visible = true
             });
+
+            Button speed_button = GetButton("Speed");
+            if (Main.TimeSpeed == 1)
+            {
+                speed_button.HoverText = "Time x1";
+                speed_button.Texture = AssetManager.Textures["Button_Speed1"];
+                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
+                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
+            }
+            else if (Main.TimeSpeed == 2)
+            {
+                speed_button.HoverText = "Time x2";
+                speed_button.Texture = AssetManager.Textures["Button_Speed2"];
+                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
+                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
+            }
+            else if (Main.TimeSpeed == 3)
+            {
+                speed_button.HoverText = "Time x3";
+                speed_button.Texture = AssetManager.Textures["Button_Speed3"];
+                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
+                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
+            }
+            else if (Main.TimeSpeed == 4)
+            {
+                speed_button.HoverText = "Time x4";
+                speed_button.Texture = AssetManager.Textures["Button_Speed4"];
+                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
+                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
+            }
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Date", "", Color.White, AssetManager.Textures["Frame_Small"],
                 new Region(0, 0, 0, 0), true);

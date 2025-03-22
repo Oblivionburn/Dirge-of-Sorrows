@@ -113,6 +113,7 @@ namespace DoS1.Util
             SoundManager.MusicLooping = true;
             SoundManager.NeedMusic = true;
             SoundManager.AmbientFade = 1;
+            SoundManager.AmbientPaused = false;
 
             foreach (Weather weather in WeatherManager.Weathers)
             {

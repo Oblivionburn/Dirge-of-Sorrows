@@ -31,7 +31,8 @@ namespace DoS1
         public static OP_Game Game;
         public static string Version;
 
-        public static long TimeSpeed = 1;
+        public static int TimeSpeed = 1;
+        public static int CombatSpeed = 2;
         public static double GameTime;
         public static System.Timers.Timer Timer = new System.Timers.Timer(1);
 

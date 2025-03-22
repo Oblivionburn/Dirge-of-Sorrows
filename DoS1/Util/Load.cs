@@ -61,6 +61,10 @@ namespace DoS1.Util
                     case "Options":
                         VisitOptions(reader);
                         break;
+
+                    case "Speed":
+                        VisitSpeed(reader);
+                        break;
                 }
             }
         }
@@ -153,6 +157,23 @@ namespace DoS1.Util
 
                     case "SoundVolume":
                         SoundManager.SoundVolume = float.Parse(reader.Value) / 10;
+                        break;
+                }
+            }
+        }
+
+        private static void VisitSpeed(XmlTextReader reader)
+        {
+            while (reader.MoveToNextAttribute())
+            {
+                switch (reader.Name)
+                {
+                    case "TimeSpeed":
+                        Main.TimeSpeed = int.Parse(reader.Value);
+                        break;
+
+                    case "CombatSpeed":
+                        Main.CombatSpeed = int.Parse(reader.Value);
                         break;
                 }
             }

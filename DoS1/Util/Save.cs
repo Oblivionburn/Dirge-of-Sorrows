@@ -95,6 +95,15 @@ namespace DoS1.Util
 
             #endregion
 
+            #region Speed
+
+            EnterNode("Speed");
+            Writer.WriteAttributeString("TimeSpeed", Main.TimeSpeed.ToString());
+            Writer.WriteAttributeString("CombatSpeed", Main.CombatSpeed.ToString());
+            ExitNode();
+
+            #endregion
+
             ExitNode();
         }
 
