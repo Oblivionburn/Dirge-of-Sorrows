@@ -8,10 +8,8 @@ using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Menus;
-using OP_Engine.Rendering;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DoS1.Util
 {
@@ -919,7 +917,7 @@ namespace DoS1.Util
                             }
                             defender.HealthBar.Update();
 
-                            Color damage_color = new Color(81, 68, 47, 255);
+                            Color damage_color = Color.White;
                             switch (type)
                             {
                                 case "Fire":
@@ -1034,7 +1032,7 @@ namespace DoS1.Util
                     }
                     defender.HealthBar.Update();
 
-                    Color damage_color = new Color(81, 68, 47, 255);
+                    Color damage_color = Color.White;
 
                     AddEffect(menu, defender, weapon, "Physical");
 

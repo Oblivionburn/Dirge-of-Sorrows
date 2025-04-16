@@ -94,15 +94,6 @@ namespace DoS1.Util
             ui.GetButton("PlayPause").Enabled = false;
             ui.GetButton("Speed").Enabled = false;
 
-            Main.TimeSpeed = 1;
-
-            Button speed = ui.GetButton("Speed");
-            speed.Value = 0;
-            speed.HoverText = "x1";
-            speed.Texture = AssetManager.Textures["Button_Speed1"];
-            speed.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
-            speed.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
-
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");
 

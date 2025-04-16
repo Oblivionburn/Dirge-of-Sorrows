@@ -598,7 +598,7 @@ namespace DoS1.Menus
             int width = (Main.Game.MenuSize.X * 4) + (Main.Game.MenuSize.X / 2);
             if (item.Type == "Rune")
             {
-                width = (Main.Game.MenuSize.X * 9) + (Main.Game.MenuSize.X / 2);
+                width = item.Description.Length * (Main.Game.MenuSize.X / 10);
             }
             else if (item.Type == "Weapon" &&
                      item.Categories.Contains("Grimoire"))

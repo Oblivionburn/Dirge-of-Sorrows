@@ -941,7 +941,7 @@ namespace DoS1.Util
                     switch (type)
                     {
                         case "Area":
-                            rune.Description = "On Weapon: paired rune weapon property on whole squad\nOn Armor: paired rune armor property on whole squad";
+                            rune.Description = "On Weapon: paired On Weapon for whole squad\nOn Armor: paired On Armor for whole squad\nStatus: None";
                             break;
 
                         case "Counter":

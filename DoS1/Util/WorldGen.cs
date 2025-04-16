@@ -194,67 +194,19 @@ namespace DoS1.Util
             float width = (float)Main.Game.Resolution.X / layer.Columns;
             float height = (Main.Game.Resolution.Y - starting_y) / layer.Rows;
 
-            if (type == "Water")
+            for (int y = 0; y < layer.Rows; y++)
             {
-                for (int y = 0; y < layer.Rows; y++)
+                for (int x = 0; x < layer.Columns; x++)
                 {
-                    for (int x = 0; x < layer.Columns; x++)
+                    layer.Tiles.Add(new Tile
                     {
-                        Region region = new Region(x * width, y * height, width, height);
-
-                        if (y == 0 ||
-                            y == layer.Rows - 1 ||
-                            x == 0 ||
-                            x == layer.Columns - 1)
-                        {
-                            layer.Tiles.Add(NewTile(layer, type, new Vector2(x, y), region));
-                        }
-                        else
-                        {
-                            layer.Tiles.Add(NewTile(layer, "Grass", new Vector2(x, y), region));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                for (int y = 0; y < layer.Rows; y++)
-                {
-                    for (int x = 0; x < layer.Columns; x++)
-                    {
-                        Region region = new Region(x * width, y * height, width, height);
-
-                        if (type.Contains("Forest"))
-                        {
-                            if (type.Contains("Snow"))
-                            {
-                                layer.Tiles.Add(NewTile(layer, "Snow", new Vector2(x, y), region));
-                            }
-                            else
-                            {
-                                layer.Tiles.Add(NewTile(layer, "Grass", new Vector2(x, y), region));
-                            }
-                        }
-                        else if (type.Contains("Mountains"))
-                        {
-                            if (type.Contains("Snow"))
-                            {
-                                layer.Tiles.Add(NewTile(layer, "Snow", new Vector2(x, y), region));
-                            }
-                            else if (type.Contains("Desert"))
-                            {
-                                layer.Tiles.Add(NewTile(layer, "Desert", new Vector2(x, y), region));
-                            }
-                            else
-                            {
-                                layer.Tiles.Add(NewTile(layer, "Grass", new Vector2(x, y), region));
-                            }
-                        }
-                        else
-                        {
-                            layer.Tiles.Add(NewTile(layer, type, new Vector2(x, y), region));
-                        }
-                    }
+                        ID = Handler.GetID(),
+                        WorldID = layer.WorldID,
+                        MapID = layer.MapID,
+                        LayerID = layer.ID,
+                        Visible = false,
+                        Region = new Region(x * width, y * height, width, height)
+                    });
                 }
             }
         }

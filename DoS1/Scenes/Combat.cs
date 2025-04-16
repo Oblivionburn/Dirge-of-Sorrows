@@ -38,11 +38,12 @@ namespace DoS1.Scenes
         private bool hero_killed = false;
         private int ep_cost = 0;
 
-        private int character_frame = 0;
         private float base_move_speed = 0;
         private float move_speed = 0;
+
+        private int character_frame = 0;
         private int effect_frame = 0;
-        private int animation_speed = 16;
+        private readonly int animation_speed = 16;
 
         private bool paused = false;
         private string combat_state = "GetTargets";
@@ -327,6 +328,8 @@ namespace DoS1.Scenes
                     SoundManager.NeedMusic = true;
 
                     SceneManager.ChangeScene("GameOver");
+
+                    hero_killed = false;
                 }
                 else
                 {
@@ -886,6 +889,17 @@ namespace DoS1.Scenes
             attack_type = "";
             ep_cost = 0;
             targets.Clear();
+            current_character = null;
+        }
+
+        private void ResetCombat_Final()
+        {
+            ResetCombat();
+            gold = 0;
+            xp = 0;
+            won_battle = false;
+            ally_total_damage = 0;
+            enemy_total_damage = 0;
         }
 
         private void FinishAttack()
@@ -909,7 +923,8 @@ namespace DoS1.Scenes
 
                     foreach (Character character in ally_squad.Characters)
                     {
-                        if (character.ID == current_character.ID)
+                        if (current_character != null &&
+                            character.ID == current_character.ID)
                         {
                             character.CombatStep = 1;
                             break;
@@ -931,7 +946,8 @@ namespace DoS1.Scenes
 
                     foreach (Character character in enemy_squad.Characters)
                     {
-                        if (character.ID == current_character.ID)
+                        if (current_character != null &&
+                            character.ID == current_character.ID)
                         {
                             character.CombatStep = 1;
                             break;
@@ -1030,7 +1046,7 @@ namespace DoS1.Scenes
             if (won_battle)
             {
                 if (gold > 0 ||
-                xp > 0)
+                    xp > 0)
                 {
                     Handler.Gold += gold;
                     button.Text += "\n\n" + gold + " Gold was looted!";
@@ -1055,8 +1071,7 @@ namespace DoS1.Scenes
                 }
             }
 
-            gold = 0;
-            xp = 0;
+            ResetCombat_Final();
         }
 
         private void Retreat()
@@ -1064,14 +1079,12 @@ namespace DoS1.Scenes
             Handler.CombatTimer.Stop();
             Handler.CombatTimer_Tiles.Stop();
 
-            won_battle = false;
-
             Picture battleResult = Menu.GetPicture("Result");
             battleResult.Texture = AssetManager.Textures["Defeat"];
             battleResult.Visible = true;
 
             Button button = Menu.GetButton("Result");
-            button.Text = ally_squad.Name + " is retreating.";
+            button.Text = ally_squad.Name + " is retreating...";
 
             Menu.GetButton("Retreat").Visible = false;
             Menu.GetPicture("MouseClick").Visible = true;
@@ -1090,8 +1103,30 @@ namespace DoS1.Scenes
                 button.Text += "\n" + xp + " XP was gained!";
             }
 
-            gold = 0;
-            xp = 0;
+            ResetCombat_Final();
+        }
+
+        private void MainCharacterKilled()
+        {
+            SoundManager.AmbientPaused = true;
+            Handler.CombatTimer.Stop();
+            Handler.CombatTimer_Tiles.Stop();
+            hero_killed = true;
+
+            Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
+
+            Button button = Menu.GetButton("Result");
+            button.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
+
+            Menu.GetButton("Retreat").Visible = false;
+            Menu.GetButton("PlayPause").Visible = false;
+            Menu.GetButton("Speed").Visible = false;
+
+            Menu.GetPicture("Result").Visible = true;
+            Menu.GetPicture("MouseClick").Visible = true;
+            button.Visible = true;
+
+            ResetCombat_Final();
         }
 
         private void Leave()
@@ -1141,27 +1176,6 @@ namespace DoS1.Scenes
 
             Main.Timer.Start();
             GameUtil.Toggle_Pause(false);
-        }
-
-        private void MainCharacterKilled()
-        {
-            SoundManager.AmbientPaused = true;
-            Handler.CombatTimer.Stop();
-            Handler.CombatTimer_Tiles.Stop();
-            hero_killed = true;
-
-            Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-
-            Button button = Menu.GetButton("Result");
-            button.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
-
-            Menu.GetButton("Retreat").Visible = false;
-            Menu.GetButton("PlayPause").Visible = false;
-            Menu.GetButton("Speed").Visible = false;
-
-            Menu.GetPicture("Result").Visible = true;
-            Menu.GetPicture("MouseClick").Visible = true;
-            button.Visible = true;
         }
 
         public void UpdateGrids()
@@ -1260,10 +1274,10 @@ namespace DoS1.Scenes
 
         public void ResizeGrids()
         {
-            int width = Main.Game.MenuSize.X * 2;
-            int height = Main.Game.MenuSize.Y * 2;
-            int starting_x = 0;
-            int starting_y = 0;
+            int width = (int)(Main.Game.MenuSize.X * 1.5f);
+            int height = (int)(Main.Game.MenuSize.Y * 1.5f);
+            int starting_x = Main.Game.MenuSize.X / 2;
+            int starting_y = Main.Game.MenuSize.Y / 2;
 
             for (int y = 0; y < 3; y++)
             {
@@ -1295,7 +1309,7 @@ namespace DoS1.Scenes
                 }
             }
 
-            starting_x = Main.Game.Resolution.X - (width * 3);
+            starting_x = Main.Game.Resolution.X - (width * 3) - (Main.Game.MenuSize.X / 2);
             for (int y = 0; y < 3; y++)
             {
                 for (int x = 0; x < 3; x++)
@@ -1414,24 +1428,19 @@ namespace DoS1.Scenes
                 }
                 else if (Handler.Combat_Terrain == "Water")
                 {
-                    if (TimeManager.Now.Hours >= 22 ||
-                        TimeManager.Now.Hours <= 5)
-                    {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Sky_Night2"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
-                    }
-                    else
-                    {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Sky_Day"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
-                    }
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Water"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
                 else if (Handler.Combat_Terrain == "Desert")
                 {
                     Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Desert"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
-                else if (Handler.Combat_Terrain == "Snow" ||
-                         Handler.Combat_Terrain == "Ice")
+                else if (Handler.Combat_Terrain == "Snow")
                 {
                     Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                }
+                else if (Handler.Combat_Terrain == "Ice")
+                {
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Ice"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
                 }
                 else if (Handler.Combat_Terrain.Contains("Forest"))
                 {
@@ -1588,7 +1597,7 @@ namespace DoS1.Scenes
 
                 Layer ground = map.GetLayer("Ground");
                 Tile tile = ground.Tiles[0];
-                Menu.GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, tile.Region.Y);
+                Menu.GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
                 base_move_speed = tile.Region.Width / 8;
                 move_speed = base_move_speed * (Main.CombatSpeed / 2);

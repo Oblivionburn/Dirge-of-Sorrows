@@ -83,6 +83,18 @@ namespace DoS1.Menus
                 }
 
                 base.Update(gameRef, content);
+
+                foreach (InputBox input in Inputs)
+                {
+                    if (input.Active)
+                    {
+                        if (!string.IsNullOrEmpty(input.Text) &&
+                            !string.IsNullOrEmpty(input.Caret))
+                        {
+                            input.Caret = "";
+                        }
+                    }
+                }
             }
         }
 
