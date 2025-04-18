@@ -33,9 +33,9 @@
 ### Planned features not yet implemented:
 - Additional runes for combat
 - Character stat/xp/level progression
-- Finding unique items hidden in the world
 - Saving/loading game state
 - Story/lore and tutorial
 - Side-quests
-- Adding more music for variety
+- Finding unique items hidden in the world
+- More music for variety
 - Hopefully some graphical improvements
