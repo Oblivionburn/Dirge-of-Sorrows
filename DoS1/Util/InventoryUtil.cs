@@ -478,19 +478,19 @@ namespace DoS1.Util
             properties.Add(NewProperty("XP", "Value", 0, 10));
             properties.Add(NewProperty("Level", "Value", 1, 10));
             Item item = NewItem(type, "Area", "Area", properties);
-            item.Buy_Price = 800;
+            item.Buy_Price = 1000;
             items.Add(item);
 
             item = NewItem(type, "Counter", "Counter", properties);
-            item.Buy_Price = 200;
-            items.Add(item);
-
-            item = NewItem(type, "Death", "Death", properties);
             item.Buy_Price = 600;
             items.Add(item);
 
+            item = NewItem(type, "Death", "Death", properties);
+            item.Buy_Price = 800;
+            items.Add(item);
+
             item = NewItem(type, "Disarm", "Disarm", properties);
-            item.Buy_Price = 400;
+            item.Buy_Price = 1000;
             items.Add(item);
 
             item = NewItem(type, "Drain", "Drain", properties);
@@ -522,7 +522,7 @@ namespace DoS1.Util
             items.Add(item);
 
             item = NewItem(type, "Time", "Time", properties);
-            item.Buy_Price = 200;
+            item.Buy_Price = 600;
             items.Add(item);
 
             item = NewItem(type, "Ice", "Ice", properties);
@@ -748,6 +748,10 @@ namespace DoS1.Util
                 {
                     effect = "Restore";
                 }
+                else if (element == "Area")
+                {
+                    effect = "Chance";
+                }
                 else if (element == "Death")
                 {
                     if (IsWeapon(item))
@@ -781,13 +785,39 @@ namespace DoS1.Util
                         effect = "EP";
                     }
                 }
+                else if (element == "Counter")
+                {
+                    if (IsWeapon(item))
+                    {
+                        effect = "Pierce Chance";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "Counter Attack";
+                    }
+                }
+                else if (element == "Disarm")
+                {
+                    if (IsWeapon(item))
+                    {
+                        effect = "Weapon";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "When Hit";
+                    }
+                }
 
                 Something level = rune.GetProperty("Level Value");
 
                 Something property = item.GetProperty(element + " " + effect);
                 if (property != null)
                 {
-                    if (element == "Death")
+                    if (element == "Area")
+                    {
+                        property.Value += level.Value * 10;
+                    }
+                    else if (element == "Death")
                     {
                         if (IsWeapon(item))
                         {
@@ -806,6 +836,14 @@ namespace DoS1.Util
                     {
                         property.Value += level.Value * 10;
                     }
+                    else if (element == "Counter")
+                    {
+                        property.Value += level.Value * 10;
+                    }
+                    else if (element == "Disarm")
+                    {
+                        property.Value += level.Value;
+                    }
                     else
                     {
                         property.Value += level.Value * Handler.Element_Multiplier;
@@ -813,7 +851,17 @@ namespace DoS1.Util
                 }
                 else
                 {
-                    if (element == "Death")
+                    if (element == "Area")
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = element + " " + effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value * 10
+                        });
+                    }
+                    else if (element == "Death")
                     {
                         if (IsWeapon(item))
                         {
@@ -850,10 +898,30 @@ namespace DoS1.Util
                     {
                         item.Properties.Add(new Something
                         {
+                            Name = element + " " + effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value * 10
+                        });
+                    }
+                    else if (element == "Counter")
+                    {
+                        item.Properties.Add(new Something
+                        {
                             Name = effect,
                             Type = element,
                             Assignment = effect,
                             Value = level.Value * 10
+                        });
+                    }
+                    else if (element == "Disarm")
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = element + " " + effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value
                         });
                     }
                     else
@@ -941,7 +1009,7 @@ namespace DoS1.Util
                     switch (type)
                     {
                         case "Area":
-                            rune.Description = "On Weapon: paired On Weapon for whole squad\nOn Armor: paired On Armor for whole squad\nStatus: None";
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance for paired On Weapon on whole squad\nOn Armor: " + (level.Value * 10) + "% chance for paired On Armor on whole squad\nStatus: None";
                             break;
 
                         case "Counter":
@@ -1177,7 +1245,7 @@ namespace DoS1.Util
         {
             Inventory inventory = new Inventory();
 
-            CryptoRandom random = new CryptoRandom();
+            CryptoRandom random;
             int min_tier = (int)Math.Ceiling(depth / 2.5);
             int max_tier = (int)Math.Ceiling(depth / 1.5);
             if (max_tier > 10)
@@ -1455,7 +1523,7 @@ namespace DoS1.Util
                 #region Runes
 
                 random = new CryptoRandom();
-                int rune_choice = random.Next(0, 11);
+                int rune_choice = random.Next(0, 13);
                 switch (rune_choice)
                 {
                     case 0:
@@ -1503,11 +1571,11 @@ namespace DoS1.Util
                         break;
 
                     case 11:
-                        AddItem(inventory, "Disarm", "Disarm", "Rune");
+                        AddItem(inventory, "Counter", "Counter", "Rune");
                         break;
 
                     case 12:
-                        AddItem(inventory, "Counter", "Counter", "Rune");
+                        AddItem(inventory, "Disarm", "Disarm", "Rune");
                         break;
 
                     case 13:
@@ -1583,33 +1651,8 @@ namespace DoS1.Util
             return false;
         }
 
-        public static bool Item_IsAoE(Item item, string type)
+        public static bool Item_HasArea_ForElement(Item item, string element)
         {
-            if (item != null)
-            {
-                for (int i = 0; i < item.Attachments.Count; i++)
-                {
-                    Item rune = item.Attachments[i];
-
-                    if (rune.Categories.Contains("Area"))
-                    {
-                        Item paired_rune = GetPairedRune(item, rune);
-                        if (paired_rune != null &&
-                            paired_rune.Categories[0] == type)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        public static int Get_Item_AoE_Level(Item item, string element)
-        {
-            int total = 0;
-
             if (item != null)
             {
                 for (int i = 0; i < item.Attachments.Count; i++)
@@ -1622,38 +1665,16 @@ namespace DoS1.Util
                         if (paired_rune != null &&
                             paired_rune.Categories[0] == element)
                         {
-                            Something level = paired_rune.GetProperty("Level Value");
-                            if (level != null)
-                            {
-                                if (element == "Death")
-                                {
-                                    if (IsWeapon(item))
-                                    {
-                                        total += (int)level.Value;
-                                    }
-                                    else if (IsArmor(item))
-                                    {
-                                        total += (int)level.Value * 10;
-                                    }
-                                }
-                                else if (element == "Time")
-                                {
-                                    total += (int)level.Value;
-                                }
-                                else
-                                {
-                                    total += (int)level.Value * Handler.Element_Multiplier;
-                                }
-                            }
+                            return true;
                         }
                     }
                 }
             }
 
-            return total;
+            return false;
         }
 
-        public static bool Item_HasDrain(Item item, string element)
+        public static bool Item_HasDrain_ForElement(Item item, string element)
         {
             if (item != null)
             {
@@ -1673,64 +1694,6 @@ namespace DoS1.Util
             }
 
             return false;
-        }
-
-        public static int Get_Item_Drain_Chance(Item item, string element)
-        {
-            int total = 0;
-
-            if (item != null)
-            {
-                for (int i = 0; i < item.Attachments.Count; i++)
-                {
-                    Item rune = item.Attachments[i];
-
-                    if (rune.Categories.Contains("Drain"))
-                    {
-                        Item paired_rune = GetPairedRune(item, rune);
-                        if (paired_rune != null &&
-                            paired_rune.Categories[0] == element)
-                        {
-                            Something level = rune.GetProperty("Level Value");
-                            if (level != null)
-                            {
-                                total += (int)level.Value * 10;
-                            }
-                        } 
-                    }
-                }
-            }
-
-            return total;
-        }
-
-        public static int Get_Item_Drain_Level(Item item, string element)
-        {
-            int total = 0;
-
-            if (item != null)
-            {
-                for (int i = 0; i < item.Attachments.Count; i++)
-                {
-                    Item rune = item.Attachments[i];
-
-                    if (rune.Categories.Contains("Drain"))
-                    {
-                        Item paired_rune = GetPairedRune(item, rune);
-                        if (paired_rune != null &&
-                            paired_rune.Categories[0] == element)
-                        {
-                            Something level = paired_rune.GetProperty("Level Value");
-                            if (level != null)
-                            {
-                                total += (int)level.Value * Handler.Element_Multiplier;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return total;
         }
 
         public static bool Weapon_IsMelee(Item weapon)
@@ -1757,13 +1720,23 @@ namespace DoS1.Util
             return false;
         }
 
-        public static bool Item_HasElement(Item item, string type)
+        public static bool Item_HasElement(Item item, string element)
         {
             if (item != null)
             {
                 foreach (Something property in item.Properties)
                 {
-                    if (property.Name.Contains(type))
+                    if (property.Name.Contains(element))
+                    {
+                        return true;
+                    }
+                }
+
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories[0] == element)
                     {
                         return true;
                     }

@@ -845,9 +845,13 @@ namespace DoS1.Util
             {
                 foreach (Squad squad in army.Squads)
                 {
-                    if (squad.GetLeader().ID == leader.ID)
+                    Character squadLeader = squad.GetLeader();
+                    if (squadLeader != null)
                     {
-                        return squad;
+                        if (squadLeader.ID == leader.ID)
+                        {
+                            return squad;
+                        }
                     }
                 }
             }
@@ -903,37 +907,6 @@ namespace DoS1.Util
             }
 
             return null;
-        }
-
-        public static int Get_AoE_Defense(Squad squad, Character defender, string element)
-        {
-            int defense = 0;
-
-            foreach (Character character in squad.Characters)
-            {
-                if (character.ID != defender.ID)
-                {
-                    Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
-                    if (helm != null)
-                    {
-                        defense += InventoryUtil.Get_Item_AoE_Level(helm, element);
-                    }
-
-                    Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
-                    if (armor != null)
-                    {
-                        defense += InventoryUtil.Get_Item_AoE_Level(armor, element);
-                    }
-
-                    Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
-                    if (shield != null)
-                    {
-                        defense += InventoryUtil.Get_Item_AoE_Level(shield, element);
-                    }
-                }
-            }
-
-            return defense;
         }
 
         public static void SetPath(Map map, Squad squad, Tile destination)

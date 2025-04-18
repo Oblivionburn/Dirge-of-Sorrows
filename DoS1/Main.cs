@@ -144,7 +144,6 @@ namespace DoS1
                                 if (Handler.Combat)
                                 {
                                     Handler.CombatTimer.Stop();
-                                    Handler.CombatTimer_Tiles.Stop();
                                 }
 
                                 OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");

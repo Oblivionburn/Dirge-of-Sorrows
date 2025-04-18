@@ -295,6 +295,20 @@ namespace DoS1.Menus
                 Visible = false;
                 MenuManager.ChangeMenu("Main");
             }
+            else if (InputManager.KeyPressed("Debug"))
+            {
+                if (!Main.Game.Debugging)
+                {
+                    Main.Game.Debugging = true;
+                    Handler.Gold = 10000;
+                    GetLabel("Debug").Visible = true;
+                }
+                else
+                {
+                    Main.Game.Debugging = false;
+                    GetLabel("Debug").Visible = false;
+                }
+            }
         }
 
         private bool HoveringButton()
@@ -585,6 +599,8 @@ namespace DoS1.Menus
             Handler.MoveGridDelay = 0;
             Handler.Level = location_num;
 
+            Army enemies = CharacterManager.GetArmy("Enemy");
+
             Layer ground = map.GetLayer("Ground");
             Tile ground_tile = ground.GetTile(new Vector2(tile.Location.X, tile.Location.Y));
 
@@ -616,12 +632,7 @@ namespace DoS1.Menus
                 world.Maps.Add(localmap);
 
                 //Generate enemies
-                Army enemies = CharacterManager.GetArmy("Enemy");
                 ArmyUtil.Gen_EnemySquads(enemies, Handler.Level);
-                foreach (Squad enemy_squad in enemies.Squads)
-                {
-                    WorldUtil.EnemyToken_Start(enemy_squad, localmap);
-                }
             }
 
             //Hide other maps
@@ -680,11 +691,17 @@ namespace DoS1.Menus
                     worldMap.Enabled = false;
                 }
 
-                //Set starting squad at base
+                //Set starting squad at ally base
                 Army allies = CharacterManager.GetArmy("Ally");
                 Squad ally_squad = allies.Squads[0];
                 WorldUtil.AllyToken_Start(ally_squad, localmap);
-                
+
+                //Set enemies at enemy base
+                foreach (Squad enemy_squad in enemies.Squads)
+                {
+                    WorldUtil.EnemyToken_Start(enemy_squad, localmap);
+                }
+
                 //Switch to local map
                 SceneManager.ChangeScene("Localmap");
                 WorldUtil.Resize_OnStart(localmap);
@@ -946,6 +963,7 @@ namespace DoS1.Menus
                 }
                 else if (button.Text == "(Retreat)")
                 {
+                    CloseDialogue();
                     GameUtil.ReturnToWorldmap();
                 }
             }
@@ -1278,7 +1296,7 @@ namespace DoS1.Menus
                 texture_disabled = AssetManager.Textures["Button_Speed1_Disabled"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White * 0.8f,
-                enabled = false,
+                enabled = true,
                 visible = true
             });
 
@@ -1312,6 +1330,8 @@ namespace DoS1.Menus
                 speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
             }
 
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Debug", "Debugging", Color.White, new Region(0, 0, 0, 0), false);
+
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Date", "", Color.White, AssetManager.Textures["Frame_Small"],
                 new Region(0, 0, 0, 0), true);
             GetLabel("Date").Opacity = 0.8f;
@@ -1320,7 +1340,9 @@ namespace DoS1.Menus
                 new Region(0, 0, 0, 0), true);
             GetLabel("Time").Opacity = 0.8f;
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Gold", "Gold: " + Handler.Gold, Color.Gold, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Gold", "Gold: " + Handler.Gold, Color.Gold, AssetManager.Textures["Frame_Wide"],
+                new Region(0, 0, 0, 0), true);
+            GetLabel("Gold").Opacity = 0.8f;
 
             AddButton(new ButtonOptions
             {
@@ -1420,7 +1442,8 @@ namespace DoS1.Menus
             GetButton("Speed").Region = new Region(Main.Game.ScreenWidth - (width * 3), 0, width, height);
 
             GetLabel("Date").Region = new Region(Main.Game.ScreenWidth - (width * 2), 0, width * 2, height / 2);
-            GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), width / 2, width * 2, height / 2);
+            GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), height / 2, width * 2, height / 2);
+            GetLabel("Debug").Region = new Region(Main.Game.ScreenWidth - (width * 2), height, width * 2, height / 2);
             GetLabel("Gold").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), 0, width * 10, height);
 
             GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);

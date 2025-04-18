@@ -27,6 +27,7 @@ namespace DoS1.Scenes
     {
         #region Variables
 
+        private bool step;
         private int mouseClickDelay = 0;
 
         private Squad ally_squad;
@@ -38,12 +39,17 @@ namespace DoS1.Scenes
         private bool hero_killed = false;
         private int ep_cost = 0;
 
+        private List<Character> counter_attackers = new List<Character>();
+        private Character initial_attacker = null;
+        private bool counter_attacking = false;
+
         private float base_move_speed = 0;
         private float move_speed = 0;
 
         private int character_frame = 0;
         private int effect_frame = 0;
         private readonly int animation_speed = 16;
+        private readonly int label_speed = 4;
 
         private bool paused = false;
         private string combat_state = "GetTargets";
@@ -66,7 +72,6 @@ namespace DoS1.Scenes
             Load(content);
 
             Handler.CombatTimer.Elapsed += Timer_Elapsed;
-            Handler.CombatTimer_Tiles.Elapsed += TileTimer_Elapsed;
         }
 
         #endregion
@@ -340,177 +345,251 @@ namespace DoS1.Scenes
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!TimeManager.Paused &&
-                !paused)
+            if (!step)
             {
-                if (current_character != null)
+                step = true;
+
+                if (!TimeManager.Paused &&
+                    !paused)
                 {
-                    Tile origin_tile = CombatUtil.OriginTile(World, current_character);
-                    Tile target_tile = CombatUtil.TargetTile(World, current_character);
-
-                    if (origin_tile != null &&
-                        target_tile != null)
+                    if (current_character != null)
                     {
-                        switch (combat_state)
+                        Tile origin_tile = CombatUtil.OriginTile(World, current_character);
+                        Tile target_tile = CombatUtil.TargetTile(World, current_character);
+
+                        if (origin_tile != null &&
+                            target_tile != null)
                         {
-                            case "GetTargets":
-                                bool can_attack = true;
+                            Squad target_squad = null;
+                            if (targets.Any())
+                            {
+                                target_squad = ArmyUtil.Get_Squad(targets[0].ID);
+                            }
 
-                                ep_cost = InventoryUtil.Get_EP_Cost(current_character);
-                                if (ep_cost > 0)
-                                {
-                                    if (current_character.ManaBar.Value < ep_cost)
+                            switch (combat_state)
+                            {
+                                case "GetTargets":
+                                    bool can_attack = true;
+
+                                    ep_cost = InventoryUtil.Get_EP_Cost(current_character);
+                                    if (ep_cost > 0)
                                     {
-                                        can_attack = false;
-                                    }
-                                }
-
-                                targets = CombatUtil.GetTargets(current_character, ally_squad, enemy_squad);
-                                if (!targets.Any())
-                                {
-                                    can_attack = false;
-                                    FinishCombat();
-                                }
-
-                                if (can_attack)
-                                {
-                                    attack_type = CharacterUtil.AttackType(current_character);
-                                    CombatUtil.SwitchAnimation(current_character, attack_type);
-
-                                    switch (attack_type)
-                                    {
-                                        case "Attack":
-                                            combat_state = "MoveForward";
-                                            break;
-
-                                        case "Ranaged":
-                                            combat_state = "Attack";
-                                            break;
-
-                                        case "Cast":
-                                            StartCast();
-                                            combat_state = "Attack";
-                                            break;
-
-                                        default:
-                                            combat_state = "Attack";
-                                            break;
-                                    }
-                                }
-                                break;
-
-                            case "MoveForward":
-                                if (CombatUtil.AtTile(current_character, target_tile, move_speed))
-                                {
-                                    combat_state = "Attack";
-                                }
-                                else
-                                {
-                                    CombatUtil.MoveForward(current_character, move_speed);
-                                }
-                                break;
-
-                            case "Attack":
-                                if (character_frame % animation_speed == 0)
-                                {
-                                    CharacterUtil.Animate(current_character);
-
-                                    if (attack_type == "Cast")
-                                    {
-                                        AnimateCastEffect();
-                                    }
-
-                                    if (character_frame == animation_speed * 2)
-                                    {
-                                        Attack();
-                                    }
-                                    else if (character_frame >= animation_speed * 3)
-                                    {
-                                        combat_state = "AnimateEffects";
-                                    }
-
-                                    character_frame += Main.CombatSpeed;
-                                }
-                                else
-                                {
-                                    character_frame += Main.CombatSpeed;
-                                }
-                                
-                                break;
-
-                            case "AnimateEffects":
-                                if (effect_frame >= animation_speed * 4)
-                                {
-                                    bool continue_attacking = false;
-                                    Item weapon = InventoryUtil.Get_EquippedItem(current_character, "Weapon");
-                                    if (InventoryUtil.Item_HasElement(weapon, "Time"))
-                                    {
-                                        int chance = InventoryUtil.Get_Item_Element_Level(weapon, "Time");
-                                        if (Utility.RandomPercent(chance))
+                                        if (current_character.ManaBar.Value < ep_cost)
                                         {
-                                            continue_attacking = true;
+                                            can_attack = false;
                                         }
                                     }
 
-                                    if (continue_attacking)
+                                    if (can_attack)
                                     {
-                                        RemoveEffects();
-                                        ResetCombat();
+                                        if (counter_attacking)
+                                        {
+                                            targets.Add(initial_attacker);
+                                        }
+                                        else
+                                        {
+                                            targets = CombatUtil.GetTargets(current_character, ally_squad, enemy_squad);
+                                            if (!targets.Any())
+                                            {
+                                                can_attack = false;
+                                                FinishCombat();
+                                            }
+                                        }
+                                    }
+
+                                    if (can_attack)
+                                    {
+                                        attack_type = CharacterUtil.AttackType(current_character);
+                                        CombatUtil.SwitchAnimation(current_character, attack_type);
+
+                                        switch (attack_type)
+                                        {
+                                            case "Attack":
+                                                combat_state = "MoveForward";
+                                                break;
+
+                                            case "Ranaged":
+                                                combat_state = "Attack";
+                                                break;
+
+                                            case "Cast":
+                                                StartCast();
+                                                combat_state = "Attack";
+                                                break;
+
+                                            default:
+                                                combat_state = "Attack";
+                                                break;
+                                        }
+                                    }
+                                    break;
+
+                                case "MoveForward":
+                                    if (CombatUtil.AtTile(current_character, target_tile, move_speed))
+                                    {
+                                        combat_state = "Attack";
                                     }
                                     else
                                     {
+                                        CombatUtil.MoveForward(current_character, move_speed);
+                                    }
+                                    break;
+
+                                case "Attack":
+                                    if (character_frame % animation_speed == 0)
+                                    {
+                                        CharacterUtil.Animate(current_character);
+
+                                        if (attack_type == "Cast")
+                                        {
+                                            AnimateCastEffect();
+                                        }
+
+                                        if (character_frame == animation_speed * 2)
+                                        {
+                                            Attack();
+                                        }
+                                        else if (character_frame >= animation_speed * 3)
+                                        {
+                                            combat_state = "AnimateDamageEffects";
+                                        }
+
+                                        character_frame += Main.CombatSpeed;
+                                    }
+                                    else
+                                    {
+                                        character_frame += Main.CombatSpeed;
+                                    }
+
+                                    break;
+
+                                case "AnimateDamageEffects":
+                                    if (target_squad == null)
+                                    {
+                                        ClearDamageEffects();
+                                        effect_frame = 0;
+                                        combat_state = "AnimateDamageLabels";
+                                    }
+                                    else
+                                    {
+                                        if (DamageEffectExists())
+                                        {
+                                            if (effect_frame >= animation_speed * 4)
+                                            {
+                                                ClearDamageEffects();
+                                                effect_frame = 0;
+                                                combat_state = "AnimateDamageLabels";
+                                            }
+                                            else if (effect_frame % animation_speed == 0)
+                                            {
+                                                AnimateDamageEffects();
+                                                effect_frame += Main.CombatSpeed;
+                                            }
+                                            else
+                                            {
+                                                effect_frame += Main.CombatSpeed;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            combat_state = "AnimateDamageLabels";
+                                        }
+                                    }
+                                        
+                                    break;
+
+                                case "AnimateDamageLabels":
+                                    if (target_squad == null)
+                                    {
+                                        ClearDamageLabels();
+                                        effect_frame = 0;
+                                        combat_state = "EndAttack";
+                                    }
+                                    else
+                                    {
+                                        if (DamageLabelExists())
+                                        {
+                                            if (effect_frame % label_speed == 0)
+                                            {
+                                                AnimateDamageLabels();
+                                                effect_frame += Main.CombatSpeed;
+                                            }
+                                            else
+                                            {
+                                                effect_frame += Main.CombatSpeed;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            effect_frame = 0;
+                                            combat_state = "EndAttack";
+                                        }
+                                    }
+                                    
+                                    break;
+
+                                case "EndAttack":
+                                    RemoveDamageStatusEffects();
+
+                                    if (target_squad == null)
+                                    {
                                         combat_state = "MoveBackward";
                                     }
-                                }
-                                else if (effect_frame % animation_speed == 0)
-                                {
-                                    AnimateDamageEffects();
-                                    AnimateDamageLabels();
-                                    effect_frame += Main.CombatSpeed;
-                                }
-                                else
-                                {
-                                    AnimateDamageLabels();
-                                    effect_frame += Main.CombatSpeed;
-                                }
-                                break;
+                                    else
+                                    {
+                                        if (!counter_attacking &&
+                                            counter_attackers.Any())
+                                        {
+                                            //Save original attacker for when counters are finished
+                                            initial_attacker = current_character;
 
-                            case "MoveBackward":
-                                if (CombatUtil.AtTile(current_character, origin_tile, move_speed))
-                                {
-                                    combat_state = "Finish";
-                                }
-                                else
-                                {
-                                    CombatUtil.MoveBack(current_character, move_speed);
-                                }
-                                break;
+                                            ResetCombat();
+                                            current_character = counter_attackers[0];
+                                            counter_attackers.Remove(current_character);
+                                            counter_attacking = true;
+                                        }
+                                        else if (!counter_attacking &&
+                                                 RuneUtil.Time_AttackChance(Menu, current_character))
+                                        {
+                                            ResetCombat();
+                                        }
+                                        else
+                                        {
+                                            combat_state = "MoveBackward";
+                                        }
+                                    }
+                                    break;
 
-                            case "Finish":
-                            default:
-                                FinishAttack();
-                                break;
+                                case "MoveBackward":
+                                    if (CombatUtil.AtTile(current_character, origin_tile, move_speed))
+                                    {
+                                        combat_state = "Finish";
+                                    }
+                                    else
+                                    {
+                                        CombatUtil.MoveBack(current_character, move_speed);
+                                    }
+                                    break;
+
+                                case "Finish":
+                                default:
+                                    FinishAttack();
+                                    break;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    GetCurrentCharacter();
-
-                    if (current_character == null)
+                    else
                     {
-                        FinishRound();
-                    }
-                }
-            }
-        }
+                        GetCurrentCharacter();
 
-        private void TileTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if (!paused &&
-                (Visible || Active))
-            {
-                WorldUtil.AnimateTiles();
+                        if (current_character == null)
+                        {
+                            FinishRound();
+                        }
+                    }
+
+                    step = false;
+                }
             }
         }
 
@@ -612,22 +691,23 @@ namespace DoS1.Scenes
 
         private void Defense(Item weapon)
         {
-            if (InventoryUtil.Item_IsAoE(weapon, "Health"))
+            if (InventoryUtil.Item_HasArea_ForElement(weapon, "Health") &&
+                RuneUtil.ApplyArea(weapon, "Health"))
             {
                 //Full party heal HP
-                int hp = InventoryUtil.Get_Item_AoE_Level(weapon, "Health");
+                int hp = RuneUtil.Area_PairedLevel(weapon, "Health");
                 if (current_character.Type == "Enemy")
                 {
                     foreach (Character character in enemy_squad.Characters)
                     {
-                        CombatUtil.DoHeal_HP(Menu, character, weapon, hp);
+                        RuneUtil.Health(Menu, character, weapon, hp);
                     }
                 }
                 else
                 {
                     foreach (Character character in ally_squad.Characters)
                     {
-                        CombatUtil.DoHeal_HP(Menu, character, weapon, hp);
+                        RuneUtil.Health(Menu, character, weapon, hp);
                     }
                 }
             }
@@ -636,37 +716,48 @@ namespace DoS1.Scenes
                 //Single target heal HP
                 Character target;
 
-                if (current_character.Type == "Enemy")
+                if (weapon.Categories.Contains("Grimoire"))
                 {
-                    target = CombatUtil.GetTarget_LeastHP(enemy_squad);
+                    //Heal least HP
+                    if (current_character.Type == "Enemy")
+                    {
+                        target = CombatUtil.GetTarget_LeastHP(enemy_squad);
+                    }
+                    else
+                    {
+                        target = CombatUtil.GetTarget_LeastHP(ally_squad);
+                    }
                 }
                 else
                 {
-                    target = CombatUtil.GetTarget_LeastHP(ally_squad);
+                    //Heal self HP
+                    target = current_character;
                 }
 
                 if (target != null)
                 {
                     int hp = InventoryUtil.Get_Item_Element_Level(weapon, "Health") * Handler.Element_Multiplier;
-                    CombatUtil.DoHeal_HP(Menu, target, weapon, hp);
+                    RuneUtil.Health(Menu, target, weapon, hp);
                 }
             }
-            else if (InventoryUtil.Item_IsAoE(weapon, "Energy"))
+
+            if (InventoryUtil.Item_HasArea_ForElement(weapon, "Energy") &&
+                RuneUtil.ApplyArea(weapon, "Health"))
             {
                 //Full party heal EP
-                int ep = InventoryUtil.Get_Item_AoE_Level(weapon, "Energy");
+                int ep = RuneUtil.Area_PairedLevel(weapon, "Energy");
                 if (current_character.Type == "Enemy")
                 {
                     foreach (Character character in enemy_squad.Characters)
                     {
-                        CombatUtil.DoHeal_EP(Menu, character, weapon, ep);
+                        RuneUtil.Energy(Menu, character, weapon, ep);
                     }
                 }
                 else
                 {
                     foreach (Character character in ally_squad.Characters)
                     {
-                        CombatUtil.DoHeal_EP(Menu, character, weapon, ep);
+                        RuneUtil.Energy(Menu, character, weapon, ep);
                     }
                 }
             }
@@ -675,110 +766,289 @@ namespace DoS1.Scenes
                 //Single target heal EP
                 Character target;
 
-                if (current_character.Type == "Enemy")
+                if (weapon.Categories.Contains("Grimoire"))
                 {
-                    target = CombatUtil.GetTarget_LeastEP(enemy_squad);
+                    //Heal least EP
+                    if (current_character.Type == "Enemy")
+                    {
+                        target = CombatUtil.GetTarget_LeastEP(enemy_squad);
+                    }
+                    else
+                    {
+                        target = CombatUtil.GetTarget_LeastEP(ally_squad);
+                    }
                 }
                 else
                 {
-                    target = CombatUtil.GetTarget_LeastEP(ally_squad);
+                    //Heal self EP
+                    target = current_character;
                 }
 
                 if (target != null)
                 {
                     int ep = InventoryUtil.Get_Item_Element_Level(weapon, "Energy") * Handler.Element_Multiplier;
-                    CombatUtil.DoHeal_EP(Menu, target, weapon, ep);
+                    RuneUtil.Energy(Menu, target, weapon, ep);
                 }
             }
         }
 
         private void Offense(Item weapon)
         {
-            foreach (Character target in targets)
+            if (weapon != null)
             {
-                Squad defender_squad = ArmyUtil.Get_Squad(target.ID);
+                Squad defender_squad = null;
 
-                bool dodge = false;
+                #region Initial Attack
 
-                int dodge_chance = CombatUtil.GetArmor_Resistance(target, "Time");
-                dodge_chance += ArmyUtil.Get_AoE_Defense(defender_squad, target, "Time");
-
-                if (Utility.RandomPercent(dodge_chance))
+                //Handle initial weapon damage
+                foreach (Character target in targets)
                 {
-                    dodge = true;
-                }
-
-                if (dodge)
-                {
-                    CombatUtil.DoDodge(Menu, target);
-                }
-                else
-                {
-                    if (InventoryUtil.Item_HasElement(weapon, "Death"))
+                    if (defender_squad == null)
                     {
-                        //Instant kill
-                        int chance = InventoryUtil.Get_Item_Element_Level(weapon, "Death");
-                        if (Utility.RandomPercent(chance))
-                        {
-                            int resist_chance = CombatUtil.GetArmor_Resistance(target, "Death");
-                            resist_chance += ArmyUtil.Get_AoE_Defense(defender_squad, target, "Death");
+                        defender_squad = ArmyUtil.Get_Squad(target.ID);
+                    }
 
-                            if (!Utility.RandomPercent(resist_chance))
+                    if (RuneUtil.Time_DodgeChance(target, defender_squad))
+                    {
+                        RuneUtil.Time_Dodge(Menu, target);
+                    }
+                    else
+                    {
+                        RuneUtil.Death(Menu, current_character, target, weapon);
+                        if (!target.Dead)
+                        {
+                            RuneUtil.DisarmWeapon(Menu, current_character, target, weapon);
+
+                            string[] elements = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
+
+                            for (int i = 0; i < elements.Length; i++)
                             {
-                                CombatUtil.AddEffect(Menu, target, weapon, "Death");
-                                target.HealthBar.Value = 0;
-                                target.Dead = true;
+                                string element = elements[i];
+
+                                if (InventoryUtil.Item_HasElement(weapon, element))
+                                {
+                                    CombatUtil.DoDamage_ForElement(Menu, current_character, target, weapon, element, ref ally_total_damage, ref enemy_total_damage);
+                                }
+                            }
+
+                            if (target.Dead)
+                            {
+                                if (target.Type == "Enemy")
+                                {
+                                    gold += 100;
+                                    xp += 1;
+                                }
+                                else if (target.ID == Handler.MainCharacter_ID)
+                                {
+                                    hero_killed = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    foreach (Character character in enemy_squad.Characters)
+                                    {
+                                        CombatUtil.GainExp(character, 1);
+                                    }
+                                }
+                            }
+                            else if (!counter_attacking &&
+                                     RuneUtil.CounterArmor(Menu, target))
+                            {
+                                counter_attackers.Add(target);
                             }
                         }
                     }
+                }
 
-                    if (!target.Dead)
+                #endregion
+
+                if (!hero_killed &&
+                    defender_squad != null &&
+                    weapon != null)
+                {
+                    #region Area Death
+
+                    //Handle weapon Area Death
+                    if (InventoryUtil.Item_HasArea_ForElement(weapon, "Death") &&
+                        RuneUtil.ApplyArea(weapon, "Death"))
                     {
-                        CombatUtil.DoDamage(Menu, current_character, target, weapon, ref ally_total_damage, ref enemy_total_damage);
-
-                        if (target.Dead)
+                        foreach (Character target in defender_squad.Characters)
                         {
-                            if (target.Type == "Enemy")
+                            //Ignore initial targets
+                            if (!targets.Contains(target))
                             {
-                                gold += 100;
-                                xp += 1;
-                            }
-                            else if (target.ID == Handler.MainCharacter_ID)
-                            {
-                                MainCharacterKilled();
-                                break;
-                            }
-                            else
-                            {
-                                foreach (Character character in enemy_squad.Characters)
+                                RuneUtil.Death(Menu, current_character, target, weapon);
+
+                                if (target.Dead)
                                 {
-                                    CombatUtil.GainExp(character, 1);
+                                    if (target.Type == "Enemy")
+                                    {
+                                        gold += 100;
+                                        xp += 1;
+                                    }
+                                    else if (target.ID == Handler.MainCharacter_ID)
+                                    {
+                                        hero_killed = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        foreach (Character character in enemy_squad.Characters)
+                                        {
+                                            CombatUtil.GainExp(character, 1);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+
+                    #endregion
+
+                    #region Area Disarm
+
+                    //Handle weapon Area Disarm
+                    if (InventoryUtil.Item_HasArea_ForElement(weapon, "Disarm") &&
+                        RuneUtil.ApplyArea(weapon, "Disarm"))
+                    {
+                        foreach (Character target in defender_squad.Characters)
+                        {
+                            //Ignore initial targets or dead ones
+                            if (!targets.Contains(target) &&
+                                !target.Dead)
+                            {
+                                RuneUtil.DisarmWeapon(Menu, current_character, target, weapon);
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    #region Area Elements
+
+                    //Handle weapon Area elements
+                    if (!hero_killed)
+                    {
+                        string[] elements = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
+
+                        for (int i = 0; i < elements.Length; i++)
+                        {
+                            string element = elements[i];
+
+                            //Only do damage for paired Area runes
+                            if (InventoryUtil.Item_HasArea_ForElement(weapon, element) &&
+                                RuneUtil.ApplyArea(weapon, element))
+                            {
+                                foreach (Character target in defender_squad.Characters)
+                                {
+                                    //Ignore initial targets or dead ones
+                                    if (!targets.Contains(target) &&
+                                        !target.Dead)
+                                    {
+                                        if (RuneUtil.Time_DodgeChance(target, defender_squad))
+                                        {
+                                            RuneUtil.Time_Dodge(Menu, target);
+                                        }
+                                        else
+                                        {
+                                            CombatUtil.DoDamage_ForElement(Menu, current_character, target, weapon, element, ref ally_total_damage, ref enemy_total_damage);
+
+                                            if (target.Dead)
+                                            {
+                                                if (target.Type == "Enemy")
+                                                {
+                                                    gold += 100;
+                                                    xp += 1;
+                                                }
+                                                else if (target.ID == Handler.MainCharacter_ID)
+                                                {
+                                                    hero_killed = true;
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    foreach (Character character in enemy_squad.Characters)
+                                                    {
+                                                        CombatUtil.GainExp(character, 1);
+                                                    }
+                                                }
+                                            }
+                                            else if (!counter_attacking &&
+                                                     RuneUtil.CounterArmor(Menu, target))
+                                            {
+                                                counter_attackers.Add(target);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (hero_killed)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    #endregion
                 }
+            }
+            else
+            {
+                #region Unarmed Attack
+
+                foreach (Character target in targets)
+                {
+                    CombatUtil.DoDamage_Unarmed(Menu, target, ref ally_total_damage, ref enemy_total_damage);
+
+                    if (target.Dead)
+                    {
+                        if (target.Type == "Enemy")
+                        {
+                            gold += 100;
+                            xp += 1;
+                        }
+                        else if (target.ID == Handler.MainCharacter_ID)
+                        {
+                            hero_killed = true;
+                            break;
+                        }
+                        else
+                        {
+                            foreach (Character character in enemy_squad.Characters)
+                            {
+                                CombatUtil.GainExp(character, 1);
+                            }
+                        }
+                    }
+                    else if (!counter_attacking &&
+                             RuneUtil.CounterArmor(Menu, target))
+                    {
+                        counter_attackers.Add(target);
+                    }
+                }
+
+                #endregion
+            }
+
+            if (hero_killed)
+            {
+                MainCharacterKilled();
             }
         }
 
-        private void AnimateDamageLabels()
+        private bool DamageEffectExists()
         {
-            for (int i = 0; i < Menu.Labels.Count; i++)
+            for (int i = 0; i < Menu.Pictures.Count; i++)
             {
-                Label label = Menu.Labels[i];
-                if (label.Name == "Damage" &&
-                    label.Region != null)
+                Picture picture = Menu.Pictures[i];
+                if (picture.Name == "Damage")
                 {
-                    label.Region.Y -= 1;
-                    label.Opacity -= 0.05f;
-
-                    if (label.Opacity <= 0)
-                    {
-                        Menu.Labels.Remove(label);
-                        i--;
-                    }
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private void AnimateDamageEffects()
@@ -798,6 +1068,106 @@ namespace DoS1.Scenes
                     {
                         picture.Image = new Rectangle(X, picture.Image.Y, picture.Image.Width, picture.Image.Height);
                     }
+                }
+            }
+        }
+
+        private void ClearDamageEffects()
+        {
+            for (int i = 0; i < Menu.Pictures.Count; i++)
+            {
+                Picture picture = Menu.Pictures[i];
+                if (picture.Name == "Damage" ||
+                    picture.Name == "Cast")
+                {
+                    Menu.Pictures.Remove(picture);
+                    i--;
+                }
+            }
+        }
+
+        private bool DamageLabelExists()
+        {
+            for (int i = 0; i < Menu.Labels.Count; i++)
+            {
+                Label label = Menu.Labels[i];
+                if (label.Name == "Damage")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void AnimateDamageLabels()
+        {
+            if (ally_squad != null)
+            {
+                for (int i = 0; i < ally_squad.Characters.Count; i++)
+                {
+                    Character character = ally_squad.Characters[i];
+
+                    for (int d = 0; d < Menu.Labels.Count; d++)
+                    {
+                        Label label = Menu.Labels[d];
+                        if (label.Name == "Damage" &&
+                            label.ID == character.ID &&
+                            label.Region != null)
+                        {
+                            label.Visible = true;
+                            label.Region.Y -= 1;
+                            label.Opacity -= 0.05f;
+
+                            if (label.Opacity <= 0)
+                            {
+                                Menu.Labels.Remove(label);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (enemy_squad != null)
+            {
+                for (int i = 0; i < enemy_squad.Characters.Count; i++)
+                {
+                    Character character = enemy_squad.Characters[i];
+
+                    for (int d = 0; d < Menu.Labels.Count; d++)
+                    {
+                        Label label = Menu.Labels[d];
+                        if (label.Name == "Damage" &&
+                            label.ID == character.ID &&
+                            label.Region != null)
+                        {
+                            label.Visible = true;
+                            label.Region.Y -= 1;
+                            label.Opacity -= 0.05f;
+
+                            if (label.Opacity <= 0)
+                            {
+                                Menu.Labels.Remove(label);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ClearDamageLabels()
+        {
+            for (int i = 0; i < Menu.Labels.Count; i++)
+            {
+                Label label = Menu.Labels[i];
+                if (label.Name == "Damage")
+                {
+                    Menu.Labels.Remove(label);
+                    i--;
                 }
             }
         }
@@ -848,35 +1218,118 @@ namespace DoS1.Scenes
             }
         }
 
-        private void RemoveEffects()
+        private void RemoveDamageStatusEffects()
         {
-            for (int i = 0; i < Menu.Labels.Count; i++)
+            if (ally_squad != null)
             {
-                Label label = Menu.Labels[i];
-                if (label.Name == "Damage")
+                for (int i = 0; i < ally_squad.Characters.Count; i++)
                 {
-                    Menu.Labels.Remove(label);
-                    i--;
+                    Character character = ally_squad.Characters[i];
+
+                    for (int s = 0; s < character.StatusEffects.Count; s++)
+                    {
+                        Something effect = character.StatusEffects[s];
+                        if (effect.Name == "Damage")
+                        {
+                            character.StatusEffects.Remove(effect);
+                            s--;
+                        }
+                    }
                 }
             }
 
-            foreach (Character target in targets)
+            if (enemy_squad != null)
             {
-                Something damage = target.GetStatusEffect("Damage");
-                if (damage != null)
+                for (int i = 0; i < enemy_squad.Characters.Count; i++)
                 {
-                    target.StatusEffects.Remove(damage);
+                    Character character = enemy_squad.Characters[i];
+
+                    for (int s = 0; s < character.StatusEffects.Count; s++)
+                    {
+                        Something effect = character.StatusEffects[s];
+                        if (effect.Name == "Damage")
+                        {
+                            character.StatusEffects.Remove(effect);
+                            s--;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void FinishAttack()
+        {
+            if (current_character != null)
+            {
+                CombatUtil.SwitchAnimation(current_character, "Idle");
+
+                if (ally_squad != null)
+                {
+                    for (int i = 0; i < ally_squad.Characters.Count; i++)
+                    {
+                        Character character = ally_squad.Characters[i];
+                        if (character.Dead)
+                        {
+                            CombatUtil.Kill(character);
+                            i--;
+                        }
+                    }
+
+                    if (!counter_attacking)
+                    {
+                        foreach (Character character in ally_squad.Characters)
+                        {
+                            if (current_character != null &&
+                                character.ID == current_character.ID)
+                            {
+                                character.CombatStep = 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (enemy_squad != null)
+                {
+                    for (int i = 0; i < enemy_squad.Characters.Count; i++)
+                    {
+                        Character character = enemy_squad.Characters[i];
+                        if (character.Dead)
+                        {
+                            CombatUtil.Kill(character);
+                            i--;
+                        }
+                    }
+
+                    if (!counter_attacking)
+                    {
+                        foreach (Character character in enemy_squad.Characters)
+                        {
+                            if (current_character != null &&
+                                character.ID == current_character.ID)
+                            {
+                                character.CombatStep = 1;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
-            for (int i = 0; i < Menu.Pictures.Count; i++)
+            ResetCombat();
+
+            if (counter_attacking)
             {
-                Picture picture = Menu.Pictures[i];
-                if (picture.Name == "Damage" ||
-                    picture.Name == "Cast")
+                if (counter_attackers.Any())
                 {
-                    Menu.Pictures.Remove(picture);
-                    i--;
+                    current_character = counter_attackers[0];
+                    counter_attackers.Remove(current_character);
+                }
+                else
+                {
+                    counter_attacking = false;
+                    current_character = initial_attacker;
+                    combat_state = "EndAttack";
                 }
             }
         }
@@ -895,70 +1348,13 @@ namespace DoS1.Scenes
         private void ResetCombat_Final()
         {
             ResetCombat();
+            counter_attackers.Clear();
             gold = 0;
             xp = 0;
             won_battle = false;
+            counter_attacking = false;
             ally_total_damage = 0;
             enemy_total_damage = 0;
-        }
-
-        private void FinishAttack()
-        {
-            if (current_character != null)
-            {
-                RemoveEffects();
-                CombatUtil.SwitchAnimation(current_character, "Idle");
-
-                if (ally_squad != null)
-                {
-                    for (int i = 0; i < ally_squad.Characters.Count; i++)
-                    {
-                        Character character = ally_squad.Characters[i];
-                        if (character.Dead)
-                        {
-                            ally_squad.Characters.Remove(character);
-                            i--;
-                        }
-                    }
-
-                    foreach (Character character in ally_squad.Characters)
-                    {
-                        if (current_character != null &&
-                            character.ID == current_character.ID)
-                        {
-                            character.CombatStep = 1;
-                            break;
-                        }
-                    }
-                }
-
-                if (enemy_squad != null)
-                {
-                    for (int i = 0; i < enemy_squad.Characters.Count; i++)
-                    {
-                        Character character = enemy_squad.Characters[i];
-                        if (character.Dead)
-                        {
-                            enemy_squad.Characters.Remove(character);
-                            i--;
-                        }
-                    }
-
-                    foreach (Character character in enemy_squad.Characters)
-                    {
-                        if (current_character != null &&
-                            character.ID == current_character.ID)
-                        {
-                            character.CombatStep = 1;
-                            break;
-                        }
-                    }
-                }
-
-                current_character = null;
-            }
-
-            ResetCombat();
         }
 
         private void FinishRound()
@@ -986,7 +1382,6 @@ namespace DoS1.Scenes
         {
             SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
-            Handler.CombatTimer_Tiles.Stop();
 
             if (!ally_squad.Characters.Any())
             {
@@ -1077,7 +1472,6 @@ namespace DoS1.Scenes
         private void Retreat()
         {
             Handler.CombatTimer.Stop();
-            Handler.CombatTimer_Tiles.Stop();
 
             Picture battleResult = Menu.GetPicture("Result");
             battleResult.Texture = AssetManager.Textures["Defeat"];
@@ -1110,8 +1504,6 @@ namespace DoS1.Scenes
         {
             SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
-            Handler.CombatTimer_Tiles.Stop();
-            hero_killed = true;
 
             Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
 
@@ -1161,7 +1553,6 @@ namespace DoS1.Scenes
             }
 
             Handler.CombatTimer.Stop();
-            Handler.CombatTimer_Tiles.Stop();
             Handler.Combat = false;
 
             Menu ui = MenuManager.GetMenu("UI");
@@ -1549,6 +1940,8 @@ namespace DoS1.Scenes
 
                 Menu.AddPicture(Handler.GetID(), "Result", AssetManager.Textures["Victory"], new Region(0, 0, 0, 0), Color.White, false);
 
+                Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Debug", "Debugging", Color.White, new Region(0, 0, 0, 0), Main.Game.Debugging);
+
                 Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                     new Region(0, 0, 0, 0), false);
 
@@ -1579,7 +1972,6 @@ namespace DoS1.Scenes
                 Resize(Main.Game.Resolution);
 
                 Handler.CombatTimer.Start();
-                Handler.CombatTimer_Tiles.Start();
             }
         }
 
@@ -1613,6 +2005,7 @@ namespace DoS1.Scenes
                 Menu.GetButton("Retreat").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2), result.Region.Y + result.Region.Height, Main.Game.MenuSize.X * 4, height);
                 Menu.GetPicture("MouseClick").Region = new Region(result.Region.X + result.Region.Width, result.Region.Y + result.Region.Height - height, height, height);
 
+                Menu.GetLabel("Debug").Region = new Region((Main.Game.Resolution.X / 2) - (Main.Game.MenuSize.X * 5), 0, Main.Game.MenuSize.X * 10, height);
                 Menu.GetLabel("Examine").Region = new Region(0, 0, 0, 0);
 
                 Picture base_image = Menu.GetPicture("Base");

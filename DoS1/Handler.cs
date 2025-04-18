@@ -59,7 +59,6 @@ namespace DoS1
         public static Squad TradingAcademy;
 
         public static Timer CombatTimer = new Timer(1);
-        public static Timer CombatTimer_Tiles = new Timer(200);
         public static bool Combat;
         public static int Element_Multiplier = 8;
         public static string Combat_Terrain;
@@ -257,6 +256,7 @@ namespace DoS1
 
         private static void LoadControls()
         {
+            InputManager.Keyboard.KeysMapped.Add("Debug", Keys.OemTilde);
             InputManager.Keyboard.KeysMapped.Add("Esc", Keys.Escape);
             InputManager.Keyboard.KeysMapped.Add("Space", Keys.Space);
             InputManager.Keyboard.KeysMapped.Add("Backspace", Keys.Back);

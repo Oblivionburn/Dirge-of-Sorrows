@@ -36,11 +36,13 @@ namespace DoS1
             Handler.light_maps.Clear();
 
             Map map = null;
+            string sceneType = "Worldmap";
 
-            Scene scene = SceneManager.GetScene("Worldmap");
+            Scene scene = SceneManager.GetScene(sceneType);
             if (Handler.LocalMap)
             {
-                scene = SceneManager.GetScene("Localmap");
+                sceneType = "Localmap";
+                scene = SceneManager.GetScene(sceneType);
                 map = scene.World.Maps[Handler.Level];
             }
             else if (scene.World.Maps.Count > 0)
@@ -52,14 +54,17 @@ namespace DoS1
             {
                 List<Vector2> light_sources = new List<Vector2>();
 
-                foreach (Army army in CharacterManager.Armies)
+                if (sceneType == "Localmap")
                 {
-                    foreach (Squad squad in army.Squads)
+                    foreach (Army army in CharacterManager.Armies)
                     {
-                        if (squad.Characters.Any() &&
-                            squad.Visible)
+                        foreach (Squad squad in army.Squads)
                         {
-                            light_sources.Add(new Vector2(squad.Region.X + (squad.Region.Width / 2), squad.Region.Y + (squad.Region.Height / 2)));
+                            if (squad.Characters.Any() &&
+                                squad.Visible)
+                            {
+                                light_sources.Add(new Vector2(squad.Region.X + (squad.Region.Width / 2), squad.Region.Y + (squad.Region.Height / 2)));
+                            }
                         }
                     }
                 }

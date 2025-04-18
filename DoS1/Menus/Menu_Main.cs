@@ -143,7 +143,6 @@ namespace DoS1.Menus
             if (Handler.Combat)
             {
                 Handler.CombatTimer.Start();
-                Handler.CombatTimer_Tiles.Start();
             }
 
             InputManager.Mouse.Flush();

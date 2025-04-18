@@ -388,9 +388,15 @@ namespace DoS1.Menus
                 {
                     Something property = properties[i];
 
-                    if (property.Name.Contains("Chance") ||
+                    if (property.Name.Contains("Area") ||
+                        property.Name.Contains("Chance") ||
                         property.Name.Contains("Drain") ||
-                        property.Name == "Haste")
+                        property.Name.Contains("Resist") ||
+                        property.Name.Contains("Haste") ||
+                        property.Name.Contains("Dodge") ||
+                        property.Name.Contains("Pierce") ||
+                        property.Name.Contains("Counter") ||
+                        property.Name.Contains("Disarm"))
                     {
                         text += property.Name + ": " + property.Value + "%";
                     }
@@ -436,9 +442,15 @@ namespace DoS1.Menus
                 {
                     Something property = properties[i];
 
-                    if (property.Name.Contains("Resist") ||
+                    if (property.Name.Contains("Area") ||
+                        property.Name.Contains("Chance") ||
                         property.Name.Contains("Drain") ||
-                        property.Name == "Dodge")
+                        property.Name.Contains("Resist") ||
+                        property.Name.Contains("Haste") ||
+                        property.Name.Contains("Dodge") ||
+                        property.Name.Contains("Pierce") ||
+                        property.Name.Contains("Counter") ||
+                        property.Name.Contains("Disarm"))
                     {
                         text += property.Name + ": " + property.Value + "%";
                     }

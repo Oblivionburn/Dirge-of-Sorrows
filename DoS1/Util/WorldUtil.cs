@@ -1031,10 +1031,12 @@ namespace DoS1.Util
             {
                 location.Type = "Shop_" + squad.Type;
             }
-            else if (location.Type.Contains("Base") &&
-                     !location.Type.Contains("Ally"))
+            else if (location.Type.Contains("Base"))
             {
-                location.Type = "Base_" + squad.Type;
+                if (!location.Type.Contains("Ally"))
+                {
+                    location.Type = "Base_" + squad.Type;
+                }
             }
             else
             {
@@ -1227,8 +1229,8 @@ namespace DoS1.Util
                                             {
                                                 if (location_tile != null)
                                                 {
-                                                    ChangeLocation(location_tile, squad);
                                                     GameUtil.Alert_Capture(map, ground, location_tile);
+                                                    ChangeLocation(location_tile, squad);
                                                 }
                                                 else if (squad.Assignment != "Guard Base")
                                                 {

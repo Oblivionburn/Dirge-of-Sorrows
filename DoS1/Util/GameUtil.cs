@@ -150,16 +150,6 @@ namespace DoS1.Util
             Menu ui = MenuManager.GetMenu("UI");
             ui.GetButton("Worldmap").Visible = false;
             ui.GetButton("PlayPause").Enabled = false;
-            ui.GetButton("Speed").Enabled = false;
-
-            Main.TimeSpeed = 1;
-
-            Button speed = ui.GetButton("Speed");
-            speed.Value = 0;
-            speed.HoverText = "x1";
-            speed.Texture = AssetManager.Textures["Button_Speed1"];
-            speed.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
-            speed.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
 
             Army army = CharacterManager.GetArmy("Ally");
             foreach (Squad squad in army.Squads)
@@ -216,7 +206,7 @@ namespace DoS1.Util
             string result = "";
 
             List<string> text_parts = new List<string>();
-            int max_length = 39;
+            int max_length = 50;
 
             string full_text = text;
             if (full_text.Length > max_length)
@@ -487,7 +477,7 @@ namespace DoS1.Util
                 option1.Text = "(Continue)";
             }
             
-            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
             option1.Visible = true;
         }
 
