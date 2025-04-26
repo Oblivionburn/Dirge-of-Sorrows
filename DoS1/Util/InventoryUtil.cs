@@ -1591,7 +1591,8 @@ namespace DoS1.Util
 
         public static bool Element_IsDamage(string type)
         {
-            if (type == "Fire" ||
+            if (type == "Physical" || 
+                type == "Fire" ||
                 type == "Lightning" ||
                 type == "Earth" ||
                 type == "Ice")
@@ -2038,13 +2039,13 @@ namespace DoS1.Util
             return (int)total;
         }
 
-        public static int Get_TotalDefense(Item item, string type)
+        public static int Get_TotalDefense(Item item, string element)
         {
             float total = 0;
 
             foreach (Something property in item.Properties)
             {
-                if (property.Name.Contains(type) &&
+                if (property.Name.Contains(element) &&
                     property.Name.Contains("Defense"))
                 {
                     total += property.Value;

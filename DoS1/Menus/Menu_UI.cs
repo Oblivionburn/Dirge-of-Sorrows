@@ -53,11 +53,7 @@ namespace DoS1.Menus
             if (Visible &&
                 !TimeManager.Paused)
             {
-                Scene scene = SceneManager.GetScene("Worldmap");
-                if (Handler.LocalMap)
-                {
-                    scene = SceneManager.GetScene("Localmap");
-                }
+                Scene scene = WorldUtil.GetScene();
 
                 if (string.IsNullOrEmpty(Handler.AlertType))
                 {
@@ -175,18 +171,7 @@ namespace DoS1.Menus
 
                 if (!hovering_button)
                 {
-                    Map map = null;
-                    if (world.Maps.Any())
-                    {
-                        if (Handler.LocalMap)
-                        {
-                            map = world.Maps[Handler.Level];
-                        }
-                        else
-                        {
-                            map = world.Maps[0];
-                        }
-                    }
+                    Map map = WorldUtil.GetMap(world);
 
                     Layer pathing = null;
                     if (map != null)
@@ -402,12 +387,7 @@ namespace DoS1.Menus
                             {
                                 hovered_squad = squad;
 
-                                Map map = null;
-
-                                if (world.Maps.Any())
-                                {
-                                    map = world.Maps[Handler.Level];
-                                }
+                                Map map = WorldUtil.GetMap(world);
 
                                 if (Handler.Selected_Token == -1)
                                 {
@@ -879,17 +859,13 @@ namespace DoS1.Menus
                 }
             }
 
-            if (Handler.LocalMap &&
-                world.Maps.Any())
+            Map map = WorldUtil.GetMap(world);
+            if (map != null)
             {
-                Map map = world.Maps[Handler.Level];
-                if (map != null)
+                Layer pathing = map.GetLayer("Pathing");
+                if (pathing != null)
                 {
-                    Layer pathing = map.GetLayer("Pathing");
-                    if (pathing != null)
-                    {
-                        pathing.Visible = false;
-                    }
+                    pathing.Visible = false;
                 }
             }
 
@@ -916,6 +892,15 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Worldmap")
             {
+                if (Handler.Selected_Token != -1)
+                {
+                    GetPicture("Select").Visible = false;
+                    GetPicture("Highlight").Visible = false;
+
+                    Scene scene = WorldUtil.GetScene();
+                    DeselectToken(WorldUtil.GetMap(scene.World));
+                }
+
                 GameUtil.ReturnToWorldmap();
             }
             else if (button.Name == "Alert")

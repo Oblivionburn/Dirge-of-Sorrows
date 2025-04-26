@@ -328,6 +328,7 @@ namespace DoS1.Scenes
                     !ally_army.Squads.Any())
                 {
                     Handler.Combat = false;
+                    Main.Timer.Start();
 
                     SoundManager.StopMusic();
                     SoundManager.NeedMusic = true;
@@ -421,6 +422,10 @@ namespace DoS1.Scenes
                                                 combat_state = "Attack";
                                                 break;
                                         }
+                                    }
+                                    else
+                                    {
+                                        combat_state = "Finish";
                                     }
                                     break;
 
@@ -1259,6 +1264,8 @@ namespace DoS1.Scenes
 
         private void FinishAttack()
         {
+            UpdateGrids();
+
             if (current_character != null)
             {
                 CombatUtil.SwitchAnimation(current_character, "Idle");
@@ -1465,8 +1472,6 @@ namespace DoS1.Scenes
                     leader.Target_ID = 0;
                 }
             }
-
-            ResetCombat_Final();
         }
 
         private void Retreat()
@@ -1554,6 +1559,8 @@ namespace DoS1.Scenes
 
             Handler.CombatTimer.Stop();
             Handler.Combat = false;
+
+            ResetCombat_Final();
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.Active = true;
@@ -1800,6 +1807,8 @@ namespace DoS1.Scenes
             move_speed = base_move_speed * (Main.CombatSpeed / 2);
 
             Save.ExportINI();
+
+            effect_frame = 0;
         }
 
         public override void Load()

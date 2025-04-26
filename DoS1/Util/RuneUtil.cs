@@ -1,12 +1,10 @@
-﻿using FMOD;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Utility;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DoS1.Util
 {
@@ -112,19 +110,28 @@ namespace DoS1.Util
                         Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
                         if (helm != null)
                         {
-                            defense += Area_PairedLevel(helm, element);
+                            if (ApplyArea(helm, element))
+                            {
+                                defense += Area_PairedLevel(helm, element);
+                            }
                         }
 
                         Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
                         if (armor != null)
                         {
-                            defense += Area_PairedLevel(armor, element);
+                            if (ApplyArea(armor, element))
+                            {
+                                defense += Area_PairedLevel(armor, element);
+                            }
                         }
 
                         Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
                         if (shield != null)
                         {
-                            defense += Area_PairedLevel(shield, element);
+                            if (ApplyArea(shield, element))
+                            {
+                                defense += Area_PairedLevel(shield, element);
+                            }
                         }
                     }
                 }
@@ -298,6 +305,36 @@ namespace DoS1.Util
             return false;
         }
 
+        public static int DeathResistChance(Item item)
+        {
+            int total = 0;
+
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains("Death"))
+                    {
+                        Something level = rune.GetProperty("Level Value");
+                        if (level != null)
+                        {
+                            total += (int)level.Value * 10;
+                        }
+                    }
+                }
+            }
+
+            if (total > 0 &&
+                Main.Game.Debugging)
+            {
+                return 100;
+            }
+
+            return total;
+        }
+
         public static void Death(Menu menu, Character attacker, Character defender, Item attacker_weapon)
         {
             int chance = InventoryUtil.Get_Item_Element_Level(attacker_weapon, "Death");
@@ -308,8 +345,7 @@ namespace DoS1.Util
                 if (character.ID != attacker.ID)
                 {
                     Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                    if (InventoryUtil.Item_HasArea_ForElement(weapon, "Death") &&
-                        ApplyArea(weapon, "Death"))
+                    if (ApplyArea(weapon, "Death"))
                     {
                         chance += Area_PairedLevel(weapon, "Death");
                     }
@@ -324,7 +360,25 @@ namespace DoS1.Util
 
             if (Utility.RandomPercent(chance))
             {
-                int resist_chance = CombatUtil.GetArmor_Resistance(defender, "Death");
+                int resist_chance = 0;
+
+                Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
+                if (helm != null)
+                {
+                    resist_chance += DeathResistChance(helm);
+                }
+
+                Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
+                if (armor != null)
+                {
+                    resist_chance += DeathResistChance(armor);
+                }
+
+                Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
+                if (shield != null)
+                {
+                    resist_chance += DeathResistChance(shield);
+                }
 
                 Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
                 resist_chance += Area_AllArmor_PairedLevel(defender_squad, defender, "Death");

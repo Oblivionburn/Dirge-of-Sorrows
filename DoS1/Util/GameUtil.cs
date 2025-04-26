@@ -91,8 +91,6 @@ namespace DoS1.Util
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.GetButton("Worldmap").Visible = false;
-            ui.GetButton("PlayPause").Enabled = false;
-            ui.GetButton("Speed").Enabled = false;
 
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");

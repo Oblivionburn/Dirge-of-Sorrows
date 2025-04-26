@@ -32,6 +32,36 @@ namespace DoS1.Util
 
         #region Methods
 
+        public static Scene GetScene()
+        {
+            Scene scene = SceneManager.GetScene("Worldmap");
+            if (Handler.LocalMap)
+            {
+                scene = SceneManager.GetScene("Localmap");
+            }
+
+            return scene;
+        }
+
+        public static Map GetMap(World world)
+        {
+            Map map = null;
+
+            if (world.Maps.Any())
+            {
+                if (Handler.LocalMap)
+                {
+                    map = world.Maps[Handler.Level];
+                }
+                else
+                {
+                    map = world.Maps[0];
+                }
+            }
+
+            return map;
+        }
+
         public static void Resize_OnZoom(Map map)
         {
             if (map != null)
@@ -318,16 +348,7 @@ namespace DoS1.Util
                 int x_diff = InputManager.Mouse.X - InputManager.Mouse.lastMouseState.X;
                 int y_diff = InputManager.Mouse.Y - InputManager.Mouse.lastMouseState.Y;
 
-                Map map = null;
-                if (!Handler.LocalMap)
-                {
-                    map = world.Maps[0];
-                }
-                else
-                {
-                    map = world.Maps[Handler.Level];
-                }
-
+                Map map = GetMap(world);
                 if (map != null)
                 {
                     Layer ground = map.GetLayer("Ground");
@@ -458,67 +479,70 @@ namespace DoS1.Util
             Layer roads = map.GetLayer("Roads");
 
             Layer pathing = map.GetLayer("Pathing");
-            pathing.Tiles.Clear();
-
-            Army army = CharacterManager.GetArmy("Ally");
-            Squad squad = army.GetSquad(Handler.Selected_Token);
-            if (squad == null)
+            if (pathing != null)
             {
-                return;
-            }
+                pathing.Tiles.Clear();
 
-            List<ALocation> path = Handler.Pathing.Get_Path(ground, roads, squad, destination, ground.Columns * ground.Rows, false);
-            if (path == null ||
-                path.Count == 0)
-            {
-                return;
-            }
-
-            path.Reverse();
-
-            ALocation start = path[0];
-            Tile start_tile = ground.GetTile(new Vector2(start.X, start.Y));
-
-            if (squad.Region.X == start_tile.Region.X &&
-                squad.Region.Y == start_tile.Region.Y)
-            {
-                //Exclude starting location if already there
-                path.RemoveAt(0);
-            }
-
-            Vector2 previous_location = new Vector2(-1, -1);
-            Vector2 current_location = new Vector2(squad.Location.X, squad.Location.Y);
-            Vector2 next_location = new Vector2(path[0].X, path[0].Y);
-
-            AddTileToPathing(ground, pathing, current_location, previous_location, next_location);
-
-            int count = path.Count;
-            for (int i = 0; i < count; i++)
-            {
-                ALocation location = path[i];
-
-                previous_location = new Vector2(-1, -1);
-                current_location = new Vector2(location.X, location.Y);
-                next_location = new Vector2(-1, -1);
-
-                if (i == 0)
+                Army army = CharacterManager.GetArmy("Ally");
+                Squad squad = army.GetSquad(Handler.Selected_Token);
+                if (squad == null)
                 {
-                    previous_location = new Vector2(squad.Location.X, squad.Location.Y);
-                }
-                else if (i > 0)
-                {
-                    previous_location = new Vector2(path[i - 1].X, path[i - 1].Y);
+                    return;
                 }
 
-                if (i < count - 1)
+                List<ALocation> path = Handler.Pathing.Get_Path(ground, roads, squad, destination, ground.Columns * ground.Rows, false);
+                if (path == null ||
+                    path.Count == 0)
                 {
-                    next_location = new Vector2(path[i + 1].X, path[i + 1].Y);
+                    return;
                 }
+
+                path.Reverse();
+
+                ALocation start = path[0];
+                Tile start_tile = ground.GetTile(new Vector2(start.X, start.Y));
+
+                if (squad.Region.X == start_tile.Region.X &&
+                    squad.Region.Y == start_tile.Region.Y)
+                {
+                    //Exclude starting location if already there
+                    path.RemoveAt(0);
+                }
+
+                Vector2 previous_location = new Vector2(-1, -1);
+                Vector2 current_location = new Vector2(squad.Location.X, squad.Location.Y);
+                Vector2 next_location = new Vector2(path[0].X, path[0].Y);
 
                 AddTileToPathing(ground, pathing, current_location, previous_location, next_location);
-            }
 
-            pathing.Visible = true;
+                int count = path.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    ALocation location = path[i];
+
+                    previous_location = new Vector2(-1, -1);
+                    current_location = new Vector2(location.X, location.Y);
+                    next_location = new Vector2(-1, -1);
+
+                    if (i == 0)
+                    {
+                        previous_location = new Vector2(squad.Location.X, squad.Location.Y);
+                    }
+                    else if (i > 0)
+                    {
+                        previous_location = new Vector2(path[i - 1].X, path[i - 1].Y);
+                    }
+
+                    if (i < count - 1)
+                    {
+                        next_location = new Vector2(path[i + 1].X, path[i + 1].Y);
+                    }
+
+                    AddTileToPathing(ground, pathing, current_location, previous_location, next_location);
+                }
+
+                pathing.Visible = true;
+            }
         }
 
         public static void DisplayPath_Squad(Menu menu, Map map, Squad squad)
@@ -958,13 +982,29 @@ namespace DoS1.Util
 
                 Tile nearest = null;
 
-                //Get first unoccupied town
+                if (to_guard)
+                {
+                    //Are we already on a captured town?
+                    foreach (Tile town in Towns)
+                    {
+                        if (town.Type.Contains("Enemy") &&
+                            !town.Type.Contains("Base") &&
+                            town.Location.X == squad.Location.X &&
+                            town.Location.Y == squad.Location.Y)
+                        {
+                            return town;
+                        }
+                    }
+                }
+
+                //Get first town
                 foreach (Tile town in Towns)
                 {
-                    if (!town.Type.Contains("Enemy") || to_guard)
+                    if (!town.Type.Contains("Enemy"))
                     {
                         Squad existing = ArmyUtil.Get_Squad(map, army, town.Location);
-                        if (existing == null)
+                        if (existing == null ||
+                            existing.Type == "Ally")
                         {
                             nearest = town;
                             break;
@@ -976,16 +1016,16 @@ namespace DoS1.Util
                 {
                     int distance = GetDistance(squad.Location, nearest.Location);
 
-                    //Check for closer unoccupied town
+                    //Check for closer town
                     foreach (Tile town in Towns)
                     {
-                        if (!town.Type.Contains("Enemy") || to_guard)
+                        if (!town.Type.Contains("Enemy"))
                         {
                             Squad existing = ArmyUtil.Get_Squad(map, army, town.Location);
                             int new_distance = GetDistance(squad.Location, town.Location);
 
                             if (new_distance < distance &&
-                                existing == null)
+                                (existing == null || existing.Type == "Ally"))
                             {
                                 distance = new_distance;
                                 nearest = town;

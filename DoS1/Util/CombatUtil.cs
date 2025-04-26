@@ -647,29 +647,19 @@ namespace DoS1.Util
             Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
             if (helm != null)
             {
-                total += InventoryUtil.Get_Item_Element_Level(helm, type);
+                total += InventoryUtil.Get_TotalDefense(helm, type);
             }
 
             Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
             if (armor != null)
             {
-                total += InventoryUtil.Get_Item_Element_Level(armor, type);
+                total += InventoryUtil.Get_TotalDefense(armor, type);
             }
 
             Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
             if (shield != null)
             {
-                total += InventoryUtil.Get_Item_Element_Level(shield, type);
-            }
-
-            if (type == "Death" ||
-                type == "Effect")
-            {
-                total *= 10;
-            }
-            else if (type != "Time")
-            {
-                total *= Handler.Element_Multiplier;
+                total += InventoryUtil.Get_TotalDefense(shield, type);
             }
 
             return total;
@@ -825,11 +815,13 @@ namespace DoS1.Util
             if (!RuneUtil.CounterWeapon(menu, attacker))
             {
                 //Reduce by defender's resistance
-                damage -= GetArmor_Resistance(defender, element);
+                int resistance = GetArmor_Resistance(defender, element);
+                damage -= resistance;
 
                 //Reduce by squad's Area resistances
                 Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
-                damage -= RuneUtil.Area_AllArmor_PairedLevel(defender_squad, defender, element);
+                int area_resistance = RuneUtil.Area_AllArmor_PairedLevel(defender_squad, defender, element);
+                damage -= area_resistance;
             }
 
             if (element == "Physical")
@@ -904,14 +896,9 @@ namespace DoS1.Util
                     DrawColor = damage_color
                 });
 
-                if (defender.HealthBar.Value < 0)
-                {
-                    defender.HealthBar.Value = 0;
-                }
-
                 if (defender.HealthBar.Value <= 0)
                 {
-                    Kill(defender);
+                    defender.Dead = true;
                 }
 
                 RuneUtil.DrainWeapon(menu, attacker, weapon, element, damage);
@@ -920,7 +907,7 @@ namespace DoS1.Util
             {
                 AssetManager.PlaySound_Random("Swing");
 
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "0", Color.Black,
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "0", Color.White,
                     new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
                         defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), false);
 
@@ -963,8 +950,6 @@ namespace DoS1.Util
                 }
                 defender.HealthBar.Update();
 
-                Color damage_color = Color.White;
-
                 AddEffect(menu, defender, null, "Physical");
 
                 if (defender.Type == "Ally")
@@ -976,7 +961,7 @@ namespace DoS1.Util
                     ally_total_damage += damage;
                 }
 
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "-" + damage.ToString(), damage_color,
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "-" + damage.ToString(), Color.White,
                     new Region(defender.Region.X + (defender.Region.Width / 4), defender.Region.Y - ((defender.Region.Width / 8) * 3), 
                         defender.Region.Width / 2, defender.Region.Width / 2), false);
 
@@ -986,7 +971,7 @@ namespace DoS1.Util
                 {
                     ID = new_damage_label.ID,
                     Name = "Damage",
-                    DrawColor = damage_color
+                    DrawColor = Color.White
                 });
 
                 if (defender.HealthBar.Value < 0)
@@ -996,14 +981,14 @@ namespace DoS1.Util
 
                 if (defender.HealthBar.Value <= 0)
                 {
-                    Kill(defender);
+                    defender.Dead = true;
                 }
             }
             else
             {
                 AssetManager.PlaySound_Random("Swing");
 
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "0", Color.Black,
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "0", Color.White,
                     new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
                         defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), false);
 
@@ -1013,7 +998,7 @@ namespace DoS1.Util
                 {
                     ID = new_damage_label.ID,
                     Name = "Damage",
-                    DrawColor = Color.Black
+                    DrawColor = Color.White
                 });
             }
         }
@@ -1163,6 +1148,8 @@ namespace DoS1.Util
         public static void Kill(Character character)
         {
             character.HealthBar.Value = 0;
+            character.HealthBar.Update();
+
             character.Dead = true;
 
             Squad squad = ArmyUtil.Get_Squad(character.ID);
