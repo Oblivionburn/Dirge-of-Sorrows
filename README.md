@@ -24,7 +24,7 @@
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
 - Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
 - Recovering HP/EP at towns
-- Collecting gold from owned towns/base
+- Collecting 1 gold every in-game hour from owned towns/base across all maps
 #
 ### Planned features not yet implemented:
 - Character stat/xp/level progression
