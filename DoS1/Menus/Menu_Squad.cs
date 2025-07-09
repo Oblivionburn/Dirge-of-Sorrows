@@ -805,6 +805,9 @@ namespace DoS1.Menus
                 visible = true
             });
 
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name_Squad", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name_Reserves", "Reserves", Color.White, new Region(0, 0, 0, 0), true);
+
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                 new Region(0, 0, 0, 0), false);
@@ -893,6 +896,8 @@ namespace DoS1.Menus
         {
             if (squad != null)
             {
+                GetLabel("Name_Squad").Text = "";
+
                 for (int i = 0; i < Pictures.Count; i++)
                 {
                     bool found = false;
@@ -964,6 +969,10 @@ namespace DoS1.Menus
 
             if (squad != null)
             {
+                Label name_squad = GetLabel("Name_Squad");
+                name_squad.Region = new Region(starting_X, starting_Y - (height / 2), width * 3, (height / 2));
+                name_squad.Text = squad.Name;
+
                 for (int y = 0; y < 3; y++)
                 {
                     for (int x = 0; x < 3; x++)
@@ -1082,6 +1091,8 @@ namespace DoS1.Menus
             ClearGrid();
             ResetGridPos();
 
+            GetLabel("Name_Reserves").Region = new Region(starting_grid_X, starting_grid_Y - grid_height, grid_width * 10, grid_height);
+
             Army army = CharacterManager.GetArmy("Reserves");
             if (army != null)
             {
@@ -1158,6 +1169,9 @@ namespace DoS1.Menus
             {
                 ResizeSquad();
                 ResizeGrid();
+
+                GetLabel("Name_Squad").Region = new Region(starting_X, starting_Y - (height / 2), width * 3, height / 2);
+                GetLabel("Name_Reserves").Region = new Region(starting_grid_X, starting_grid_Y - grid_height, grid_width * 10, grid_height);
             }
         }
 

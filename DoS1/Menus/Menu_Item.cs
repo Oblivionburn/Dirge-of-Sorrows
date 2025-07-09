@@ -726,12 +726,141 @@ namespace DoS1.Menus
                     selectedItem.Attachments = new List<Item>();
                 }
 
-                Picture item = GetPicture("SelectedItem");
-                item.Region = new Region(starting_X - (width * 12), starting_Y, width * 5, height * 5);
-                item.Texture = selectedItem.Icon;
-                item.Image = new Rectangle(0, 0, item.Texture.Width, item.Texture.Height);
+                Picture selectedItemImage = GetPicture("SelectedItem");
+                selectedItemImage.Region = new Region(starting_X - (width * 12), starting_Y, width * 5, height * 5);
+                selectedItemImage.Texture = selectedItem.Icon;
+                selectedItemImage.Image = new Rectangle(0, 0, selectedItemImage.Texture.Width, selectedItemImage.Texture.Height);
 
-                GetPicture("SelectedItem_Spot").Region = item.Region;
+                GetPicture("SelectedItem_Spot").Region = selectedItemImage.Region;
+
+                Label item_name = GetLabel("Item_Name");
+                item_name.Region = new Region(starting_X - (width * 12), starting_Y - height, width * 5, height);
+                item_name.Text = selectedItem.Name;
+
+                if (selectedItem.Type == "Weapon" &&
+                    InventoryUtil.Weapon_Is2H(selectedItem))
+                {
+                    item_name.Text = selectedItem.Name + " (2H)";
+                }
+
+                int Y = starting_Y + (height * 6) + (height / 2);
+                GetLabel("Properties").Region = new Region(starting_X - (width * 12), Y, width * 5, height);
+                GetPicture("Properties_Underline").Region = new Region(starting_X - (width * 12), Y + (height / 2), width * 5, height);
+
+                Label item_properties = GetLabel("Item_Properties");
+                item_properties.Region = new Region(starting_X - (width * 12), Y + height, width * 5, height);
+                item_properties.Text = "";
+
+                if (selectedItem.Type == "Weapon")
+                {
+                    List<Something> properties = new List<Something>();
+
+                    //List damage properties first
+                    for (int i = 0; i < selectedItem.Properties.Count; i++)
+                    {
+                        Something property = selectedItem.Properties[i];
+                        if (property.Name.Contains("Damage"))
+                        {
+                            properties.Add(property);
+                        }
+                    }
+
+                    //List non-damage properties last
+                    for (int i = 0; i < selectedItem.Properties.Count; i++)
+                    {
+                        Something property = selectedItem.Properties[i];
+                        if (!property.Name.Contains("Damage") &&
+                            !property.Name.Contains("Slots"))
+                        {
+                            properties.Add(property);
+                        }
+                    }
+
+                    for (int i = 0; i < properties.Count; i++)
+                    {
+                        Something property = properties[i];
+
+                        if (property.Name.Contains("Area") ||
+                            property.Name.Contains("Chance") ||
+                            property.Name.Contains("Drain") ||
+                            property.Name.Contains("Resist") ||
+                            property.Name.Contains("Haste") ||
+                            property.Name.Contains("Dodge") ||
+                            property.Name.Contains("Pierce") ||
+                            property.Name.Contains("Counter") ||
+                            property.Name.Contains("Disarm"))
+                        {
+                            item_properties.Text += property.Name + ": " + property.Value + "%";
+                        }
+                        else
+                        {
+                            item_properties.Text += property.Name + ": " + property.Value;
+                        }
+
+                        if (i < properties.Count - 1)
+                        {
+                            item_properties.Text += "\n";
+                            item_properties.Region.Height += (Main.Game.MenuSize.Y / 2);
+                        }
+                    }
+
+                    properties.Clear();
+                }
+                else
+                {
+                    List<Something> properties = new List<Something>();
+
+                    //List defense properties first
+                    for (int i = 0; i < selectedItem.Properties.Count; i++)
+                    {
+                        Something property = selectedItem.Properties[i];
+                        if (property.Name.Contains("Defense"))
+                        {
+                            properties.Add(property);
+                        }
+                    }
+
+                    //List non-defense properties last
+                    for (int i = 0; i < selectedItem.Properties.Count; i++)
+                    {
+                        Something property = selectedItem.Properties[i];
+                        if (!property.Name.Contains("Defense") &&
+                            !property.Name.Contains("Slots"))
+                        {
+                            properties.Add(property);
+                        }
+                    }
+
+                    for (int i = 0; i < properties.Count; i++)
+                    {
+                        Something property = properties[i];
+
+                        if (property.Name.Contains("Area") ||
+                            property.Name.Contains("Chance") ||
+                            property.Name.Contains("Drain") ||
+                            property.Name.Contains("Resist") ||
+                            property.Name.Contains("Haste") ||
+                            property.Name.Contains("Dodge") ||
+                            property.Name.Contains("Pierce") ||
+                            property.Name.Contains("Counter") ||
+                            property.Name.Contains("Disarm"))
+                        {
+                            item_properties.Text += property.Name + ": " + property.Value + "%";
+                        }
+                        else
+                        {
+                            item_properties.Text += property.Name + ": " + property.Value;
+                        }
+
+                        if (i < properties.Count - 1)
+                        {
+                            item_properties.Text += "\n";
+                            item_properties.Region.Height += (Main.Game.MenuSize.Y / 2);
+                        }
+                    }
+
+                    properties.Clear();
+                }
 
                 LoadSlots();
             }
@@ -865,6 +994,13 @@ namespace DoS1.Menus
 
             AddPicture(Handler.GetID(), "SelectedItem_Spot", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, true);
             AddPicture(Handler.GetID(), "SelectedItem", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White, true);
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Runes", "Runes", Color.White, new Region(0, 0, 0, 0), true);
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Item_Name", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Item_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Properties", "Properties", Color.White, new Region(0, 0, 0, 0), true);
+            AddPicture(Handler.GetID(), "Properties_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
 
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
@@ -1017,6 +1153,8 @@ namespace DoS1.Menus
         {
             ClearGrid();
             ResetPos();
+
+            GetLabel("Runes").Region = new Region(starting_X, starting_Y - height, width * 10, height);
 
             for (int y = 0; y < 10; y++)
             {

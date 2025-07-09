@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
@@ -16,7 +16,6 @@ using OP_Engine.Tiles;
 using OP_Engine.Sounds;
 
 using DoS1.Util;
-using System.Linq;
 
 namespace DoS1.Menus
 {
@@ -251,6 +250,15 @@ namespace DoS1.Menus
                 GetPicture("Highlight").Visible = false;
             }
 
+            if (InputManager.Mouse.ScrolledDown)
+            {
+                ScrollDown();
+            }
+            else if (InputManager.Mouse.ScrolledUp)
+            {
+                ScrollUp();
+            }
+
             if (InputManager.KeyPressed("Esc"))
             {
                 Back();
@@ -288,16 +296,13 @@ namespace DoS1.Menus
             TimeManager.Paused = false;
             SoundManager.AmbientPaused = false;
 
-            InputManager.Mouse.OnWheelUp -= ScrollUp;
-            InputManager.Mouse.OnWheelDown -= ScrollDown;
-
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
             MenuManager.ChangeMenu_Previous();
         }
 
-        private void ScrollDown(object sender, EventArgs e)
+        private void ScrollDown()
         {
             if (!Bottom)
             {
@@ -307,7 +312,7 @@ namespace DoS1.Menus
             }
         }
 
-        private void ScrollUp(object sender, EventArgs e)
+        private void ScrollUp()
         {
             Top -= (Main.Game.MenuSize.Y / 2);
             if (Top <= 0)
@@ -375,9 +380,6 @@ namespace DoS1.Menus
             Handler.ViewOnly_Squad = false;
             Handler.ViewOnly_Character = false;
             Handler.ViewOnly_Item = false;
-
-            InputManager.Mouse.OnWheelUp -= ScrollUp;
-            InputManager.Mouse.OnWheelDown -= ScrollDown;
 
             InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Squad");
@@ -463,9 +465,6 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                 new Region(0, 0, 0, 0), false);
 
-            InputManager.Mouse.OnWheelUp += ScrollUp;
-            InputManager.Mouse.OnWheelDown += ScrollDown;
-
             Resize(Main.Game.Resolution);
         }
 
@@ -516,7 +515,7 @@ namespace DoS1.Menus
                         }
                     }
 
-                    if (Y >= Main.Game.ScreenHeight - (Main.Game.MenuSize.Y * 2))
+                    if (Y >= Main.Game.ScreenHeight - (Main.Game.MenuSize.Y * 3))
                     {
                         GetPicture("Arrow_Down").Visible = true;
                         Bottom = false;

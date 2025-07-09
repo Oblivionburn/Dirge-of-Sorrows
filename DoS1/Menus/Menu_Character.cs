@@ -833,6 +833,9 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats", "Stats", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
 
             AddPicture(Handler.GetID(), "Character", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White, false);
 
@@ -968,14 +971,14 @@ namespace DoS1.Menus
             if (character != null)
             {
                 Picture char_pic = GetPicture("Character");
-                char_pic.Region = new Region(starting_X - (width * 8), starting_Y + (height * 2), (width * 4), (height * 6));
+                char_pic.Region = new Region(starting_X - (width * 8), starting_Y, (width * 4), (height * 6));
 
                 character.Region = new Region(char_pic.Region.X, char_pic.Region.Y, char_pic.Region.Width, char_pic.Region.Height);
                 character.Visible = true;
 
                 GetLabel("Name").Region = new Region(char_pic.Region.X, char_pic.Region.Y - height, char_pic.Region.Width, height);
 
-                float X = char_pic.Region.X + char_pic.Region.Width;
+                float X = char_pic.Region.X + char_pic.Region.Width + width;
                 float Y = char_pic.Region.Y + height;
 
                 GetPicture("Helm").Region = new Region(X, Y, width, height);
@@ -1020,6 +1023,128 @@ namespace DoS1.Menus
                     equip.Icon_Region = new Region(weapon.Region.X, weapon.Region.Y, weapon.Region.Width, weapon.Region.Height);
                     equip.Icon_Image = new Rectangle(0, 0, equip.Icon.Width, equip.Icon.Height);
                     equip.Icon_Visible = true;
+                }
+
+                Y = char_pic.Region.Y + char_pic.Region.Height + height;
+                GetLabel("Stats").Region = new Region(char_pic.Region.X, Y, (width * 6), height);
+                GetPicture("Stats_Underline").Region = new Region(char_pic.Region.X, Y + (height / 2), (width * 6), height);
+
+                Label stats = GetLabel("Stats_Properties");
+                stats.Region = new Region(char_pic.Region.X, Y + height, (width * 6), height);
+                stats.Text = "";
+
+                List<Something> Properties = new List<Something>();
+
+                //List defense properties
+                foreach (Item item in character.Inventory.Items)
+                {
+                    if (item.Type != "Weapon")
+                    {
+                        foreach (Something property in item.Properties)
+                        {
+                            if (!property.Name.Contains("Slots"))
+                            {
+                                Something existing_property = null;
+                                foreach (Something existing in Properties)
+                                {
+                                    if (existing.Name == property.Name)
+                                    {
+                                        existing_property = existing;
+                                        break;
+                                    }
+                                }
+
+                                if (existing_property == null)
+                                {
+                                    Properties.Add(new Something
+                                    {
+                                        Name = property.Name,
+                                        Value = property.Value
+                                    });
+                                }
+                                else
+                                {
+                                    existing_property.Value += property.Value;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //List damage properties
+                foreach (Item item in character.Inventory.Items)
+                {
+                    if (item.Type == "Weapon")
+                    {
+                        foreach (Something property in item.Properties)
+                        {
+                            if (!property.Name.Contains("Slots"))
+                            {
+                                Something existing_property = null;
+                                foreach (Something existing in Properties)
+                                {
+                                    if (existing.Name == property.Name)
+                                    {
+                                        existing_property = existing;
+                                        break;
+                                    }
+                                }
+
+                                if (existing_property == null)
+                                {
+                                    Properties.Add(new Something
+                                    {
+                                        Name = property.Name,
+                                        Value = property.Value
+                                    });
+                                }
+                                else
+                                {
+                                    existing_property.Value += property.Value;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < Properties.Count; i++)
+                {
+                    Something property = Properties[i];
+
+                    if (!property.Name.Contains("Cost"))
+                    {
+                        if (property.Name.Contains("Area") ||
+                            property.Name.Contains("Chance") ||
+                            property.Name.Contains("Drain") ||
+                            property.Name.Contains("Resist") ||
+                            property.Name.Contains("Haste") ||
+                            property.Name.Contains("Dodge") ||
+                            property.Name.Contains("Pierce") ||
+                            property.Name.Contains("Counter") ||
+                            property.Name.Contains("Disarm"))
+                        {
+                            stats.Text += property.Name + ": " + property.Value + "%";
+                        }
+                        else
+                        {
+                            stats.Text += property.Name + ": " + property.Value;
+                        }
+
+                        stats.Text += "\n";
+                        stats.Region.Height += (Main.Game.MenuSize.Y / 2);
+                    }
+                }
+
+                for (int i = 0; i < Properties.Count; i++)
+                {
+                    Something property = Properties[i];
+
+                    if (property.Name.Contains("Cost"))
+                    {
+                        stats.Text += property.Name + ": " + property.Value;
+                        break;
+                    }
                 }
             }
         }
