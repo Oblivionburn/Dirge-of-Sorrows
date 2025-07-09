@@ -31,7 +31,6 @@
 - Collecting gold from owned towns
 #
 ### Planned features not yet implemented:
-- Additional runes for combat
 - Character stat/xp/level progression
 - Saving/loading game state
 - Story/lore and tutorial
