@@ -76,12 +76,18 @@ namespace DoS1.Util
         {
             Main.Game.GameStarted = false;
 
+            Handler.ShopInventories.Clear();
+            Handler.TradingShop = null;
+            Handler.AcademyRecruits.Clear();
+            Handler.TradingAcademy = null;
             Handler.LocalMap = false;
             Handler.LocalPause = false;
             Handler.Gold = 1000;
 
             TimeManager.Paused = false;
             TimeManager.Interval = 0;
+
+            MenuManager.PreviousMenus.Clear();
 
             Toggle_MainMenu();
 
@@ -247,6 +253,60 @@ namespace DoS1.Util
             return result;
         }
 
+        public static Color Get_EffectColor(string effect_name)
+        {
+            if (effect_name == "Weak")
+            {
+                return new Color(86, 127, 93, 255);
+            }
+            else if (effect_name == "Cursed")
+            {
+                return new Color(0, 0, 0, 255);
+            }
+            else if (effect_name == "Melting")
+            {
+                return new Color(125, 115, 62, 255);
+            }
+            else if (effect_name == "Poisoned")
+            {
+                return new Color(0, 255, 0, 255);
+            }
+            else if (effect_name == "Petrified")
+            {
+                return new Color(125, 125, 125, 255);
+            }
+            else if (effect_name == "Burning")
+            {
+                return new Color(255, 0, 0, 255);
+            }
+            else if (effect_name == "Regenerating")
+            {
+                return new Color(255, 255, 255, 255);
+            }
+            else if (effect_name == "Charging")
+            {
+                return new Color(255, 255, 0, 255);
+            }
+            else if (effect_name == "Stunned")
+            {
+                return new Color(81, 68, 47, 255);
+            }
+            else if (effect_name == "Slow")
+            {
+                return new Color(255, 140, 20, 255);
+            }
+            else if (effect_name == "Frozen")
+            {
+                return new Color(0, 0, 255, 255);
+            }
+            else if (effect_name == "Shocked")
+            {
+                return new Color(0, 255, 255, 255);
+            }
+
+            return new Color(0, 0, 0, 0);
+        }
+
         public static void Alert_Combat(string attacker_name, string defender_name)
         {
             Handler.LocalPause = true;
@@ -365,6 +425,10 @@ namespace DoS1.Util
             {
                 message += " The enemy will no longer hold control over this region... it's ours now!";
             }
+            else if (is_base)
+            {
+                message += " This is our current base of operations. We could retreat inside to deploy again later.";
+            }
 
             message += "\"";
 
@@ -383,10 +447,20 @@ namespace DoS1.Util
 
             if (!captured_enemy_base)
             {
-                Button option1 = ui.GetButton("Dialogue_Option1");
-                option1.Text = "Enter Town";
-                option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
-                option1.Visible = true;
+                if (is_base)
+                {
+                    Button option1 = ui.GetButton("Dialogue_Option1");
+                    option1.Text = "Retreat";
+                    option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+                    option1.Visible = true;
+                }
+                else
+                {
+                    Button option1 = ui.GetButton("Dialogue_Option1");
+                    option1.Text = "Enter Town";
+                    option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+                    option1.Visible = true;
+                }
 
                 Button option2 = ui.GetButton("Dialogue_Option2");
                 option2.Text = "Move Out";

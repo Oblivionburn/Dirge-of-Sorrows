@@ -640,26 +640,26 @@ namespace DoS1.Util
             return target;
         }
 
-        public static int GetArmor_Resistance(Character character, string type)
+        public static int GetArmor_Resistance(Character character, string element)
         {
             int total = 0;
 
             Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
             if (helm != null)
             {
-                total += InventoryUtil.Get_TotalDefense(helm, type);
+                total += InventoryUtil.Get_TotalDefense(helm, element);
             }
 
             Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
             if (armor != null)
             {
-                total += InventoryUtil.Get_TotalDefense(armor, type);
+                total += InventoryUtil.Get_TotalDefense(armor, element);
             }
 
             Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
             if (shield != null)
             {
-                total += InventoryUtil.Get_TotalDefense(shield, type);
+                total += InventoryUtil.Get_TotalDefense(shield, element);
             }
 
             return total;
@@ -812,7 +812,19 @@ namespace DoS1.Util
         {
             int damage = InventoryUtil.Get_TotalDamage(weapon, element);
 
-            if (!RuneUtil.CounterWeapon(menu, attacker))
+            Something status_weak = attacker.GetStatusEffect("Weak");
+            if (status_weak != null)
+            {
+                damage /= 2;
+            }
+
+            Something status_slow = attacker.GetStatusEffect("Slow");
+            if (status_slow != null)
+            {
+                damage = 0;
+            }
+
+            if (!RuneUtil.CounterWeapon(menu, attacker, defender))
             {
                 //Reduce by defender's resistance
                 int resistance = GetArmor_Resistance(defender, element);
@@ -901,7 +913,7 @@ namespace DoS1.Util
                     defender.Dead = true;
                 }
 
-                RuneUtil.DrainWeapon(menu, attacker, weapon, element, damage);
+                RuneUtil.DrainWeapon(menu, attacker, defender, weapon, element, damage);
             }
             else
             {
@@ -923,6 +935,95 @@ namespace DoS1.Util
 
             RuneUtil.DrainArmor(menu, defender, weapon, element, damage);
             RuneUtil.DisarmArmor(menu, attacker, defender);
+            RuneUtil.StatusEffect(menu, defender, weapon, element, false);
+        }
+
+        public static void DoDamage_ForStatus(Menu menu, Character character, Something statusEffect, ref int ally_total_damage, ref int enemy_total_damage)
+        {
+            int damage = (int)statusEffect.Value;
+
+            if (statusEffect.Name == "Burning" &&
+                statusEffect.Amount > 0)
+            {
+                damage *= statusEffect.Amount;
+            }
+
+            Color damage_color = GameUtil.Get_EffectColor(statusEffect.Name);
+            statusEffect.DrawColor = damage_color;
+
+            AddEffect_Status(menu, character, statusEffect.Name);
+
+            if (damage > 0)
+            {
+                if (statusEffect.Name == "Regenerating" ||
+                    statusEffect.Name == "Charging")
+                {
+                    if (statusEffect.Name == "Regenerating")
+                    {
+                        character.HealthBar.Value += damage;
+                        if (character.HealthBar.Value > character.HealthBar.Max_Value)
+                        {
+                            character.HealthBar.Value = character.HealthBar.Max_Value;
+                        }
+                        character.HealthBar.Update();
+                    }
+                    else if (statusEffect.Name == "Charging")
+                    {
+                        character.ManaBar.Value += damage;
+                        if (character.ManaBar.Value > character.ManaBar.Max_Value)
+                        {
+                            character.ManaBar.Value = character.ManaBar.Max_Value;
+                        }
+                        character.ManaBar.Update();
+                    }
+
+                    menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", statusEffect.Name + "! (+" + damage.ToString() + ")", damage_color,
+                        new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
+                            character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), false);
+                }
+                else
+                {
+                    character.HealthBar.Value -= damage;
+                    if (character.HealthBar.Value < 0)
+                    {
+                        character.HealthBar.Value = 0;
+                    }
+                    character.HealthBar.Update();
+
+                    if (character.Type == "Ally")
+                    {
+                        enemy_total_damage += damage;
+                    }
+                    else if (character.Type == "Enemy")
+                    {
+                        ally_total_damage += damage;
+                    }
+
+                    menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", statusEffect.Name + "! (-" + damage.ToString() + ")", damage_color,
+                        new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
+                            character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), false);
+                }
+            }
+            else
+            {
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", statusEffect.Name + "!", damage_color,
+                    new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
+                        character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), false);
+            }
+
+            Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
+
+            character.StatusEffects.Add(new Something
+            {
+                ID = new_damage_label.ID,
+                Name = "Damage",
+                DrawColor = damage_color
+            });
+
+            if (character.HealthBar.Value <= 0)
+            {
+                character.Dead = true;
+            }
         }
 
         public static void DoDamage_Unarmed(Menu menu, Character defender, ref int ally_total_damage, ref int enemy_total_damage)
@@ -1136,6 +1237,56 @@ namespace DoS1.Util
                     AssetManager.PlaySound_Random("Siphon");
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["EP Drain"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+            }
+
+            Picture effect = Get_LastDamagePicture(menu);
+            effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
+        }
+
+        public static void AddEffect_Status(Menu menu, Character character, string status)
+        {
+            switch (status)
+            {
+                case "Poisoned":
+                    AssetManager.PlaySound_Random("Poison");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Poison"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "Burning":
+                    AssetManager.PlaySound_Random("Fire");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Fire"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "Regenerating":
+                case "Charging":
+                    AssetManager.PlaySound_Random("Heal");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Heal"],
+                        new Region(character.Region.X, character.Region.Y - (character.Region.Height / 3), character.Region.Width,
+                            character.Region.Height), Color.White, true);
+                    break;
+
+                case "Frozen":
+                    AssetManager.PlaySound_Random("Ice");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Ice"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "Shocked":
+                    AssetManager.PlaySound_Random("Shock");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
                             Color.White * 0.9f, true);
                     break;

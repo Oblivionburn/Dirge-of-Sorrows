@@ -107,11 +107,33 @@ namespace DoS1.Menus
                 {
                     foreach (Squad squad in army.Squads)
                     {
-                        foreach (Character character in squad.Characters)
+                        if (squad.Active)
                         {
-                            if (character.Visible)
+                            foreach (Character character in squad.Characters)
                             {
-                                CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
+                                if (character.Visible)
+                                {
+                                    Effect effect = AssetManager.Shaders["Grayscale"];
+                                    effect.Parameters["percent"].SetValue(0f);
+
+                                    spriteBatch.End();
+                                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, effect, null);
+
+                                    CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, Color.White);
+
+                                    spriteBatch.End();
+                                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (Character character in squad.Characters)
+                            {
+                                if (character.Visible)
+                                {
+                                    CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
+                                }
                             }
                         }
                     }
@@ -204,19 +226,21 @@ namespace DoS1.Menus
                                     highlight.Region = picture.Region;
                                     highlight.Visible = true;
 
-                                    if (InputManager.Mouse_RB_Pressed)
+                                    if (InputManager.Mouse_RB_Pressed) 
                                     {
                                         found = false;
-                                        SelectSquad(squad.ID);
+                                        SelectSquad(squad);
                                         break;
                                     }
                                     else if (InputManager.Mouse_LB_Pressed &&
-                                             i > 0 && //Prevent removing last squad
                                              !squad.Active) //Prevent removing deployed squad
                                     {
                                         SelectedSquad = squad.ID;
 
-                                        GetButton("Remove").Enabled = true;
+                                        if (i > 0) //Prevent removing last squad
+                                        {
+                                            GetButton("Remove").Enabled = true;
+                                        }
 
                                         if (Handler.LocalMap &&
                                             squad.Characters.Any())
@@ -371,15 +395,25 @@ namespace DoS1.Menus
             SelectedSquad = 0;
         }
 
-        private void SelectSquad(long id)
+        private void SelectSquad(Squad squad)
         {
             AssetManager.PlaySound_Random("Click");
 
-            Handler.Selected_Squad = id;
+            Handler.Selected_Squad = squad.ID;
 
-            Handler.ViewOnly_Squad = false;
-            Handler.ViewOnly_Character = false;
-            Handler.ViewOnly_Item = false;
+            if (squad.Active) 
+            {
+                //Prevent editing deployed squad
+                Handler.ViewOnly_Squad = true;
+                Handler.ViewOnly_Character = true;
+                Handler.ViewOnly_Item = true;
+            }
+            else
+            {
+                Handler.ViewOnly_Squad = false;
+                Handler.ViewOnly_Character = false;
+                Handler.ViewOnly_Item = false;
+            }
 
             InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Squad");

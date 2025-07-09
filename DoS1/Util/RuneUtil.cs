@@ -170,7 +170,7 @@ namespace DoS1.Util
             return total;
         }
 
-        public static bool CounterWeapon(Menu menu, Character attacker)
+        public static bool CounterWeapon(Menu menu, Character attacker, Character defender)
         {
             Item weapon = InventoryUtil.Get_EquippedItem(attacker, "Weapon");
             int counter_chance = CounterChance(weapon);
@@ -209,9 +209,11 @@ namespace DoS1.Util
                     DrawColor = new_damage_label.TextColor
                 });
 
+                StatusEffect(menu, defender, weapon, "Counter", false);
                 return true;
             }
 
+            StatusEffect(menu, defender, weapon, "Counter", false);
             return false;
         }
 
@@ -388,6 +390,10 @@ namespace DoS1.Util
                     CombatUtil.AddEffect(menu, defender, attacker_weapon, "Death");
                     CombatUtil.Kill(defender);
                 }
+                else
+                {
+                    StatusEffect(menu, defender, attacker_weapon, "Death", false);
+                }
             }
         }
 
@@ -426,6 +432,8 @@ namespace DoS1.Util
                     new Region(defender.Region.X - (defender.Region.Width / 8), defender.Region.Y - ((defender.Region.Width / 8) * 6),
                             defender.Region.Width + ((defender.Region.Width / 8) * 2), defender.Region.Width + ((defender.Region.Width / 8) * 2)), false);
             }
+
+            StatusEffect(menu, defender, attacker_weapon, element, false);
         }
 
         public static void DisarmArmor(Menu menu, Character attacker, Character defender)
@@ -572,7 +580,7 @@ namespace DoS1.Util
             return total;
         }
 
-        public static void DrainWeapon(Menu menu, Character attacker, Item weapon, string element, int damage)
+        public static void DrainWeapon(Menu menu, Character attacker, Character defender, Item weapon, string element, int damage)
         {
             if (weapon != null)
             {
@@ -583,6 +591,8 @@ namespace DoS1.Util
                     {
                         Health(menu, attacker, weapon, damage);
                     }
+
+                    StatusEffect(menu, defender, weapon, element, false);
                 }
             }
         }
@@ -646,6 +656,531 @@ namespace DoS1.Util
             }
 
             Energy(menu, defender, weapon, armor_drain_level);
+        }
+
+        public static bool ApplyStatus(Item weapon, string element)
+        {
+            int status_chance = 0;
+
+            if (weapon != null)
+            {
+                for (int i = 0; i < weapon.Attachments.Count; i++)
+                {
+                    Item rune = weapon.Attachments[i];
+
+                    if (rune.Categories.Contains(element))
+                    {
+                        Item paired_rune = InventoryUtil.GetPairedRune(weapon, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == "Effect")
+                        {
+                            Something level = paired_rune.GetProperty("Level Value");
+                            if (level != null)
+                            {
+                                status_chance += (int)level.Value * 10;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (status_chance > 0 &&
+                Main.Game.Debugging)
+            {
+                return true;
+            }
+
+            if (Utility.RandomPercent(status_chance))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ResistStatus(Item armor, string element)
+        {
+            int resist_chance = 0;
+
+            if (armor != null)
+            {
+                for (int i = 0; i < armor.Attachments.Count; i++)
+                {
+                    Item rune = armor.Attachments[i];
+
+                    if (rune.Categories.Contains(element))
+                    {
+                        Item paired_rune = InventoryUtil.GetPairedRune(armor, rune);
+                        if (paired_rune != null &&
+                            paired_rune.Categories[0] == "Effect")
+                        {
+                            Something level = paired_rune.GetProperty("Level Value");
+                            if (level != null)
+                            {
+                                resist_chance += (int)level.Value * 10;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (Utility.RandomPercent(resist_chance))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void StatusEffect(Menu menu, Character defender, Item weapon, string element, bool defense_only)
+        {
+            if (weapon != null)
+            {
+                for (int i = 0; i < weapon.Attachments.Count; i++)
+                {
+                    Item rune = weapon.Attachments[i];
+                    if (rune.Categories[0] == element)
+                    {
+                        bool apply = false;
+                        if (defense_only)
+                        {
+                            if (element == "Health" ||
+                                element == "Energy")
+                            {
+                                apply = true;
+                            }
+                        }
+                        else
+                        {
+                            if (element != "Health" &&
+                                element != "Energy")
+                            {
+                                apply = true;
+                            }
+                        }
+
+                        if (apply)
+                        {
+                            if (ApplyStatus(weapon, element))
+                            {
+                                bool resisted = false;
+
+                                Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
+                                if (helm != null)
+                                {
+                                    resisted = ResistStatus(helm, element);
+                                }
+
+                                Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
+                                if (armor != null)
+                                {
+                                    resisted = ResistStatus(armor, element);
+                                }
+
+                                Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
+                                if (shield != null)
+                                {
+                                    resisted = ResistStatus(shield, element);
+                                }
+
+                                if (!resisted)
+                                {
+                                    string status_name = "";
+
+                                    if (rune.Categories.Contains("Counter"))
+                                    {
+                                        #region Weak
+
+                                        status_name = "Weak";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                existing.Amount += 3;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 3
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Death"))
+                                    {
+                                        #region Cursed
+
+                                        status_name = "Cursed";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Disarm"))
+                                    {
+                                        #region Melting
+
+                                        status_name = "Melting";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                existing.Amount += 3;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 3
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Drain"))
+                                    {
+                                        #region Poisoned
+
+                                        status_name = "Poisoned";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                existing.Value += 2;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Value = 2
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Earth"))
+                                    {
+                                        #region Petrified
+
+                                        status_name = "Petrified";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Fire"))
+                                    {
+                                        #region Burning
+
+                                        status_name = "Burning";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                existing.Amount += 4;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 4,
+                                                Value = 2
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Health"))
+                                    {
+                                        #region Regenerating
+
+                                        status_name = "Regenerating";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+
+                                                existing.Amount += 5;
+                                                if (existing.Amount > 5)
+                                                {
+                                                    existing.Amount = 5;
+                                                }
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 5,
+                                                Value = 20
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Energy"))
+                                    {
+                                        #region Charging
+
+                                        status_name = "Charging";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+
+                                                existing.Amount += 5;
+                                                if (existing.Amount > 5)
+                                                {
+                                                    existing.Amount = 5;
+                                                }
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 5,
+                                                Value = 20
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Physical"))
+                                    {
+                                        #region Stunned
+
+                                        status_name = "Stunned";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                existing.Amount += 1;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 1
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Time"))
+                                    {
+                                        #region Slow
+
+                                        status_name = "Slow";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+
+                                                existing.Amount += 5;
+                                                if (existing.Amount > 5)
+                                                {
+                                                    existing.Amount = 5;
+                                                }
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 5
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Ice"))
+                                    {
+                                        #region Frozen
+
+                                        status_name = "Frozen";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+
+                                                existing.Amount += 4;
+                                                if (existing.Amount > 4)
+                                                {
+                                                    existing.Amount = 4;
+                                                }
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 4,
+                                                Value = 5
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+                                    else if (rune.Categories.Contains("Lightning"))
+                                    {
+                                        #region Shocked
+
+                                        status_name = "Shocked";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+
+                                                existing.Amount += 2;
+                                                if (existing.Amount > 2)
+                                                {
+                                                    existing.Amount = 2;
+                                                }
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Amount = 2,
+                                                Value = 10
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
+
+                                    if (!string.IsNullOrEmpty(status_name))
+                                    {
+                                        Color damage_color = GameUtil.Get_EffectColor(status_name);
+
+                                        menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "+" + status_name, damage_color,
+                                            new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
+                                                defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public static void Health(Menu menu, Character character, Item weapon, int heal)

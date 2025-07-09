@@ -155,6 +155,7 @@ namespace DoS1
             AssetManager.Files.Add("Save", Environment.CurrentDirectory + @"\save.dat");
 
             AssetManager.LoadFonts();
+            AssetManager.LoadShaders(Main.Game.GraphicsManager.GraphicsDevice);
 
             //Textures
             string[] textures =

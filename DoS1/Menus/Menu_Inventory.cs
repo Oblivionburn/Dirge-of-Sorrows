@@ -374,13 +374,37 @@ namespace DoS1.Menus
                     }
                 }
 
-                //List non-damage properties last
+                //List non-damage properties
                 for (int i = 0; i < item.Properties.Count; i++)
                 {
                     Something property = item.Properties[i];
-                    if (!property.Name.Contains("Damage"))
+                    if (!property.Name.Contains("Damage") &&
+                        !property.Name.Contains("Slots") &&
+                        !property.Name.Contains("Cost"))
                     {
                         properties.Add(property);
+                    }
+                }
+
+                //List slots
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (property.Name.Contains("Slots"))
+                    {
+                        properties.Add(property);
+                        break;
+                    }
+                }
+
+                //List cost last
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (property.Name.Contains("Cost"))
+                    {
+                        properties.Add(property);
+                        break;
                     }
                 }
 
@@ -390,6 +414,7 @@ namespace DoS1.Menus
 
                     if (property.Name.Contains("Area") ||
                         property.Name.Contains("Chance") ||
+                        property.Name.Contains("Status") ||
                         property.Name.Contains("Drain") ||
                         property.Name.Contains("Resist") ||
                         property.Name.Contains("Haste") ||
@@ -428,13 +453,37 @@ namespace DoS1.Menus
                     }
                 }
 
-                //List non-defense properties last
+                //List non-defense properties
                 for (int i = 0; i < item.Properties.Count; i++)
                 {
                     Something property = item.Properties[i];
-                    if (!property.Name.Contains("Defense"))
+                    if (!property.Name.Contains("Defense") &&
+                        !property.Name.Contains("Slots") &&
+                        !property.Name.Contains("Cost"))
                     {
                         properties.Add(property);
+                    }
+                }
+
+                //List slots
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (property.Name.Contains("Slots"))
+                    {
+                        properties.Add(property);
+                        break;
+                    }
+                }
+
+                //List cost last
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (property.Name.Contains("Cost"))
+                    {
+                        properties.Add(property);
+                        break;
                     }
                 }
 
@@ -444,6 +493,7 @@ namespace DoS1.Menus
 
                     if (property.Name.Contains("Area") ||
                         property.Name.Contains("Chance") ||
+                        property.Name.Contains("Status") ||
                         property.Name.Contains("Drain") ||
                         property.Name.Contains("Resist") ||
                         property.Name.Contains("Haste") ||

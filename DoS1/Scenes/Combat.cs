@@ -42,6 +42,7 @@ namespace DoS1.Scenes
         private List<Character> counter_attackers = new List<Character>();
         private Character initial_attacker = null;
         private bool counter_attacking = false;
+        private bool skip_turn = false;
 
         private float base_move_speed = 0;
         private float move_speed = 0;
@@ -52,7 +53,7 @@ namespace DoS1.Scenes
         private readonly int label_speed = 4;
 
         private bool paused = false;
-        private string combat_state = "GetTargets";
+        private string combat_state = "StatusEffects";
 
         private int ally_total_damage;
         private int enemy_total_damage;
@@ -369,7 +370,120 @@ namespace DoS1.Scenes
 
                             switch (combat_state)
                             {
+                                case "StatusEffects":
+                                    #region StatusEffects
+
+                                    if (current_character.StatusEffects.Any())
+                                    {
+                                        for (int i = 0; i < current_character.StatusEffects.Count; i++)
+                                        {
+                                            Something statusEffect = current_character.StatusEffects[i];
+                                            if (statusEffect.Name != "Damage")
+                                            {
+                                                if (statusEffect.Name == "Petrified" ||
+                                                    statusEffect.Name == "Stunned" ||
+                                                    statusEffect.Name == "Frozen" ||
+                                                    statusEffect.Name == "Shocked")
+                                                {
+                                                    skip_turn = true;
+                                                }
+
+                                                CombatUtil.DoDamage_ForStatus(Menu, current_character, statusEffect, ref ally_total_damage, ref enemy_total_damage);
+
+                                                if (statusEffect.Name == "Weak" ||
+                                                    statusEffect.Name == "Melting" ||
+                                                    statusEffect.Name == "Burning" ||
+                                                    statusEffect.Name == "Regenerating" ||
+                                                    statusEffect.Name == "Charging" ||
+                                                    statusEffect.Name == "Stunned" ||
+                                                    statusEffect.Name == "Slow" ||
+                                                    statusEffect.Name == "Frozen" ||
+                                                    statusEffect.Name == "Shocked")
+                                                {
+                                                    statusEffect.Amount--;
+                                                    if (statusEffect.Amount <= 0)
+                                                    {
+                                                        current_character.StatusEffects.Remove(statusEffect);
+                                                        i--;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        combat_state = "AnimateStatusEffects";
+                                    }
+                                    else
+                                    {
+                                        combat_state = "GetTargets";
+                                    }
+
+                                    #endregion
+                                    break;
+
+                                case "AnimateStatusEffects":
+                                    #region AnimateStatusEffects
+
+                                    if (DamageEffectExists())
+                                    {
+                                        if (effect_frame >= animation_speed * 4)
+                                        {
+                                            ClearDamageEffects();
+                                            effect_frame = 0;
+                                            combat_state = "AnimateStatusDamageLabels";
+                                        }
+                                        else if (effect_frame % animation_speed == 0)
+                                        {
+                                            AnimateDamageEffects();
+                                            effect_frame += Main.CombatSpeed;
+                                        }
+                                        else
+                                        {
+                                            effect_frame += Main.CombatSpeed;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        combat_state = "AnimateStatusDamageLabels";
+                                    }
+
+                                    #endregion
+                                    break;
+
+                                case "AnimateStatusDamageLabels":
+                                    #region AnimateStatusDamageLabels
+
+                                    if (DamageLabelExists())
+                                    {
+                                        if (effect_frame % label_speed == 0)
+                                        {
+                                            AnimateDamageLabels();
+                                            effect_frame += Main.CombatSpeed;
+                                        }
+                                        else
+                                        {
+                                            effect_frame += Main.CombatSpeed;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        effect_frame = 0;
+
+                                        if (skip_turn)
+                                        {
+                                            combat_state = "Finish";
+                                        }
+                                        else
+                                        {
+                                            combat_state = "GetTargets";
+                                        }
+                                    }
+
+                                    #endregion
+                                    break;
+
                                 case "GetTargets":
+                                    #region GetTargets
+
                                     bool can_attack = true;
 
                                     ep_cost = InventoryUtil.Get_EP_Cost(current_character);
@@ -427,9 +541,13 @@ namespace DoS1.Scenes
                                     {
                                         combat_state = "Finish";
                                     }
+
+                                    #endregion
                                     break;
 
                                 case "MoveForward":
+                                    #region MoveForward
+
                                     if (CombatUtil.AtTile(current_character, target_tile, move_speed))
                                     {
                                         combat_state = "Attack";
@@ -438,9 +556,13 @@ namespace DoS1.Scenes
                                     {
                                         CombatUtil.MoveForward(current_character, move_speed);
                                     }
+
+                                    #endregion
                                     break;
 
                                 case "Attack":
+                                    #region Attack
+
                                     if (character_frame % animation_speed == 0)
                                     {
                                         CharacterUtil.Animate(current_character);
@@ -466,9 +588,12 @@ namespace DoS1.Scenes
                                         character_frame += Main.CombatSpeed;
                                     }
 
+                                    #endregion
                                     break;
 
                                 case "AnimateDamageEffects":
+                                    #region AnimateDamageEffects
+
                                     if (target_squad == null)
                                     {
                                         ClearDamageEffects();
@@ -500,10 +625,13 @@ namespace DoS1.Scenes
                                             combat_state = "AnimateDamageLabels";
                                         }
                                     }
-                                        
+
+                                    #endregion
                                     break;
 
                                 case "AnimateDamageLabels":
+                                    #region AnimateDamageLabels
+
                                     if (target_squad == null)
                                     {
                                         ClearDamageLabels();
@@ -530,10 +658,13 @@ namespace DoS1.Scenes
                                             combat_state = "EndAttack";
                                         }
                                     }
-                                    
+
+                                    #endregion
                                     break;
 
                                 case "EndAttack":
+                                    #region EndAttack
+
                                     RemoveDamageStatusEffects();
 
                                     if (target_squad == null)
@@ -563,9 +694,13 @@ namespace DoS1.Scenes
                                             combat_state = "MoveBackward";
                                         }
                                     }
+
+                                    #endregion
                                     break;
 
                                 case "MoveBackward":
+                                    #region MoveBackward
+
                                     if (CombatUtil.AtTile(current_character, origin_tile, move_speed))
                                     {
                                         combat_state = "Finish";
@@ -574,6 +709,8 @@ namespace DoS1.Scenes
                                     {
                                         CombatUtil.MoveBack(current_character, move_speed);
                                     }
+
+                                    #endregion
                                     break;
 
                                 case "Finish":
@@ -706,6 +843,34 @@ namespace DoS1.Scenes
                     foreach (Character character in enemy_squad.Characters)
                     {
                         RuneUtil.Health(Menu, character, weapon, hp);
+
+                        //Remove negative status effects
+                        for (int i = 0; i < character.StatusEffects.Count; i++)
+                        {
+                            Something statusEffect = character.StatusEffects[i];
+
+                            if (statusEffect.Name == "Weak" ||
+                                statusEffect.Name == "Cursed" ||
+                                statusEffect.Name == "Melting" ||
+                                statusEffect.Name == "Poisoned" ||
+                                statusEffect.Name == "Petrified" ||
+                                statusEffect.Name == "Burning" ||
+                                statusEffect.Name == "Stunned" ||
+                                statusEffect.Name == "Slow" ||
+                                statusEffect.Name == "Frozen" ||
+                                statusEffect.Name == "Shocked")
+                            {
+                                character.StatusEffects.Remove(statusEffect);
+
+                                Menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "-" + statusEffect.Name, Color.White,
+                                    new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
+                                        character.Region.Width / 2, character.Region.Width / 2), false);
+
+                                i--;
+                            }
+                        }
+
+                        RuneUtil.StatusEffect(Menu, character, weapon, "Health", true);
                     }
                 }
                 else
@@ -713,6 +878,34 @@ namespace DoS1.Scenes
                     foreach (Character character in ally_squad.Characters)
                     {
                         RuneUtil.Health(Menu, character, weapon, hp);
+
+                        //Remove negative status effects
+                        for (int i = 0; i < character.StatusEffects.Count; i++)
+                        {
+                            Something statusEffect = character.StatusEffects[i];
+
+                            if (statusEffect.Name == "Weak" ||
+                                statusEffect.Name == "Cursed" ||
+                                statusEffect.Name == "Melting" ||
+                                statusEffect.Name == "Poisoned" ||
+                                statusEffect.Name == "Petrified" ||
+                                statusEffect.Name == "Burning" ||
+                                statusEffect.Name == "Stunned" ||
+                                statusEffect.Name == "Slow" ||
+                                statusEffect.Name == "Frozen" ||
+                                statusEffect.Name == "Shocked")
+                            {
+                                character.StatusEffects.Remove(statusEffect);
+
+                                Menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "-" + statusEffect.Name, Color.White,
+                                    new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
+                                        character.Region.Width / 2, character.Region.Width / 2), false);
+
+                                i--;
+                            }
+                        }
+
+                        RuneUtil.StatusEffect(Menu, character, weapon, "Health", true);
                     }
                 }
             }
@@ -743,11 +936,39 @@ namespace DoS1.Scenes
                 {
                     int hp = InventoryUtil.Get_Item_Element_Level(weapon, "Health") * Handler.Element_Multiplier;
                     RuneUtil.Health(Menu, target, weapon, hp);
+
+                    //Remove negative status effects
+                    for (int i = 0; i < target.StatusEffects.Count; i++)
+                    {
+                        Something statusEffect = target.StatusEffects[i];
+
+                        if (statusEffect.Name == "Weak" ||
+                            statusEffect.Name == "Cursed" ||
+                            statusEffect.Name == "Melting" ||
+                            statusEffect.Name == "Poisoned" ||
+                            statusEffect.Name == "Petrified" ||
+                            statusEffect.Name == "Burning" ||
+                            statusEffect.Name == "Stunned" ||
+                            statusEffect.Name == "Slow" ||
+                            statusEffect.Name == "Frozen" ||
+                            statusEffect.Name == "Shocked")
+                        {
+                            target.StatusEffects.Remove(statusEffect);
+
+                            Menu.AddLabel(AssetManager.Fonts["ControlFont"], target.ID, "Damage", "-" + statusEffect.Name, Color.White,
+                                new Region(target.Region.X + (target.Region.Width / 4), target.Region.Y - ((target.Region.Width / 8) * 3),
+                                    target.Region.Width / 2, target.Region.Width / 2), false);
+
+                            i--;
+                        }
+                    }
+
+                    RuneUtil.StatusEffect(Menu, target, weapon, "Health", true);
                 }
             }
 
             if (InventoryUtil.Item_HasArea_ForElement(weapon, "Energy") &&
-                RuneUtil.ApplyArea(weapon, "Health"))
+                RuneUtil.ApplyArea(weapon, "Energy"))
             {
                 //Full party heal EP
                 int ep = RuneUtil.Area_PairedLevel(weapon, "Energy");
@@ -756,6 +977,7 @@ namespace DoS1.Scenes
                     foreach (Character character in enemy_squad.Characters)
                     {
                         RuneUtil.Energy(Menu, character, weapon, ep);
+                        RuneUtil.StatusEffect(Menu, character, weapon, "Energy", true);
                     }
                 }
                 else
@@ -763,6 +985,7 @@ namespace DoS1.Scenes
                     foreach (Character character in ally_squad.Characters)
                     {
                         RuneUtil.Energy(Menu, character, weapon, ep);
+                        RuneUtil.StatusEffect(Menu, character, weapon, "Energy", true);
                     }
                 }
             }
@@ -793,6 +1016,7 @@ namespace DoS1.Scenes
                 {
                     int ep = InventoryUtil.Get_Item_Element_Level(weapon, "Energy") * Handler.Element_Multiplier;
                     RuneUtil.Energy(Menu, target, weapon, ep);
+                    RuneUtil.StatusEffect(Menu, target, weapon, "Energy", true);
                 }
             }
         }
@@ -824,7 +1048,7 @@ namespace DoS1.Scenes
                         {
                             RuneUtil.DisarmWeapon(Menu, current_character, target, weapon);
 
-                            string[] elements = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
+                            string[] elements = { "Earth", "Fire", "Physical", "Ice", "Lightning" };
 
                             for (int i = 0; i < elements.Length; i++)
                             {
@@ -834,6 +1058,11 @@ namespace DoS1.Scenes
                                 {
                                     CombatUtil.DoDamage_ForElement(Menu, current_character, target, weapon, element, ref ally_total_damage, ref enemy_total_damage);
                                 }
+                            }
+
+                            if (InventoryUtil.Item_HasElement(weapon, "Time"))
+                            {
+                                RuneUtil.StatusEffect(Menu, target, weapon, "Time", false);
                             }
 
                             if (target.Dead)
@@ -848,7 +1077,7 @@ namespace DoS1.Scenes
                                     hero_killed = true;
                                     break;
                                 }
-                                else
+                                else if (target.Type == "Ally")
                                 {
                                     foreach (Character character in enemy_squad.Characters)
                                     {
@@ -896,7 +1125,7 @@ namespace DoS1.Scenes
                                         hero_killed = true;
                                         break;
                                     }
-                                    else
+                                    else if (target.Type == "Ally")
                                     {
                                         foreach (Character character in enemy_squad.Characters)
                                         {
@@ -970,7 +1199,7 @@ namespace DoS1.Scenes
                                                     hero_killed = true;
                                                     break;
                                                 }
-                                                else
+                                                else if (target.Type == "Ally")
                                                 {
                                                     foreach (Character character in enemy_squad.Characters)
                                                     {
@@ -1343,7 +1572,8 @@ namespace DoS1.Scenes
 
         private void ResetCombat()
         {
-            combat_state = "GetTargets";
+            skip_turn = false;
+            combat_state = "StatusEffects";
             character_frame = 0;
             effect_frame = 0;
             attack_type = "";
@@ -1394,10 +1624,60 @@ namespace DoS1.Scenes
             {
                 CharacterManager.GetArmy("Ally").Squads.Remove(ally_squad);
             }
+            else
+            {
+                foreach (Character character in ally_squad.Characters)
+                {
+                    for (int i = 0; i < character.StatusEffects.Count; i++)
+                    {
+                        Something statusEffect = character.StatusEffects[i];
+
+                        if (statusEffect.Name == "Weak" ||
+                            statusEffect.Name == "Melting" ||
+                            statusEffect.Name == "Poisoned" ||
+                            statusEffect.Name == "Burning" ||
+                            statusEffect.Name == "Regenerating" ||
+                            statusEffect.Name == "Charging" ||
+                            statusEffect.Name == "Stunned" ||
+                            statusEffect.Name == "Slow" ||
+                            statusEffect.Name == "Frozen" ||
+                            statusEffect.Name == "Shocked")
+                        {
+                            character.StatusEffects.Remove(statusEffect);
+                            i--;
+                        }
+                    }
+                }
+            }
 
             if (!enemy_squad.Characters.Any())
             {
                 CharacterManager.GetArmy("Enemy").Squads.Remove(enemy_squad);
+            }
+            else
+            {
+                foreach (Character character in enemy_squad.Characters)
+                {
+                    for (int i = 0; i < character.StatusEffects.Count; i++)
+                    {
+                        Something statusEffect = character.StatusEffects[i];
+
+                        if (statusEffect.Name == "Weak" ||
+                            statusEffect.Name == "Melting" ||
+                            statusEffect.Name == "Poisoned" ||
+                            statusEffect.Name == "Burning" ||
+                            statusEffect.Name == "Regenerating" ||
+                            statusEffect.Name == "Charging" ||
+                            statusEffect.Name == "Stunned" ||
+                            statusEffect.Name == "Slow" ||
+                            statusEffect.Name == "Frozen" ||
+                            statusEffect.Name == "Shocked")
+                        {
+                            character.StatusEffects.Remove(statusEffect);
+                            i--;
+                        }
+                    }
+                }
             }
 
             Button button = Menu.GetButton("Result");

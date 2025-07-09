@@ -732,6 +732,8 @@ namespace DoS1.Util
                 string element = rune.Categories[0];
                 string effect = "";
 
+                #region Get_Effect
+
                 if (Element_IsDamage(element))
                 {
                     if (IsWeapon(item))
@@ -807,9 +809,157 @@ namespace DoS1.Util
                         effect = "When Hit";
                     }
                 }
+                else if (element == "Effect")
+                {
+                    #region Status Effects
+
+                    Item paired_rune = GetPairedRune(item, rune);
+                    if (paired_rune != null)
+                    {
+                        if (paired_rune.Name.Contains("Counter"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Weak Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Weak Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Death"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Cursed Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Cursed Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Disarm"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Melting Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Melting Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Drain"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Poisoned Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Poisoned Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Earth"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Petrified Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Petrified Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Fire"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Burning Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Burning Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Health"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Regenerating Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Regenerating Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Energy"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Charging Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Charging Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Physical"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Stunned Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Stunned Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Time"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Slow Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Slow Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Ice"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Frozen Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Frozen Status";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Lightning"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Apply Shocked Status";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Shocked Status";
+                            }
+                        }
+                    }
+
+                    #endregion
+                }
+
+                #endregion
+
+                #region Update Value
 
                 Something level = rune.GetProperty("Level Value");
 
+                //Check for existing property
                 Something property = item.GetProperty(element + " " + effect);
                 if (property != null)
                 {
@@ -851,6 +1001,7 @@ namespace DoS1.Util
                 }
                 else
                 {
+                    //Else add new property
                     if (element == "Area")
                     {
                         item.Properties.Add(new Something
@@ -924,6 +1075,16 @@ namespace DoS1.Util
                             Value = level.Value
                         });
                     }
+                    else if (element == "Effect")
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = effect,
+                            Type = element,
+                            Assignment = effect,
+                            Value = level.Value * 10
+                        });
+                    }
                     else
                     {
                         item.Properties.Add(new Something
@@ -935,6 +1096,10 @@ namespace DoS1.Util
                         });
                     }
                 }
+
+                #endregion
+
+                #region Update Cost
 
                 if (cost != null)
                 {
@@ -951,8 +1116,10 @@ namespace DoS1.Util
                     });
                 }
 
+                #endregion
+
                 //Increase price per rune
-                item.Buy_Price += GetBasePrice(item);
+                item.Buy_Price += rune.Buy_Price;
             }
         }
 
@@ -1033,7 +1200,7 @@ namespace DoS1.Util
                             break;
 
                         case "Effect":
-                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to apply paired Status\nOn Armor: " + (level.Value * 10) + "% chance to resist paired Status";
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to apply paired Status\nOn Armor: " + (level.Value * 10) + "% chance to resist paired Status\nStatus: None";
                             break;
 
                         case "Fire":
@@ -1253,7 +1420,7 @@ namespace DoS1.Util
                 max_tier = 10;
             }
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 40; i++)
             {
                 #region Helms
 
@@ -1523,7 +1690,7 @@ namespace DoS1.Util
                 #region Runes
 
                 random = new CryptoRandom();
-                int rune_choice = random.Next(0, 13);
+                int rune_choice = random.Next(0, 14);
                 switch (rune_choice)
                 {
                     case 0:
@@ -1771,7 +1938,7 @@ namespace DoS1.Util
             return total;
         }
 
-        public static Item GetPairedRune(Item item, Item area_rune)
+        public static Item GetPairedRune(Item item, Item rune_original)
         {
             Something slots = item.GetProperty("Rune Slots");
             if (slots != null)
@@ -1782,7 +1949,7 @@ namespace DoS1.Util
                     {
                         Item rune = item.Attachments[a];
                         if (rune.Location.X == s &&
-                            rune.ID == area_rune.ID)
+                            rune.ID == rune_original.ID)
                         {
                             if (s % 2 == 0)
                             {

@@ -107,9 +107,7 @@ namespace DoS1.Menus
                     {
                         foreach (Item item in selectedItem.Attachments)
                         {
-                            if (item.Icon_Visible &&
-                                (movingItem == null ||
-                                 item.ID != movingItem.ID))
+                            if (item.Icon_Visible)
                             {
                                 item.Draw(spriteBatch, Main.Game.Resolution, Color.White);
                             }
@@ -125,20 +123,16 @@ namespace DoS1.Menus
                     }
                 }
 
-                if (selectedItem != null)
+                foreach (Button button in Buttons)
                 {
-                    if (selectedItem.Attachments != null)
+                    button.Draw(spriteBatch);
+                }
+
+                foreach (Label label in Labels)
+                {
+                    if (label.Name != "Examine")
                     {
-                        foreach (Item item in selectedItem.Attachments)
-                        {
-                            if (item.Icon_Visible &&
-                                movingItem != null &&
-                                item.ID == movingItem.ID)
-                            {
-                                item.Draw(spriteBatch, Main.Game.Resolution, Color.White);
-                                break;
-                            }
-                        }
+                        label.Draw(spriteBatch);
                     }
                 }
 
@@ -154,14 +148,18 @@ namespace DoS1.Menus
                     }
                 }
 
-                foreach (Button button in Buttons)
-                {
-                    button.Draw(spriteBatch);
-                }
-
                 foreach (Label label in Labels)
                 {
-                    label.Draw(spriteBatch);
+                    if (label.Name == "Examine")
+                    {
+                        label.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                if (movingItem != null)
+                {
+                    movingItem.Draw(spriteBatch, Main.Game.Resolution, Color.White);
                 }
             }
         }
@@ -434,14 +432,13 @@ namespace DoS1.Menus
                         {
                             reset = false;
                             Attach(movingItem);
-                            movingItem.Location.X = slot;
                             movingItem = null;
                         }
                     }
 
                     if (reset)
                     {
-                        movingItem.Icon_Region = new Region(starting_pos.X, starting_pos.Y, starting_pos.Width, starting_pos.Height);
+                        movingItem = null;
                     }
 
                     Filter("Runes");
@@ -466,6 +463,8 @@ namespace DoS1.Menus
 
                 inventory.Items.Remove(item);
                 selectedItem.Attachments.Add(item);
+
+                movingItem.Location.X = slot;
 
                 InventoryUtil.UpdateItem(selectedItem);
             }
@@ -765,14 +764,26 @@ namespace DoS1.Menus
                         }
                     }
 
-                    //List non-damage properties last
+                    //List non-damage properties
                     for (int i = 0; i < selectedItem.Properties.Count; i++)
                     {
                         Something property = selectedItem.Properties[i];
                         if (!property.Name.Contains("Damage") &&
-                            !property.Name.Contains("Slots"))
+                            !property.Name.Contains("Slots") &&
+                            !property.Name.Contains("Cost"))
                         {
                             properties.Add(property);
+                        }
+                    }
+
+                    //List cost last
+                    for (int i = 0; i < selectedItem.Properties.Count; i++)
+                    {
+                        Something property = selectedItem.Properties[i];
+                        if (property.Name.Contains("Cost"))
+                        {
+                            properties.Add(property);
+                            break;
                         }
                     }
 
@@ -782,6 +793,7 @@ namespace DoS1.Menus
 
                         if (property.Name.Contains("Area") ||
                             property.Name.Contains("Chance") ||
+                            property.Name.Contains("Status") ||
                             property.Name.Contains("Drain") ||
                             property.Name.Contains("Resist") ||
                             property.Name.Contains("Haste") ||
@@ -820,14 +832,26 @@ namespace DoS1.Menus
                         }
                     }
 
-                    //List non-defense properties last
+                    //List non-defense properties
                     for (int i = 0; i < selectedItem.Properties.Count; i++)
                     {
                         Something property = selectedItem.Properties[i];
                         if (!property.Name.Contains("Defense") &&
-                            !property.Name.Contains("Slots"))
+                            !property.Name.Contains("Slots") &&
+                            !property.Name.Contains("Cost"))
                         {
                             properties.Add(property);
+                        }
+                    }
+
+                    //List cost last
+                    for (int i = 0; i < selectedItem.Properties.Count; i++)
+                    {
+                        Something property = selectedItem.Properties[i];
+                        if (property.Name.Contains("Cost"))
+                        {
+                            properties.Add(property);
+                            break;
                         }
                     }
 
@@ -837,6 +861,7 @@ namespace DoS1.Menus
 
                         if (property.Name.Contains("Area") ||
                             property.Name.Contains("Chance") ||
+                            property.Name.Contains("Status") ||
                             property.Name.Contains("Drain") ||
                             property.Name.Contains("Resist") ||
                             property.Name.Contains("Haste") ||
@@ -1190,15 +1215,17 @@ namespace DoS1.Menus
 
         public override void Load()
         {
-            if (!Handler.ViewOnly_Item)
+            if (Handler.ViewOnly_Item)
+            {
+                ClearGrid();
+                GetLabel("Runes").Visible = false;
+            }
+            else
             {
                 LoadGrid();
                 Filter("Runes");
                 ResizeInventory();
-            }
-            else
-            {
-                ClearGrid();
+                GetLabel("Runes").Visible = true;
             }
 
             ResizeSlots();

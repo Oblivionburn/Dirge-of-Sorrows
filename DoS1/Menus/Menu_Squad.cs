@@ -740,7 +740,7 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
-            if (Handler.ViewOnly_Squad)
+            if (MenuManager.PreviousMenus.Count < 3)
             {
                 GameUtil.Toggle_Pause(false);
             }
@@ -806,7 +806,7 @@ namespace DoS1.Menus
             });
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name_Squad", "", Color.White, new Region(0, 0, 0, 0), true);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name_Reserves", "Reserves", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name_Reserves", "Reserves", Color.White, new Region(0, 0, 0, 0), false);
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
@@ -971,7 +971,7 @@ namespace DoS1.Menus
             {
                 Label name_squad = GetLabel("Name_Squad");
                 name_squad.Region = new Region(starting_X, starting_Y - (height / 2), width * 3, (height / 2));
-                name_squad.Text = squad.Name;
+                name_squad.Text = squad.Name + " Squad";
 
                 for (int y = 0; y < 3; y++)
                 {
@@ -1060,6 +1060,7 @@ namespace DoS1.Menus
                 }
             }
 
+            GetLabel("Name_Reserves").Visible = false;
             ReserveList.Clear();
 
             for (int y = 0; y < 10; y++)
@@ -1091,7 +1092,9 @@ namespace DoS1.Menus
             ClearGrid();
             ResetGridPos();
 
-            GetLabel("Name_Reserves").Region = new Region(starting_grid_X, starting_grid_Y - grid_height, grid_width * 10, grid_height);
+            Label reserves = GetLabel("Name_Reserves");
+            reserves.Region = new Region(starting_grid_X, starting_grid_Y - grid_height, grid_width * 10, grid_height);
+            reserves.Visible = true;
 
             Army army = CharacterManager.GetArmy("Reserves");
             if (army != null)
@@ -1140,13 +1143,13 @@ namespace DoS1.Menus
         {
             LoadSquad();
 
-            if (!Handler.ViewOnly_Squad)
+            if (Handler.ViewOnly_Squad)
             {
-                LoadGrid();
+                ClearGrid();
             }
             else
             {
-                ClearGrid();
+                LoadGrid();
             }
         }
 

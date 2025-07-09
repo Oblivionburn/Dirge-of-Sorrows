@@ -73,6 +73,87 @@ namespace DoS1.Util
             }
         }
 
+        public static void DrawCharacter_Grayscale(SpriteBatch spriteBatch, Character character, Color color)
+        {
+            if (character != null &&
+                !character.Dead)
+            {
+                Effect effect = AssetManager.Shaders["Grayscale"];
+
+                //Draw shield
+                Item item = InventoryUtil.Get_EquippedItem(character, "Shield");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                //Draw body
+                effect.Parameters["Texture1"].SetValue(character.Texture);
+                spriteBatch.Draw(character.Texture, character.Region.ToRectangle, character.Image, color);
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                item = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                item = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (item != null)
+                {
+                    effect.Parameters["Texture1"].SetValue(item.Texture);
+                    item.Draw(spriteBatch, Main.Game.Resolution, color);
+                    effect.CurrentTechnique.Passes[0].Apply();
+                }
+
+                if (character.HealthBar.Visible)
+                {
+                    character.HealthBar.Draw(spriteBatch);
+                }
+
+                if (character.ManaBar.Visible)
+                {
+                    character.ManaBar.Draw(spriteBatch);
+                }
+            }
+        }
+
         public static void DrawCharacter_Portrait(SpriteBatch spriteBatch, Picture portraitBox, Character character)
         {
             if (character != null &&

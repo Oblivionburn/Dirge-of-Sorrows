@@ -453,6 +453,21 @@ namespace DoS1.Menus
                                     Handler.ViewOnly_Character = true;
                                     Handler.ViewOnly_Item = true;
 
+                                    Layer locations = map.GetLayer("Locations");
+                                    Tile location_tile = locations.GetTile(squad.Destination);
+                                    if (location_tile != null &&
+                                        squad.Type == "Ally")
+                                    {
+                                        if (location_tile.Type.Contains("Shop") ||
+                                            location_tile.Type.Contains("Academy") ||
+                                            location_tile.Type.Contains("Ally"))
+                                        {
+                                            Handler.ViewOnly_Squad = false;
+                                            Handler.ViewOnly_Character = false;
+                                            Handler.ViewOnly_Item = false;
+                                        }
+                                    }
+
                                     GameUtil.Toggle_Pause(false);
                                     InputManager.Mouse.Flush();
                                     MenuManager.ChangeMenu("Squad");
@@ -935,6 +950,12 @@ namespace DoS1.Menus
                 {
                     EnterTown();
                 }
+                else if (button.Text == "Retreat")
+                {
+                    Undeploy();
+                    CloseDialogue();
+                    GameUtil.Toggle_Pause(false);
+                }
                 else if (button.Text == "Claim Region")
                 {
                     UnlockNextLocation();
@@ -1033,6 +1054,16 @@ namespace DoS1.Menus
             else
             {
                 GameUtil.Toggle_Pause(false);
+            }
+        }
+
+        private void Undeploy()
+        {
+            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character1);
+            if (squad != null)
+            {
+                squad.Visible = false;
+                squad.Active = false;
             }
         }
 

@@ -389,6 +389,15 @@ namespace DoS1.Menus
 
         private void Back()
         {
+            Inventory inventory = InventoryManager.GetInventory("Ally");
+            if (inventory != null)
+            {
+                foreach (Item item in inventory.Items)
+                {
+                    item.Icon_Visible = false;
+                }
+            }
+
             TimeManager.Paused = false;
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
