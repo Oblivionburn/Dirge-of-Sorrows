@@ -20,15 +20,11 @@
 - Menu for buying/selling items in shops
 - Menu for purchasing more characters at academy towns
 - Right-clicking squads on map to view their characters/formation
-- Combat screen and basic combat mechanics
-- Dispatching additional squads to player base on map
 - Context menu to handle selection of a squad when there's multiple in one location
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
-- AI to control enemy squad movement on map
-- Enemy squads capturing towns
 - Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
 - Recovering HP/EP at towns
-- Collecting gold from owned towns
+- Collecting gold from owned towns/base
 #
 ### Planned features not yet implemented:
 - Character stat/xp/level progression
