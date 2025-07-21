@@ -808,6 +808,34 @@ namespace DoS1.Util
             return false;
         }
 
+        public static void CureStatusEffects(Menu menu, Character character)
+        {
+            for (int i = 0; i < character.StatusEffects.Count; i++)
+            {
+                Something statusEffect = character.StatusEffects[i];
+
+                if (statusEffect.Name == "Weak" ||
+                    statusEffect.Name == "Cursed" ||
+                    statusEffect.Name == "Melting" ||
+                    statusEffect.Name == "Poisoned" ||
+                    statusEffect.Name == "Petrified" ||
+                    statusEffect.Name == "Burning" ||
+                    statusEffect.Name == "Stunned" ||
+                    statusEffect.Name == "Slow" ||
+                    statusEffect.Name == "Frozen" ||
+                    statusEffect.Name == "Shocked")
+                {
+                    character.StatusEffects.Remove(statusEffect);
+
+                    menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "-" + statusEffect.Name, Color.White,
+                        new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
+                            character.Region.Width / 2, character.Region.Width / 2), false);
+
+                    i--;
+                }
+            }
+        }
+
         public static void DoDamage_ForElement(Menu menu, Character attacker, Character defender, Item weapon, string element, ref int ally_total_damage, ref int enemy_total_damage)
         {
             int damage = InventoryUtil.Get_TotalDamage(weapon, element);
@@ -951,7 +979,44 @@ namespace DoS1.Util
             Color damage_color = GameUtil.Get_EffectColor(statusEffect.Name);
             statusEffect.DrawColor = damage_color;
 
-            AddEffect_Status(menu, character, statusEffect.Name);
+            if (statusEffect.Name == "Cursed")
+            {
+                bool death_chance = Utility.RandomPercent(10);
+                if (death_chance)
+                {
+                    character.Dead = true;
+                    AddEffect_Status(menu, character, statusEffect.Name);
+                }
+            }
+            else if (statusEffect.Name == "Melting")
+            {
+                bool acid_chance = Utility.RandomPercent(10);
+                if (acid_chance)
+                {
+                    CryptoRandom random;
+                    
+                    for (int i = 0; i < character.Inventory.Items.Count; i++)
+                    {
+                        random = new CryptoRandom();
+
+                        int acid_choice = random.Next(0, character.Inventory.Items.Count);
+                        Item item = character.Inventory.Items[acid_choice];
+
+                        if (InventoryUtil.IsArmor(item) ||
+                            InventoryUtil.IsWeapon(item))
+                        {
+                            character.Inventory.Items.Remove(item);
+                            break;
+                        }
+                    }
+
+                    AddEffect_Status(menu, character, statusEffect.Name);
+                }
+            }
+            else
+            {
+                AddEffect_Status(menu, character, statusEffect.Name);
+            }
 
             if (damage > 0)
             {
@@ -1250,6 +1315,22 @@ namespace DoS1.Util
         {
             switch (status)
             {
+                case "Cursed":
+                    AssetManager.PlaySound_Random("Death");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Death"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
+                case "Melting":
+                    AssetManager.PlaySound_Random("Acid");
+
+                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Acid"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                            Color.White * 0.9f, true);
+                    break;
+
                 case "Poisoned":
                     AssetManager.PlaySound_Random("Poison");
 

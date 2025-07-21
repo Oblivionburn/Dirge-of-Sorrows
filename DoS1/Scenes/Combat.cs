@@ -486,6 +486,11 @@ namespace DoS1.Scenes
 
                                     bool can_attack = true;
 
+                                    if (current_character.Dead)
+                                    {
+                                        can_attack = false;
+                                    }
+
                                     ep_cost = InventoryUtil.Get_EP_Cost(current_character);
                                     if (ep_cost > 0)
                                     {
@@ -843,33 +848,7 @@ namespace DoS1.Scenes
                     foreach (Character character in enemy_squad.Characters)
                     {
                         RuneUtil.Health(Menu, character, weapon, hp);
-
-                        //Remove negative status effects
-                        for (int i = 0; i < character.StatusEffects.Count; i++)
-                        {
-                            Something statusEffect = character.StatusEffects[i];
-
-                            if (statusEffect.Name == "Weak" ||
-                                statusEffect.Name == "Cursed" ||
-                                statusEffect.Name == "Melting" ||
-                                statusEffect.Name == "Poisoned" ||
-                                statusEffect.Name == "Petrified" ||
-                                statusEffect.Name == "Burning" ||
-                                statusEffect.Name == "Stunned" ||
-                                statusEffect.Name == "Slow" ||
-                                statusEffect.Name == "Frozen" ||
-                                statusEffect.Name == "Shocked")
-                            {
-                                character.StatusEffects.Remove(statusEffect);
-
-                                Menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "-" + statusEffect.Name, Color.White,
-                                    new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
-                                        character.Region.Width / 2, character.Region.Width / 2), false);
-
-                                i--;
-                            }
-                        }
-
+                        CombatUtil.CureStatusEffects(Menu, character);
                         RuneUtil.StatusEffect(Menu, character, weapon, "Health", true);
                     }
                 }
@@ -878,33 +857,7 @@ namespace DoS1.Scenes
                     foreach (Character character in ally_squad.Characters)
                     {
                         RuneUtil.Health(Menu, character, weapon, hp);
-
-                        //Remove negative status effects
-                        for (int i = 0; i < character.StatusEffects.Count; i++)
-                        {
-                            Something statusEffect = character.StatusEffects[i];
-
-                            if (statusEffect.Name == "Weak" ||
-                                statusEffect.Name == "Cursed" ||
-                                statusEffect.Name == "Melting" ||
-                                statusEffect.Name == "Poisoned" ||
-                                statusEffect.Name == "Petrified" ||
-                                statusEffect.Name == "Burning" ||
-                                statusEffect.Name == "Stunned" ||
-                                statusEffect.Name == "Slow" ||
-                                statusEffect.Name == "Frozen" ||
-                                statusEffect.Name == "Shocked")
-                            {
-                                character.StatusEffects.Remove(statusEffect);
-
-                                Menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "-" + statusEffect.Name, Color.White,
-                                    new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
-                                        character.Region.Width / 2, character.Region.Width / 2), false);
-
-                                i--;
-                            }
-                        }
-
+                        CombatUtil.CureStatusEffects(Menu, character);
                         RuneUtil.StatusEffect(Menu, character, weapon, "Health", true);
                     }
                 }
@@ -936,33 +889,7 @@ namespace DoS1.Scenes
                 {
                     int hp = InventoryUtil.Get_Item_Element_Level(weapon, "Health") * Handler.Element_Multiplier;
                     RuneUtil.Health(Menu, target, weapon, hp);
-
-                    //Remove negative status effects
-                    for (int i = 0; i < target.StatusEffects.Count; i++)
-                    {
-                        Something statusEffect = target.StatusEffects[i];
-
-                        if (statusEffect.Name == "Weak" ||
-                            statusEffect.Name == "Cursed" ||
-                            statusEffect.Name == "Melting" ||
-                            statusEffect.Name == "Poisoned" ||
-                            statusEffect.Name == "Petrified" ||
-                            statusEffect.Name == "Burning" ||
-                            statusEffect.Name == "Stunned" ||
-                            statusEffect.Name == "Slow" ||
-                            statusEffect.Name == "Frozen" ||
-                            statusEffect.Name == "Shocked")
-                        {
-                            target.StatusEffects.Remove(statusEffect);
-
-                            Menu.AddLabel(AssetManager.Fonts["ControlFont"], target.ID, "Damage", "-" + statusEffect.Name, Color.White,
-                                new Region(target.Region.X + (target.Region.Width / 4), target.Region.Y - ((target.Region.Width / 8) * 3),
-                                    target.Region.Width / 2, target.Region.Width / 2), false);
-
-                            i--;
-                        }
-                    }
-
+                    CombatUtil.CureStatusEffects(Menu, target);
                     RuneUtil.StatusEffect(Menu, target, weapon, "Health", true);
                 }
             }
@@ -1634,7 +1561,6 @@ namespace DoS1.Scenes
 
                         if (statusEffect.Name == "Weak" ||
                             statusEffect.Name == "Melting" ||
-                            statusEffect.Name == "Poisoned" ||
                             statusEffect.Name == "Burning" ||
                             statusEffect.Name == "Regenerating" ||
                             statusEffect.Name == "Charging" ||
@@ -1664,7 +1590,6 @@ namespace DoS1.Scenes
 
                         if (statusEffect.Name == "Weak" ||
                             statusEffect.Name == "Melting" ||
-                            statusEffect.Name == "Poisoned" ||
                             statusEffect.Name == "Burning" ||
                             statusEffect.Name == "Regenerating" ||
                             statusEffect.Name == "Charging" ||

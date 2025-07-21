@@ -800,7 +800,13 @@ namespace DoS1.Util
                                             if (existing.Name == status_name)
                                             {
                                                 found = true;
-                                                existing.Amount += 3;
+
+                                                existing.Amount += 1;
+                                                if (existing.Amount > 3)
+                                                {
+                                                    existing.Amount = 3;
+                                                }
+
                                                 break;
                                             }
                                         }
@@ -810,7 +816,7 @@ namespace DoS1.Util
                                             defender.StatusEffects.Add(new Something
                                             {
                                                 Name = status_name,
-                                                Amount = 3
+                                                Amount = 1
                                             });
                                         }
 
@@ -856,7 +862,13 @@ namespace DoS1.Util
                                             if (existing.Name == status_name)
                                             {
                                                 found = true;
-                                                existing.Amount += 3;
+
+                                                existing.Amount += 1;
+                                                if (existing.Amount > 3)
+                                                {
+                                                    existing.Amount = 3;
+                                                }
+
                                                 break;
                                             }
                                         }
@@ -866,7 +878,7 @@ namespace DoS1.Util
                                             defender.StatusEffects.Add(new Something
                                             {
                                                 Name = status_name,
-                                                Amount = 3
+                                                Amount = 1
                                             });
                                         }
 
@@ -941,7 +953,8 @@ namespace DoS1.Util
                                             if (existing.Name == status_name)
                                             {
                                                 found = true;
-                                                existing.Amount += 4;
+                                                existing.Amount += 2;
+                                                existing.Value += 4;
                                                 break;
                                             }
                                         }
@@ -951,8 +964,8 @@ namespace DoS1.Util
                                             defender.StatusEffects.Add(new Something
                                             {
                                                 Name = status_name,
-                                                Amount = 4,
-                                                Value = 2
+                                                Amount = 2,
+                                                Value = 4
                                             });
                                         }
 
@@ -1073,10 +1086,10 @@ namespace DoS1.Util
                                             {
                                                 found = true;
 
-                                                existing.Amount += 5;
-                                                if (existing.Amount > 5)
+                                                existing.Amount += 1;
+                                                if (existing.Amount > 2)
                                                 {
-                                                    existing.Amount = 5;
+                                                    existing.Amount = 2;
                                                 }
 
                                                 break;
@@ -1088,7 +1101,7 @@ namespace DoS1.Util
                                             defender.StatusEffects.Add(new Something
                                             {
                                                 Name = status_name,
-                                                Amount = 5
+                                                Amount = 1
                                             });
                                         }
 
