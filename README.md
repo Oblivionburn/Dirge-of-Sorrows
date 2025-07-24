@@ -7,13 +7,15 @@
 ### Features currently in the game:
 - Random generation of worldmap with levels to progress through marked on the map (click location to enter that level)
 - Random generation of levels with starting player base/town, enemy base, neutral towns, merchant town, academy town
+- Random generation of enemy squads in levels with increasing amount/difficulty/equipment
 - Capturing/liberating towns (flipping them to player-controlled)
-- Generation of enemy squads on maps with increasing amount/difficulty/equipment
-- A* pathing for player squad token movement on map
-- Character stat/xp/level progression
-- Equippable items
-- Recovering HP/EP at towns
 - Collecting 1 gold every in-game hour from owned towns/base across all maps
+- Squads recover HP/EP when idle on towns/base
+- A* pathing for squad movement
+- Character XP/Level progression
+- 4 character stats: Strength, Intelligence, Dexterity, and Agility
+- Various tiers of armor/weapons to equip on characters
+- Various runes to equip on armor/weapons
 #
 ### Planned features not yet implemented:
 - Saving/loading game state
