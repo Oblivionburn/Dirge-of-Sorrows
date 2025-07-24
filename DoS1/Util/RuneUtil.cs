@@ -655,7 +655,10 @@ namespace DoS1.Util
                 }
             }
 
-            Energy(menu, defender, weapon, armor_drain_level);
+            if (armor_drain_level > 0)
+            {
+                Energy(menu, defender, weapon, armor_drain_level);
+            }
         }
 
         public static bool ApplyStatus(Item weapon, string element)
@@ -1236,6 +1239,9 @@ namespace DoS1.Util
             Squad squad = ArmyUtil.Get_Squad(character.ID);
             heal += Area_AllArmor_PairedLevel(squad, character, element);
 
+            //Check for stat extra healing
+            heal += (int)character.GetStat("INT").Value;
+
             if (heal > 0)
             {
                 //Apply heal
@@ -1307,6 +1313,9 @@ namespace DoS1.Util
                 energy += Area_AllArmor_PairedLevel(squad, character, element);
             }
 
+            //Check for stat extra energy
+            energy += (int)character.GetStat("INT").Value;
+
             if (energy > 0)
             {
                 //Apply energy
@@ -1319,7 +1328,7 @@ namespace DoS1.Util
 
                 CombatUtil.AddEffect(menu, character, weapon, element);
 
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "+" + energy.ToString(), new Color(255, 174, 201, 255),
+                menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "+" + energy.ToString(), new Color(255, 255, 0, 255),
                     new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
                         character.Region.Width / 2, character.Region.Width / 2), false);
 
@@ -1394,6 +1403,118 @@ namespace DoS1.Util
             }
 
             return false;
+        }
+
+        public static void UpdateRune_Level(Item rune)
+        {
+            Something level = rune.GetProperty("Level Value");
+            if (level != null &&
+                level.Value < level.Max_Value) //Don't increase XP if we've hit max level
+            {
+                Something xp = rune.GetProperty("XP Value");
+                if (xp != null)
+                {
+                    //Check if rune can increase level
+                    float left_over = xp.Max_Value - xp.Value;
+                    while (left_over <= 0)
+                    {
+                        if (level != null)
+                        {
+                            //Increase rune level
+                            level.Value++;
+                            UpdateRune_Description(rune);
+
+                            if (level.Value >= level.Max_Value)
+                            {
+                                //We've hit max level
+                                level.Value = level.Max_Value;
+                                xp.Value = xp.Max_Value;
+                                break;
+                            }
+                            else
+                            {
+                                xp.Value -= xp.Max_Value;
+                                left_over = xp.Max_Value - xp.Value;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void UpdateRune_Description(Item rune)
+        {
+            if (rune.Categories.Count > 0)
+            {
+                string type = rune.Categories[0];
+
+                Something level = rune.GetProperty("Level Value");
+                if (level != null)
+                {
+                    switch (type)
+                    {
+                        case "Area":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance for paired On Weapon on whole squad\nOn Armor: " + (level.Value * 10) + "% chance for paired On Armor on whole squad\nStatus: None";
+                            break;
+
+                        case "Counter":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to ignore defenses\nOn Armor: " + (level.Value * 10) + "% chance to counter attack\nStatus: Weak";
+                            break;
+
+                        case "Death":
+                            rune.Description = "On Weapon: " + level.Value + "% chance to instant kill target\nOn Armor: " + (level.Value * 10) + "% chance to resist instant kill\nStatus: Cursed";
+                            break;
+
+                        case "Disarm":
+                            rune.Description = "On Weapon: " + level.Value + "% chance to destroy target's weapon\nOn Armor: " + level.Value + "% chance to destroy attacker's weapon when hit\nStatus: Melting";
+                            break;
+
+                        case "Drain":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to restore HP by paired damage\nOn Armor: " + (level.Value * 10) + "% chance to restore EP by paired resistance\nStatus: Poisoned";
+                            break;
+
+                        case "Earth":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Earth damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Earth damage\nStatus: Petrified";
+                            break;
+
+                        case "Effect":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to apply paired Status\nOn Armor: " + (level.Value * 10) + "% chance to resist paired Status\nStatus: None";
+                            break;
+
+                        case "Fire":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Fire damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Fire damage\nStatus: Burning";
+                            break;
+
+                        case "Health":
+                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " HP\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " HP\nStatus: Regenerating";
+                            break;
+
+                        case "Energy":
+                            rune.Description = "On Weapon: restore " + (level.Value * Handler.Element_Multiplier) + " EP\nOn Armor: restore extra " + (level.Value * Handler.Element_Multiplier) + " EP\nStatus: Charging";
+                            break;
+
+                        case "Physical":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Physical damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Physical damage\nStatus: Stunned";
+                            break;
+
+                        case "Time":
+                            rune.Description = "On Weapon: " + level.Value + "% chance to attack again\nOn Armor: " + level.Value + "% chance to dodge attack\nStatus: Slow";
+                            break;
+
+                        case "Ice":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Ice damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Ice damage\nStatus: Frozen";
+                            break;
+
+                        case "Lightning":
+                            rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Lightning damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Lightning damage\nStatus: Shocked";
+                            break;
+                    }
+                }
+            }
         }
     }
 }

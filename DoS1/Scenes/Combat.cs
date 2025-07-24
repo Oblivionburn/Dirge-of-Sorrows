@@ -983,7 +983,25 @@ namespace DoS1.Scenes
 
                                 if (InventoryUtil.Item_HasElement(weapon, element))
                                 {
-                                    CombatUtil.DoDamage_ForElement(Menu, current_character, target, weapon, element, ref ally_total_damage, ref enemy_total_damage);
+                                    bool can_dodge = false;
+                                    bool dodged = false;
+
+                                    //Can only dodge melee/ranged physical attacks
+                                    if ((InventoryUtil.Weapon_IsMelee(weapon) || weapon.Categories[0] == "Bow") &&
+                                        element == "Physical")
+                                    {
+                                        can_dodge = true;
+                                    }
+
+                                    if (can_dodge)
+                                    {
+                                        dodged = CombatUtil.Dodge(Menu, current_character, target);
+                                    }
+
+                                    if (!dodged)
+                                    {
+                                        CombatUtil.DoDamage_ForElement(Menu, current_character, target, weapon, element, ref ally_total_damage, ref enemy_total_damage);
+                                    }
                                 }
                             }
 
@@ -1090,27 +1108,27 @@ namespace DoS1.Scenes
                     //Handle weapon Area elements
                     if (!hero_killed)
                     {
-                        string[] elements = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
-
-                        for (int i = 0; i < elements.Length; i++)
+                        foreach (Character target in defender_squad.Characters)
                         {
-                            string element = elements[i];
-
-                            //Only do damage for paired Area runes
-                            if (InventoryUtil.Item_HasArea_ForElement(weapon, element) &&
-                                RuneUtil.ApplyArea(weapon, element))
+                            //Ignore initial targets or dead ones
+                            if (!targets.Contains(target) &&
+                                !target.Dead)
                             {
-                                foreach (Character target in defender_squad.Characters)
+                                if (RuneUtil.Time_DodgeChance(target, defender_squad))
                                 {
-                                    //Ignore initial targets or dead ones
-                                    if (!targets.Contains(target) &&
-                                        !target.Dead)
+                                    RuneUtil.Time_Dodge(Menu, target);
+                                }
+                                else
+                                {
+                                    string[] elements = { "Physical", "Fire", "Lightning", "Earth", "Ice" };
+
+                                    for (int i = 0; i < elements.Length; i++)
                                     {
-                                        if (RuneUtil.Time_DodgeChance(target, defender_squad))
-                                        {
-                                            RuneUtil.Time_Dodge(Menu, target);
-                                        }
-                                        else
+                                        string element = elements[i];
+
+                                        //Only do damage for paired Area runes
+                                        if (InventoryUtil.Item_HasArea_ForElement(weapon, element) &&
+                                            RuneUtil.ApplyArea(weapon, element))
                                         {
                                             CombatUtil.DoDamage_ForElement(Menu, current_character, target, weapon, element, ref ally_total_damage, ref enemy_total_damage);
 
@@ -1140,6 +1158,11 @@ namespace DoS1.Scenes
                                                 counter_attackers.Add(target);
                                             }
                                         }
+
+                                        if (hero_killed)
+                                        {
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -1160,32 +1183,35 @@ namespace DoS1.Scenes
 
                 foreach (Character target in targets)
                 {
-                    CombatUtil.DoDamage_Unarmed(Menu, target, ref ally_total_damage, ref enemy_total_damage);
-
-                    if (target.Dead)
+                    if (!CombatUtil.Dodge(Menu, current_character, target))
                     {
-                        if (target.Type == "Enemy")
+                        CombatUtil.DoDamage_Unarmed(Menu, target, ref ally_total_damage, ref enemy_total_damage);
+
+                        if (target.Dead)
                         {
-                            gold += 100;
-                            xp += 1;
-                        }
-                        else if (target.ID == Handler.MainCharacter_ID)
-                        {
-                            hero_killed = true;
-                            break;
-                        }
-                        else
-                        {
-                            foreach (Character character in enemy_squad.Characters)
+                            if (target.Type == "Enemy")
                             {
-                                CombatUtil.GainExp(character, 1);
+                                gold += 100;
+                                xp += 1;
+                            }
+                            else if (target.ID == Handler.MainCharacter_ID)
+                            {
+                                hero_killed = true;
+                                break;
+                            }
+                            else
+                            {
+                                foreach (Character character in enemy_squad.Characters)
+                                {
+                                    CombatUtil.GainExp(character, 1);
+                                }
                             }
                         }
-                    }
-                    else if (!counter_attacking &&
-                             RuneUtil.CounterArmor(Menu, target))
-                    {
-                        counter_attackers.Add(target);
+                        else if (!counter_attacking &&
+                                 RuneUtil.CounterArmor(Menu, target))
+                        {
+                            counter_attackers.Add(target);
+                        }
                     }
                 }
 

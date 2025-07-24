@@ -423,7 +423,7 @@ namespace DoS1.Menus
                         property.Name.Contains("Counter") ||
                         property.Name.Contains("Disarm"))
                     {
-                        text += property.Name + ": " + property.Value + "%";
+                        text += property.Name + " Chance: " + property.Value + "%";
                     }
                     else
                     {
@@ -502,7 +502,7 @@ namespace DoS1.Menus
                         property.Name.Contains("Counter") ||
                         property.Name.Contains("Disarm"))
                     {
-                        text += property.Name + ": " + property.Value + "%";
+                        text += property.Name + " Chance: " + property.Value + "%";
                     }
                     else
                     {

@@ -144,6 +144,7 @@ namespace DoS1.Menus
         private void UpdateControls()
         {
             bool found_button = HoveringButton();
+            bool found_stat = HoveringStat();
             bool found_grid = HoveringGrid();
             bool found_item = HoveringItem();
 
@@ -162,6 +163,7 @@ namespace DoS1.Menus
             }
 
             if (!found_button &&
+                !found_stat &&
                 !found_item)
             {
                 GetLabel("Examine").Visible = false;
@@ -360,6 +362,28 @@ namespace DoS1.Menus
             }
 
             return found;
+        }
+
+        private bool HoveringStat()
+        {
+            foreach (Label label in Labels)
+            {
+                if (label.Name == "Level" ||
+                    label.Name == "XP" ||
+                    label.Name == "STR" ||
+                    label.Name == "INT" ||
+                    label.Name == "DEX" ||
+                    label.Name == "AGI")
+                {
+                    if (InputManager.MouseWithin(label.Region.ToRectangle))
+                    {
+                        ExamineStat(label.Name);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private bool HoveringSlot(string type)
@@ -585,7 +609,7 @@ namespace DoS1.Menus
 
             if (!Handler.ViewOnly_Character)
             {
-                starting_X = (Main.Game.ScreenWidth / 2) - (width * 5);
+                starting_X = (Main.Game.ScreenWidth / 2) + width;
             }
             else
             {
@@ -807,6 +831,70 @@ namespace DoS1.Menus
             examine.Visible = true;
         }
 
+        private void ExamineStat(string name)
+        {
+            Label examine = GetLabel("Examine");
+
+            switch (name)
+            {
+                case "Level":
+                    examine.Text = "Level (LVL):\nThe progress the character has made.";
+                    break;
+
+                case "XP":
+                    examine.Text = "Experience (EXP):\nThe character progress to the next Level.";
+                    break;
+
+                case "STR":
+                    examine.Text = "Strength (STR):\nAffects melee and ranged attack power.";
+                    break;
+
+                case "INT":
+                    examine.Text = "Intelligence (INT):\nAffects magic attack power.";
+                    break;
+
+                case "DEX":
+                    examine.Text = "Dexterity (DEX):\nAffects melee and ranged accuracy.";
+                    break;
+
+                case "AGI":
+                    examine.Text = "Agility (AGI):\nAffects ability to dodge attacks.";
+                    break;
+            }
+
+            int X = InputManager.Mouse.X - (width / 2);
+            if (X < 0)
+            {
+                X = 0;
+            }
+            else if (X > Main.Game.Resolution.X - width)
+            {
+                X = Main.Game.Resolution.X - width;
+            }
+
+            int Y = InputManager.Mouse.Y + 20;
+            if (Y < 0)
+            {
+                Y = 0;
+            }
+            else if (Y > Main.Game.Resolution.Y - height)
+            {
+                Y = Main.Game.Resolution.Y - height;
+            }
+
+            if (name == "INT" ||
+                name == "AGI")
+            {
+                examine.Region = new Region(X, Y, width * 8, height + (height / 2));
+            }
+            else
+            {
+                examine.Region = new Region(X, Y, width * 10, height + (height / 2));
+            }
+                
+            examine.Visible = true;
+        }
+
         private void Filter(string filter)
         {
             Handler.ItemFilter = filter;
@@ -883,9 +971,20 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "", Color.White, new Region(0, 0, 0, 0), true);
+
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats", "Stats", Color.White, new Region(0, 0, 0, 0), true);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
             AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Level", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "XP", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "STR", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "INT", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "DEX", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "AGI", "", Color.White, new Region(0, 0, 0, 0), true);
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment", "Equipment", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddPicture(Handler.GetID(), "Equipment_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
 
             AddPicture(Handler.GetID(), "Character", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White, false);
 
@@ -1021,14 +1120,14 @@ namespace DoS1.Menus
             if (character != null)
             {
                 Picture char_pic = GetPicture("Character");
-                char_pic.Region = new Region(starting_X - (width * 8), starting_Y, (width * 4), (height * 6));
+                char_pic.Region = new Region(starting_X - (width * 7), starting_Y + (height * 2), (width * 4), (height * 6));
 
                 character.Region = new Region(char_pic.Region.X, char_pic.Region.Y, char_pic.Region.Width, char_pic.Region.Height);
                 character.Visible = true;
 
                 GetLabel("Name").Region = new Region(char_pic.Region.X, char_pic.Region.Y - height, char_pic.Region.Width, height);
 
-                float X = char_pic.Region.X + char_pic.Region.Width + width;
+                float X = char_pic.Region.X + char_pic.Region.Width;
                 float Y = char_pic.Region.Y + height;
 
                 GetPicture("Helm").Region = new Region(X, Y, width, height);
@@ -1075,13 +1174,57 @@ namespace DoS1.Menus
                     equip.Icon_Visible = true;
                 }
 
-                Y = char_pic.Region.Y + char_pic.Region.Height + height;
-                GetLabel("Stats").Region = new Region(char_pic.Region.X, Y, (width * 6), height);
-                GetPicture("Stats_Underline").Region = new Region(char_pic.Region.X, Y + (height / 2), (width * 6), height);
+                // ===============
+                // Character Stats
+                // ===============
+                X = char_pic.Region.X - (width * 7);
+                Y = char_pic.Region.Y - height;
 
-                Label stats = GetLabel("Stats_Properties");
-                stats.Region = new Region(char_pic.Region.X, Y + height, (width * 6), height);
-                stats.Text = "";
+                GetLabel("Stats").Region = new Region(X, Y, (width * 6), height);
+                GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), (width * 6), height);
+
+                Y += height;
+                Label level = GetLabel("Level");
+                level.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                level.Text = "LVL: " + character.Level + "/100";
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
+                Label xp = GetLabel("XP");
+                xp.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                xp.Text = "EXP: " + character.XP + "/" + character.XP_Needed_ForLevels[character.Level + 1];
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
+                Label strength = GetLabel("STR");
+                strength.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                strength.Text = "STR: 10/100";
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
+                Label intelligence = GetLabel("INT");
+                intelligence.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                intelligence.Text = "INT: 10/100";
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
+                Label dexterity = GetLabel("DEX");
+                dexterity.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                dexterity.Text = "DEX: 10/100";
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
+                Label agility = GetLabel("AGI");
+                agility.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                agility.Text = "AGI: 10/100";
+
+                // ===============
+                // Equipment Stats
+                // ===============
+                X = char_pic.Region.X - (width * 7);
+                Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + (height * 2);
+
+                GetLabel("Equipment").Region = new Region(X, Y, (width * 6), height);
+                GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), (width * 6), height);
+
+                Label equipment = GetLabel("Equipment_Properties");
+                equipment.Region = new Region(X, Y + height, (width * 6), height);
+                equipment.Text = "";
 
                 List<Something> Properties = new List<Something>();
 
@@ -1175,15 +1318,15 @@ namespace DoS1.Menus
                             property.Name.Contains("Counter") ||
                             property.Name.Contains("Disarm"))
                         {
-                            stats.Text += property.Name + ": " + property.Value + "%";
+                            equipment.Text += property.Name + " Chance: " + property.Value + "%";
                         }
                         else
                         {
-                            stats.Text += property.Name + ": " + property.Value;
+                            equipment.Text += property.Name + ": " + property.Value;
                         }
 
-                        stats.Text += "\n";
-                        stats.Region.Height += (Main.Game.MenuSize.Y / 2);
+                        equipment.Text += "\n";
+                        equipment.Region.Height += (Main.Game.MenuSize.Y / 2);
                     }
                 }
 
@@ -1193,7 +1336,7 @@ namespace DoS1.Menus
 
                     if (property.Name.Contains("Cost"))
                     {
-                        stats.Text += property.Name + ": " + property.Value;
+                        equipment.Text += property.Name + ": " + property.Value;
                         break;
                     }
                 }

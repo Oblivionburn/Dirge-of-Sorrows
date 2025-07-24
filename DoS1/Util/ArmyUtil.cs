@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 
 using OP_Engine.Characters;
-using OP_Engine.Inventories;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
@@ -96,169 +95,6 @@ namespace DoS1.Util
             }
 
             return squad;
-        }
-
-        public static Character NewCharacter(string name, Vector2 formation, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor)
-        {
-            Character character = new Character();
-            character.ID = Handler.GetID();
-            character.Name = name;
-            character.Animator.Frames = 4;
-            character.Formation = new Vector2(formation.X, formation.Y);
-            character.Type = "Ally";
-            character.Direction = Direction.Left;
-            character.Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + skinColor + "_Idle"];
-            character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
-
-            //Add head
-            Item item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Head";
-            item.Type = "Head";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + headStyle];
-            item.Image = character.Image;
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            //Add eyes
-            item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Eyes";
-            item.Type = "Eyes";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
-            item.Image = character.Image;
-            item.DrawColor = Handler.EyeColors[eyeColor];
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            //Add hair
-            if (hairStyle != "Bald")
-            {
-                item = new Item();
-                item.ID = Handler.GetID();
-                item.Name = "Hair";
-                item.Type = "Hair";
-                item.Location = new Location();
-                item.Equipped = true;
-                item.DrawColor = Handler.HairColors[hairColor];
-                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + hairStyle];
-                item.Image = character.Image;
-                item.Visible = true;
-                character.Inventory.Items.Add(item);
-            }
-
-            character.HealthBar.Base_Texture = AssetManager.Textures["ProgressBase"];
-            character.HealthBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
-            character.HealthBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
-            character.HealthBar.DrawColor = Color.Red;
-            character.HealthBar.Max_Value = 100;
-            character.HealthBar.Value = 100;
-            character.HealthBar.Update();
-
-            character.ManaBar.Base_Texture = AssetManager.Textures["ProgressBase"];
-            character.ManaBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
-            character.ManaBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
-            character.ManaBar.DrawColor = Color.Blue;
-            character.ManaBar.Max_Value = 100;
-            character.ManaBar.Value = 100;
-            character.ManaBar.Update();
-
-            return character;
-        }
-
-        public static Character NewCharacter_Random(string name, Vector2 formation, bool enemy)
-        {
-            CryptoRandom random = new CryptoRandom();
-
-            Character character = new Character();
-            character.ID = Handler.GetID();
-            character.Name = name;
-            character.Animator.Frames = 4;
-            character.Formation = new Vector2(formation.X, formation.Y);
-
-            if (enemy)
-            {
-                character.Type = "Enemy";
-                character.Direction = Direction.Right;
-            }
-            else
-            {
-                character.Type = "Ally";
-                character.Direction = Direction.Left;
-            }
-
-            string direction = character.Direction.ToString();
-            string skin_tone = Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)];
-            string head_style = Handler.HeadStyles[random.Next(0, Handler.HeadStyles.Length)];
-            Color eye_color = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Value;
-            string hairStyle = Handler.HairStyles[random.Next(0, Handler.HairStyles.Length)];
-            Color hair_color = Handler.HairColors.ElementAt(random.Next(0, 6)).Value;
-
-            character.Texture = AssetManager.Textures[direction + "_Body_" + skin_tone + "_Idle"];
-            character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
-
-            //Add head
-            Item item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Head";
-            item.Type = "Head";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[direction + "_" + skin_tone + "_" + head_style];
-            item.Image = character.Image;
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            //Add eyes
-            item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Eyes";
-            item.Type = "Eyes";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[direction + "_Eye"];
-            item.Image = character.Image;
-            item.DrawColor = eye_color;
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            if (hairStyle != "Bald")
-            {
-                //Add hair
-                item = new Item();
-                item.ID = Handler.GetID();
-                item.Name = "Hair";
-                item.Type = "Hair";
-                item.Location = new Location();
-                item.Equipped = true;
-                item.DrawColor = hair_color;
-                item.Texture = AssetManager.Textures[direction + "_" + hairStyle];
-                item.Image = character.Image;
-                item.Visible = true;
-                character.Inventory.Items.Add(item);
-            }
-
-            character.HealthBar.Base_Texture = AssetManager.Textures["ProgressBase"];
-            character.HealthBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
-            character.HealthBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
-            character.HealthBar.DrawColor = Color.Red;
-            character.HealthBar.Max_Value = 100;
-            character.HealthBar.Value = 100;
-            character.HealthBar.Update();
-
-            character.ManaBar.Base_Texture = AssetManager.Textures["ProgressBase"];
-            character.ManaBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
-            character.ManaBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
-            character.ManaBar.DrawColor = Color.Blue;
-            character.ManaBar.Max_Value = 100;
-            character.ManaBar.Value = 100;
-            character.ManaBar.Update();
-
-            return character;
         }
 
         public static void Gen_EnemySquads(Army army, int depth)
@@ -377,7 +213,7 @@ namespace DoS1.Util
                 }
                 //name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
 
-                Character character = NewCharacter_Random(name, formation, true);
+                Character character = CharacterUtil.NewCharacter_Random(name, formation, true);
                 if (gender == 0)
                 {
                     character.Gender = "Male";
@@ -780,7 +616,7 @@ namespace DoS1.Util
                 }
                 //name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
 
-                Character character = NewCharacter_Random(name, new Vector2(x, y), false);
+                Character character = CharacterUtil.NewCharacter_Random(name, new Vector2(x, y), false);
                 if (gender == 0)
                 {
                     character.Gender = "Male";

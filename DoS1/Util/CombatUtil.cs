@@ -836,9 +836,38 @@ namespace DoS1.Util
             }
         }
 
+        public static bool Dodge(Menu menu, Character attacker, Character defender)
+        {
+            int attacker_dex = (int)attacker.GetStat("DEX").Value;
+            int defender_agi = (int)defender.GetStat("AGI").Value;
+
+            int chance = defender_agi - attacker_dex;
+            if (chance > 0)
+            {
+                bool dodge = Utility.RandomPercent(chance);
+                if (dodge)
+                {
+                    RuneUtil.Time_Dodge(menu, defender);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void DoDamage_ForElement(Menu menu, Character attacker, Character defender, Item weapon, string element, ref int ally_total_damage, ref int enemy_total_damage)
         {
             int damage = InventoryUtil.Get_TotalDamage(weapon, element);
+
+            if (InventoryUtil.Weapon_IsMelee(weapon) ||
+                weapon.Categories[0] == "Bow")
+            {
+                damage += (int)attacker.GetStat("STR").Value;
+            }
+            else if (weapon.Categories[0] == "Grimoire")
+            {
+                damage += (int)attacker.GetStat("INT").Value;
+            }
 
             Something status_weak = attacker.GetStatusEffect("Weak");
             if (status_weak != null)
@@ -1417,6 +1446,8 @@ namespace DoS1.Util
             {
                 GainExp_Item(shield, 1);
             }
+
+            CharacterUtil.Increase_XP(character, amount);
         }
 
         public static void GainExp_Item(Item item, int amount)
@@ -1432,7 +1463,7 @@ namespace DoS1.Util
                     if (xp != null)
                     {
                         xp.Value += amount;
-                        InventoryUtil.UpdateRune_Level(rune);
+                        RuneUtil.UpdateRune_Level(rune);
                     }
                 }
 

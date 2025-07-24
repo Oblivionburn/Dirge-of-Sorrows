@@ -449,7 +449,7 @@ namespace DoS1.Menus
             Squad squad = army.Squads[0];
             squad.Name = LeaderName;
 
-            leader = ArmyUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles[HairStyle], HairColors[HairColor], Handler.HeadStyles[Head], EyeColors[EyeColor], Handler.SkinTones[Skin]);
+            leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles[HairStyle], HairColors[HairColor], Handler.HeadStyles[Head], EyeColors[EyeColor], Handler.SkinTones[Skin]);
             squad.Characters.Add(leader);
             squad.Leader_ID = leader.ID;
             Handler.MainCharacter_ID = leader.ID;
