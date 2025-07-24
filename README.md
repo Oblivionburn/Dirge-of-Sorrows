@@ -9,25 +9,14 @@
 - Random generation of levels/local-maps with starting player base/town, enemy base, neutral towns, merchant town, academy town
 - Capturing/liberating neutral towns (flipping them to player-controlled)
 - Level/area/map progression, displaying next location(s) on worldmap
-- A* pathing for player squad token movement on map
-- Starting character generation screen
-- Equippable items and viewing equipment stats
-- Menu for managing squads in player army
-- Menu for managing character formation in a squad
-- Menu for managing character equipped gear
-- Menu for managing rune attachments in items/gear
-- Menu for viewing general inventory of player army
-- Menu for buying/selling items in shops
-- Menu for purchasing more characters at academy towns
-- Right-clicking squads on map to view their characters/formation
-- Context menu to handle selection of a squad when there's multiple in one location
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
-- Losing level/map if enemy squad reaches player base (forced to retreat back to Worldmap)
+- A* pathing for player squad token movement on map
+- Character stat/xp/level progression
+- Equippable items
 - Recovering HP/EP at towns
 - Collecting 1 gold every in-game hour from owned towns/base across all maps
 #
 ### Planned features not yet implemented:
-- Character stat/xp/level progression
 - Saving/loading game state
 - Story/lore and tutorial
 - Side-quests
