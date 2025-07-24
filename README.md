@@ -19,7 +19,8 @@
 #
 ### Planned features not yet implemented:
 - Saving/loading game state
-- Story/lore and tutorial
+- Tutorials
+- Story/lore
 - Side-quests
 - Finding unique items hidden in the world
 - More music for variety
