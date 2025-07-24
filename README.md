@@ -15,7 +15,7 @@
 - Character XP/Level progression
 - 4 character stats: Strength, Intelligence, Dexterity, and Agility
 - Various tiers of armor/weapons to equip on characters
-- Various runes to equip on armor/weapons
+- 14 types of Runes that can be equipped on armor/weapons and paired for various effects (similar to FF7 materia system)
 #
 ### Planned features not yet implemented:
 - Saving/loading game state
