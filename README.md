@@ -5,7 +5,7 @@
 ###### Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 # 
 ### Features currently in the game:
-- Random generation of worldmap with levels to progress through marked on the map (click location to enter map for that level)
+- Random generation of worldmap with levels to progress through marked on the map (click location to enter that level)
 - Random generation of levels/local-maps with starting player base/town, enemy base, neutral towns, merchant town, academy town
 - Capturing/liberating neutral towns (flipping them to player-controlled)
 - Level/area/map progression, displaying next location(s) on worldmap
