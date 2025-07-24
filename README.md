@@ -6,7 +6,7 @@
 # 
 ### Features currently in the game:
 - Random generation of worldmap with levels to progress through marked on the map (click location to enter that level)
-- Random generation of levels/local-maps with starting player base/town, enemy base, neutral towns, merchant town, academy town
+- Random generation of levels with starting player base/town, enemy base, neutral towns, merchant town, academy town
 - Capturing/liberating neutral towns (flipping them to player-controlled)
 - Level/area/map progression, displaying next location(s) on worldmap
 - Generation of enemy squads on maps with increasing amount/difficulty/equipment
