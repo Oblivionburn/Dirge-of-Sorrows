@@ -57,19 +57,99 @@ namespace DoS1.Util
             SoundManager.MusicLooping = false;
             SoundManager.NeedMusic = true;
 
-            Scene worldmap = SceneManager.GetScene("Worldmap");
-            SceneManager.ChangeScene(worldmap);
+            Scene scene = WorldUtil.GetScene();
+            SceneManager.ChangeScene(scene);
 
             MenuManager.GetMenu("UI").Visible = true;
             MenuManager.CurrentMenu_ID = MenuManager.GetMenu("UI").ID;
 
-            while (!worldmap.World.Maps.Any())
+            if (scene.Name == "Worldmap")
             {
-                Thread.Sleep(100);
+                while (!scene.World.Maps.Any())
+                {
+                    Thread.Sleep(100);
+                }
             }
 
-            Map map = worldmap.World.Maps[0];
+            Map map = WorldUtil.GetMap(scene.World);
             WorldUtil.Resize_OnStart(map);
+        }
+
+        public static void Load()
+        {
+            SoundManager.AmbientFade = 1;
+            SoundManager.StopAmbient();
+
+            foreach (Weather weather in WeatherManager.Weathers)
+            {
+                weather.TransitionTime = 0;
+                weather.ParticleManager.Particles.Clear();
+                weather.Visible = false;
+            }
+
+            WeatherManager.Transitioning = false;
+            WeatherManager.Lightning = false;
+            WeatherManager.TransitionType = WeatherTransition.None;
+            WeatherManager.CurrentWeather = WeatherType.Clear;
+
+            TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
+
+            TimeManager.Now.OnSecondsChange -= SecondChanged;
+            TimeManager.Now.OnSecondsChange += SecondChanged;
+
+            TimeManager.Now.OnMinutesChange -= MinuteChanged;
+            TimeManager.Now.OnMinutesChange += MinuteChanged;
+
+            TimeManager.Now.OnHoursChange -= HourChanged;
+            TimeManager.Now.OnHoursChange += HourChanged;
+
+            Main.Game.GameStarted = true;
+            Toggle_MainMenu();
+
+            SoundManager.StopMusic();
+            SoundManager.MusicLooping = false;
+            SoundManager.NeedMusic = true;
+
+            Scene scene = WorldUtil.GetScene();
+            SceneManager.ChangeScene(scene);
+
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.Visible = true;
+            MenuManager.CurrentMenu_ID = ui.ID;
+
+            Map map = WorldUtil.GetMap(scene.World);
+            WorldUtil.Resize_OnStart(map);
+
+            if (Handler.LocalMap)
+            {
+                ui.GetButton("PlayPause").Enabled = true;
+                ui.GetButton("Speed").Enabled = true;
+
+                //Set weather
+                if (map.Type.Contains("Snow") ||
+                    map.Type.Contains("Ice"))
+                {
+                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Snow };
+                }
+                else if (!map.Type.Contains("Desert"))
+                {
+                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm };
+                }
+
+                //Set "Return to Worldmap" button
+                Button worldMap = ui.GetButton("Worldmap");
+                worldMap.Visible = true;
+
+                int maxLevelUnlocked = WorldUtil.MaxLevelUnlocked();
+                if (maxLevelUnlocked > Handler.Level)
+                {
+                    worldMap.Enabled = true;
+                }
+                else
+                {
+                    worldMap.Enabled = false;
+                }
+            }
         }
 
         public static void ReturnToTitle()
@@ -101,6 +181,7 @@ namespace DoS1.Util
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");
 
+            CharacterManager.Armies.Clear();
             SceneManager.GetScene("Worldmap").World.Maps.Clear();
             SceneManager.GetScene("Localmap").World.Maps.Clear();
 
@@ -305,6 +386,18 @@ namespace DoS1.Util
             }
 
             return new Color(0, 0, 0, 0);
+        }
+
+        public static void Alert_Generic(string message)
+        {
+            Menu ui = MenuManager.GetMenu("UI");
+
+            Handler.AlertType = "Generic";
+
+            Label alert = ui.GetLabel("Alert");
+            alert.Text = message;
+            alert.Value = 60;
+            alert.Visible = true;
         }
 
         public static void Alert_Combat(string attacker_name, string defender_name)
@@ -612,34 +705,16 @@ namespace DoS1.Util
                 menu.GetButton("Back").Visible = true;
                 menu.GetButton("Play").Visible = false;
 
-                Button save = menu.GetButton("Save");
-                save.Visible = true;
-
-                Button options = menu.GetButton("Options");
-                options.Region = new Region(options.Region.X, save.Region.Y + Main.Game.MenuSize.Y, options.Region.Width, options.Region.Height);
-
-                Button main = menu.GetButton("Main");
-                main.Visible = true;
-                main.Region = new Region(main.Region.X, options.Region.Y + Main.Game.MenuSize.Y, main.Region.Width, main.Region.Height);
-
+                menu.GetButton("SaveExit").Visible = true;
                 menu.GetButton("Exit").Visible = false;
             }
             else
             {
                 menu.GetButton("Back").Visible = false;
+                menu.GetButton("Play").Visible = true;
 
-                Button play = menu.GetButton("Play");
-                play.Visible = true;
-
-                menu.GetButton("Save").Visible = false;
-                menu.GetButton("Main").Visible = false;
-
-                Button options = menu.GetButton("Options");
-                options.Region = new Region(options.Region.X, play.Region.Y + (Main.Game.MenuSize.Y * 2), options.Region.Width, options.Region.Height);
-
-                Button exit = menu.GetButton("Exit");
-                exit.Visible = true;
-                exit.Region = new Region(exit.Region.X, options.Region.Y + Main.Game.MenuSize.Y, exit.Region.Width, exit.Region.Height);
+                menu.GetButton("SaveExit").Visible = false;
+                menu.GetButton("Exit").Visible = true;
             }
         }
 

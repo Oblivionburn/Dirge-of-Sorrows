@@ -61,7 +61,7 @@ namespace DoS1.Menus
                 }
                 else
                 {
-                    UpdateAlert(scene.World);
+                    UpdateAlerts(scene.World);
                 }
 
                 if (!Handler.LocalPause)
@@ -827,8 +827,18 @@ namespace DoS1.Menus
             }
         }
 
-        private void UpdateAlert(World world)
+        private void UpdateAlerts(World world)
         {
+            Label alert = GetLabel("Alert");
+            if (alert.Visible)
+            {
+                alert.Value--;
+                if (alert.Value <= 0)
+                {
+                    alert.Visible = false;
+                }
+            }
+
             foreach (Button button in Buttons)
             {
                 if (button.Visible &&
@@ -1375,6 +1385,9 @@ namespace DoS1.Menus
                 enabled = true
             });
 
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Alert", "", Color.LimeGreen, AssetManager.Textures["TextFrame"], 
+                new Region(0, 0, 0, 0), Color.White * 0.6f, false);
+
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_Attacker", "", Color.Red, new Region(0, 0, 0, 0), false);
             GetLabel("Combat_Attacker").Alignment_Horizontal = Alignment.Center;
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_VS", "vs", Color.Red, new Region(0, 0, 0, 0), false);
@@ -1461,6 +1474,7 @@ namespace DoS1.Menus
             GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), height / 2, width * 2, height / 2);
             GetLabel("Debug").Region = new Region(Main.Game.ScreenWidth - (width * 2), height, width * 2, height / 2);
             GetLabel("Gold").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), 0, width * 10, height);
+            GetLabel("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), (Main.Game.ScreenHeight / 2) - height, width * 8, height * 2);
 
             GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
             GetLabel("Dialogue").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Main.Game.ScreenHeight - (height * 5), width * 10, height * 4);

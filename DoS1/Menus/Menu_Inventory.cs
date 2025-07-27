@@ -306,6 +306,15 @@ namespace DoS1.Menus
 
         private void Back()
         {
+            Inventory inventory = InventoryManager.GetInventory("Ally");
+            if (inventory != null)
+            {
+                foreach (Item item in inventory.Items)
+                {
+                    item.Icon_Visible = false;
+                }
+            }
+
             TimeManager.Paused = false;
             SoundManager.AmbientPaused = false;
 
@@ -317,6 +326,15 @@ namespace DoS1.Menus
 
         private void SelectItem(long id)
         {
+            Inventory inventory = InventoryManager.GetInventory("Ally");
+            if (inventory != null)
+            {
+                foreach (Item item in inventory.Items)
+                {
+                    item.Icon_Visible = false;
+                }
+            }
+
             AssetManager.PlaySound_Random("Click");
 
             Handler.Selected_Item = id;

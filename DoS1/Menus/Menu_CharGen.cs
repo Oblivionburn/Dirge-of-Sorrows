@@ -433,8 +433,15 @@ namespace DoS1.Menus
             Active = false;
             Visible = false;
 
-            SceneManager.GetScene("Title").Menu.Visible = true;
-            MenuManager.ChangeMenu("Main");
+            if (Handler.Saves.Count > 0)
+            {
+                MenuManager.ChangeMenu("Save_Load");
+            }
+            else
+            {
+                SceneManager.GetScene("Title").Menu.Visible = true;
+                MenuManager.ChangeMenu("Main");
+            }
         }
 
         private void Finish()
@@ -452,8 +459,11 @@ namespace DoS1.Menus
             leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles[HairStyle], HairColors[HairColor], Handler.HeadStyles[Head], EyeColors[EyeColor], Handler.SkinTones[Skin]);
             squad.Characters.Add(leader);
             squad.Leader_ID = leader.ID;
-            Handler.MainCharacter_ID = leader.ID;
 
+            Handler.MainCharacter_ID = leader.ID;
+            Handler.Selected_Save = LeaderName;
+
+            leader.Inventory.Name = LeaderName;
             InventoryUtil.AddItem(leader.Inventory, "Cloth", "Cloth", "Armor");
             InventoryUtil.EquipItem(leader, leader.Inventory.Items[leader.Inventory.Items.Count - 1]);
 
@@ -470,7 +480,7 @@ namespace DoS1.Menus
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
             AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "Type your name here", Color.DarkGray, AssetManager.Textures["TextFrame"],
-                new Region(0, 0, 0, 0), true, true);
+                new Region(0, 0, 0, 0), false, true);
             GetInput("Name").CarrotDelay = 10;
             GetInput("Name").Alignment_Horizontal = Alignment.Left;
             GetInput("Name").Alignment_Verticle = Alignment.Center;

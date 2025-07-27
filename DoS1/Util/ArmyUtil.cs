@@ -52,17 +52,6 @@ namespace DoS1.Util
             Squad reserves_squad = NewSquad("Reserves");
             reserves.Squads.Add(reserves_squad);
 
-            //Academy
-            Army academy = new Army
-            {
-                ID = Handler.GetID(),
-                Name = "Academy"
-            };
-            CharacterManager.Armies.Add(academy);
-
-            Squad academy_squad = NewSquad("Academy");
-            academy.Squads.Add(academy_squad);
-
             //Enemy
             Army enemies = new Army
             {

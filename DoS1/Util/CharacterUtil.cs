@@ -37,6 +37,8 @@ namespace DoS1.Util
             character.Stats.Add(new Something { Name = "DEX", Value = 10, Max_Value = 100 });
             character.Stats.Add(new Something { Name = "AGI", Value = 10, Max_Value = 100 });
 
+            character.Inventory.Name = name;
+
             //Add head
             Item item = new Item();
             item.ID = Handler.GetID();
@@ -46,6 +48,7 @@ namespace DoS1.Util
             item.Equipped = true;
             item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + headStyle];
             item.Image = character.Image;
+            item.DrawColor = Color.White;
             item.Visible = true;
             character.Inventory.Items.Add(item);
 
@@ -140,6 +143,8 @@ namespace DoS1.Util
 
             character.Texture = AssetManager.Textures[direction + "_Body_" + skin_tone + "_Idle"];
             character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
+
+            character.Inventory.Name = name;
 
             //Add head
             Item item = new Item();

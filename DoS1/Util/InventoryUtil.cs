@@ -14,15 +14,7 @@ namespace DoS1.Util
     {
         public static void GenAssets()
         {
-            for (int i = 0; i < InventoryManager.Inventories.Count; i++)
-            {
-                Inventory existing = InventoryManager.Inventories[i];
-                if (existing.Name != "Assets")
-                {
-                    InventoryManager.Inventories.Remove(existing);
-                    i--;
-                }
-            }
+            InventoryManager.Inventories.Clear();
 
             Inventory assets = new Inventory
             {
@@ -1146,6 +1138,10 @@ namespace DoS1.Util
                 if (asset != null)
                 {
                     Item new_item = CopyItem(asset, true);
+                    if (new_item.DrawColor == Color.Black)
+                    {
+                        new_item.DrawColor = Color.White;
+                    }
 
                     int x = 0;
                     int y = 0;

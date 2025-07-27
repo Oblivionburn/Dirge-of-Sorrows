@@ -289,6 +289,7 @@ namespace DoS1
         {
             MenuManager.Menus.Add(new Menu_UI(Content));
             MenuManager.Menus.Add(new Menu_Main(Content));
+            MenuManager.Menus.Add(new Menu_Save_Load(Content));
             MenuManager.Menus.Add(new Menu_CharGen(Content));
             MenuManager.Menus.Add(new Menu_Options(Content));
             MenuManager.Menus.Add(new Menu_Army(Content));

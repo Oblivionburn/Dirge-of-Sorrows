@@ -105,7 +105,7 @@ namespace DoS1
         public static List<Something> light_maps = new List<Something>();
         public static int light_tile_distance = 1;
 
-        public static List<string> Saves;
+        public static List<string> Saves = new List<string>();
         public static string Selected_Save;
 
         public static oPathing Pathing = new oPathing();
@@ -135,13 +135,26 @@ namespace DoS1
             TimeManager.Reset(TimeRate.Second, 1, 1, 1, 12);
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm, WeatherType.Snow };
 
-            SoundManager.SoundEnabled = true;
-            SoundManager.SoundVolume = 0.8f;
+            string saves = AssetManager.Directories["Saves"];
+            if (!Directory.Exists(saves))
+            {
+                Directory.CreateDirectory(saves);
+            }
+            else
+            {
+                //Load Saves
+                DirectoryInfo savesDir = new DirectoryInfo(AssetManager.Directories["Saves"]);
+                foreach (DirectoryInfo saveDir in savesDir.GetDirectories())
+                {
+                    Saves.Add(saveDir.Name);
+                }
+            }
 
             string config = AssetManager.Files["Config"];
             if (!File.Exists(config))
             {
                 File.Create(config).Close();
+                Save.ExportINI();
             }
             else
             {
@@ -151,8 +164,8 @@ namespace DoS1
 
         public static void Load_Init()
         {
-            AssetManager.Files.Add("Config", Environment.CurrentDirectory + @"\config.ini");
-            AssetManager.Files.Add("Save", Environment.CurrentDirectory + @"\save.dat");
+            AssetManager.Directories.Add("Saves", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Dirge of Sorrows"));
+            AssetManager.Files.Add("Config", Path.Combine(AssetManager.Directories["Saves"], "config.ini"));
 
             AssetManager.LoadFonts();
             AssetManager.LoadShaders(Main.Game.GraphicsManager.GraphicsDevice);
