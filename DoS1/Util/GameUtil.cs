@@ -191,17 +191,17 @@ namespace DoS1.Util
             SoundManager.AmbientFade = 1;
             SoundManager.AmbientPaused = false;
 
+            WeatherManager.Transitioning = false;
+            WeatherManager.Lightning = false;
+            WeatherManager.TransitionType = WeatherTransition.None;
+            WeatherManager.CurrentWeather = WeatherType.Clear;
+
             foreach (Weather weather in WeatherManager.Weathers)
             {
                 weather.TransitionTime = 0;
                 weather.ParticleManager.Particles.Clear();
                 weather.Visible = false;
             }
-
-            WeatherManager.Transitioning = false;
-            WeatherManager.Lightning = false;
-            WeatherManager.TransitionType = WeatherTransition.None;
-            WeatherManager.CurrentWeather = WeatherType.Clear;
 
             CryptoRandom random = new CryptoRandom();
             int weather_choice = random.Next(0, 3);
@@ -690,6 +690,60 @@ namespace DoS1.Util
             SoundManager.AmbientPaused = false;
 
             Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
+            button.HoverText = "Pause";
+            button.Texture = AssetManager.Textures["Button_Pause"];
+            button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
+            button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
+        }
+
+        public static void Toggle_Pause_Combat(bool manual)
+        {
+            if (Handler.CombatPause)
+            {
+                if (manual)
+                {
+                    Handler.ManualPause = false;
+                    CombatUnpause();
+                }
+                else if (!Handler.ManualPause)
+                {
+                    //Don't auto-unpause if player had intentionally paused
+                    CombatUnpause();
+                }
+            }
+            else
+            {
+                if (manual)
+                {
+                    Handler.ManualPause = true;
+                }
+
+                CombatPause();
+            }
+        }
+
+        public static void CombatPause()
+        {
+            Handler.CombatTimer.Stop();
+
+            Handler.CombatPause = true;
+            SoundManager.AmbientPaused = true;
+
+            Button button = SceneManager.GetScene("Combat").Menu.GetButton("PlayPause");
+            button.HoverText = "Play";
+            button.Texture = AssetManager.Textures["Button_Play"];
+            button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+            button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+        }
+
+        public static void CombatUnpause()
+        {
+            Handler.CombatTimer.Start();
+
+            Handler.CombatPause = false;
+            SoundManager.AmbientPaused = false;
+
+            Button button = SceneManager.GetScene("Combat").Menu.GetButton("PlayPause");
             button.HoverText = "Pause";
             button.Texture = AssetManager.Textures["Button_Pause"];
             button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];

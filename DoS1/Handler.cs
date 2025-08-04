@@ -37,6 +37,7 @@ namespace DoS1
 
         public static bool ManualPause;
         public static bool LocalPause;
+        public static bool CombatPause;
 
         public static long Selected_Token = -1;
 
@@ -71,7 +72,7 @@ namespace DoS1
         public static Character Dialogue_Character2;
 
         public static string[] SkinTones = new string[] { "Light", "Tan", "Dark", "Darkest" };
-        public static string[] HeadStyles = new string[] { "Head1", "Head2", "Head3", "Head4" };
+        public static string[] HeadStyles = new string[] { "Head1", "Head2", "Head3", "Head4", "Head5", "Head6" };
         public static string[] HairStyles = new string[] { "Style1", "Style2", "Style3", "Style4", "Style5", "Style6", "Bald"};
 
         public static Dictionary<string, Color> HairColors = new Dictionary<string, Color>()

@@ -21,6 +21,7 @@ using OP_Engine.Time;
 
 using DoS1.Scenes;
 using DoS1.Menus;
+using DoS1.Util;
 
 namespace DoS1
 {
@@ -30,6 +31,7 @@ namespace DoS1
 
         public static OP_Game Game;
         public static string Version;
+        public static bool LostFocus;
 
         public static int TimeSpeed = 1;
         public static int CombatSpeed = 2;
@@ -136,27 +138,45 @@ namespace DoS1
                         if (!Game.Form.Focused)
                         {
                             if (Game.GameStarted &&
-                                !TimeManager.Paused)
+                                !LostFocus)
                             {
-                                TimeManager.Paused = true;
-                                SoundManager.AmbientPaused = true;
-
-                                if (Handler.Combat)
+                                if (!TimeManager.Paused ||
+                                    Handler.Combat)
                                 {
-                                    Handler.CombatTimer.Stop();
+                                    LostFocus = true;
+
+                                    if (Handler.Combat)
+                                    {
+                                        GameUtil.Toggle_Pause_Combat(false);
+                                    }
+                                    else if (!TimeManager.Paused)
+                                    {
+                                        TimeManager.Paused = true;
+                                        SoundManager.AmbientPaused = true;
+
+                                        OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");
+                                        ui.Active = false;
+                                        ui.Visible = false;
+
+                                        MenuManager.ChangeMenu("Main");
+                                    }
                                 }
-
-                                OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");
-                                ui.Active = false;
-                                ui.Visible = false;
-
-                                MenuManager.ChangeMenu("Main");
                             }
 
                             SoundManager.Paused = true;
                         }
                         else if (Game.Form.Focused)
                         {
+                            if (LostFocus)
+                            {
+                                LostFocus = false;
+
+                                if (Handler.Combat)
+                                {
+                                    GameUtil.Toggle_Pause_Combat(false);
+                                }
+                            }
+
                             SoundManager.Paused = false;
 
                             InputManager.Update();
@@ -170,10 +190,18 @@ namespace DoS1
                             }
                         }
                     }
-                    else
+                    else if (!LostFocus)
                     {
+                        LostFocus = true;
+
                         TimeManager.Paused = true;
                         SoundManager.Paused = true;
+
+                        if (Handler.Combat)
+                        {
+                            GameUtil.Toggle_Pause_Combat(false);
+                            Handler.CombatTimer.Stop();
+                        }
                     }
 
                     SoundManager.Update();

@@ -52,7 +52,6 @@ namespace DoS1.Scenes
         private readonly int animation_speed = 16;
         private readonly int label_speed = 4;
 
-        private bool paused = false;
         private string combat_state = "StatusEffects";
 
         private int ally_total_damage;
@@ -300,7 +299,7 @@ namespace DoS1.Scenes
 
             if (InputManager.KeyPressed("Space"))
             {
-                Toggle_Pause();
+                GameUtil.Toggle_Pause_Combat(true);
             }
         }
 
@@ -311,7 +310,7 @@ namespace DoS1.Scenes
 
             if (button.Name == "PlayPause")
             {
-                Toggle_Pause();
+                GameUtil.Toggle_Pause_Combat(true);
             }
             else if (button.Name == "Speed")
             {
@@ -352,7 +351,7 @@ namespace DoS1.Scenes
                 step = true;
 
                 if (!TimeManager.Paused &&
-                    !paused)
+                    !Handler.CombatPause)
                 {
                     if (current_character != null)
                     {
@@ -1967,32 +1966,6 @@ namespace DoS1.Scenes
                         }
                     }
                 }
-            }
-        }
-
-        private void Toggle_Pause()
-        {
-            Button button = Menu.GetButton("PlayPause");
-
-            if (paused)
-            {
-                paused = false;
-                SoundManager.AmbientPaused = false;
-
-                button.HoverText = "Pause";
-                button.Texture = AssetManager.Textures["Button_Pause"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
-            }
-            else
-            {
-                paused = true;
-                SoundManager.AmbientPaused = true;
-
-                button.HoverText = "Play";
-                button.Texture = AssetManager.Textures["Button_Play"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
             }
         }
 
