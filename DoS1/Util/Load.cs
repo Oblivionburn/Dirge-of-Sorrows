@@ -1022,7 +1022,7 @@ namespace DoS1.Util
 
                     case "Destination":
                         string[] destination_parts = reader.Value.Split(',');
-                        squad.Destination = new Vector3(float.Parse(destination_parts[0]), float.Parse(destination_parts[1]), 0);
+                        squad.Destination = new Location(float.Parse(destination_parts[0]), float.Parse(destination_parts[1]), 0);
                         break;
 
                     case "Coordinates":

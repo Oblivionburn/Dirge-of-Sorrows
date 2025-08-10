@@ -397,16 +397,19 @@ namespace DoS1.Menus
                                     if (squad.Type == "Ally")
                                     {
                                         highlight.DrawColor = new Color(0, 0, 255, 255);
+                                        highlight.Texture = AssetManager.Textures["Highlight_Circle"];
                                     }
                                     else if (squad.Type == "Enemy")
                                     {
                                         highlight.DrawColor = new Color(255, 0, 0, 255);
+                                        highlight.Texture = AssetManager.Textures["Highlight_Circle"];
                                     }
 
                                     GameUtil.Examine(this, squad.Name);
                                 }
                                 else if (Handler.Selected_Token == squad.ID)
                                 {
+                                    select.Texture = AssetManager.Textures["Highlight_Circle"];
                                     select.Region = squad.Region;
                                     select.Visible = true;
                                     select.DrawColor = new Color(0, 255, 255, 255);
@@ -417,6 +420,7 @@ namespace DoS1.Menus
                                 }
                                 else if (squad.Type == "Enemy")
                                 {
+                                    select.Texture = AssetManager.Textures["Highlight_Circle"];
                                     select.Region = squad.Region;
                                     select.Visible = true;
                                     select.DrawColor = new Color(255, 0, 0, 255);
@@ -454,7 +458,7 @@ namespace DoS1.Menus
                                     Handler.ViewOnly_Item = true;
 
                                     Layer locations = map.GetLayer("Locations");
-                                    Tile location_tile = locations.GetTile(squad.Destination);
+                                    Tile location_tile = locations.GetTile(new Vector3(squad.Destination.X, squad.Destination.Y, 0));
                                     if (location_tile != null &&
                                         squad.Type == "Ally")
                                     {
@@ -514,6 +518,7 @@ namespace DoS1.Menus
                         if (Handler.Selected_Token == -1)
                         {
                             Picture highlight = GetPicture("Highlight");
+                            highlight.Texture = AssetManager.Textures["Grid_Hover"];
                             highlight.Region = location.Region;
                             highlight.Visible = true;
                             highlight.DrawColor = new Color(255, 255, 255, 255);
@@ -521,6 +526,7 @@ namespace DoS1.Menus
                         else
                         {
                             Picture select = GetPicture("Select");
+                            select.Texture = AssetManager.Textures["Grid_Hover"];
                             select.Region = location.Region;
                             select.Visible = true;
                             select.DrawColor = new Color(0, 255, 0, 255);
@@ -563,6 +569,7 @@ namespace DoS1.Menus
                         Handler.Hovering_Squad.Type != "Enemy")
                     {
                         Picture select = GetPicture("Select");
+                        select.Texture = AssetManager.Textures["Grid_Hover"];
                         select.Region = tile.Region;
                         select.DrawColor = new Color(0, 255, 0, 255);
                     }
@@ -1456,8 +1463,8 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                 new Region(0, 0, 0, 0), false);
 
-            AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Highlight"], new Region(0, 0, 0, 0), Color.White, false);
-            AddPicture(Handler.GetID(), "Select", AssetManager.Textures["Highlight"], new Region(0, 0, 0, 0), new Color(0, 255, 0, 255), false);
+            AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Select", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), new Color(0, 255, 0, 255), false);
 
             Resize(Main.Game.Resolution);
         }

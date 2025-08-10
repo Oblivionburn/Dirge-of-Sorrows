@@ -569,12 +569,16 @@ namespace DoS1.Util
             if (destination != null)
             {
                 Picture select = menu.GetPicture("Select");
+                select.Texture = AssetManager.Textures["Grid_Hover"];
                 select.Region = destination.Region;
                 select.Visible = true;
 
                 Squad target = ArmyUtil.Get_TargetSquad(squad.GetLeader().Target_ID);
                 if (target != null)
                 {
+                    select.Texture = AssetManager.Textures["Highlight_Circle"];
+                    select.Region = target.Region;
+
                     if (target.Type == "Ally")
                     {
                         select.DrawColor = new Color(0, 0, 255, 255);
@@ -1212,7 +1216,7 @@ namespace DoS1.Util
                                     squad.Move_TotalDistance = Main.Game.TileSize.X;
                                     squad.Moving = true;
                                     squad.Speed = Get_TerrainSpeed(map, squad_location);
-                                    squad.Destination = new Vector3(path_location.X, path_location.Y, 0);
+                                    squad.Destination = new Location(path_location.X, path_location.Y, 0);
                                     squad.Update();
 
                                     Squad other_squad = CheckSquadCollision(squad);
@@ -1254,7 +1258,7 @@ namespace DoS1.Util
                                             if (!squad.Path.Any())
                                             {
                                                 Layer locations = map.GetLayer("Locations");
-                                                Tile location_tile = locations.GetTile(squad.Destination);
+                                                Tile location_tile = locations.GetTile(new Vector3(squad.Destination.X, squad.Destination.Y, 0));
 
                                                 if (squad.Type == "Ally")
                                                 {

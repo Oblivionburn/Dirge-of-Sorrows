@@ -878,8 +878,10 @@ namespace DoS1.Util
                     Army enemy_army = CharacterManager.GetArmy("Enemy");
                     foreach (Squad enemy_squad in enemy_army.Squads)
                     {
-                        if (enemy_squad.Location.X == destination.Location.X &&
-                            enemy_squad.Location.Y == destination.Location.Y)
+                        if ((destination.Location.X == enemy_squad.Location.X &&
+                             destination.Location.Y == enemy_squad.Location.Y) ||
+                            (destination.Location.X == enemy_squad.Destination.X &&
+                             destination.Location.Y == enemy_squad.Destination.Y))
                         {
                             enemy_targeted = true;
                             squad.GetLeader().Target_ID = enemy_squad.ID;
