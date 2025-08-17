@@ -7,6 +7,7 @@ using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
+using System;
 
 namespace DoS1.Util
 {
@@ -466,7 +467,6 @@ namespace DoS1.Util
 
         public static void Increase_XP(Character character, int xp)
         {
-            CryptoRandom random;
             int max_level = 100;
 
             if (character.Level < max_level)
@@ -478,60 +478,7 @@ namespace DoS1.Util
                     //Do we have enough XP to reach the next level?
                     if (character.XP >= character.XP_Needed_ForLevels[character.Level + 1])
                     {
-                        character.XP = 0;
-                        character.Level++;
-
-                        //Increase stat
-                        random = new CryptoRandom();
-                        int choice = random.Next(0, 3);
-                        if (choice == 0)
-                        {
-                            //Increase damage
-                            Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                            if (weapon != null)
-                            {
-                                if (InventoryUtil.Weapon_IsMelee(weapon) ||
-                                    weapon.Categories[0] == "Bow")
-                                {
-                                    character.GetStat("STR").IncreaseValue(1);
-                                }
-                                else if (weapon.Categories[0] == "Grimoire")
-                                {
-                                    character.GetStat("INT").IncreaseValue(1);
-                                }
-                            }
-                            else
-                            {
-                                character.GetStat("STR").IncreaseValue(1);
-                            }
-                        }
-                        else if (choice == 1)
-                        {
-                            //Increase accuracy
-                            Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                            if (weapon != null)
-                            {
-                                if (InventoryUtil.Weapon_IsMelee(weapon) ||
-                                    weapon.Categories[0] == "Bow")
-                                {
-                                    character.GetStat("DEX").IncreaseValue(1);
-                                }
-                                else if (weapon.Categories[0] == "Grimoire")
-                                {
-                                    //Accuracy doesn't matter for magic, so increase damage
-                                    character.GetStat("INT").IncreaseValue(1);
-                                }
-                            }
-                            else
-                            {
-                                character.GetStat("DEX").IncreaseValue(1);
-                            }
-                        }
-                        else if (choice == 2)
-                        {
-                            //Increase dodge chance
-                            character.GetStat("AGI").IncreaseValue(1);
-                        }
+                        Increase_Level(character);
 
                         if (character.Level == max_level)
                         {
@@ -539,6 +486,66 @@ namespace DoS1.Util
                         }
                     }
                 }
+            }
+        }
+
+        public static void Increase_Level(Character character)
+        {
+            CryptoRandom random;
+
+            character.XP = 0;
+            character.Level++;
+
+            //Increase stat
+            random = new CryptoRandom();
+            int choice = random.Next(0, 3);
+            if (choice == 0)
+            {
+                //Increase damage
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
+                {
+                    if (InventoryUtil.Weapon_IsMelee(weapon) ||
+                        weapon.Categories[0] == "Bow")
+                    {
+                        character.GetStat("STR").IncreaseValue(1);
+                    }
+                    else if (weapon.Categories[0] == "Grimoire")
+                    {
+                        character.GetStat("INT").IncreaseValue(1);
+                    }
+                }
+                else
+                {
+                    character.GetStat("STR").IncreaseValue(1);
+                }
+            }
+            else if (choice == 1)
+            {
+                //Increase accuracy
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
+                {
+                    if (InventoryUtil.Weapon_IsMelee(weapon) ||
+                        weapon.Categories[0] == "Bow")
+                    {
+                        character.GetStat("DEX").IncreaseValue(1);
+                    }
+                    else if (weapon.Categories[0] == "Grimoire")
+                    {
+                        //Accuracy doesn't matter for magic, so increase damage
+                        character.GetStat("INT").IncreaseValue(1);
+                    }
+                }
+                else
+                {
+                    character.GetStat("DEX").IncreaseValue(1);
+                }
+            }
+            else if (choice == 2)
+            {
+                //Increase dodge chance
+                character.GetStat("AGI").IncreaseValue(1);
             }
         }
     }

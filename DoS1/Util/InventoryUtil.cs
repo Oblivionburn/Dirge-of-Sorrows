@@ -72,18 +72,21 @@ namespace DoS1.Util
             items.Add(item);
 
             properties[0].Value = 20;
+            properties[1].Value = 2;
             properties[2].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 200;
             items.Add(item);
 
             properties[0].Value = 25;
+            properties[1].Value = 2;
             properties[2].Value = 5;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 250;
             items.Add(item);
 
             properties[0].Value = 30;
+            properties[1].Value = 2;
             properties[2].Value = 6;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 300;
@@ -98,18 +101,21 @@ namespace DoS1.Util
             items.Add(item);
 
             properties[0].Value = 40;
+            properties[1].Value = 0;
             properties[2].Value = 8;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 400;
             items.Add(item);
 
             properties[0].Value = 45;
+            properties[1].Value = 0;
             properties[2].Value = 9;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 450;
             items.Add(item);
 
             properties[0].Value = 50;
+            properties[1].Value = 0;
             properties[2].Value = 10;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 500;
@@ -150,18 +156,21 @@ namespace DoS1.Util
             items.Add(item);
 
             properties[0].Value = 4;
+            properties[1].Value = 2;
             properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 40;
             items.Add(item);
 
             properties[0].Value = 5;
+            properties[1].Value = 2;
             properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 50;
             items.Add(item);
 
             properties[0].Value = 6;
+            properties[1].Value = 2;
             properties[2].Value = 3;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 60;
@@ -176,18 +185,21 @@ namespace DoS1.Util
             items.Add(item);
 
             properties[0].Value = 8;
+            properties[1].Value = 0;
             properties[2].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 80;
             items.Add(item);
 
             properties[0].Value = 9;
+            properties[1].Value = 0;
             properties[2].Value = 5;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 90;
             items.Add(item);
 
             properties[0].Value = 10;
+            properties[1].Value = 0;
             properties[2].Value = 5;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 100;
@@ -586,39 +598,6 @@ namespace DoS1.Util
             property.Type = type;
             property.Assignment = assignment;
             return property;
-        }
-
-        public static void TestInventory()
-        {
-            Inventory assets = InventoryManager.GetInventory("Assets");
-            if (assets != null)
-            {
-                Inventory ally = InventoryManager.GetInventory("Ally");
-                if (ally != null)
-                {
-                    int x = 0;
-                    int y = 0;
-
-                    for (int i = 0; i < 300; i++)
-                    {
-                        CryptoRandom random = new CryptoRandom();
-                        Item item = assets.Items[random.Next(0, assets.Items.Count)];
-                        if (item != null)
-                        {
-                            Item new_item = CopyItem(item, true);
-                            new_item.Location = new Location(x, y, 0);
-                            ally.Items.Add(new_item);
-
-                            x++;
-                            if (x > 9)
-                            {
-                                x = 0;
-                                y++;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         public static void BeginningInventory()
@@ -1138,7 +1117,7 @@ namespace DoS1.Util
                 if (asset != null)
                 {
                     Item new_item = CopyItem(asset, true);
-                    if (new_item.DrawColor == Color.Black)
+                    if (new_item.DrawColor == default)
                     {
                         new_item.DrawColor = Color.White;
                     }
@@ -1290,6 +1269,106 @@ namespace DoS1.Util
             }
 
             return spell;
+        }
+
+        public static void AddRunes(Item item, int tier, int amount)
+        {
+            CryptoRandom random;
+
+            Inventory assets = InventoryManager.GetInventory("Assets");
+            if (assets != null)
+            {
+                Something slots = item.GetProperty("Rune Slots");
+                if (slots != null)
+                {
+                    if (amount > slots.Value)
+                    {
+                        amount = (int)slots.Value;
+                    }
+
+                    for (int i = 0; i < amount; i++)
+                    {
+                        string rune_type = "";
+
+                        random = new CryptoRandom();
+                        int rune_choice = random.Next(0, 14);
+                        switch (rune_choice)
+                        {
+                            case 0:
+                                rune_type = "Area Rune";
+                                break;
+
+                            case 1:
+                                rune_type = "Death Rune";
+                                break;
+
+                            case 2:
+                                rune_type = "Time Rune";
+                                break;
+
+                            case 3:
+                                rune_type = "Drain Rune";
+                                break;
+
+                            case 4:
+                                rune_type = "Health Rune";
+                                break;
+
+                            case 5:
+                                rune_type = "Earth Rune";
+                                break;
+
+                            case 6:
+                                rune_type = "Ice Rune";
+                                break;
+
+                            case 7:
+                                rune_type = "Physical Rune";
+                                break;
+
+                            case 8:
+                                rune_type = "Lightning Rune";
+                                break;
+
+                            case 9:
+                                rune_type = "Fire Rune";
+                                break;
+
+                            case 10:
+                                rune_type = "Energy Rune";
+                                break;
+
+                            case 11:
+                                rune_type = "Effect Rune";
+                                break;
+
+                            case 12:
+                                rune_type = "Counter Rune";
+                                break;
+
+                            case 13:
+                                rune_type = "Disarm Rune";
+                                break;
+                        }
+
+                        Item rune = CopyItem(assets.GetItem(rune_type), true);
+                        rune.Location = new Location(item.Attachments.Count, 0, 0);
+                        rune.Icon_Visible = true;
+
+                        Something xp = rune.GetProperty("XP Value");
+                        Something level = rune.GetProperty("Level Value");
+
+                        level.Value = tier;
+                        if (level.Value >= level.Max_Value)
+                        {
+                            xp.Value = xp.Max_Value;
+                        }
+
+                        item.Attachments.Add(rune);
+                        UpdateItem(item);
+                    }
+                }
+            }
         }
 
         public static Inventory Gen_Shop(int depth)

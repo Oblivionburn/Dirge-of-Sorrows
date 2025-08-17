@@ -18,7 +18,7 @@ namespace DoS1.Util
         {
             Vector2 other_squad_location = new Vector2(other_squad.Location.X, other_squad.Location.Y);
 
-            Handler.Combat_Terrain = WorldUtil.Get_Terrain(map, other_squad_location);
+            Handler.Combat_Terrain = WorldUtil.Get_Terrain_Tile(map, other_squad_location);
 
             Handler.Combat_Ally_Base = false;
             Handler.Combat_Enemy_Base = false;
@@ -1403,7 +1403,10 @@ namespace DoS1.Util
             }
 
             Picture effect = Get_LastDamagePicture(menu);
-            effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
+            if (effect != null)
+            {
+                effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
+            }
         }
 
         public static void Kill(Character character)

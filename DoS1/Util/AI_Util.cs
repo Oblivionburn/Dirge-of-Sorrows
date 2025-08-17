@@ -32,6 +32,18 @@ namespace DoS1.Util
                     target_tile = ground.GetTile(new Vector2(target_squad.Location.X, target_squad.Location.Y));
                 }
             }
+            else if (squad.Assignment == "Sleeper")
+            {
+                Squad target_squad = WorldUtil.GetNearest_Squad(squad);
+                if (target_squad != null)
+                {
+                    if (WorldUtil.GetDistance(squad.Location, target_squad.Location) <= 4)
+                    {
+                        squad.GetLeader().Target_ID = target_squad.ID;
+                        target_tile = ground.GetTile(new Vector2(target_squad.Location.X, target_squad.Location.Y));
+                    }
+                }
+            }
 
             if (target_tile != null)
             {

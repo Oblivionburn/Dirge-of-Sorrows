@@ -204,6 +204,19 @@ namespace DoS1.Menus
                 ResizeInventory();
             }
 
+            if (!found_helm &&
+                !found_armor &&
+                !found_shield &&
+                !found_weapon &&
+                !found_button &&
+                !found_stat &&
+                !found_grid &&
+                !found_item &&
+                InputManager.Mouse_RB_Pressed)
+            {
+                Back();
+            }
+
             if (InputManager.KeyPressed("Esc"))
             {
                 Back();

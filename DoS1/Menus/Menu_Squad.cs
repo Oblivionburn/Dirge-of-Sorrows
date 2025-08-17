@@ -281,6 +281,14 @@ namespace DoS1.Menus
                 }
             }
 
+            if (!found_button &&
+                !found_squad &&
+                !found_grid &&
+                InputManager.Mouse_RB_Pressed)
+            {
+                Back();
+            }
+            
             if (InputManager.KeyPressed("Esc"))
             {
                 Back();

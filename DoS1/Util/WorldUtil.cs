@@ -307,7 +307,10 @@ namespace DoS1.Util
                                 squad.Region.Y = current.Region.Y;
                             }
 
-                            float new_speed = Get_TerrainSpeed(map, new Vector2(squad.Location.X, squad.Location.Y));
+                            Vector2 squad_screen_location = new Vector2(squad.Region.X + squad.Region.Width / 2,
+                                squad.Region.Y + squad.Region.Height / 2);
+
+                            float new_speed = Get_TerrainSpeed(map, squad_screen_location);
                             float move_percent = squad.Moved / squad.Move_TotalDistance;
 
                             squad.Moved = move_percent * Main.Game.TileSize.X;
@@ -858,7 +861,7 @@ namespace DoS1.Util
             return x_diff + y_diff;
         }
 
-        public static string Get_Terrain(Map map, Vector2 location)
+        public static string Get_Terrain_Tile(Map map, Vector2 location)
         {
             Layer ground = map.GetLayer("Ground");
 
@@ -871,11 +874,39 @@ namespace DoS1.Util
             return null;
         }
 
-        public static float Get_TerrainSpeed(Map map, Vector2 location)
+        public static string Get_Terrain_Screen(Map map, Vector2 screen_location)
+        {
+            Layer roads = map.GetLayer("Roads");
+            if (roads != null)
+            {
+                foreach (Tile tile in roads.Tiles)
+                {
+                    if (screen_location.X >= tile.Region.X && screen_location.X < tile.Region.X + tile.Region.Width &&
+                        screen_location.Y >= tile.Region.Y && screen_location.Y < tile.Region.Y + tile.Region.Height)
+                    {
+                        return "Road";
+                    }
+                }
+            }
+
+            Layer ground = map.GetLayer("Ground");
+            foreach (Tile tile in ground.Tiles)
+            {
+                if (screen_location.X >= tile.Region.X && screen_location.X < tile.Region.X + tile.Region.Width &&
+                    screen_location.Y >= tile.Region.Y && screen_location.Y < tile.Region.Y + tile.Region.Height)
+                {
+                    return tile.Type;
+                }
+            }
+
+            return null;
+        }
+
+        public static float Get_TerrainSpeed(Map map, Vector2 screen_location)
         {
             float speed = 0;
 
-            string terrain = Get_Terrain(map, location);
+            string terrain = Get_Terrain_Screen(map, screen_location);
             switch (terrain)
             {
                 case "Grass":
@@ -899,16 +930,10 @@ namespace DoS1.Util
                 case "Mountains_Snow":
                     speed = (float)Main.Game.TileSize.X / 96; //0.5
                     break;
-            }
 
-            Layer roads = map.GetLayer("Roads");
-            if (roads != null)
-            {
-                Tile road = roads.GetTile(new Vector3(location.X, location.Y, 0));
-                if (road != null)
-                {
+                case "Road":
                     speed = (float)Main.Game.TileSize.X / 12; //4
-                }
+                    break;
             }
 
             return speed / 20;
@@ -1191,31 +1216,33 @@ namespace DoS1.Util
                                     ALocation path = squad.Path[0];
 
                                     Vector2 path_location = new Vector2(path.X, path.Y);
-                                    Vector2 squad_location = new Vector2(squad.Location.X, squad.Location.Y);
+                                    Vector2 squad_screen_location = new Vector2(squad.Region.X + squad.Region.Width / 2, 
+                                        squad.Region.Y + squad.Region.Height / 2);
+                                    Vector2 squad_tile_location = new Vector2(squad.Location.X, squad.Location.Y);
 
-                                    if (squad_location.X < path_location.X)
+                                    if (squad_tile_location.X < path_location.X)
                                     {
                                         squad.Direction = Direction.East;
                                     }
-                                    else if (squad_location.X > path_location.X)
+                                    else if (squad_tile_location.X > path_location.X)
                                     {
                                         squad.Direction = Direction.West;
                                     }
-                                    else if (squad_location.Y < path_location.Y)
+                                    else if (squad_tile_location.Y < path_location.Y)
                                     {
                                         squad.Direction = Direction.South;
                                     }
-                                    else if (squad_location.Y > path_location.Y)
+                                    else if (squad_tile_location.Y > path_location.Y)
                                     {
                                         squad.Direction = Direction.North;
                                     }
 
                                     Tile destination = ground.GetTile(path_location);
-                                    Tile location = ground.GetTile(squad_location);
+                                    Tile location = ground.GetTile(squad_tile_location);
 
                                     squad.Move_TotalDistance = Main.Game.TileSize.X;
                                     squad.Moving = true;
-                                    squad.Speed = Get_TerrainSpeed(map, squad_location);
+                                    squad.Speed = Get_TerrainSpeed(map, squad_screen_location);
                                     squad.Destination = new Location(path_location.X, path_location.Y, 0);
                                     squad.Update();
 

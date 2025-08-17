@@ -1408,41 +1408,43 @@ namespace DoS1.Util
         public static void UpdateRune_Level(Item rune)
         {
             Something level = rune.GetProperty("Level Value");
-            if (level != null &&
-                level.Value < level.Max_Value) //Don't increase XP if we've hit max level
-            {
-                Something xp = rune.GetProperty("XP Value");
-                if (xp != null)
-                {
-                    //Check if rune can increase level
-                    float left_over = xp.Max_Value - xp.Value;
-                    while (left_over <= 0)
-                    {
-                        if (level != null)
-                        {
-                            //Increase rune level
-                            level.Value++;
-                            UpdateRune_Description(rune);
+            Something xp = rune.GetProperty("XP Value");
 
-                            if (level.Value >= level.Max_Value)
-                            {
-                                //We've hit max level
-                                level.Value = level.Max_Value;
-                                xp.Value = xp.Max_Value;
-                                break;
-                            }
-                            else
-                            {
-                                xp.Value -= xp.Max_Value;
-                                left_over = xp.Max_Value - xp.Value;
-                            }
+            //Don't increase XP if we've hit max level
+            if (level.Value < level.Max_Value)
+            {
+                //Check if rune can increase level
+                float left_over = xp.Max_Value - xp.Value;
+                while (left_over <= 0)
+                {
+                    if (level != null)
+                    {
+                        //Increase rune level
+                        level.Value++;
+                        UpdateRune_Description(rune);
+
+                        if (level.Value >= level.Max_Value)
+                        {
+                            //We've hit max level
+                            level.Value = level.Max_Value;
+                            xp.Value = xp.Max_Value;
+                            break;
                         }
                         else
                         {
-                            break;
+                            xp.Value -= xp.Max_Value;
+                            left_over = xp.Max_Value - xp.Value;
                         }
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                xp.Value = xp.Max_Value;
             }
         }
 

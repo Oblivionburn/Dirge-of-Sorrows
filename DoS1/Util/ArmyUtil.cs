@@ -7,6 +7,7 @@ using OP_Engine.Characters;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Menus;
+using OP_Engine.Inventories;
 
 namespace DoS1.Util
 {
@@ -66,6 +67,7 @@ namespace DoS1.Util
             Squad squad = new Squad
             {
                 ID = Handler.GetID(),
+                Location = new Location(),
                 Type = type
             };
 
@@ -86,12 +88,12 @@ namespace DoS1.Util
             return squad;
         }
 
-        public static void Gen_EnemySquads(Army army, int depth)
+        public static void Gen_EnemySquads(Army army, int map_level)
         {
             army.Squads.Clear();
 
             int squads = 1;
-            for (int i = 0; i < depth; i++)
+            for (int i = 0; i < map_level; i++)
             {
                 if (i == 1)
                 {
@@ -99,6 +101,7 @@ namespace DoS1.Util
                 }
                 else if (i % 2 == 0)
                 {
+                    //+9 squads at level 20
                     squads++;
                 }
             }
@@ -117,7 +120,7 @@ namespace DoS1.Util
                 else
                 {
                     CryptoRandom random = new CryptoRandom();
-                    int task = random.Next(0, 4);
+                    int task = random.Next(0, 5);
                     if (task == 0)
                     {
                         enemy_squad.Assignment = "Attack Base";
@@ -134,17 +137,21 @@ namespace DoS1.Util
                     {
                         enemy_squad.Assignment = "Attack Nearest Squad";
                     }
+                    else if (task == 4)
+                    {
+                        enemy_squad.Assignment = "Sleeper";
+                    }
                 }
 
-                Gen_EnemySquad(enemy_squad, depth + 1);
+                Gen_EnemySquad(enemy_squad, map_level + 1);
                 army.Squads.Add(enemy_squad);
             }
         }
 
-        public static void Gen_EnemySquad(Squad squad, int depth)
+        public static void Gen_EnemySquad(Squad squad, int map_level)
         {
-            int min_chars = (int)Math.Ceiling((double)depth / 5);
-            int max_chars = (int)Math.Ceiling((double)depth / 2);
+            int min_chars = (int)Math.Ceiling((double)map_level / 5);
+            int max_chars = (int)Math.Ceiling((double)map_level / 2);
             if (max_chars > 5)
             {
                 max_chars = 5;
@@ -212,16 +219,18 @@ namespace DoS1.Util
                     character.Gender = "Female";
                 }
 
-                random = new CryptoRandom();
-                int min_tier = (int)Math.Ceiling(depth / 2.5);
-                int max_tier = (int)Math.Ceiling(depth / 1.5);
+                //Highest min value is 8 at level 20
+                int min_tier = (int)Math.Ceiling(map_level / 2.5);
+
+                //Max is always 10 once we reach level 15+
+                int max_tier = (int)Math.Ceiling(map_level / 1.5);
                 if (max_tier > 10)
                 {
                     max_tier = 10;
                 }
 
                 random = new CryptoRandom();
-                int class_type = random.Next(0, 2);
+                int class_type = random.Next(0, 3);
                 if (class_type == 0)
                 {
                     #region Warrior Gear
@@ -565,9 +574,158 @@ namespace DoS1.Util
                 {
                     #region Mage Gear
 
+                    InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
+                    random = new CryptoRandom();
+                    int helm_chance = random.Next(min_tier, max_tier + 1);
+                    if (helm_chance >= (int)Math.Ceiling((double)(min_tier + max_tier) / 2))
+                    {
+                        random = new CryptoRandom();
+                        int helm_tier = random.Next(min_tier, max_tier + 1);
+                        switch (helm_tier)
+                        {
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 5:
+                                //No helm
+                                break;
+
+                            case 6:
+                            case 7:
+                            case 8:
+                            case 9:
+                            case 10:
+                                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                                break;
+                        }
+                    }
+
+                    random = new CryptoRandom();
+                    int weapon_tier = random.Next(min_tier, max_tier + 1);
+                    switch (weapon_tier)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            InventoryUtil.AddItem(character.Inventory, "Apprentice", "Grimoire", "Weapon");
+                            break;
+
+                        case 4:
+                        case 5:
+                        case 6:
+                            InventoryUtil.AddItem(character.Inventory, "Novice", "Grimoire", "Weapon");
+                            break;
+
+                        case 7:
+                        case 8:
+                            InventoryUtil.AddItem(character.Inventory, "Expert", "Grimoire", "Weapon");
+                            break;
+
+                        case 9:
+                        case 10:
+                            InventoryUtil.AddItem(character.Inventory, "Master", "Grimoire", "Weapon");
+                            break;
+                    }
+                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
                     #endregion
+                }
+
+                random = new CryptoRandom();
+                int runes_tier = random.Next(min_tier, max_tier + 1);
+
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+
+                if (class_type == 0)
+                {
+                    #region Warrior Runes
+
+                    //Max of 4 runes at level 15+, min of 1 at level 10+
+                    random = new CryptoRandom();
+                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
+                    InventoryUtil.AddRunes(armor, runes_tier, runes_amount);
+
+                    if (helm != null)
+                    {
+                        random = new CryptoRandom();
+                        runes_amount = random.Next(0, max_tier + 7) / 4;
+                        InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
+                    }
+
+                    if (shield != null)
+                    {
+                        random = new CryptoRandom();
+                        runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
+                        InventoryUtil.AddRunes(shield, runes_tier, runes_amount);
+                    }
+
+                    random = new CryptoRandom();
+                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
+                    InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
+
+                    #endregion
+                }
+                else if (class_type == 1)
+                {
+                    #region Ranger Runes
+
+                    //Max of 6 runes at level 15+, min of 1 at level 8+
+                    random = new CryptoRandom();
+                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 9) / 3);
+                    InventoryUtil.AddRunes(armor, runes_tier, runes_amount);
+
+                    if (helm != null)
+                    {
+                        random = new CryptoRandom();
+                        runes_amount = random.Next(0, max_tier + 9) / 3;
+                        InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
+                    }
+
+                    random = new CryptoRandom();
+                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 9) / 3);
+                    InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
+
+                    #endregion
+                }
+                else if (class_type == 2)
+                {
+                    #region Mage Runes
+
+                    //Max of 8 runes at level 15+, min of 1 at level 5+
+                    random = new CryptoRandom();
+                    int runes_amount = random.Next(min_tier, max_tier + 7) / 2;
+                    InventoryUtil.AddRunes(armor, runes_tier, runes_amount);
+
+                    if (helm != null)
+                    {
+                        random = new CryptoRandom();
+                        runes_amount = random.Next(0, max_tier + 7) / 2;
+                        InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
+                    }
+
+                    //Always at least 1 on weapon
+                    random = new CryptoRandom();
+                    runes_amount = (int)Math.Ceiling((double)random.Next(min_tier, max_tier + 7) / 2);
+                    InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
+
+                    #endregion
+                }
+
+                random = new CryptoRandom();
+                int level = random.Next(min_tier, max_tier + 1);
+                for (int l = 1; l <= level; l++)
+                {
+                    if (l > 1)
+                    {
+                        CharacterUtil.Increase_Level(character);
+                    }
                 }
 
                 squad.Characters.Add(character);
