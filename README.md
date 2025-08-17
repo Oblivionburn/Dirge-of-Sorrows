@@ -8,7 +8,7 @@
 - Random generation of worldmap with levels to progress through marked on the map (click location to enter that level)
 - Random generation of levels with starting player base/town, enemy base, neutral towns, merchant town, academy town
 - Random generation of enemy squads in levels with increasing amount/difficulty/equipment
-- Capturing/liberating towns (flipping them to player-controlled)
+- Capturing/liberating towns (flipping them to player-owned)
 - Collecting 1 gold every in-game hour from owned towns/base across all maps
 - Squads recover HP/EP when idle on towns/base
 - A* pathing for squad movement
