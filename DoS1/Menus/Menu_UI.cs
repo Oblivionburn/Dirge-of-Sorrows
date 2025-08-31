@@ -55,11 +55,13 @@ namespace DoS1.Menus
             {
                 Scene scene = WorldUtil.GetScene();
 
-                if (string.IsNullOrEmpty(Handler.AlertType))
+                if (string.IsNullOrEmpty(Handler.AlertType) ||
+                    Handler.AlertType == "Generic")
                 {
                     UpdateControls(scene.World);
                 }
-                else
+
+                if (!string.IsNullOrEmpty(Handler.AlertType))
                 {
                     UpdateAlerts(scene.World);
                 }
@@ -458,7 +460,7 @@ namespace DoS1.Menus
                                     Handler.ViewOnly_Item = true;
 
                                     Layer locations = map.GetLayer("Locations");
-                                    Tile location_tile = locations.GetTile(new Vector3(squad.Destination.X, squad.Destination.Y, 0));
+                                    Tile location_tile = locations.GetTile(new Vector3(squad.Location.X, squad.Location.Y, 0));
                                     if (location_tile != null &&
                                         squad.Type == "Ally")
                                     {
@@ -836,76 +838,82 @@ namespace DoS1.Menus
 
         private void UpdateAlerts(World world)
         {
-            Label alert = GetLabel("Alert");
-            if (alert.Visible)
+            if (Handler.AlertType == "Generic")
             {
-                alert.Value--;
-                if (alert.Value <= 0)
+                Label alert = GetLabel("Alert");
+                if (alert.Visible)
                 {
-                    alert.Visible = false;
+                    alert.Value--;
+                    alert.Opacity -= 0.01f;
+                    if (alert.Value <= 0)
+                    {
+                        alert.Visible = false;
+                    }
                 }
             }
-
-            foreach (Button button in Buttons)
+            else
             {
-                if (button.Visible &&
-                    button.Enabled)
+                foreach (Button button in Buttons)
                 {
-                    if (button.Name == "Alert" ||
-                        button.Name == "Dialogue_Option1" ||
-                        button.Name == "Dialogue_Option2" ||
-                        button.Name == "Dialogue_Option3")
+                    if (button.Visible &&
+                        button.Enabled)
                     {
-                        if (InputManager.MouseWithin(button.Region.ToRectangle))
+                        if (button.Name == "Alert" ||
+                            button.Name == "Dialogue_Option1" ||
+                            button.Name == "Dialogue_Option2" ||
+                            button.Name == "Dialogue_Option3")
                         {
-                            button.Selected = true;
-
-                            if (button.Name == "Alert" &&
-                                Handler.AlertType == "Combat")
+                            if (InputManager.MouseWithin(button.Region.ToRectangle))
                             {
-                                GetLabel("Combat_Attacker").TextColor = button.TextColor_Selected;
-                                GetLabel("Combat_VS").TextColor = button.TextColor_Selected;
-                                GetLabel("Combat_Defender").TextColor = button.TextColor_Selected;
+                                button.Selected = true;
+
+                                if (button.Name == "Alert" &&
+                                    Handler.AlertType == "Combat")
+                                {
+                                    GetLabel("Combat_Attacker").TextColor = button.TextColor_Selected;
+                                    GetLabel("Combat_VS").TextColor = button.TextColor_Selected;
+                                    GetLabel("Combat_Defender").TextColor = button.TextColor_Selected;
+                                }
+
+                                if (InputManager.Mouse_LB_Pressed)
+                                {
+                                    CheckClick(button);
+                                    button.Selected = false;
+                                    break;
+                                }
                             }
-
-                            if (InputManager.Mouse_LB_Pressed)
+                            else if (InputManager.Mouse.Moved)
                             {
-                                CheckClick(button);
                                 button.Selected = false;
-                                break;
-                            }
-                        }
-                        else if (InputManager.Mouse.Moved)
-                        {
-                            button.Selected = false;
 
-                            if (button.Name == "Alert" &&
-                                Handler.AlertType == "Combat")
-                            {
-                                GetLabel("Combat_Attacker").TextColor = button.TextColor;
-                                GetLabel("Combat_VS").TextColor = button.TextColor;
-                                GetLabel("Combat_Defender").TextColor = button.TextColor;
+                                if (button.Name == "Alert" &&
+                                    Handler.AlertType == "Combat")
+                                {
+                                    GetLabel("Combat_Attacker").TextColor = button.TextColor;
+                                    GetLabel("Combat_VS").TextColor = button.TextColor;
+                                    GetLabel("Combat_Defender").TextColor = button.TextColor;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            Map map = WorldUtil.GetMap(world);
-            if (map != null)
-            {
-                Layer pathing = map.GetLayer("Pathing");
-                if (pathing != null)
+                Map map = WorldUtil.GetMap(world);
+                if (map != null)
                 {
-                    pathing.Visible = false;
+                    Layer pathing = map.GetLayer("Pathing");
+                    if (pathing != null)
+                    {
+                        pathing.Visible = false;
+                    }
                 }
-            }
 
-            GetLabel("Examine").Visible = false;
-            GetPicture("Select").Visible = false;
-            GetPicture("Highlight").Visible = false;
+                GetLabel("Examine").Visible = false;
+                GetPicture("Select").Visible = false;
+                GetPicture("Highlight").Visible = false;
 
-            AnimateMouseClick();
+                AnimateMouseClick();
+            }                
         }
 
         private void CheckClick(Button button)
@@ -1392,8 +1400,7 @@ namespace DoS1.Menus
                 enabled = true
             });
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Alert", "", Color.LimeGreen, AssetManager.Textures["TextFrame"], 
-                new Region(0, 0, 0, 0), Color.White * 0.6f, false);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Alert", "", Color.White, new Region(0, 0, 0, 0), false);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_Attacker", "", Color.Red, new Region(0, 0, 0, 0), false);
             GetLabel("Combat_Attacker").Alignment_Horizontal = Alignment.Center;
@@ -1481,7 +1488,7 @@ namespace DoS1.Menus
             GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), height / 2, width * 2, height / 2);
             GetLabel("Debug").Region = new Region(Main.Game.ScreenWidth - (width * 2), height, width * 2, height / 2);
             GetLabel("Gold").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), 0, width * 10, height);
-            GetLabel("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), (Main.Game.ScreenHeight / 2) - height, width * 8, height * 2);
+            GetLabel("Alert").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), height, width * 10, height);
 
             GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
             GetLabel("Dialogue").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Main.Game.ScreenHeight - (height * 5), width * 10, height * 4);

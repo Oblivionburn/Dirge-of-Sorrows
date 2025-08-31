@@ -62,7 +62,7 @@ namespace DoS1.Util
             return map;
         }
 
-        public static void Resize_OnZoom(Map map)
+        public static void Resize_OnZoom(Map map, bool world_map)
         {
             if (map != null)
             {
@@ -86,7 +86,7 @@ namespace DoS1.Util
 
                     if (current != null)
                     {
-                        ResizeMap(map, ground, current);
+                        ResizeMap(map, ground, current, world_map);
                     }
                 }
             }
@@ -205,11 +205,11 @@ namespace DoS1.Util
                 target.Region.X = Main.Game.Resolution.X / 2 - (Main.Game.TileSize.X / 2);
                 target.Region.Y = Main.Game.Resolution.Y / 2 - (Main.Game.TileSize.Y / 2);
 
-                ResizeMap(map, ground, target);
+                ResizeMap(map, ground, target, false);
             }
         }
 
-        public static void ResizeMap(Map map, Layer ground, Tile current)
+        public static void ResizeMap(Map map, Layer ground, Tile current, bool world_map)
         {
             current.Region.Width = Main.Game.TileSize.X;
             current.Region.Height = Main.Game.TileSize.Y;
@@ -258,7 +258,7 @@ namespace DoS1.Util
                 }
             }
 
-            if (Handler.LocalMap)
+            if (!world_map)
             {
                 foreach (Army army in CharacterManager.Armies)
                 {
@@ -1370,19 +1370,25 @@ namespace DoS1.Util
 
         public static void Collect_Tax()
         {
-            Scene localmap = SceneManager.GetScene("Localmap");
-            if (localmap.World.Maps.Any())
-            {
-                Map map = localmap.World.Maps[Handler.Level];
-                Layer locations = map.GetLayer("Locations");
+            int gold = 0;
 
+            Scene localmap = SceneManager.GetScene("Localmap");
+            foreach (Map map in localmap.World.Maps)
+            {
+                Layer locations = map.GetLayer("Locations");
                 foreach (Tile location in locations.Tiles)
                 {
                     if (location.Type.Contains("Ally"))
                     {
-                        Handler.Gold++;
+                        gold++;
                     }
                 }
+            }
+
+            if (gold > 0)
+            {
+                Handler.Gold += gold;
+                GameUtil.Alert_Generic("Gold +" + gold, Color.Gold);
             }
         }
 

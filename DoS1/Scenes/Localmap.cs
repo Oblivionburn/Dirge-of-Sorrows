@@ -113,7 +113,7 @@ namespace DoS1.Scenes
         {
             if (World.Maps.Any())
             {
-                WorldUtil.Resize_OnZoom(World.Maps[Handler.Level]);
+                WorldUtil.Resize_OnZoom(World.Maps[Handler.Level], false);
             }
         }
 

@@ -203,7 +203,7 @@ namespace DoS1.Menus
             {
                 id = Handler.GetID(),
                 name = "SaveExit",
-                hover_text = "Save & Exit",
+                hover_text = "Save & Quit",
                 texture = AssetManager.Textures["Button_Main"],
                 texture_highlight = AssetManager.Textures["Button_Main_Hover"],
                 region = new Region(0, 0, 0, 0),

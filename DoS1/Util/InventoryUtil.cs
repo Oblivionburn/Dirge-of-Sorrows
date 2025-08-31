@@ -1363,6 +1363,7 @@ namespace DoS1.Util
                         {
                             xp.Value = xp.Max_Value;
                         }
+                        RuneUtil.UpdateRune_Description(rune);
 
                         item.Attachments.Add(rune);
                         UpdateItem(item);

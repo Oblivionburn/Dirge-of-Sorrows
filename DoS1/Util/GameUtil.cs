@@ -388,15 +388,17 @@ namespace DoS1.Util
             return new Color(0, 0, 0, 0);
         }
 
-        public static void Alert_Generic(string message)
+        public static void Alert_Generic(string message, Color color)
         {
             Menu ui = MenuManager.GetMenu("UI");
 
             Handler.AlertType = "Generic";
 
             Label alert = ui.GetLabel("Alert");
+            alert.Opacity = 1;
+            alert.TextColor = color;
             alert.Text = message;
-            alert.Value = 60;
+            alert.Value = 100;
             alert.Visible = true;
         }
 

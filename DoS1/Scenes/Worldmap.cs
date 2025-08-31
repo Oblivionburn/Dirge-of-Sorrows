@@ -57,7 +57,7 @@ namespace DoS1.Scenes
         {
             if (World.Maps.Any())
             {
-                WorldUtil.Resize_OnZoom(World.Maps[0]);
+                WorldUtil.Resize_OnZoom(World.Maps[0], true);
             }
         }
 
