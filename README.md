@@ -1,7 +1,7 @@
 # Dirge of Sorrows
 ### This is the source code for a low-fantasy RPG/Strategy auto-battler game (e.g. like Ogre Battle) being built using OP Game Engine in VS 2022.
 #
-# Current state: Playable Early Alpha
+# Current state: Playable Alpha
 ###### Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 # 
 ### Features currently in the game:
