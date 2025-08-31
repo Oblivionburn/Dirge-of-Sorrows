@@ -18,7 +18,6 @@
 - 14 types of Runes that can be equipped on armor/weapons and paired for various effects (similar to FF7 materia system)
 #
 ### Planned features not yet implemented:
-- Tutorials
 - Story/lore
 - Side-quests
 - Finding unique items hidden in the world
