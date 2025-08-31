@@ -420,26 +420,29 @@ namespace DoS1.Util
 
             int height = Main.Game.MenuSize.X;
 
-            Button alert = ui.GetButton("Alert");
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
+
+            Button alert = alerts.GetButton("Alert");
             alert.Selected = false;
             alert.Opacity = 1;
             alert.Visible = true;
 
-            Label attacker = ui.GetLabel("Combat_Attacker");
+            Label attacker = alerts.GetLabel("Combat_Attacker");
             attacker.Text = attacker_name;
             attacker.Region = new Region(alert.Region.X, alert.Region.Y, alert.Region.Width, height);
             attacker.Visible = true;
 
-            Label vs = ui.GetLabel("Combat_VS");
+            Label vs = alerts.GetLabel("Combat_VS");
             vs.Region = new Region(alert.Region.X, alert.Region.Y + height, alert.Region.Width, height);
             vs.Visible = true;
 
-            Label defender = ui.GetLabel("Combat_Defender");
+            Label defender = alerts.GetLabel("Combat_Defender");
             defender.Text = defender_name;
             defender.Region = new Region(alert.Region.X, alert.Region.Y + (height * 2), alert.Region.Width, height);
             defender.Visible = true;
 
-            Picture mouseClick = ui.GetPicture("MouseClick");
+            Picture mouseClick = alerts.GetPicture("MouseClick");
             mouseClick.Region = new Region(alert.Region.X + alert.Region.Width, alert.Region.Y + alert.Region.Height - height, height, height);
             mouseClick.Image = new Rectangle(0, 0, mouseClick.Texture.Width / 4, mouseClick.Texture.Height);
             mouseClick.Visible = true;
@@ -527,16 +530,16 @@ namespace DoS1.Util
 
             message += "\"";
 
-            Menu ui = MenuManager.GetMenu("UI");
-            Button worldmap = ui.GetButton("Worldmap");
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
 
-            Label dialogue = ui.GetLabel("Dialogue");
+            Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
             dialogue.Text = WrapText(message);
 
             int height = Main.Game.MenuSize.X;
 
-            Picture picture = ui.GetPicture("Dialogue_Portrait1");
+            Picture picture = alerts.GetPicture("Dialogue_Portrait1");
             picture.Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 2), height * 3, height * 3);
             picture.Visible = true;
 
@@ -544,27 +547,33 @@ namespace DoS1.Util
             {
                 if (is_base)
                 {
-                    Button option1 = ui.GetButton("Dialogue_Option1");
+                    Button option1 = alerts.GetButton("Dialogue_Option1");
                     option1.Text = "Retreat";
                     option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+                    option1.Opacity = 0.8f;
                     option1.Visible = true;
                 }
                 else
                 {
-                    Button option1 = ui.GetButton("Dialogue_Option1");
+                    Button option1 = alerts.GetButton("Dialogue_Option1");
                     option1.Text = "Enter Town";
                     option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
+                    option1.Opacity = 0.8f;
                     option1.Visible = true;
                 }
 
-                Button option2 = ui.GetButton("Dialogue_Option2");
+                Button option2 = alerts.GetButton("Dialogue_Option2");
                 option2.Text = "Move Out";
                 option2.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+                option2.Opacity = 0.8f;
                 option2.Visible = true;
             }
             else
             {
-                Button option1 = ui.GetButton("Dialogue_Option1");
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+
+                Menu ui = MenuManager.GetMenu("UI");
+                Button worldmap = ui.GetButton("Worldmap");
 
                 if (worldmap.Enabled)
                 {
@@ -576,6 +585,7 @@ namespace DoS1.Util
                 }
                 
                 option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+                option1.Opacity = 0.8f;
                 option1.Visible = true;
             }
         }
@@ -589,21 +599,23 @@ namespace DoS1.Util
 
             string message = squad.Name + ": \"We have arrived at our destination.\"";
 
-            Menu ui = MenuManager.GetMenu("UI");
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
 
-            Label dialogue = ui.GetLabel("Dialogue");
+            Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
             dialogue.Text = WrapText(message);
 
             int height = Main.Game.MenuSize.X;
 
-            Picture picture = ui.GetPicture("Dialogue_Portrait1");
+            Picture picture = alerts.GetPicture("Dialogue_Portrait1");
             picture.Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 2), height * 3, height * 3);
             picture.Visible = true;
 
-            Button option1 = ui.GetButton("Dialogue_Option1");
+            Button option1 = alerts.GetButton("Dialogue_Option1");
             option1.Text = "(Continue)";
             option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+            option1.Opacity = 0.8f;
             option1.Visible = true;
         }
 
@@ -627,13 +639,15 @@ namespace DoS1.Util
             }
 
             int height = Main.Game.MenuSize.X;
-            Menu ui = MenuManager.GetMenu("UI");
 
-            Label dialogue = ui.GetLabel("Dialogue");
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
+
+            Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
             dialogue.Text = WrapText(message);
 
-            Button option1 = ui.GetButton("Dialogue_Option1");
+            Button option1 = alerts.GetButton("Dialogue_Option1");
 
             if (location.Type == "Base_Ally")
             {
@@ -645,6 +659,184 @@ namespace DoS1.Util
             }
             
             option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+            option1.Opacity = 0.8f;
+            option1.Visible = true;
+        }
+
+        public static void Alert_Tutorial()
+        {
+            LocalPause();
+
+            Handler.AlertType = "Tutorial";
+
+            string message = "";
+
+            if (Handler.TutorialType == "Worldmap")
+            {
+                if (Handler.TutorialStep == 0)
+                {
+                    message = "This is the World Map. From here you can see the available locations to enter represented by red and blue " +
+                        "castles. Red castles are enemy territory yet to be liberated, and blue castles are liberated areas you can revisit. " +
+                        "Left-click a location to enter its local map.";
+                }
+                else if (Handler.TutorialStep == 1)
+                {
+                    message = "In the upper-left corner are the System, Army, and Inventory buttons. The Army button will bring you to a " +
+                        "menu where you can make changes to undeployed squads or view deployed ones. All squads are undeployed while on " +
+                        "the World Map.";
+                }
+            }
+            else if (Handler.TutorialType == "Localmap")
+            {
+                if (Handler.TutorialStep == 0)
+                {
+                    message = "This is a Local Map. The blue character tokens represent your deployed squads, while the red tokens belong to " +
+                        "the enemy. Your objective is to capture the Enemy Base by landing one of your squads on it. The enemy's base will always " +
+                        "be guarded by an enemy squad.";
+                }
+                else if (Handler.TutorialStep == 1)
+                {
+                    message = "If the enemy captures your base, you will forfeit the local map and be returned to the World Map where you can " +
+                        "re-select the same location to try again or visit a previous location to re-supply your army before attempting the " +
+                        "forfeited map again.";
+                }
+                else if (Handler.TutorialStep == 2)
+                {
+                    message = "Besides the bases, there are also towns scattered around the map. Towns with a gold outline are shops where you "
+                        + "can purchase items. Towns with a purple outline are academies where you can hire recruits to join your army.";
+                }
+                else if (Handler.TutorialStep == 3)
+                {
+                    message = "Towns with green roofs are neutral, red roofs are held by the enemy, and blue roofs belong to you. You will "
+                        + "collect 1 gold per hour from each town that belongs to you. To liberate a town and make it yours, land one of "
+                        + "your squads on it.";
+                }
+                else if (Handler.TutorialStep == 4)
+                {
+                    message = "Any squad on the map can be examined by right-clicking it, and if it's currently moving you can view its destination " +
+                        "and path by hovering the mouse over it. If your squad is currently in a town, you can right-click to edit it instead " +
+                        "of viewing it.";
+                }
+                else if (Handler.TutorialStep == 4)
+                {
+                    message = "To move the map, left-click and drag it. Scrolling the mouse wheel will zoom in/out.";
+                }
+                else if (Handler.TutorialStep == 5)
+                {
+                    message = "To move a squad, left-click to select it and then left-click a destination to tell the squad to move there. " +
+                        "While a squad is selected, you can left-click them again to unselect them or just right-click anywhere to unselect.";
+                }
+            }
+            else if (Handler.TutorialType == "Army")
+            {
+                if (Handler.TutorialStep == 0)
+                {
+                    message = "Here you can see all squads currently in your army and can right-click one to edit it. Greyed-out squads are " +
+                        "deployed and can only be viewed when right-clicked. To create a new squad, left-click the plus button in the upper-left " +
+                        "corner.";
+                }
+                else if (Handler.TutorialStep == 1)
+                {
+                    message = "To remove a squad, left-click to select it and then left-click the minus button in the upper-left corner. When " +
+                        "a squad is selected, you can unselect it by clicking it again.";
+                }
+                else if (Handler.TutorialStep == 2)
+                {
+                    message = "To deploy a squad, left-click it and then click the Deploy button in the upper-left corner. Squads can only be " +
+                        "deployed when in a local map, and your main character's squad cannot be removed.";
+                }
+            }
+            else if (Handler.TutorialType == "Squad")
+            {
+                if (Handler.TutorialStep == 0)
+                {
+                    message = "On the left you can see all characters currently in this squad and their formation position. To " +
+                        "move someone to a different position in the formation left-click and drag them.";
+                }
+                else if (Handler.TutorialStep == 1)
+                {
+                    message = "The first/left column of your squad is the 'front' of its formation, and the last/right column is the 'back'. " +
+                        "For enemy squads the 'front' of their formation is on the right, since they face the opposite direction.";
+                }
+                else if (Handler.TutorialStep == 2)
+                {
+                    message = "Characters in the front do normal damage with melee weapons, as well as receive normal damage from melee attacks. " +
+                        "Characters in the middle will do and receive 3/4 of melee damage. The back will do and receive 1/2 of melee damage.";
+                }
+                else if (Handler.TutorialStep == 3)
+                {
+                    message = "Characters in the back will do normal damage with bow weapons, as well as receive normal damage from bow attacks. " +
+                        "Characters in the middle will do and receive 3/4 of bow damage. The front will do and receive 1/2 of bow damage.";
+                }
+                else if (Handler.TutorialStep == 4)
+                {
+                    message = "Characters wielding magic grimoires do no extra damage from formation position.";
+                }
+                else if (Handler.TutorialStep == 5)
+                {
+                    message = "On the right is all your reserve characters recruited from academies. To exchange a character between your squad " +
+                        "and your reserves, left-click and drag them. Right-click a character to edit their equipment.";
+                }
+            }
+            else if (Handler.TutorialType == "Character")
+            {
+                if (Handler.TutorialStep == 0)
+                {
+                    message = "On the left is your character's stats and equipment properties. The grid on the right is your army's inventory. " +
+                        "Between your character and the inventory is your character's equipment slots. To equip an item, left-click and drag " +
+                        "it from the inventory to a slot.";
+                }
+                else if (Handler.TutorialStep == 1)
+                {
+                    message = "Items equipped on your character or sitting in your inventory can be right-clicked to edit them and attach runes " +
+                        "to enhance the item's properties. The effects of runes will differ depending on whether they're attached in a piece of " +
+                        "armor or a weapon.";
+                }
+                else if (Handler.TutorialStep == 2)
+                {
+                    message = "Grimoire weapons must have a rune attached in order to cast magic.";
+                }
+            }
+            else if (Handler.TutorialType == "Item")
+            {
+                if (Handler.TutorialStep == 0)
+                {
+                    message = "The grid on the right is all the runes in your army's inventory. On the left is your item's rune slots and its " +
+                        "current properties. Some rune slots are connected with a plus symbol... runes in those connect slots are considered " +
+                        "to be 'paired'.";
+                }
+                else if (Handler.TutorialStep == 1)
+                {
+                    message = "Some runes, like the Status rune, require another rune to be paired with it in order to determine its effect. To " +
+                        "attach a rune, left-click and drag it to a slot.";
+                }
+            }
+            else if (Handler.TutorialType == "Shop")
+            {
+                message = "The grid on the left is your army's inventory. On the right is the shop's inventory. To purchase an item from " +
+                    "the shop, right-click it. Right-clicking an item in your inventory will sell it.";
+            }
+            else if (Handler.TutorialType == "Academy")
+            {
+                message = "The grid on the left is your army's reserves. On the right is the academy's recruits. To hire a recruit, right-click " +
+                    "it to pay " + Handler.RecruitPrice + " gold. Right-clicking a character in your reserves will sell them to the academy " +
+                    "for " + Handler.RecruitPrice + " gold.";
+            }
+
+            int height = Main.Game.MenuSize.X;
+
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
+
+            Label dialogue = alerts.GetLabel("Dialogue");
+            dialogue.Visible = true;
+            dialogue.Text = WrapText(message);
+
+            Button option1 = alerts.GetButton("Dialogue_Option1");
+
+            option1.Text = "(Continue)";
+            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
+            option1.Opacity = 0.8f;
             option1.Visible = true;
         }
 

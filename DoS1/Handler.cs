@@ -28,6 +28,18 @@ namespace DoS1
         public static long MainCharacter_ID;
         public static string AlertType;
 
+        public static bool Tutorials = true;
+        public static bool Tutorial_Worldmap;
+        public static bool Tutorial_Localmap;
+        public static bool Tutorial_Shop;
+        public static bool Tutorial_Academy;
+        public static bool Tutorial_Army;
+        public static bool Tutorial_Squad;
+        public static bool Tutorial_Character;
+        public static bool Tutorial_Item;
+        public static int TutorialStep;
+        public static string TutorialType;
+
         public static bool LocalMap;
         public static int Level;
         public static bool MovingGrid;

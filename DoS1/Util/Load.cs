@@ -256,6 +256,42 @@ namespace DoS1.Util
                         Handler.MainCharacter_ID = long.Parse(reader.Value);
                         break;
 
+                    case "Tutorials":
+                        Handler.Tutorials = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Worldmap":
+                        Handler.Tutorial_Worldmap = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Localmap":
+                        Handler.Tutorial_Localmap = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Shop":
+                        Handler.Tutorial_Shop = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Academy":
+                        Handler.Tutorial_Academy = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Army":
+                        Handler.Tutorial_Army = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Squad":
+                        Handler.Tutorial_Squad = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Character":
+                        Handler.Tutorial_Character = reader.Value == "True";
+                        break;
+
+                    case "Tutorial_Item":
+                        Handler.Tutorial_Item = reader.Value == "True";
+                        break;
+
                     case "LocalMap":
                         Handler.LocalMap = reader.Value == "True";
                         break;

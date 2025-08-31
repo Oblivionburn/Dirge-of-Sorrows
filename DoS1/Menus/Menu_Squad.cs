@@ -68,7 +68,7 @@ namespace DoS1.Menus
                 {
                     MoveCharacter();
                 }
-                else
+                else if (string.IsNullOrEmpty(Handler.AlertType))
                 {
                     UpdateControls();
                 }
@@ -126,6 +126,14 @@ namespace DoS1.Menus
                             }
                         }
                     }
+                }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Squad &&
+                    !Handler.ViewOnly_Squad)
+                {
+                    Handler.TutorialType = "Squad";
+                    GameUtil.Alert_Tutorial();
                 }
 
                 base.Update(gameRef, content);

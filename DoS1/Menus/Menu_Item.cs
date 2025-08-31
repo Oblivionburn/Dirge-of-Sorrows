@@ -60,9 +60,17 @@ namespace DoS1.Menus
                 {
                     MoveItem();
                 }
-                else
+                else if (string.IsNullOrEmpty(Handler.AlertType))
                 {
                     UpdateControls();
+                }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Item &&
+                    !Handler.ViewOnly_Item)
+                {
+                    Handler.TutorialType = "Item";
+                    GameUtil.Alert_Tutorial();
                 }
 
                 base.Update(gameRef, content);

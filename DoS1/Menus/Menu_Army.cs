@@ -49,7 +49,21 @@ namespace DoS1.Menus
             if (Visible ||
                 Active)
             {
-                UpdateControls();
+                if (string.IsNullOrEmpty(Handler.AlertType))
+                {
+                    UpdateControls();
+                }
+                else
+                {
+                    foreach (Button button in Buttons)
+                    {
+                        button.Opacity = 0.8f;
+                        button.Selected = false;
+                    }
+
+                    GetLabel("Examine").Visible = false;
+                    GetPicture("Highlight").Visible = false;
+                }
 
                 Army army = CharacterManager.GetArmy("Ally");
                 if (army != null)
@@ -64,6 +78,13 @@ namespace DoS1.Menus
                             }
                         }
                     }
+                }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Army)
+                {
+                    Handler.TutorialType = "Army";
+                    GameUtil.Alert_Tutorial();
                 }
 
                 base.Update(gameRef, content);

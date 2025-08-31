@@ -164,21 +164,37 @@ namespace DoS1.Menus
             }
             else if (button.Name == "FullscreenOn")
             {
-                Main.Game.GraphicsManager.IsFullScreen = false;
+                Main.Game.ScreenType = ScreenType.Windowed;
                 Main.Game.ResetScreen();
 
                 button.Name = "FullscreenOff";
                 button.Texture = AssetManager.Textures["Button_FullscreenOff"];
                 button.Texture_Highlight = AssetManager.Textures["Button_FullscreenOff_Hover"];
+
+                GetLabel("Fullscreen").Text = "Fullscreen Off";
             }
             else if (button.Name == "FullscreenOff")
             {
-                Main.Game.GraphicsManager.IsFullScreen = true;
+                Main.Game.ScreenType = ScreenType.BorderlessFullscreen;
                 Main.Game.ResetScreen();
 
                 button.Name = "FullscreenOn";
                 button.Texture = AssetManager.Textures["Button_FullscreenOn"];
                 button.Texture_Highlight = AssetManager.Textures["Button_FullscreenOn_Hover"];
+
+                GetLabel("Fullscreen").Text = "Fullscreen On";
+            }
+            else if (button.Name == "TutorialsOn")
+            {
+                Handler.Tutorials = false;
+                button.Name = "TutorialsOff";
+                GetLabel("Tutorials").Text = "Tutorials Off";
+            }
+            else if (button.Name == "TutorialsOff")
+            {
+                Handler.Tutorials = true;
+                button.Name = "TutorialsOn";
+                GetLabel("Tutorials").Text = "Tutorials On";
             }
             else if (button.Name == "MusicOn")
             {
@@ -372,6 +388,7 @@ namespace DoS1.Menus
                 });
 
                 GetButton("FullscreenOn").Value = 1;
+                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Fullscreen", "Fullscreen On", Color.White, new Region(0, 0, 0, 0), true);
             }
             else
             {
@@ -387,6 +404,43 @@ namespace DoS1.Menus
                     enabled = true,
                     visible = true
                 });
+
+                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Fullscreen", "Fullscreen Off", Color.White, new Region(0, 0, 0, 0), true);
+            }
+
+            if (Handler.Tutorials)
+            {
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "TutorialsOn",
+                    hover_text = "Toggle Tutorials",
+                    texture = AssetManager.Textures["Button_Tutorials"],
+                    texture_highlight = AssetManager.Textures["Button_Tutorials_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
+                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Tutorials", "Tutorials On", Color.White, new Region(0, 0, 0, 0), true);
+            }
+            else
+            {
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "TutorialsOff",
+                    hover_text = "Toggle Tutorials",
+                    texture = AssetManager.Textures["Button_Tutorials"],
+                    texture_highlight = AssetManager.Textures["Button_Tutorials_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
+                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Tutorials", "Tutorials Off", Color.White, new Region(0, 0, 0, 0), true);
             }
 
             if (SoundManager.MusicEnabled)
@@ -524,8 +578,11 @@ namespace DoS1.Menus
         public override void Resize(Point point)
         {
             int Y = Main.Game.ScreenHeight / (Main.Game.MenuSize.Y * 2);
+            int X = (Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2) - (Main.Game.MenuSize.X / 2);
+            int width = Main.Game.MenuSize.X * 4;
+            int height = Main.Game.MenuSize.Y;
 
-            GetButton("Back").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+            GetButton("Back").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
 
             Y += 2;
             Button fullscreen = GetButton("FullscreenOn");
@@ -533,7 +590,17 @@ namespace DoS1.Menus
             {
                 fullscreen = GetButton("FullscreenOff");
             }
-            fullscreen.Region = new Region((Main.Game.ScreenWidth / 2) - Main.Game.MenuSize.X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+            fullscreen.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
+            GetLabel("Fullscreen").Region = new Region(fullscreen.Region.X + fullscreen.Region.Width, fullscreen.Region.Y, width, height);
+
+            Y += 1;
+            Button tutorials = GetButton("TutorialsOn");
+            if (tutorials == null)
+            {
+                tutorials = GetButton("TutorialsOff");
+            }
+            tutorials.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
+            GetLabel("Tutorials").Region = new Region(tutorials.Region.X + tutorials.Region.Width, tutorials.Region.Y, width, height);
 
             Y += 1;
             Button music = GetButton("MusicOn");
@@ -541,10 +608,10 @@ namespace DoS1.Menus
             {
                 music = GetButton("MusicOff");
             }
-            music.Region = new Region((Main.Game.ScreenWidth / 2) - Main.Game.MenuSize.X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+            music.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
 
-            GetProgressBar("Music").Base_Region = new Region((Main.Game.ScreenWidth / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X * 4, Main.Game.MenuSize.Y);
-            GetLabel("Music").Region = new Region((Main.Game.ScreenWidth / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X * 4, Main.Game.MenuSize.Y);
+            GetProgressBar("Music").Base_Region = new Region(music.Region.X + music.Region.Width, music.Region.Y, width, height);
+            GetLabel("Music").Region = new Region(music.Region.X + music.Region.Width, music.Region.Y, width, height);
 
             Y += 1;
             Button ambience = GetButton("AmbienceOn");
@@ -552,10 +619,10 @@ namespace DoS1.Menus
             {
                 ambience = GetButton("AmbienceOff");
             }
-            ambience.Region = new Region((Main.Game.ScreenWidth / 2) - Main.Game.MenuSize.X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+            ambience.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
 
-            GetProgressBar("Ambience").Base_Region = new Region((Main.Game.ScreenWidth / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X * 4, Main.Game.MenuSize.Y);
-            GetLabel("Ambience").Region = new Region((Main.Game.ScreenWidth / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X * 4, Main.Game.MenuSize.Y);
+            GetProgressBar("Ambience").Base_Region = new Region(ambience.Region.X + ambience.Region.Width, ambience.Region.Y, width, height);
+            GetLabel("Ambience").Region = new Region(ambience.Region.X + ambience.Region.Width, ambience.Region.Y, width, height);
 
             Y += 1;
             Button sound = GetButton("SoundOn");
@@ -563,10 +630,10 @@ namespace DoS1.Menus
             {
                 sound = GetButton("SoundOff");
             }
-            sound.Region = new Region((Main.Game.ScreenWidth / 2) - Main.Game.MenuSize.X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+            sound.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
 
-            GetProgressBar("Sound").Base_Region = new Region((Main.Game.ScreenWidth / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X * 4, Main.Game.MenuSize.Y);
-            GetLabel("Sound").Region = new Region((Main.Game.ScreenWidth / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X * 4, Main.Game.MenuSize.Y);
+            GetProgressBar("Sound").Base_Region = new Region(sound.Region.X + sound.Region.Width, sound.Region.Y, width, height);
+            GetLabel("Sound").Region = new Region(sound.Region.X + sound.Region.Width, sound.Region.Y, width, height);
         }
 
         #endregion

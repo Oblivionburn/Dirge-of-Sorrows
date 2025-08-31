@@ -55,7 +55,17 @@ namespace DoS1.Menus
             if (Visible ||
                 Active)
             {
-                UpdateControls();
+                if (string.IsNullOrEmpty(Handler.AlertType))
+                {
+                    UpdateControls();
+                }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Shop)
+                {
+                    Handler.TutorialType = "Shop";
+                    GameUtil.Alert_Tutorial();
+                }
 
                 base.Update(gameRef, content);
             }

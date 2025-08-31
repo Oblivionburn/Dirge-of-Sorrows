@@ -180,11 +180,25 @@ namespace DoS1.Util
             Writer.WriteAttributeString("ID", Handler.ID.ToString());
             Writer.WriteAttributeString("Gold", Handler.Gold.ToString());
             Writer.WriteAttributeString("MainCharacter_ID", Handler.MainCharacter_ID.ToString());
+
+            Writer.WriteAttributeString("Tutorials", Handler.Tutorials.ToString());
+            Writer.WriteAttributeString("Tutorial_Worldmap", Handler.Tutorial_Worldmap.ToString());
+            Writer.WriteAttributeString("Tutorial_Localmap", Handler.Tutorial_Localmap.ToString());
+            Writer.WriteAttributeString("Tutorial_Shop", Handler.Tutorial_Shop.ToString());
+            Writer.WriteAttributeString("Tutorial_Academy", Handler.Tutorial_Academy.ToString());
+            Writer.WriteAttributeString("Tutorial_Army", Handler.Tutorial_Army.ToString());
+            Writer.WriteAttributeString("Tutorial_Squad", Handler.Tutorial_Squad.ToString());
+            Writer.WriteAttributeString("Tutorial_Character", Handler.Tutorial_Character.ToString());
+            Writer.WriteAttributeString("Tutorial_Item", Handler.Tutorial_Item.ToString());
+
             Writer.WriteAttributeString("LocalMap", Handler.LocalMap.ToString());
             Writer.WriteAttributeString("Level", Handler.Level.ToString());
+
             Writer.WriteAttributeString("ManualPause", Handler.ManualPause.ToString());
             Writer.WriteAttributeString("LocalPause", Handler.LocalPause.ToString());
+
             Writer.WriteAttributeString("ItemFilter", Handler.ItemFilter);
+
             Writer.WriteAttributeString("Time_TotalYears", TimeManager.Now.TotalYears.ToString());
             Writer.WriteAttributeString("Time_Years", TimeManager.Now.Years.ToString());
             Writer.WriteAttributeString("Time_TotalMonths", TimeManager.Now.TotalMonths.ToString());

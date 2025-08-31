@@ -57,7 +57,7 @@ namespace DoS1.Menus
                 {
                     MoveItem();
                 }
-                else
+                else if (string.IsNullOrEmpty(Handler.AlertType))
                 {
                     UpdateControls();
                 }
@@ -65,6 +65,14 @@ namespace DoS1.Menus
                 if (character != null)
                 {
                     CharacterUtil.UpdateGear(character);
+                }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Character &&
+                    !Handler.ViewOnly_Character)
+                {
+                    Handler.TutorialType = "Character";
+                    GameUtil.Alert_Tutorial();
                 }
 
                 base.Update(gameRef, content);

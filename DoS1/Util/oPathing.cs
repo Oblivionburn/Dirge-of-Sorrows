@@ -27,7 +27,7 @@ namespace DoS1.Util
             {
                 if (last_min != null)
                 {
-                    List<ALocation> locations = GetLocations(ground, roads, last_min);
+                    List<ALocation> locations = GetLocations(ground, roads, last_min, tile);
                     foreach (ALocation location in locations)
                     {
                         if (!HasLocation(path, location))
@@ -71,38 +71,157 @@ namespace DoS1.Util
             return result;
         }
 
-        public List<ALocation> GetLocations(Layer ground, Layer roads, ALocation location)
+        public List<ALocation> GetLocations(Layer ground, Layer roads, ALocation location, Tile tile)
         {
             List<ALocation> locations = new List<ALocation>();
 
             ALocation North = new ALocation(location.X, location.Y - 1);
-            if (Walkable(ground, North))
-            {
-                SetPriority(ground, roads, North);
-                locations.Add(North);
-            }
-
             ALocation East = new ALocation(location.X + 1, location.Y);
-            if (Walkable(ground, East))
-            {
-                SetPriority(ground, roads, East);
-                locations.Add(East);
-            }
-
             ALocation South = new ALocation(location.X, location.Y + 1);
-            if (Walkable(ground, South))
-            {
-                SetPriority(ground, roads, South);
-                locations.Add(South);
-            }
-
             ALocation West = new ALocation(location.X - 1, location.Y);
-            if (Walkable(ground, West))
-            {
-                SetPriority(ground, roads, West);
-                locations.Add(West);
-            }
 
+            if (tile.Location.X < location.X)
+            {
+                if (Walkable(ground, West))
+                {
+                    SetPriority(ground, roads, West);
+                    locations.Add(West);
+                }
+
+                if (tile.Location.Y <= location.Y)
+                {
+                    if (Walkable(ground, North))
+                    {
+                        SetPriority(ground, roads, North);
+                        locations.Add(North);
+                    }
+
+                    if (Walkable(ground, South))
+                    {
+                        SetPriority(ground, roads, South);
+                        locations.Add(South);
+                    }
+                }
+                else if (tile.Location.Y > location.Y)
+                {
+                    if (Walkable(ground, South))
+                    {
+                        SetPriority(ground, roads, South);
+                        locations.Add(South);
+                    }
+
+                    if (Walkable(ground, North))
+                    {
+                        SetPriority(ground, roads, North);
+                        locations.Add(North);
+                    }
+                }
+
+                if (Walkable(ground, East))
+                {
+                    SetPriority(ground, roads, East);
+                    locations.Add(East);
+                }
+            }
+            else if (tile.Location.X > location.X)
+            {
+                if (Walkable(ground, East))
+                {
+                    SetPriority(ground, roads, East);
+                    locations.Add(East);
+                }
+
+                if (tile.Location.Y <= location.Y)
+                {
+                    if (Walkable(ground, North))
+                    {
+                        SetPriority(ground, roads, North);
+                        locations.Add(North);
+                    }
+
+                    if (Walkable(ground, South))
+                    {
+                        SetPriority(ground, roads, South);
+                        locations.Add(South);
+                    }
+                }
+                else if (tile.Location.Y > location.Y)
+                {
+                    if (Walkable(ground, South))
+                    {
+                        SetPriority(ground, roads, South);
+                        locations.Add(South);
+                    }
+
+                    if (Walkable(ground, North))
+                    {
+                        SetPriority(ground, roads, North);
+                        locations.Add(North);
+                    }
+                }
+
+                if (Walkable(ground, West))
+                {
+                    SetPriority(ground, roads, West);
+                    locations.Add(West);
+                }
+            }
+            else if (tile.Location.X == location.X)
+            {
+                if (tile.Location.Y < location.Y)
+                {
+                    if (Walkable(ground, North))
+                    {
+                        SetPriority(ground, roads, North);
+                        locations.Add(North);
+                    }
+
+                    if (Walkable(ground, West))
+                    {
+                        SetPriority(ground, roads, West);
+                        locations.Add(West);
+                    }
+
+                    if (Walkable(ground, East))
+                    {
+                        SetPriority(ground, roads, East);
+                        locations.Add(East);
+                    }
+
+                    if (Walkable(ground, South))
+                    {
+                        SetPriority(ground, roads, South);
+                        locations.Add(South);
+                    }
+                }
+                else if (tile.Location.Y > location.Y)
+                {
+                    if (Walkable(ground, South))
+                    {
+                        SetPriority(ground, roads, South);
+                        locations.Add(South);
+                    }
+
+                    if (Walkable(ground, West))
+                    {
+                        SetPriority(ground, roads, West);
+                        locations.Add(West);
+                    }
+
+                    if (Walkable(ground, East))
+                    {
+                        SetPriority(ground, roads, East);
+                        locations.Add(East);
+                    }
+
+                    if (Walkable(ground, North))
+                    {
+                        SetPriority(ground, roads, North);
+                        locations.Add(North);
+                    }
+                }
+            }
+            
             return locations;
         }
 

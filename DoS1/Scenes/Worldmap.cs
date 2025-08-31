@@ -45,6 +45,13 @@ namespace DoS1.Scenes
                     SoundManager.MusicLooping = false;
                     AssetManager.PlayMusic_Random("Worldmap", true);
                 }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Worldmap)
+                {
+                    Handler.TutorialType = "Worldmap";
+                    GameUtil.Alert_Tutorial();
+                }
             }
         }
 

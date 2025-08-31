@@ -65,6 +65,13 @@ namespace DoS1.Scenes
                         }
                     }
                 }
+
+                if (Handler.Tutorials &&
+                    !Handler.Tutorial_Localmap)
+                {
+                    Handler.TutorialType = "Localmap";
+                    GameUtil.Alert_Tutorial();
+                }
             }
         }
 
