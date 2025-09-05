@@ -98,6 +98,7 @@ namespace DoS1.Util
 
             EnterNode("Options");
             Writer.WriteAttributeString("Fullscreen", Main.Game.GraphicsManager.IsFullScreen.ToString());
+            Writer.WriteAttributeString("Tutorials", Handler.Tutorials.ToString());
             Writer.WriteAttributeString("Resolution", Main.Game.Resolution.X.ToString() + "," + Main.Game.Resolution.Y.ToString());
             Writer.WriteAttributeString("MusicEnabled", SoundManager.MusicEnabled.ToString());
             Writer.WriteAttributeString("MusicVolume", (SoundManager.MusicVolume * 10).ToString());
@@ -181,7 +182,6 @@ namespace DoS1.Util
             Writer.WriteAttributeString("Gold", Handler.Gold.ToString());
             Writer.WriteAttributeString("MainCharacter_ID", Handler.MainCharacter_ID.ToString());
 
-            Writer.WriteAttributeString("Tutorials", Handler.Tutorials.ToString());
             Writer.WriteAttributeString("Tutorial_Worldmap", Handler.Tutorial_Worldmap.ToString());
             Writer.WriteAttributeString("Tutorial_Localmap", Handler.Tutorial_Localmap.ToString());
             Writer.WriteAttributeString("Tutorial_Shop", Handler.Tutorial_Shop.ToString());

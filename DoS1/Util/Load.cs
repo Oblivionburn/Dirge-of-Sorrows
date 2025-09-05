@@ -88,6 +88,10 @@ namespace DoS1.Util
                         Main.Game.GraphicsManager.ApplyChanges();
                         break;
 
+                    case "Tutorials":
+                        Handler.Tutorials = reader.Value == "True";
+                        break;
+
                     case "Resolution":
                         var parts = reader.Value.Split(',');
                         int X = int.Parse(parts[0]);
@@ -254,10 +258,6 @@ namespace DoS1.Util
 
                     case "MainCharacter_ID":
                         Handler.MainCharacter_ID = long.Parse(reader.Value);
-                        break;
-
-                    case "Tutorials":
-                        Handler.Tutorials = reader.Value == "True";
                         break;
 
                     case "Tutorial_Worldmap":

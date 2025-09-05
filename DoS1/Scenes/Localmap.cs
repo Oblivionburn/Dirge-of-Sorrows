@@ -85,13 +85,30 @@ namespace DoS1.Scenes
                     {
                         foreach (Layer layer in map.Layers)
                         {
+                            if (layer.Name != "Pathing")
+                            {
+                                layer.Draw(spriteBatch, resolution, color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void DrawWorld(SpriteBatch spriteBatch, Point resolution)
+        {
+            if (Visible)
+            {
+                foreach (Map map in World.Maps)
+                {
+                    if (map.Visible)
+                    {
+                        foreach (Layer layer in map.Layers)
+                        {
                             if (layer.Name == "Pathing")
                             {
                                 layer.Draw(spriteBatch, resolution, Color.White);
-                            }
-                            else
-                            {
-                                layer.Draw(spriteBatch, resolution, color);
+                                break;
                             }
                         }
                     }
@@ -104,7 +121,7 @@ namespace DoS1.Scenes
                         if (squad.Characters.Any() &&
                             squad.Visible)
                         {
-                            squad.Draw(spriteBatch, resolution, color);
+                            squad.Draw(spriteBatch, resolution, Color.White);
                         }
                     }
                 }
