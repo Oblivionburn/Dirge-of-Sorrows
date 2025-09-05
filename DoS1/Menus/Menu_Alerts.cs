@@ -298,90 +298,14 @@ namespace DoS1.Menus
                 {
                     if (Handler.AlertType == "Tutorial")
                     {
-                        if (Handler.TutorialType == "Worldmap")
-                        {
-                            if (Handler.TutorialStep < 1)
-                            {
-                                Handler.TutorialStep++;
-                            }
-                            else
-                            {
-                                Handler.TutorialStep = 0;
-                                Handler.Tutorial_Worldmap = true;
-                            }
-                        }
-                        else if (Handler.TutorialType == "Localmap")
-                        {
-                            if (Handler.TutorialStep < 5)
-                            {
-                                Handler.TutorialStep++;
-                            }
-                            else
-                            {
-                                Handler.TutorialStep = 0;
-                                Handler.Tutorial_Localmap = true;
-                            }
-                        }
-                        else if (Handler.TutorialType == "Army")
-                        {
-                            if (Handler.TutorialStep < 2)
-                            {
-                                Handler.TutorialStep++;
-                            }
-                            else
-                            {
-                                Handler.TutorialStep = 0;
-                                Handler.Tutorial_Army = true;
-                            }
-                        }
-                        else if (Handler.TutorialType == "Squad")
-                        {
-                            if (Handler.TutorialStep < 5)
-                            {
-                                Handler.TutorialStep++;
-                            }
-                            else
-                            {
-                                Handler.TutorialStep = 0;
-                                Handler.Tutorial_Squad = true;
-                            }
-                        }
-                        else if (Handler.TutorialType == "Character")
-                        {
-                            if (Handler.TutorialStep < 2)
-                            {
-                                Handler.TutorialStep++;
-                            }
-                            else
-                            {
-                                Handler.TutorialStep = 0;
-                                Handler.Tutorial_Character = true;
-                            }
-                        }
-                        else if (Handler.TutorialType == "Item")
-                        {
-                            if (Handler.TutorialStep < 1)
-                            {
-                                Handler.TutorialStep++;
-                            }
-                            else
-                            {
-                                Handler.TutorialStep = 0;
-                                Handler.Tutorial_Item = true;
-                            }
-                        }
-                        else if (Handler.TutorialType == "Shop")
-                        {
-                            Handler.Tutorial_Shop = true;
-                        }
-                        else if (Handler.TutorialType == "Academy")
-                        {
-                            Handler.Tutorial_Academy = true;
-                        }
+                        ContinueTutorials();
+                    }
+                    else
+                    {
+                        GameUtil.Toggle_Pause(false);
                     }
 
                     Close();
-                    GameUtil.Toggle_Pause(false);
                 }
                 else if (button.Text == "(Retreat)")
                 {
@@ -522,6 +446,92 @@ namespace DoS1.Menus
                 {
                     mouseClickDelay++;
                 }
+            }
+        }
+
+        private void ContinueTutorials()
+        {
+            if (Handler.TutorialType == "Worldmap")
+            {
+                if (Handler.TutorialStep < 1)
+                {
+                    Handler.TutorialStep++;
+                }
+                else
+                {
+                    Handler.TutorialStep = 0;
+                    Handler.Tutorial_Worldmap = true;
+                    GameUtil.Toggle_Pause(false);
+                }
+            }
+            else if (Handler.TutorialType == "Localmap")
+            {
+                if (Handler.TutorialStep < 5)
+                {
+                    Handler.TutorialStep++;
+                }
+                else
+                {
+                    Handler.TutorialStep = 0;
+                    Handler.Tutorial_Localmap = true;
+                    GameUtil.Toggle_Pause(false);
+                }
+            }
+            else if (Handler.TutorialType == "Army")
+            {
+                if (Handler.TutorialStep < 2)
+                {
+                    Handler.TutorialStep++;
+                }
+                else
+                {
+                    Handler.TutorialStep = 0;
+                    Handler.Tutorial_Army = true;
+                }
+            }
+            else if (Handler.TutorialType == "Squad")
+            {
+                if (Handler.TutorialStep < 5)
+                {
+                    Handler.TutorialStep++;
+                }
+                else
+                {
+                    Handler.TutorialStep = 0;
+                    Handler.Tutorial_Squad = true;
+                }
+            }
+            else if (Handler.TutorialType == "Character")
+            {
+                if (Handler.TutorialStep < 2)
+                {
+                    Handler.TutorialStep++;
+                }
+                else
+                {
+                    Handler.TutorialStep = 0;
+                    Handler.Tutorial_Character = true;
+                }
+            }
+            else if (Handler.TutorialType == "Item")
+            {
+                if (Handler.TutorialStep < 1)
+                {
+                    Handler.TutorialStep++;
+                }
+                else
+                {
+                    Handler.TutorialStep = 0;
+                    Handler.Tutorial_Item = true;
+                }
+            }
+            else if (Handler.TutorialType == "Shop")
+            {
+                Handler.Tutorial_Shop = true;
+            }
+            else if (Handler.TutorialType == "Academy")
+            {
+                Handler.Tutorial_Academy = true;
             }
         }
 

@@ -60,15 +60,11 @@ namespace DoS1.Menus
                     UpdateControls(scene.World);
                 }
 
-                if (!string.IsNullOrEmpty(Handler.AlertType))
-                {
-                    UpdateAlerts();
-                }
-
                 if (!Handler.LocalPause)
                 {
                     UpdateTime();
                     UpdateGold();
+                    UpdateAlerts();
                 }
 
                 base.Update(gameRef, content);
@@ -787,17 +783,14 @@ namespace DoS1.Menus
 
         private void UpdateAlerts()
         {
-            if (Handler.AlertType == "Generic")
+            Label alert = GetLabel("Alert");
+            if (alert.Visible)
             {
-                Label alert = GetLabel("Alert");
-                if (alert.Visible)
+                alert.Value--;
+                alert.Opacity -= 0.01f;
+                if (alert.Value <= 0)
                 {
-                    alert.Value--;
-                    alert.Opacity -= 0.01f;
-                    if (alert.Value <= 0)
-                    {
-                        alert.Visible = false;
-                    }
+                    alert.Visible = false;
                 }
             }
         }

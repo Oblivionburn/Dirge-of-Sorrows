@@ -54,7 +54,8 @@ namespace DoS1.Menus
             if (Visible ||
                 Active)
             {
-                if (string.IsNullOrEmpty(Handler.AlertType))
+                if (string.IsNullOrEmpty(Handler.AlertType) ||
+                    Handler.AlertType == "Generic")
                 {
                     UpdateControls();
                 }

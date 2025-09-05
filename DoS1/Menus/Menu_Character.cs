@@ -57,7 +57,8 @@ namespace DoS1.Menus
                 {
                     MoveItem();
                 }
-                else if (string.IsNullOrEmpty(Handler.AlertType))
+                else if (string.IsNullOrEmpty(Handler.AlertType) ||
+                         Handler.AlertType == "Generic")
                 {
                     UpdateControls();
                 }

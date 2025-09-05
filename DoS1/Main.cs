@@ -151,14 +151,25 @@ namespace DoS1
                                     }
                                     else if (!TimeManager.Paused)
                                     {
-                                        TimeManager.Paused = true;
                                         SoundManager.AmbientPaused = true;
 
-                                        OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");
-                                        ui.Active = false;
-                                        ui.Visible = false;
+                                        OP_Engine.Menus.Menu alerts = MenuManager.GetMenu("Alerts");
 
-                                        MenuManager.ChangeMenu("Main");
+                                        OP_Engine.Menus.Menu currentMenu = MenuManager.GetCurrentMenu();
+                                        if (currentMenu.Name != "Army" &&
+                                            currentMenu.Name != "Squad" &&
+                                            currentMenu.Name != "Character" &&
+                                            currentMenu.Name != "Item" &&
+                                            !alerts.Visible)
+                                        {
+                                            TimeManager.Paused = true;
+
+                                            OP_Engine.Menus.Menu ui = MenuManager.GetMenu("UI");
+                                            ui.Active = false;
+                                            ui.Visible = false;
+
+                                            MenuManager.ChangeMenu("Main");
+                                        }
                                     }
                                 }
                             }
