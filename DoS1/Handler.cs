@@ -285,6 +285,7 @@ namespace DoS1
         {
             InputManager.Keyboard.KeysMapped.Add("Debug", Keys.OemTilde);
             InputManager.Keyboard.KeysMapped.Add("Esc", Keys.Escape);
+            InputManager.Keyboard.KeysMapped.Add("Enter", Keys.Enter);
             InputManager.Keyboard.KeysMapped.Add("Space", Keys.Space);
             InputManager.Keyboard.KeysMapped.Add("Backspace", Keys.Back);
             InputManager.Keyboard.KeysMapped.Add("LeftShift", Keys.LeftShift);

@@ -7,7 +7,6 @@ using OP_Engine.Controls;
 using OP_Engine.Inventories;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
-using System;
 
 namespace DoS1.Util
 {

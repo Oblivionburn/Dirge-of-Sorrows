@@ -1372,6 +1372,63 @@ namespace DoS1.Util
             }
         }
 
+        public static void AddRune_Elemental(Item item, int tier)
+        {
+            CryptoRandom random;
+
+            Inventory assets = InventoryManager.GetInventory("Assets");
+            if (assets != null)
+            {
+                Something slots = item.GetProperty("Rune Slots");
+                if (slots != null)
+                {
+                    string rune_type = "";
+
+                    random = new CryptoRandom();
+                    int rune_choice = random.Next(0, 5);
+                    switch (rune_choice)
+                    {
+                        case 0:
+                            rune_type = "Earth Rune";
+                            break;
+
+                        case 1:
+                            rune_type = "Ice Rune";
+                            break;
+
+                        case 2:
+                            rune_type = "Physical Rune";
+                            break;
+
+                        case 3:
+                            rune_type = "Lightning Rune";
+                            break;
+
+                        case 4:
+                            rune_type = "Fire Rune";
+                            break;
+                    }
+
+                    Item rune = CopyItem(assets.GetItem(rune_type), true);
+                    rune.Location = new Location(item.Attachments.Count, 0, 0);
+                    rune.Icon_Visible = true;
+
+                    Something xp = rune.GetProperty("XP Value");
+                    Something level = rune.GetProperty("Level Value");
+
+                    level.Value = tier;
+                    if (level.Value >= level.Max_Value)
+                    {
+                        xp.Value = xp.Max_Value;
+                    }
+                    RuneUtil.UpdateRune_Description(rune);
+
+                    item.Attachments.Add(rune);
+                    UpdateItem(item);
+                }
+            }
+        }
+
         public static Inventory Gen_Shop(int depth)
         {
             Inventory inventory = new Inventory();

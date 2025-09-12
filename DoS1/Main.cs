@@ -339,6 +339,7 @@ namespace DoS1
             MenuManager.Menus.Add(new Menu_Shop(Content));
             MenuManager.Menus.Add(new Menu_Academy(Content));
             MenuManager.Menus.Add(new Menu_Alerts(Content));
+            MenuManager.Menus.Add(new Menu_CharEdit(Content));
         }
 
         public static void Timer_Elapsed(object sender, ElapsedEventArgs e)

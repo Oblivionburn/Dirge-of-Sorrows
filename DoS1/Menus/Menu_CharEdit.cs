@@ -1,45 +1,43 @@
-﻿using System.Threading.Tasks;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
-using OP_Engine.Scenes;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
+using OP_Engine.Inventories;
 
 using DoS1.Util;
 
 namespace DoS1.Menus
 {
-    public class Menu_CharGen : Menu
+    public class Menu_CharEdit : Menu
     {
         #region Variables
 
-        private Character leader;
-        private string LeaderName;
-        private int warning = 0;
-        private bool Shift = false;
+        Character character;
 
-        private int Head;
-        private int Skin;
-        private int HairStyle;
-        private string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White", "Purple", "Blue", "Cyan", "Green", "Pink" };
-        private int HairColor;
-        private string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Red", "Black", "Gray" };
-        private int EyeColor;
+        int warning = 0;
+        bool Shift = false;
+
+        int Head;
+        int Skin;
+        int HairStyle;
+        string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White", "Purple", "Blue", "Cyan", "Green", "Pink" };
+        int HairColor;
+        string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Red", "Black", "Gray" };
+        int EyeColor;
 
         #endregion
 
         #region Constructors
 
-        public Menu_CharGen(ContentManager content)
+        public Menu_CharEdit(ContentManager content)
         {
             ID = Handler.GetID();
-            Name = "CharGen";
+            Name = "CharEdit";
             Load(content);
         }
 
@@ -140,7 +138,7 @@ namespace DoS1.Menus
             {
                 if (input.Active)
                 {
-                    input.Text = LeaderName;
+                    input.Text = character.Name;
                 }
                 else if (InputManager.MouseWithin(input.Region.ToRectangle))
                 {
@@ -180,11 +178,6 @@ namespace DoS1.Menus
                 InputBox nameBox = GetInput("Name");
                 nameBox.Active = false;
                 nameBox.Opacity = 0.8f;
-
-                if (string.IsNullOrEmpty(LeaderName))
-                {
-                    nameBox.Text = "Type name here";
-                }
             }
         }
 
@@ -192,9 +185,9 @@ namespace DoS1.Menus
         {
             if (e.Key == Keys.Back)
             {
-                if (!string.IsNullOrEmpty(LeaderName))
+                if (!string.IsNullOrEmpty(character.Name))
                 {
-                    LeaderName = LeaderName.Remove(LeaderName.Length - 1, 1);
+                    character.Name = character.Name.Remove(character.Name.Length - 1, 1);
                 }
             }
             else if (InputManager.Keyboard.KeysMapped.ContainsValue(e.Key) &&
@@ -205,11 +198,11 @@ namespace DoS1.Menus
             {
                 if (Shift)
                 {
-                    LeaderName += e.Key.ToString().ToUpper();
+                    character.Name += e.Key.ToString().ToUpper();
                 }
                 else
                 {
-                    LeaderName += e.Key.ToString().ToLower();
+                    character.Name += e.Key.ToString().ToLower();
                 }
             }
         }
@@ -244,13 +237,9 @@ namespace DoS1.Menus
 
             if (button.Name == "Back")
             {
-                Back();
-            }
-            else if (button.Name == "Next")
-            {
-                if (!string.IsNullOrEmpty(LeaderName))
+                if (!string.IsNullOrEmpty(character.Name))
                 {
-                    Finish();
+                    Back();
                 }
                 else
                 {
@@ -405,6 +394,12 @@ namespace DoS1.Menus
                 }
 
                 GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor == null)
+                {
+                    GetPicture("Body").Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + Handler.SkinTones[Skin] + "_Idle"];
+                }
             }
             else if (button.Name == "SkinColor_Plus")
             {
@@ -421,53 +416,260 @@ namespace DoS1.Menus
                 }
 
                 GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor == null)
+                {
+                    GetPicture("Body").Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + Handler.SkinTones[Skin] + "_Idle"];
+                }
             }
         }
 
         private void Back()
         {
-            Active = false;
-            Visible = false;
+            AssetManager.PlaySound_Random("Click");
 
-            if (Handler.Saves.Count > 0)
+            GetInput("Name").Active = false;
+
+            Squad squad = ArmyUtil.Get_Squad(character.ID);
+            if (squad != null)
             {
-                MenuManager.ChangeMenu("Save_Load");
+                Character leader = squad.GetLeader();
+                if (leader != null &&
+                    leader.ID == character.ID)
+                {
+                    squad.Name = character.Name;
+                }
             }
-            else
+
+            character.Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + Handler.SkinTones[Skin] + "_Idle"];
+            character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
+
+            Item head = character.Inventory.GetItem("Head");
+            head.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+            head.Image = character.Image;
+
+            character.Inventory.GetItem("Eyes").DrawColor = Handler.EyeColors[EyeColors[EyeColor]];
+
+            Item hair = character.Inventory.GetItem("Hair");
+            if (hair != null)
             {
-                SceneManager.GetScene("Title").Menu.Visible = true;
-                MenuManager.ChangeMenu("Main");
+                hair.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + Handler.HairStyles[HairStyle]];
+                hair.Image = character.Image;
+                hair.DrawColor = Handler.HairColors[HairColors[HairColor]];
             }
+
+            InputManager.Mouse.Flush();
+            InputManager.Keyboard.Flush();
+
+            MenuManager.ChangeMenu_Previous();
         }
 
-        private void Finish()
+        public override void Load()
         {
-            Active = false;
-            Visible = false;
+            character = null;
 
-            InventoryUtil.GenAssets();
-            ArmyUtil.InitArmies();
+            Army ally_army = CharacterManager.GetArmy("Ally");
+            if (ally_army != null)
+            {
+                foreach (Squad squad in ally_army.Squads)
+                {
+                    character = squad.GetCharacter(Handler.Selected_Character);
+                    if (character != null)
+                    {
+                        break;
+                    }
+                }
+            }
 
-            Army army = CharacterManager.GetArmy("Ally");
-            Squad squad = army.Squads[0];
-            squad.Name = LeaderName;
+            if (character == null)
+            {
+                Army reserve_army = CharacterManager.GetArmy("Reserves");
+                if (reserve_army != null)
+                {
+                    foreach (Squad squad in reserve_army.Squads)
+                    {
+                        character = squad.GetCharacter(Handler.Selected_Character);
+                        if (character != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
 
-            leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles[HairStyle], HairColors[HairColor], Handler.HeadStyles[Head], EyeColors[EyeColor], Handler.SkinTones[Skin]);
-            squad.Characters.Add(leader);
-            squad.Leader_ID = leader.ID;
+            if (character != null)
+            {
+                GetInput("Name").Text = character.Name;
 
-            Handler.MainCharacter_ID = leader.ID;
-            Handler.Selected_Save = LeaderName;
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor != null)
+                {
+                    GetPicture("Body").Texture = armor.Texture;
+                }
+                else
+                {
+                    GetPicture("Body").Texture = character.Texture;
+                }
 
-            leader.Inventory.Name = LeaderName;
-            InventoryUtil.AddItem(leader.Inventory, "Cloth", "Cloth", "Armor");
-            InventoryUtil.EquipItem(leader, leader.Inventory.Items[leader.Inventory.Items.Count - 1]);
+                Item head = character.Inventory.GetItem("Head");
+                GetPicture("Head").Texture = head.Texture;
 
-            InventoryUtil.BeginningInventory();
+                string[] headParts = head.Texture.Name.Split('_');
 
-            Task.Factory.StartNew(() => WorldGen.GenWorldmap());
+                string skinTone = headParts[1];
+                for (int i = 0; i < Handler.SkinTones.Length; i++)
+                {
+                    string tone = Handler.SkinTones[i];
+                    if (tone == skinTone)
+                    {
+                        Skin = i;
 
-            GameUtil.Start();
+                        if (Skin == 0)
+                        {
+                            GetButton("SkinColor_Minus").Enabled = false;
+                        }
+                        else
+                        {
+                            GetButton("SkinColor_Minus").Enabled = true;
+                        }
+
+                        if (Skin == Handler.SkinTones.Length - 1)
+                        {
+                            GetButton("SkinColor_Plus").Enabled = false;
+                        }
+
+                        break;
+                    }
+                }
+
+                string headStyle = headParts[2];
+                for (int i = 0; i < Handler.HeadStyles.Length; i++)
+                {
+                    string style = Handler.HeadStyles[i];
+                    if (style == headStyle)
+                    {
+                        Head = i;
+
+                        if (Head == 0)
+                        {
+                            GetButton("Head_Minus").Enabled = false;
+                        }
+                        else
+                        {
+                            GetButton("Head_Minus").Enabled = true;
+                        }
+
+                        if (Head == Handler.HeadStyles.Length - 1)
+                        {
+                            GetButton("Head_Plus").Enabled = false;
+                        }
+
+                        break;
+                    }
+                }
+
+                Item eyes = character.Inventory.GetItem("Eyes");
+                GetPicture("Eyes").DrawColor = eyes.DrawColor;
+
+                int eyeColorNum = 0;
+                foreach (var color in Handler.EyeColors)
+                {
+                    if (color.Value.R == eyes.DrawColor.R &&
+                        color.Value.G == eyes.DrawColor.G &&
+                        color.Value.B == eyes.DrawColor.B)
+                    {
+                        EyeColor = eyeColorNum;
+                        if (EyeColor == 0)
+                        {
+                            GetButton("EyeColor_Minus").Enabled = false;
+                        }
+                        else
+                        {
+                            GetButton("EyeColor_Minus").Enabled = true;
+                        }
+
+                        if (EyeColor == Handler.EyeColors.Count - 1)
+                        {
+                            GetButton("EyeColor_Plus").Enabled = false;
+                        }
+
+                        break;
+                    }
+
+                    eyeColorNum++;
+                }
+
+                Item hair = character.Inventory.GetItem("Hair");
+                if (hair != null)
+                {
+                    GetPicture("Hair").Texture = hair.Texture;
+                    GetPicture("Hair").DrawColor = hair.DrawColor;
+                    GetPicture("Hair").Visible = true;
+
+                    string[] hairParts = hair.Texture.Name.Split('_');
+
+                    string hairStyle = hairParts[1];
+                    for (int i = 0; i < Handler.HairStyles.Length; i++)
+                    {
+                        string style = Handler.HairStyles[i];
+                        if (style == hairStyle)
+                        {
+                            HairStyle = i;
+
+                            if (HairStyle == 0)
+                            {
+                                GetButton("HairStyle_Minus").Enabled = false;
+                            }
+                            else
+                            {
+                                GetButton("HairStyle_Minus").Enabled = true;
+                            }
+
+                            if (HairStyle == Handler.HairStyles.Length - 1)
+                            {
+                                GetButton("HairStyle_Plus").Enabled = false;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    int hairColorNum = 0;
+                    foreach (var color in Handler.HairColors)
+                    {
+                        if (color.Value.R == hair.DrawColor.R &&
+                            color.Value.G == hair.DrawColor.G &&
+                            color.Value.B == hair.DrawColor.B)
+                        {
+                            HairColor = hairColorNum;
+                            if (HairColor == 0)
+                            {
+                                GetButton("HairColor_Minus").Enabled = false;
+                            }
+                            else
+                            {
+                                GetButton("HairColor_Minus").Enabled = true;
+                            }
+                            
+                            if (HairColor == Handler.HairColors.Count - 1)
+                            {
+                                GetButton("HairColor_Plus").Enabled = false;
+                            }
+
+                            break;
+                        }
+
+                        hairColorNum++;
+                    }
+                }
+                else
+                {
+                    GetButton("HairStyle_Plus").Enabled = false;
+                    GetPicture("Hair").Visible = false;
+                    HairStyle = Handler.HairStyles.Length - 1;
+                }
+            }
         }
 
         public override void Load(ContentManager content)
@@ -475,7 +677,7 @@ namespace DoS1.Menus
             Clear();
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
-            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "Type name here", Color.DarkGray, AssetManager.Textures["TextFrame"],
+            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "", Color.DarkGray, AssetManager.Textures["TextFrame"],
                 new Region(0, 0, 0, 0), false, true);
             GetInput("Name").Alignment_Horizontal = Alignment.Left;
             GetInput("Name").Alignment_Verticle = Alignment.Center;
@@ -644,22 +846,9 @@ namespace DoS1.Menus
             {
                 id = Handler.GetID(),
                 name = "Back",
-                hover_text = "Cancel",
+                hover_text = "Back",
                 texture = AssetManager.Textures["Button_Back"],
                 texture_highlight = AssetManager.Textures["Button_Back_Hover"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "Next",
-                hover_text = "Finish",
-                texture = AssetManager.Textures["Button_Next"],
-                texture_highlight = AssetManager.Textures["Button_Next_Hover"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White,
                 enabled = true,
@@ -723,8 +912,7 @@ namespace DoS1.Menus
             GetButton("SkinColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
             Y = (int)body.Region.Y + (int)body.Region.Height;
-            GetButton("Back").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("Next").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+            GetButton("Back").Region = new Region(body.Region.X + (body.Region.Width / 2) - (width / 2), Y, width, height);
 
             GetLabel("Examine").Region = new Region(0, 0, 0, 0);
         }

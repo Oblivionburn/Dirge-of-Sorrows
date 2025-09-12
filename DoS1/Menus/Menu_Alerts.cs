@@ -88,21 +88,6 @@ namespace DoS1.Menus
                     }
                 }
 
-                foreach (Slider slider in Sliders)
-                {
-                    slider.Draw(spriteBatch, slider.DrawColor);
-                }
-
-                foreach (InputBox input in Inputs)
-                {
-                    input.Draw(spriteBatch);
-                }
-
-                foreach (ProgressBar progressBar in ProgressBars)
-                {
-                    progressBar.Draw(spriteBatch);
-                }
-
                 foreach (Label label in Labels)
                 {
                     label.Draw(spriteBatch);
@@ -146,7 +131,6 @@ namespace DoS1.Menus
                             GameUtil.Examine(this, button.HoverText);
                         }
 
-                        button.Opacity = 1;
                         button.Selected = true;
 
                         if (button.Name == "Alert")
@@ -162,24 +146,12 @@ namespace DoS1.Menus
                         if (InputManager.Mouse_LB_Pressed)
                         {
                             CheckClick(button);
-
-                            if (button.Name != "Alert")
-                            {
-                                button.Opacity = 0.8f;
-                            }
-
                             button.Selected = false;
-
                             break;
                         }
                     }
                     else if (InputManager.Mouse.Moved)
                     {
-                        if (button.Name != "Alert")
-                        {
-                            button.Opacity = 0.8f;
-                        }
-
                         button.Selected = false;
 
                         if (button.Name == "Alert")
@@ -278,23 +250,24 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Dialogue_Option1")
             {
-                if (button.Text == "Enter Town")
+                if (button.Text == "[Enter Town]")
                 {
                     EnterTown();
                 }
-                else if (button.Text == "Retreat")
+                else if (button.Text == "[Retreat]")
                 {
                     Undeploy();
                     Close();
                     GameUtil.Toggle_Pause(false);
                 }
-                else if (button.Text == "Claim Region")
+                else if (button.Text == "[Claim Region]")
                 {
                     UnlockNextLocation();
                     Close();
                     GameUtil.Toggle_Pause(false);
                 }
-                else if (button.Text == "(Continue)")
+                else if (button.Text == "[Continue]" ||
+                         button.Text == "[Click here to continue]")
                 {
                     if (Handler.AlertType == "Tutorial")
                     {
@@ -307,7 +280,7 @@ namespace DoS1.Menus
 
                     Close();
                 }
-                else if (button.Text == "(Retreat)")
+                else if (button.Text == "[Retreat]")
                 {
                     Close();
                     GameUtil.ReturnToWorldmap();
@@ -315,7 +288,7 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Dialogue_Option2")
             {
-                if (button.Text == "Move Out")
+                if (button.Text == "[Continue]")
                 {
                     Close();
                     GameUtil.Toggle_Pause(false);
@@ -347,7 +320,7 @@ namespace DoS1.Menus
         {
             string type = "Town";
 
-            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character1);
+            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
             if (squad != null)
             {
                 Tile location = WorldUtil.GetLocation(squad);
@@ -382,7 +355,7 @@ namespace DoS1.Menus
 
         private void Undeploy()
         {
-            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character1);
+            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
             if (squad != null)
             {
                 squad.Visible = false;
@@ -554,36 +527,95 @@ namespace DoS1.Menus
                 enabled = true
             });
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_Attacker", "", Color.Red, new Region(0, 0, 0, 0), false);
-            GetLabel("Combat_Attacker").Alignment_Horizontal = Alignment.Center;
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_VS", "vs", Color.Red, new Region(0, 0, 0, 0), false);
-            GetLabel("Combat_VS").Alignment_Horizontal = Alignment.Center;
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Combat_Defender", "", Color.Red, new Region(0, 0, 0, 0), false);
-            GetLabel("Combat_Defender").Alignment_Horizontal = Alignment.Center;
+            AddLabel(new LabelOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Combat_Attacker",
+                text = "",
+                auto_scale = true,
+                scale = 1,
+                text_color = Color.Red,
+                alignment_horizontal = Alignment.Center,
+                region = new Region(0, 0, 0, 0),
+                visible = false
+            });
+
+            AddLabel(new LabelOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Combat_VS",
+                text = "vs",
+                auto_scale = true,
+                scale = 1,
+                text_color = Color.Red,
+                alignment_horizontal = Alignment.Center,
+                region = new Region(0, 0, 0, 0),
+                visible = false
+            });
+
+            AddLabel(new LabelOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Combat_Defender",
+                text = "",
+                auto_scale = true,
+                scale = 1,
+                text_color = Color.Red,
+                alignment_horizontal = Alignment.Center,
+                region = new Region(0, 0, 0, 0),
+                visible = false
+            });
+
+            AddLabel(new LabelOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Dialogue",
+                text = "",
+                text_color = Color.White,
+                alignment_verticle = Alignment.Top,
+                alignment_horizontal = Alignment.Left,
+                auto_scale = false,
+                scale = 1,
+                texture = AssetManager.Textures["TextFrame"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = new Color(64, 64, 64, 255),
+                visible = false
+            });
+
+            AddLabel(new LabelOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Dialogue_Name",
+                text = "",
+                text_color = Color.White,
+                alignment_horizontal = Alignment.Center,
+                auto_scale = false,
+                scale = 1,
+                texture = AssetManager.Textures["ButtonFrame_Wide"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = new Color(64, 64, 64, 255),
+                visible = false
+            });
+
+            AddPicture(Handler.GetID(), "Dialogue_Portrait1", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Dialogue_Portrait2", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "MouseClick", AssetManager.Textures["LeftClick"], new Region(0, 0, 0, 0), Color.White, false);
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Dialogue", "", Color.White, AssetManager.Textures["TextFrame"],
-                new Region(0, 0, 0, 0), new Color(64, 64, 64, 255), false);
-
-            Label dialogue = GetLabel("Dialogue");
-            dialogue.Alignment_Verticle = Alignment.Top;
-            dialogue.Alignment_Horizontal = Alignment.Left;
-            dialogue.AutoScale = false;
-            dialogue.Scale = 1;
-
-            AddPicture(Handler.GetID(), "Dialogue_Portrait1", AssetManager.Textures["Spot"], new Region(0, 0, 0, 0), Color.White, false);
-            AddPicture(Handler.GetID(), "Dialogue_Portrait2", AssetManager.Textures["Spot"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddButton(new ButtonOptions
             {
                 id = Handler.GetID(),
                 name = "Dialogue_Option1",
                 font = AssetManager.Fonts["ControlFont"],
-                texture = AssetManager.Textures["TextFrame"],
-                texture_highlight = AssetManager.Textures["TextFrame"],
+                texture = AssetManager.Textures["ButtonFrame_Wide"],
+                texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = new Color(64, 64, 64, 255),
-                draw_color_selected = new Color(128, 128, 128, 255),
+                draw_color_selected = Color.White,
                 text_color = Color.White,
                 text_selected_color = Color.Red,
                 enabled = true
@@ -594,11 +626,11 @@ namespace DoS1.Menus
                 id = Handler.GetID(),
                 name = "Dialogue_Option2",
                 font = AssetManager.Fonts["ControlFont"],
-                texture = AssetManager.Textures["TextFrame"],
-                texture_highlight = AssetManager.Textures["TextFrame"],
+                texture = AssetManager.Textures["ButtonFrame_Wide"],
+                texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = new Color(64, 64, 64, 255),
-                draw_color_selected = new Color(128, 128, 128, 255),
+                draw_color_selected = Color.White,
                 text_color = Color.White,
                 text_selected_color = Color.Red,
                 enabled = true
@@ -609,11 +641,11 @@ namespace DoS1.Menus
                 id = Handler.GetID(),
                 name = "Dialogue_Option3",
                 font = AssetManager.Fonts["ControlFont"],
-                texture = AssetManager.Textures["TextFrame"],
-                texture_highlight = AssetManager.Textures["TextFrame"],
+                texture = AssetManager.Textures["ButtonFrame_Wide"],
+                texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = new Color(64, 64, 64, 255),
-                draw_color_selected = new Color(128, 128, 128, 255),
+                draw_color_selected = Color.White,
                 text_color = Color.White,
                 text_selected_color = Color.Red,
                 enabled = true
@@ -628,7 +660,24 @@ namespace DoS1.Menus
             int height = Main.Game.MenuSize.X;
 
             GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
-            GetLabel("Dialogue").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Main.Game.ScreenHeight - (height * 5), width * 10, height * 4);
+
+            Label dialogue = GetLabel("Dialogue");
+            dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Main.Game.ScreenHeight - (height * 7), width * 10, height * 4);
+
+            int name_height = (int)(dialogue.Region.Height / 6);
+            GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X, dialogue.Region.Y - name_height, dialogue.Region.Width, name_height);
+
+            GetPicture("Dialogue_Portrait1").Region = new Region(dialogue.Region.X - (width * 3), dialogue.Region.Y - (height * 3), width * 3, height * 3);
+            GetPicture("Dialogue_Portrait2").Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 3), width * 3, height * 3);
+
+            Button option1 = GetButton("Dialogue_Option1");
+            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height, dialogue.Region.Width, name_height);
+
+            Button option2 = GetButton("Dialogue_Option2");
+            option2.Region = new Region(dialogue.Region.X, option1.Region.Y + option1.Region.Height, dialogue.Region.Width, name_height);
+
+            Button option3 = GetButton("Dialogue_Option3");
+            option3.Region = new Region(dialogue.Region.X, option2.Region.Y + option2.Region.Height, dialogue.Region.Width, name_height);
         }
 
         #endregion

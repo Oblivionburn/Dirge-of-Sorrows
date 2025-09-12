@@ -568,6 +568,8 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Num",
                             text = i.ToString() + ".",
+                            auto_scale = true,
+                            scale = 1,
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true
@@ -592,6 +594,8 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Name",
                             text = save,
+                            auto_scale = true,
+                            scale = 1,
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true
@@ -603,6 +607,8 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Date",
                             text = saveDir.LastWriteTime.ToString("MM-dd-yyyy hh:mm tt"),
+                            auto_scale = true,
+                            scale = 1,
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true

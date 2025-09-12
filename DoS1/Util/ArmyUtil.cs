@@ -710,9 +710,11 @@ namespace DoS1.Util
                         InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
                     }
 
-                    //Always at least 1 on weapon
+                    //Always at least 1 offense on weapon
+                    InventoryUtil.AddRune_Elemental(weapon, runes_tier);
+
                     random = new CryptoRandom();
-                    runes_amount = (int)Math.Ceiling((double)random.Next(min_tier, max_tier + 7) / 2);
+                    runes_amount = (int)Math.Ceiling((double)random.Next(min_tier, max_tier + 7) / 2) - 1;
                     InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
 
                     #endregion
@@ -824,16 +826,19 @@ namespace DoS1.Util
 
         public static Squad Get_Squad(Character leader)
         {
-            foreach (Army army in CharacterManager.Armies)
+            if (leader != null)
             {
-                foreach (Squad squad in army.Squads)
+                foreach (Army army in CharacterManager.Armies)
                 {
-                    Character squadLeader = squad.GetLeader();
-                    if (squadLeader != null)
+                    foreach (Squad squad in army.Squads)
                     {
-                        if (squadLeader.ID == leader.ID)
+                        Character squadLeader = squad.GetLeader();
+                        if (squadLeader != null)
                         {
-                            return squad;
+                            if (squadLeader.ID == leader.ID)
+                            {
+                                return squad;
+                            }
                         }
                     }
                 }

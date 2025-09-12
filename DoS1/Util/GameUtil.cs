@@ -452,7 +452,7 @@ namespace DoS1.Util
         {
             LocalPause();
 
-            Handler.Dialogue_Character1 = squad.GetLeader();
+            Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "Location";
 
             bool captured = false;
@@ -500,15 +500,15 @@ namespace DoS1.Util
             string message;
             if (liberated)
             {
-                message = squad.Name + ": \"We liberated " + location.Name + "!";
+                message = "\"We liberated " + location.Name + "!";
             }
             else if (captured)
             {
-                message = squad.Name + ": \"We captured " + location.Name + ".";
+                message = "\"We captured " + location.Name + ".";
             }
             else
             {
-                message = squad.Name + ": \"We arrived at " + location.Name + ".";
+                message = "\"We arrived at " + location.Name + ".";
             }
 
             if (is_academy)
@@ -533,14 +533,15 @@ namespace DoS1.Util
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
 
+            Label dialogue_name = alerts.GetLabel("Dialogue_Name");
+            dialogue_name.Visible = true;
+            dialogue_name.Text = Handler.Dialogue_Character2.Name;
+
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
             dialogue.Text = WrapText(message);
 
-            int height = Main.Game.MenuSize.X;
-
-            Picture picture = alerts.GetPicture("Dialogue_Portrait1");
-            picture.Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 2), height * 3, height * 3);
+            Picture picture = alerts.GetPicture("Dialogue_Portrait2");
             picture.Visible = true;
 
             if (!captured_enemy_base)
@@ -548,45 +549,36 @@ namespace DoS1.Util
                 if (is_base)
                 {
                     Button option1 = alerts.GetButton("Dialogue_Option1");
-                    option1.Text = "Retreat";
-                    option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
-                    option1.Opacity = 0.8f;
+                    option1.Text = "[Retreat]";
                     option1.Visible = true;
                 }
                 else
                 {
                     Button option1 = alerts.GetButton("Dialogue_Option1");
-                    option1.Text = "Enter Town";
-                    option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - (height * 2), dialogue.Region.Width, height);
-                    option1.Opacity = 0.8f;
+                    option1.Text = "[Enter Town]";
                     option1.Visible = true;
                 }
 
                 Button option2 = alerts.GetButton("Dialogue_Option2");
-                option2.Text = "Move Out";
-                option2.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
-                option2.Opacity = 0.8f;
+                option2.Text = "[Continue]";
                 option2.Visible = true;
             }
             else
             {
                 Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Visible = true;
 
                 Menu ui = MenuManager.GetMenu("UI");
                 Button worldmap = ui.GetButton("Worldmap");
 
                 if (worldmap.Enabled)
                 {
-                    option1.Text = "(Continue)";
+                    option1.Text = "[Continue]";
                 }
                 else
                 {
-                    option1.Text = "Claim Region";
+                    option1.Text = "[Claim Region]";
                 }
-                
-                option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
-                option1.Opacity = 0.8f;
-                option1.Visible = true;
             }
         }
 
@@ -594,28 +586,27 @@ namespace DoS1.Util
         {
             LocalPause();
 
-            Handler.Dialogue_Character1 = squad.GetLeader();
+            Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "MoveFinished";
 
-            string message = squad.Name + ": \"We have arrived at our destination.\"";
+            string message = "\"We have arrived at our destination.\"";
 
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
+
+            Label dialogue_name = alerts.GetLabel("Dialogue_Name");
+            dialogue_name.Visible = true;
+            dialogue_name.Text = Handler.Dialogue_Character2.Name;
 
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
             dialogue.Text = WrapText(message);
 
-            int height = Main.Game.MenuSize.X;
-
-            Picture picture = alerts.GetPicture("Dialogue_Portrait1");
-            picture.Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 2), height * 3, height * 3);
+            Picture picture = alerts.GetPicture("Dialogue_Portrait2");
             picture.Visible = true;
 
             Button option1 = alerts.GetButton("Dialogue_Option1");
-            option1.Text = "(Continue)";
-            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
-            option1.Opacity = 0.8f;
+            option1.Text = "[Continue]";
             option1.Visible = true;
         }
 
@@ -638,8 +629,6 @@ namespace DoS1.Util
                 message = "The enemy has captured " + location.Name + "!";
             }
 
-            int height = Main.Game.MenuSize.X;
-
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
 
@@ -648,19 +637,16 @@ namespace DoS1.Util
             dialogue.Text = WrapText(message);
 
             Button option1 = alerts.GetButton("Dialogue_Option1");
+            option1.Visible = true;
 
             if (location.Type == "Base_Ally")
             {
-                option1.Text = "(Retreat)";
+                option1.Text = "[Retreat]";
             }
             else
             {
-                option1.Text = "(Continue)";
+                option1.Text = "[Continue]";
             }
-            
-            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
-            option1.Opacity = 0.8f;
-            option1.Visible = true;
         }
 
         public static void Alert_Tutorial()
@@ -823,8 +809,6 @@ namespace DoS1.Util
                     "for " + Handler.RecruitPrice + " gold.";
             }
 
-            int height = Main.Game.MenuSize.X;
-
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
 
@@ -833,10 +817,7 @@ namespace DoS1.Util
             dialogue.Text = WrapText(message);
 
             Button option1 = alerts.GetButton("Dialogue_Option1");
-
-            option1.Text = "(Continue)";
-            option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height - height, dialogue.Region.Width, height);
-            option1.Opacity = 0.8f;
+            option1.Text = "[Click here to continue]";
             option1.Visible = true;
         }
 

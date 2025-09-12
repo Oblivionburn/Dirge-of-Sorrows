@@ -579,6 +579,10 @@ namespace DoS1.Menus
             {
                 Back();
             }
+            else if (button.Name == "Edit")
+            {
+                Edit();
+            }
             else if (button.Name == "Helms" ||
                      button.Name == "Armors" ||
                      button.Name == "Shields" ||
@@ -611,6 +615,12 @@ namespace DoS1.Menus
             character.ManaBar.Visible = false;
 
             MenuManager.ChangeMenu_Previous();
+        }
+
+        private void Edit()
+        {
+            InputManager.Mouse.Flush();
+            MenuManager.ChangeMenu("CharEdit");
         }
 
         private void SelectItem(long id)
@@ -994,8 +1004,8 @@ namespace DoS1.Menus
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "", Color.White, new Region(0, 0, 0, 0), true);
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats", "Stats", Color.White, new Region(0, 0, 0, 0), true);
-            AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats", "Stats", Color.IndianRed, new Region(0, 0, 0, 0), true);
+            AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.IndianRed, true);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Level", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "XP", "", Color.White, new Region(0, 0, 0, 0), true);
@@ -1004,9 +1014,9 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "DEX", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "AGI", "", Color.White, new Region(0, 0, 0, 0), true);
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment", "Equipment", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment", "Equipment", Color.Gold, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
-            AddPicture(Handler.GetID(), "Equipment_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
+            AddPicture(Handler.GetID(), "Equipment_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.Gold, true);
 
             AddPicture(Handler.GetID(), "Character", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White, false);
 
@@ -1024,6 +1034,20 @@ namespace DoS1.Menus
                 texture = AssetManager.Textures["Button_Back"],
                 texture_highlight = AssetManager.Textures["Button_Back_Hover"],
                 texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Edit",
+                hover_text = "Edit Character",
+                texture = AssetManager.Textures["Button_Edit"],
+                texture_highlight = AssetManager.Textures["Button_Edit_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Edit_Disabled"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White,
                 enabled = true,
@@ -1102,6 +1126,7 @@ namespace DoS1.Menus
                     character = squad.GetCharacter(Handler.Selected_Character);
                     if (character != null)
                     {
+                        GetButton("Edit").Visible = true;
                         break;
                     }
                 }
@@ -1117,6 +1142,7 @@ namespace DoS1.Menus
                         character = squad.GetCharacter(Handler.Selected_Character);
                         if (character != null)
                         {
+                            GetButton("Edit").Visible = false;
                             break;
                         }
                     }
@@ -1133,6 +1159,7 @@ namespace DoS1.Menus
                         character = squad.GetCharacter(Handler.Selected_Character);
                         if (character != null)
                         {
+                            GetButton("Edit").Visible = true;
                             break;
                         }
                     }
@@ -1159,6 +1186,9 @@ namespace DoS1.Menus
 
                 CharacterUtil.ResizeBars(character);
                 GetLabel("Name").Text = character.Name;
+
+                GetButton("Edit").Region = new Region(char_pic.Region.X + (char_pic.Region.Width / 2) - (Main.Game.MenuSize.X / 2), 
+                    char_pic.Region.Y + char_pic.Region.Height + Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
 
                 Item equip = InventoryUtil.Get_EquippedItem(character, "Helm");
                 if (equip != null)

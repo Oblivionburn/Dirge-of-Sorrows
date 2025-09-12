@@ -77,6 +77,7 @@
     <Compile Include="Menus\Menu_Academy.cs" />
     <Compile Include="Menus\Menu_Army.cs" />
     <Compile Include="Menus\Menu_Character.cs" />
+    <Compile Include="Menus\Menu_CharEdit.cs" />
     <Compile Include="Menus\Menu_CharGen.cs" />
     <Compile Include="Menus\Menu_Alerts.cs" />
     <Compile Include="Menus\Menu_Inventory.cs" />
