@@ -711,6 +711,8 @@ namespace DoS1.Menus
                     }
                 }
             }
+
+            Resize(Main.Game.Resolution);
         }
 
         public override void Resize(Point point)

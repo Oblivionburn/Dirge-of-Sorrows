@@ -100,9 +100,20 @@ namespace DoS1.Util
             return character;
         }
 
-        public static Character NewCharacter_Random(string name, Vector2 formation, bool enemy)
+        public static Character NewCharacter_Random(Vector2 formation, bool enemy)
         {
             CryptoRandom random = new CryptoRandom();
+
+            string name;
+            int gender = random.Next(0, 2);
+            if (gender == 0)
+            {
+                name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
+            }
+            else
+            {
+                name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
+            }
 
             Character character = new Character();
             character.ID = Handler.GetID();
@@ -110,6 +121,15 @@ namespace DoS1.Util
             character.Level = 1;
             character.Animator.Frames = 4;
             character.Formation = new Vector2(formation.X, formation.Y);
+
+            if (gender == 0)
+            {
+                character.Gender = "Male";
+            }
+            else
+            {
+                character.Gender = "Female";
+            }
 
             int xp = 10;
             for (int i = 2; i <= 100; i++)
@@ -202,6 +222,35 @@ namespace DoS1.Util
             character.ManaBar.Max_Value = 100;
             character.ManaBar.Value = 100;
             character.ManaBar.Update();
+
+            return character;
+        }
+
+        public static Character NewCharacter_Random(int gender)
+        {
+            CryptoRandom random = new CryptoRandom();
+
+            string name;
+            if (gender == 0)
+            {
+                name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
+            }
+            else
+            {
+                name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
+            }
+
+            Character character = NewCharacter_Random(new Vector2(0, 0), false);
+            character.Name = name;
+
+            if (gender == 0)
+            {
+                character.Gender = "Male";
+            }
+            else
+            {
+                character.Gender = "Female";
+            }
 
             return character;
         }

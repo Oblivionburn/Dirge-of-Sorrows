@@ -99,7 +99,6 @@ namespace DoS1.Util
             EnterNode("Options");
             Writer.WriteAttributeString("Fullscreen", Main.Game.GraphicsManager.IsFullScreen.ToString());
             Writer.WriteAttributeString("Tutorials", Handler.Tutorials.ToString());
-            Writer.WriteAttributeString("Resolution", Main.Game.Resolution.X.ToString() + "," + Main.Game.Resolution.Y.ToString());
             Writer.WriteAttributeString("MusicEnabled", SoundManager.MusicEnabled.ToString());
             Writer.WriteAttributeString("MusicVolume", (SoundManager.MusicVolume * 10).ToString());
             Writer.WriteAttributeString("AmbientEnabled", SoundManager.AmbientEnabled.ToString());

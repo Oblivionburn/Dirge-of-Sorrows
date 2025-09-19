@@ -68,7 +68,7 @@ namespace DoS1.Scenes
         {
             Menu.Clear();
 
-            Menu.AddPicture(Handler.GetID(), "Title", AssetManager.Textures["Title"], new Region(0, 0, 0, 0), Color.White, true);
+            Menu.AddPicture(Handler.GetID(), "Title", AssetManager.Textures["Title2"], new Region(0, 0, 0, 0), Color.White, true);
 
             Menu.Visible = true;
 

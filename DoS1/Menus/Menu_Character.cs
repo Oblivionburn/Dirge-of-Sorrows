@@ -1533,6 +1533,8 @@ namespace DoS1.Menus
                 GetButton("Shields").Visible = false;
                 GetButton("Weapons").Visible = false;
             }
+
+            Resize(Main.Game.Resolution);
         }
 
         private void ClearGrid()

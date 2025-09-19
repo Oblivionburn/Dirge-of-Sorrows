@@ -19,18 +19,19 @@ namespace DoS1.Menus
     {
         #region Variables
 
-        private Character leader;
-        private string LeaderName;
-        private int warning = 0;
-        private bool Shift = false;
+        Character leader;
+        string LeaderName;
+        int warning = 0;
+        bool Shift = false;
 
-        private int Head;
-        private int Skin;
-        private int HairStyle;
-        private string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White", "Purple", "Blue", "Cyan", "Green", "Pink" };
-        private int HairColor;
-        private string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Red", "Black", "Gray" };
-        private int EyeColor;
+        int Head;
+        int Skin;
+        int HairStyle;
+        string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White" };
+        int HairColor;
+        string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Red", "Black", "Gray" };
+        int EyeColor;
+        int Gender;
 
         #endregion
 
@@ -257,6 +258,24 @@ namespace DoS1.Menus
                     warning = 60;
                 }
             }
+            else if (button.Name == "Gender_Minus")
+            {
+                GetButton("Gender_Plus").Enabled = true;
+                button.Enabled = false;
+
+                Gender--;
+
+                GetLabel("Gender").Text = "Male";
+            }
+            else if (button.Name == "Gender_Plus")
+            {
+                GetButton("Gender_Minus").Enabled = true;
+                button.Enabled = false;
+
+                Gender++;
+
+                GetLabel("Gender").Text = "Female";
+            }
             else if (button.Name == "HairStyle_Minus")
             {
                 GetButton("HairStyle_Plus").Enabled = true;
@@ -448,6 +467,14 @@ namespace DoS1.Menus
             InventoryUtil.GenAssets();
             ArmyUtil.InitArmies();
 
+            Character friend = CharacterUtil.NewCharacter_Random(Gender);
+
+            InventoryUtil.AddItem(friend.Inventory, "Cloth", "Cloth", "Armor");
+            InventoryUtil.EquipItem(friend, friend.Inventory.Items[friend.Inventory.Items.Count - 1]);
+
+            Squad reserves = CharacterManager.GetArmy("Reserves").Squads[0];
+            reserves.Characters.Add(friend);
+
             Army army = CharacterManager.GetArmy("Ally");
             Squad squad = army.Squads[0];
             squad.Name = LeaderName;
@@ -467,7 +494,7 @@ namespace DoS1.Menus
 
             Task.Factory.StartNew(() => WorldGen.GenWorldmap());
 
-            GameUtil.Start();
+            GameUtil.NewGame();
         }
 
         public override void Load(ContentManager content)
@@ -481,14 +508,34 @@ namespace DoS1.Menus
             GetInput("Name").Alignment_Verticle = Alignment.Center;
             GetInput("Name").TextColor_Selected = Color.White;
 
-            AddPicture(Handler.GetID(), "Body", AssetManager.Textures["Left_Armor_Cloth_Cloth_Idle"], new Region(0, 0, 0, 0),
-                new Color(255, 255, 255, 255), true);
-            AddPicture(Handler.GetID(), "Head", AssetManager.Textures["Left_Light_Head1"], new Region(0, 0, 0, 0),
-                new Color(255, 255, 255, 255), true);
-            AddPicture(Handler.GetID(), "Eyes", AssetManager.Textures["Left_Eye"], new Region(0, 0, 0, 0),
-                Handler.EyeColors["Green"], true);
-            AddPicture(Handler.GetID(), "Hair", AssetManager.Textures["Left_Style1"], new Region(0, 0, 0, 0),
-                Handler.HairColors["Brown"], true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "GenderLabel", "Gender:", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Gender", "Male", Color.White, new Region(0, 0, 0, 0), true);
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Gender_Minus",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Gender_Plus",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HairStyle", "Hair Style:", Color.White, new Region(0, 0, 0, 0), true);
             GetLabel("HairStyle").Alignment_Horizontal = Alignment.Right;
@@ -640,6 +687,15 @@ namespace DoS1.Menus
                 visible = true
             });
 
+            AddPicture(Handler.GetID(), "Body", AssetManager.Textures["Left_Armor_Cloth_Cloth_Idle"], new Region(0, 0, 0, 0),
+                new Color(255, 255, 255, 255), true);
+            AddPicture(Handler.GetID(), "Head", AssetManager.Textures["Left_Light_Head1"], new Region(0, 0, 0, 0),
+                new Color(255, 255, 255, 255), true);
+            AddPicture(Handler.GetID(), "Eyes", AssetManager.Textures["Left_Eye"], new Region(0, 0, 0, 0),
+                Handler.EyeColors["Green"], true);
+            AddPicture(Handler.GetID(), "Hair", AssetManager.Textures["Left_Style1"], new Region(0, 0, 0, 0),
+                Handler.HairColors["Brown"], true);
+
             AddButton(new ButtonOptions
             {
                 id = Handler.GetID(),
@@ -685,6 +741,18 @@ namespace DoS1.Menus
             GetLabel("Warning").Region = new Region(center_x + (width * 4), Y, width * 4, height);
 
             Y += (height * 2);
+            Label gender_label = GetLabel("GenderLabel");
+            gender_label.Region = new Region(center_x - (width * 6), Y, width * 2, height);
+
+            Button gender_minus = GetButton("Gender_Minus");
+            gender_minus.Region = new Region(gender_label.Region.X + gender_label.Region.Width, Y, width, height);
+
+            Label gender = GetLabel("Gender");
+            gender.Region = new Region(gender_minus.Region.X + gender_minus.Region.Width, Y, width * 6, height);
+
+            GetButton("Gender_Plus").Region = new Region(gender.Region.X + gender.Region.Width, Y, width, height);
+
+            Y += height;
             Picture body = GetPicture("Body");
             body.Region = new Region(center_x - (width * 3), Y, width * 6, height * 8);
             body.Image = new Rectangle(0, 0, body.Texture.Width / 4, body.Texture.Height);

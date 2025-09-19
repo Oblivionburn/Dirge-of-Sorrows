@@ -670,11 +670,15 @@ namespace DoS1.Menus
                     HairStyle = Handler.HairStyles.Length - 1;
                 }
             }
+
+            Resize(Main.Game.Resolution);
         }
 
         public override void Load(ContentManager content)
         {
             Clear();
+
+            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
             AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "", Color.DarkGray, AssetManager.Textures["TextFrame"],
@@ -867,6 +871,8 @@ namespace DoS1.Menus
             int width = Main.Game.MenuSize.X;
             int height = Main.Game.MenuSize.Y;
             float center_x = Main.Game.ScreenWidth / 2;
+
+            GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
             int Y = (Main.Game.ScreenHeight / 2) - (height * 6);
             GetLabel("Name").Region = new Region(center_x - (width * 6), Y, width * 2, height);

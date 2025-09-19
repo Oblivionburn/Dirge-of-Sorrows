@@ -2,17 +2,15 @@
 using System.IO;
 using System.Xml;
 
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-using OP_Engine.Sounds;
-using OP_Engine.Inventories;
-using OP_Engine.Utility;
 using OP_Engine.Characters;
-using OP_Engine.Tiles;
+using OP_Engine.Inventories;
 using OP_Engine.Scenes;
-using FMOD;
+using OP_Engine.Sounds;
+using OP_Engine.Tiles;
 using OP_Engine.Time;
+using OP_Engine.Utility;
 
 namespace DoS1.Util
 {
@@ -84,38 +82,19 @@ namespace DoS1.Util
                 switch (reader.Name)
                 {
                     case "Fullscreen":
-                        Main.Game.GraphicsManager.IsFullScreen = reader.Value == "True";
-                        Main.Game.GraphicsManager.ApplyChanges();
+                        if (reader.Value == "True")
+                        {
+                            Main.Game.ScreenType = ScreenType.BorderlessFullscreen;
+                        }
+                        else
+                        {
+                            Main.Game.ScreenType = ScreenType.Windowed;
+                        }
+                        Main.Game.ResetScreen();
                         break;
 
                     case "Tutorials":
                         Handler.Tutorials = reader.Value == "True";
-                        break;
-
-                    case "Resolution":
-                        var parts = reader.Value.Split(',');
-                        int X = int.Parse(parts[0]);
-                        int Y = int.Parse(parts[1]);
-
-                        if (Main.Game.GraphicsManager.IsFullScreen)
-                        {
-                            Main.Game.GraphicsManager.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-                            Main.Game.GraphicsManager.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-                        }
-                        else
-                        {
-                            Main.Game.Form.Width = X;
-                            Main.Game.Form.Height = Y;
-                            Main.Game.GraphicsManager.PreferredBackBufferWidth = Main.Game.Form.Width;
-                            Main.Game.GraphicsManager.PreferredBackBufferHeight = Main.Game.Form.Height;
-                        }
-
-                        Main.Game.ScreenWidth = X;
-                        Main.Game.ScreenHeight = Y;
-
-                        Main.Game.ResolutionChange();
-
-                        Main.Game.GraphicsManager.ApplyChanges();
                         break;
 
                     case "MusicEnabled":

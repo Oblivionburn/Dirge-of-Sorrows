@@ -21,7 +21,7 @@ namespace DoS1.Util
 {
     public static class GameUtil
     {
-        public static void Start()
+        public static void NewGame()
         {
             SoundManager.AmbientFade = 1;
             SoundManager.StopAmbient();
@@ -75,7 +75,7 @@ namespace DoS1.Util
             WorldUtil.Resize_OnStart(map);
         }
 
-        public static void Load()
+        public static void LoadGame()
         {
             SoundManager.AmbientFade = 1;
             SoundManager.StopAmbient();

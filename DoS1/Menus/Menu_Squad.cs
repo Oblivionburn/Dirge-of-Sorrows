@@ -777,8 +777,12 @@ namespace DoS1.Menus
 
         private void ResetPos()
         {
+            grid_width = Main.Game.MenuSize.X;
+            grid_height = Main.Game.MenuSize.Y;
+
             width = Main.Game.MenuSize.X * 3;
             height = Main.Game.MenuSize.Y * 3;
+
             starting_Y = (Main.Game.ScreenHeight / 2) + (grid_height * 5) - (height * 3);
 
             if (!Handler.ViewOnly_Squad)
@@ -1168,6 +1172,8 @@ namespace DoS1.Menus
             {
                 LoadGrid();
             }
+
+            Resize(Main.Game.Resolution);
         }
 
         public override void Resize(Point point)
@@ -1187,9 +1193,6 @@ namespace DoS1.Menus
 
             if (Visible)
             {
-                ResizeSquad();
-                ResizeGrid();
-
                 GetLabel("Name_Squad").Region = new Region(starting_X, starting_Y - (height / 2), width * 3, height / 2);
                 GetLabel("Name_Reserves").Region = new Region(starting_grid_X, starting_grid_Y - grid_height, grid_width * 10, grid_height);
             }

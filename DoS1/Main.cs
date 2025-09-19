@@ -266,12 +266,19 @@ namespace DoS1
                             //Alt method with no lighting applied
                             SceneManager.Draw_WorldsOnly(Game.SpriteBatch, Game.Resolution);
 
+                            //Render weather underneath title menu
+                            if (SceneManager.GetScene("Title").Visible &&
+                                !Handler.Combat &&
+                                !SceneManager.GetScene("GameOver").Visible)
+                            {
+                                WeatherManager.Draw(Game.SpriteBatch);
+                            }
+
                             //Render scene specific menus
                             SceneManager.Draw_MenusOnly(Game.SpriteBatch);
 
                             //Render weather ontop of scene but underneath menus
-                            if ((Handler.LocalMap ||
-                                SceneManager.GetScene("Title").Visible) &&
+                            if (Handler.LocalMap &&
                                 !Handler.Combat &&
                                 !SceneManager.GetScene("GameOver").Visible)
                             {

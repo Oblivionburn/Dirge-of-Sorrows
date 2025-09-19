@@ -29,6 +29,7 @@ namespace DoS1
         public static string AlertType;
 
         public static bool Tutorials = true;
+        public static string TutorialType;
         public static bool Tutorial_Worldmap;
         public static bool Tutorial_Localmap;
         public static bool Tutorial_Shop;
@@ -37,8 +38,9 @@ namespace DoS1
         public static bool Tutorial_Squad;
         public static bool Tutorial_Character;
         public static bool Tutorial_Item;
+
         public static int TutorialStep;
-        public static string TutorialType;
+        public static int StoryStep;
 
         public static bool LocalMap;
         public static int Level;
@@ -94,12 +96,7 @@ namespace DoS1
             { "Blonde", new Color(230, 230, 170, 255) },
             { "Black", new Color(32, 32, 32, 255) },
             { "Gray", new Color(160, 160, 160, 255) },
-            { "White", new Color(240, 240, 240, 255) },
-            { "Purple", new Color(120, 0, 160, 255) },
-            { "Blue", new Color(0, 0, 240, 255) },
-            { "Cyan", new Color(0, 190, 200, 255) },
-            { "Green", new Color(0, 200, 0, 255) },
-            { "Pink", new Color(240, 64, 200, 255) }
+            { "White", new Color(240, 240, 240, 255) }
         };
 
         public static Dictionary<string, Color> EyeColors = new Dictionary<string, Color>()

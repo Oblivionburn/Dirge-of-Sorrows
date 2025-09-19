@@ -195,29 +195,7 @@ namespace DoS1.Util
                     continue;
                 }
 
-                string name = "";
-                
-                random = new CryptoRandom();
-                int gender = random.Next(0, 2);
-                if (gender == 0)
-                {
-                    name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
-                }
-                else
-                {
-                    name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
-                }
-                //name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
-
-                Character character = CharacterUtil.NewCharacter_Random(name, formation, true);
-                if (gender == 0)
-                {
-                    character.Gender = "Male";
-                }
-                else
-                {
-                    character.Gender = "Female";
-                }
+                Character character = CharacterUtil.NewCharacter_Random(formation, true);
 
                 //Highest min value is 8 at level 20
                 int min_tier = (int)Math.Ceiling(map_level / 2.5);
@@ -745,35 +723,12 @@ namespace DoS1.Util
         {
             Squad squad = new Squad();
 
-            CryptoRandom random;
             int x = 0;
             int y = 0;
 
             for (int i = 0; i < 20; i++)
             {
-                string name = "";
-
-                random = new CryptoRandom();
-                int gender = random.Next(0, 2);
-                if (gender == 0)
-                {
-                    name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
-                }
-                else
-                {
-                    name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
-                }
-                //name += " " + CharacterManager.LastNames[random.Next(0, CharacterManager.LastNames.Count)];
-
-                Character character = CharacterUtil.NewCharacter_Random(name, new Vector2(x, y), false);
-                if (gender == 0)
-                {
-                    character.Gender = "Male";
-                }
-                else
-                {
-                    character.Gender = "Female";
-                }
+                Character character = CharacterUtil.NewCharacter_Random(new Vector2(x, y), false);
 
                 InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                 InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);

@@ -533,8 +533,6 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Combat_Attacker",
                 text = "",
-                auto_scale = true,
-                scale = 1,
                 text_color = Color.Red,
                 alignment_horizontal = Alignment.Center,
                 region = new Region(0, 0, 0, 0),
@@ -547,8 +545,6 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Combat_VS",
                 text = "vs",
-                auto_scale = true,
-                scale = 1,
                 text_color = Color.Red,
                 alignment_horizontal = Alignment.Center,
                 region = new Region(0, 0, 0, 0),
@@ -561,8 +557,6 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Combat_Defender",
                 text = "",
-                auto_scale = true,
-                scale = 1,
                 text_color = Color.Red,
                 alignment_horizontal = Alignment.Center,
                 region = new Region(0, 0, 0, 0),
@@ -578,13 +572,14 @@ namespace DoS1.Menus
                 text_color = Color.White,
                 alignment_verticle = Alignment.Top,
                 alignment_horizontal = Alignment.Left,
-                auto_scale = false,
-                scale = 1,
                 texture = AssetManager.Textures["TextFrame"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = new Color(64, 64, 64, 255),
                 visible = false
             });
+            Label dialogue = GetLabel("Dialogue");
+            dialogue.AutoScale = false;
+            dialogue.Scale = 1;
 
             AddLabel(new LabelOptions
             {
@@ -594,13 +589,14 @@ namespace DoS1.Menus
                 text = "",
                 text_color = Color.White,
                 alignment_horizontal = Alignment.Center,
-                auto_scale = false,
-                scale = 1,
                 texture = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = new Color(64, 64, 64, 255),
                 visible = false
             });
+            Label dialogue_name = GetLabel("Dialogue_Name");
+            dialogue_name.AutoScale = false;
+            dialogue_name.Scale = 1;
 
             AddPicture(Handler.GetID(), "Dialogue_Portrait1", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Dialogue_Portrait2", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
