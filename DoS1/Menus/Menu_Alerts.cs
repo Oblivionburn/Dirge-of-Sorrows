@@ -365,7 +365,8 @@ namespace DoS1.Menus
 
         private void UnlockNextLocation()
         {
-            GetButton("Worldmap").Enabled = true;
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.GetButton("Worldmap").Enabled = true;
 
             Scene scene = SceneManager.GetScene("Worldmap");
             Map map = scene.World.Maps[0];

@@ -757,7 +757,7 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
-            if (MenuManager.PreviousMenus.Count < 3)
+            if (MenuManager.PreviousMenu.Name != "Army")
             {
                 GameUtil.Toggle_Pause(false);
             }

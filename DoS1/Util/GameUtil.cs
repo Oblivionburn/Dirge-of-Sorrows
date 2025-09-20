@@ -423,6 +423,8 @@ namespace DoS1.Util
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
 
+            alerts.GetLabel("Dialogue_Name").Visible = false;
+
             Button alert = alerts.GetButton("Alert");
             alert.Selected = false;
             alert.Opacity = 1;
