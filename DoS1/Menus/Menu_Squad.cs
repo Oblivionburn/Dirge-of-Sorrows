@@ -991,7 +991,7 @@ namespace DoS1.Menus
             if (squad != null)
             {
                 Label name_squad = GetLabel("Name_Squad");
-                name_squad.Region = new Region(starting_X, starting_Y - (height / 2), width * 3, (height / 2));
+                name_squad.Region = new Region(starting_X, starting_Y + (height * 3), width * 3, (height / 2));
                 name_squad.Text = squad.Name + " Squad";
 
                 for (int y = 0; y < 3; y++)
@@ -1114,7 +1114,7 @@ namespace DoS1.Menus
             ResetGridPos();
 
             Label reserves = GetLabel("Name_Reserves");
-            reserves.Region = new Region(starting_grid_X, starting_grid_Y - grid_height, grid_width * 10, grid_height);
+            reserves.Region = new Region(starting_grid_X, starting_grid_Y + (grid_height * 10), grid_width * 10, (height / 2));
             reserves.Visible = true;
 
             Army army = CharacterManager.GetArmy("Reserves");

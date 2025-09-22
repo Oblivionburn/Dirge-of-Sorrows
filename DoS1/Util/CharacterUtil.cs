@@ -513,8 +513,10 @@ namespace DoS1.Util
             return "Attack";
         }
 
-        public static void Increase_XP(Character character, int xp)
+        public static int Increase_XP(Character character, int xp)
         {
+            int levels_gained = 0;
+
             int max_level = 100;
 
             if (character.Level < max_level)
@@ -526,6 +528,7 @@ namespace DoS1.Util
                     //Do we have enough XP to reach the next level?
                     if (character.XP >= character.XP_Needed_ForLevels[character.Level + 1])
                     {
+                        levels_gained++;
                         Increase_Level(character);
 
                         if (character.Level == max_level)
@@ -535,6 +538,8 @@ namespace DoS1.Util
                     }
                 }
             }
+
+            return levels_gained;
         }
 
         public static void Increase_Level(Character character)

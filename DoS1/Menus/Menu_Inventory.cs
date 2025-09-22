@@ -10,9 +10,9 @@ using OP_Engine.Menus;
 using OP_Engine.Inventories;
 using OP_Engine.Utility;
 using OP_Engine.Time;
+using OP_Engine.Sounds;
 
 using DoS1.Util;
-using OP_Engine.Sounds;
 
 namespace DoS1.Menus
 {
@@ -431,7 +431,7 @@ namespace DoS1.Menus
                     Something property = properties[i];
 
                     if (property.Name.Contains("Area") ||
-                        property.Name.Contains("Chance") ||
+                        property.Name.Contains("Death") ||
                         property.Name.Contains("Status") ||
                         property.Name.Contains("Drain") ||
                         property.Name.Contains("Resist") ||
@@ -441,7 +441,22 @@ namespace DoS1.Menus
                         property.Name.Contains("Counter") ||
                         property.Name.Contains("Disarm"))
                     {
-                        text += property.Name + " Chance: " + property.Value + "%";
+                        if (!property.Name.Contains("Chance"))
+                        {
+                            text += property.Name + " Chance: " + property.Value + "%";
+                        }
+                        else
+                        {
+                            text += property.Name + ": " + property.Value + "%";
+                        }
+                    }
+                    else if (property.Name.Contains("XP"))
+                    {
+                        text += "Exp: " + property.Value + "/" + property.Max_Value;
+                    }
+                    else if (property.Name.Contains("Level"))
+                    {
+                        text += "Level: " + property.Value + "/" + property.Max_Value;
                     }
                     else
                     {
@@ -510,7 +525,7 @@ namespace DoS1.Menus
                     Something property = properties[i];
 
                     if (property.Name.Contains("Area") ||
-                        property.Name.Contains("Chance") ||
+                        property.Name.Contains("Death") ||
                         property.Name.Contains("Status") ||
                         property.Name.Contains("Drain") ||
                         property.Name.Contains("Resist") ||
@@ -520,7 +535,22 @@ namespace DoS1.Menus
                         property.Name.Contains("Counter") ||
                         property.Name.Contains("Disarm"))
                     {
-                        text += property.Name + " Chance: " + property.Value + "%";
+                        if (!property.Name.Contains("Chance"))
+                        {
+                            text += property.Name + " Chance: " + property.Value + "%";
+                        }
+                        else
+                        {
+                            text += property.Name + ": " + property.Value + "%";
+                        }
+                    }
+                    else if (property.Name.Contains("XP"))
+                    {
+                        text += "Exp: " + property.Value + "/" + property.Max_Value;
+                    }
+                    else if (property.Name.Contains("Level"))
+                    {
+                        text += "Level: " + property.Value + "/" + property.Max_Value;
                     }
                     else
                     {

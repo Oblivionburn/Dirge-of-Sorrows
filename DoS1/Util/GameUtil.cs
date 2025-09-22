@@ -221,12 +221,6 @@ namespace DoS1.Util
 
         public static void ReturnToWorldmap()
         {
-            Handler.TradingShop.Items.Clear();
-            Handler.TradingShop = null;
-
-            Handler.TradingAcademy.Characters.Clear();
-            Handler.TradingAcademy = null;
-
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
 
             Handler.LocalMap = false;

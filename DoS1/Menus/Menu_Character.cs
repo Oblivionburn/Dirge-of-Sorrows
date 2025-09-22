@@ -4,12 +4,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
+using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
-using OP_Engine.Menus;
 using OP_Engine.Inventories;
+using OP_Engine.Menus;
 using OP_Engine.Utility;
-using OP_Engine.Characters;
 
 using DoS1.Util;
 
@@ -1232,37 +1232,37 @@ namespace DoS1.Menus
                 X = char_pic.Region.X - (width * 7);
                 Y = char_pic.Region.Y - height;
 
-                GetLabel("Stats").Region = new Region(X, Y, (width * 6), height);
-                GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), (width * 6), height);
+                GetLabel("Stats").Region = new Region(X, Y, (width * 7), height);
+                GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
 
                 Y += height;
                 Label level = GetLabel("Level");
-                level.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                level.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 level.Text = "LVL: " + character.Level + "/100";
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label xp = GetLabel("XP");
-                xp.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                xp.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 xp.Text = "EXP: " + character.XP + "/" + character.XP_Needed_ForLevels[character.Level + 1];
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label strength = GetLabel("STR");
-                strength.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                strength.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 strength.Text = "STR: 10/100";
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label intelligence = GetLabel("INT");
-                intelligence.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                intelligence.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 intelligence.Text = "INT: 10/100";
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label dexterity = GetLabel("DEX");
-                dexterity.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                dexterity.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 dexterity.Text = "DEX: 10/100";
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label agility = GetLabel("AGI");
-                agility.Region = new Region(X, Y, (width * 6), (Main.Game.MenuSize.Y / 4) * 3);
+                agility.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 agility.Text = "AGI: 10/100";
 
                 // ===============
@@ -1271,11 +1271,11 @@ namespace DoS1.Menus
                 X = char_pic.Region.X - (width * 7);
                 Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + (height * 2);
 
-                GetLabel("Equipment").Region = new Region(X, Y, (width * 6), height);
-                GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), (width * 6), height);
+                GetLabel("Equipment").Region = new Region(X, Y, (width * 7), height);
+                GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
 
                 Label equipment = GetLabel("Equipment_Properties");
-                equipment.Region = new Region(X, Y + height, (width * 6), height);
+                equipment.Region = new Region(X, Y + height, (width * 7), height);
                 equipment.Text = "";
 
                 List<Something> Properties = new List<Something>();
@@ -1360,7 +1360,7 @@ namespace DoS1.Menus
                     if (!property.Name.Contains("Cost"))
                     {
                         if (property.Name.Contains("Area") ||
-                            property.Name.Contains("Chance") ||
+                            property.Name.Contains("Death") ||
                             property.Name.Contains("Status") ||
                             property.Name.Contains("Drain") ||
                             property.Name.Contains("Resist") ||
@@ -1370,7 +1370,22 @@ namespace DoS1.Menus
                             property.Name.Contains("Counter") ||
                             property.Name.Contains("Disarm"))
                         {
-                            equipment.Text += property.Name + " Chance: " + property.Value + "%";
+                            if (!property.Name.Contains("Chance"))
+                            {
+                                equipment.Text += property.Name + " Chance: " + property.Value + "%";
+                            }
+                            else
+                            {
+                                equipment.Text += property.Name + ": " + property.Value + "%";
+                            }
+                        }
+                        else if (property.Name.Contains("XP"))
+                        {
+                            equipment.Text += "XP: " + property.Value + "/" + property.Max_Value;
+                        }
+                        else if (property.Name.Contains("Level"))
+                        {
+                            equipment.Text += "Level: " + property.Value + "/" + property.Max_Value;
                         }
                         else
                         {

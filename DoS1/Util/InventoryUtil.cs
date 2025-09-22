@@ -548,6 +548,8 @@ namespace DoS1.Util
             item.Materials.Add(material);
             item.Categories.Add(category);
             item.Location = new Location();
+            item.Icon_Region = new Region();
+            item.Attachments = new List<Item>();
 
             if (material == category)
             {
@@ -719,11 +721,88 @@ namespace DoS1.Util
                 else if (element == "Health" ||
                          element == "Energy")
                 {
-                    effect = "Restore";
+                    if (IsWeapon(item))
+                    {
+                        effect = "Restore";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "Restore Extra";
+                    }
                 }
                 else if (element == "Area")
                 {
-                    effect = "Chance";
+                    #region Area Effects
+
+                    Item paired_rune = GetPairedRune(item, rune);
+                    if (paired_rune != null)
+                    {
+                        if (Element_IsDamage(paired_rune.Categories[0]))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = paired_rune.Categories[0] + " Damage";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = paired_rune.Categories[0] + " Defense";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Counter"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Pierce Chance";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Counter Attack";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Death"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Death";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Resist Death";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Disarm"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Disarm Weapon";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Disarm When Hit";
+                            }
+                        }
+                        else if (paired_rune.Name.Contains("Health"))
+                        {
+                            effect = "Health Restore";
+                        }
+                        else if (paired_rune.Name.Contains("Energy"))
+                        {
+                            effect = "Energy Restore";
+                        }
+                        else if (paired_rune.Name.Contains("Time"))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "Haste";
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "Dodge";
+                            }
+                        }
+                    }
+
+                    #endregion
                 }
                 else if (element == "Death")
                 {
@@ -749,13 +828,20 @@ namespace DoS1.Util
                 }
                 else if (element == "Drain")
                 {
-                    if (IsWeapon(item))
+                    Item paired_rune = GetPairedRune(item, rune);
+                    if (paired_rune != null)
                     {
-                        effect = "HP";
-                    }
-                    else if (IsArmor(item))
-                    {
-                        effect = "EP";
+                        if (Element_IsDamage(paired_rune.Categories[0]))
+                        {
+                            if (IsWeapon(item))
+                            {
+                                effect = "HP With " + paired_rune.Categories[0];
+                            }
+                            else if (IsArmor(item))
+                            {
+                                effect = "EP From " + paired_rune.Categories[0];
+                            }
+                        }
                     }
                 }
                 else if (element == "Counter")
@@ -930,141 +1016,140 @@ namespace DoS1.Util
 
                 Something level = rune.GetProperty("Level Value");
 
-                //Check for existing property
-                Something property = item.GetProperty(element + " " + effect);
-                if (property != null)
+                if (!string.IsNullOrEmpty(effect))
                 {
-                    if (element == "Area")
+                    //Check for existing property
+                    Something property = item.GetProperty(element + " " + effect);
+                    if (property == null)
                     {
-                        property.Value += level.Value * 10;
+                        property = item.GetProperty(effect);
                     }
-                    else if (element == "Death")
+
+                    if (property != null)
                     {
-                        if (IsWeapon(item))
-                        {
-                            property.Value += level.Value;
-                        }
-                        else if (IsArmor(item))
+                        if (element == "Area")
                         {
                             property.Value += level.Value * 10;
                         }
-                    }
-                    else if (element == "Time")
-                    {
-                        property.Value += level.Value;
-                    }
-                    else if (element == "Drain")
-                    {
-                        property.Value += level.Value * 10;
-                    }
-                    else if (element == "Counter")
-                    {
-                        property.Value += level.Value * 10;
-                    }
-                    else if (element == "Disarm")
-                    {
-                        property.Value += level.Value;
+                        else if (element == "Death")
+                        {
+                            if (IsWeapon(item))
+                            {
+                                property.Value += level.Value;
+                            }
+                            else if (IsArmor(item))
+                            {
+                                property.Value += level.Value * 10;
+                            }
+                        }
+                        else if (element == "Time")
+                        {
+                            property.Value += level.Value;
+                        }
+                        else if (element == "Drain")
+                        {
+                            property.Value += level.Value * 10;
+                        }
+                        else if (element == "Counter")
+                        {
+                            property.Value += level.Value * 10;
+                        }
+                        else if (element == "Disarm")
+                        {
+                            property.Value += level.Value;
+                        }
+                        else
+                        {
+                            property.Value += level.Value * Handler.Element_Multiplier;
+                        }
                     }
                     else
                     {
-                        property.Value += level.Value * Handler.Element_Multiplier;
-                    }
-                }
-                else
-                {
-                    //Else add new property
-                    if (element == "Area")
-                    {
-                        item.Properties.Add(new Something
-                        {
-                            Name = element + " " + effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value * 10
-                        });
-                    }
-                    else if (element == "Death")
-                    {
-                        if (IsWeapon(item))
+                        //Else add new property
+                        if (element == "Area")
                         {
                             item.Properties.Add(new Something
                             {
                                 Name = element + " " + effect,
                                 Type = element,
-                                Assignment = effect,
-                                Value = level.Value
-                            });
-                        }
-                        else if (IsArmor(item))
-                        {
-                            item.Properties.Add(new Something
-                            {
-                                Name = element + " " + effect,
-                                Type = element,
-                                Assignment = effect,
                                 Value = level.Value * 10
                             });
                         }
-                    }
-                    else if (element == "Time")
-                    {
-                        item.Properties.Add(new Something
+                        else if (element == "Death")
                         {
-                            Name = effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value
-                        });
-                    }
-                    else if (element == "Drain")
-                    {
-                        item.Properties.Add(new Something
+                            if (IsWeapon(item))
+                            {
+                                item.Properties.Add(new Something
+                                {
+                                    Name = element + " " + effect,
+                                    Type = element,
+                                    Value = level.Value
+                                });
+                            }
+                            else if (IsArmor(item))
+                            {
+                                item.Properties.Add(new Something
+                                {
+                                    Name = element + " " + effect,
+                                    Type = element,
+                                    Value = level.Value * 10
+                                });
+                            }
+                        }
+                        else if (element == "Time")
                         {
-                            Name = element + " " + effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value * 10
-                        });
-                    }
-                    else if (element == "Counter")
-                    {
-                        item.Properties.Add(new Something
+                            item.Properties.Add(new Something
+                            {
+                                Name = effect,
+                                Type = element,
+                                Value = level.Value
+                            });
+                        }
+                        else if (element == "Drain")
                         {
-                            Name = effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value * 10
-                        });
-                    }
-                    else if (element == "Disarm")
-                    {
-                        item.Properties.Add(new Something
+                            item.Properties.Add(new Something
+                            {
+                                Name = element + " " + effect,
+                                Type = element,
+                                Value = level.Value * 10
+                            });
+                        }
+                        else if (element == "Counter")
                         {
-                            Name = element + " " + effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value
-                        });
-                    }
-                    else if (element == "Effect")
-                    {
-                        item.Properties.Add(new Something
+                            item.Properties.Add(new Something
+                            {
+                                Name = effect,
+                                Type = element,
+                                Value = level.Value * 10
+                            });
+                        }
+                        else if (element == "Disarm")
                         {
-                            Name = effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value * 10
-                        });
-                    }
-                    else
-                    {
-                        item.Properties.Add(new Something
+                            item.Properties.Add(new Something
+                            {
+                                Name = element + " " + effect,
+                                Type = element,
+                                Value = level.Value
+                            });
+                        }
+                        else if (element == "Effect")
                         {
-                            Name = element + " " + effect,
-                            Type = element,
-                            Assignment = effect,
-                            Value = level.Value * Handler.Element_Multiplier
-                        });
+                            item.Properties.Add(new Something
+                            {
+                                Name = effect,
+                                Type = element,
+                                Value = level.Value * 10
+                            });
+                        }
+                        else
+                        {
+                            item.Properties.Add(new Something
+                            {
+                                Name = element + " " + effect,
+                                Type = element,
+                                Value = level.Value * Handler.Element_Multiplier
+                            });
+                        }
                     }
                 }
 
@@ -1072,25 +1157,30 @@ namespace DoS1.Util
 
                 #region Update Cost
 
-                if (cost != null)
+                if (!string.IsNullOrEmpty(effect))
                 {
-                    cost.Value += level.Value;
-                }
-                else
-                {
-                    item.Properties.Add(new Something
+                    if (cost != null)
                     {
-                        Name = "EP Cost",
-                        Type = "EP",
-                        Assignment = "Cost",
-                        Value = level.Value
-                    });
+                        cost.Value += level.Value;
+                    }
+                    else
+                    {
+                        item.Properties.Add(new Something
+                        {
+                            Name = "EP Cost",
+                            Type = "EP",
+                            Value = level.Value
+                        });
+                    }
                 }
 
                 #endregion
 
-                //Increase price per rune
-                item.Buy_Price += rune.Buy_Price;
+                if (!string.IsNullOrEmpty(effect))
+                {
+                    //Increase price per rune
+                    item.Buy_Price += rune.Buy_Price;
+                }
             }
         }
 

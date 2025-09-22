@@ -4,12 +4,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
+using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
-using OP_Engine.Menus;
 using OP_Engine.Inventories;
+using OP_Engine.Menus;
 using OP_Engine.Utility;
-using OP_Engine.Characters;
 
 using DoS1.Util;
 
@@ -439,7 +439,7 @@ namespace DoS1.Menus
                             if (found_slot)
                             {
                                 reset = false;
-                                movingItem.Location.X = slot;
+                                Swap(movingItem);
                                 movingItem = null;
                             }
                         }
@@ -479,10 +479,20 @@ namespace DoS1.Menus
             {
                 AssetManager.PlaySound_Random("Equip");
 
+                foreach (Item attachment in selectedItem.Attachments)
+                {
+                    if (attachment.Location.X == slot)
+                    {
+                        inventory.Items.Add(attachment);
+                        selectedItem.Attachments.Remove(attachment);
+                        break;
+                    }
+                }
+
                 inventory.Items.Remove(item);
                 selectedItem.Attachments.Add(item);
 
-                movingItem.Location.X = slot;
+                item.Location.X = slot;
 
                 InventoryUtil.UpdateItem(selectedItem);
             }
@@ -498,6 +508,24 @@ namespace DoS1.Menus
 
                 InventoryUtil.UpdateItem(selectedItem);
             }
+        }
+
+        private void Swap(Item item)
+        {
+            AssetManager.PlaySound_Random("Equip");
+
+            foreach (Item attachment in selectedItem.Attachments)
+            {
+                if (attachment.Location.X == slot)
+                {
+                    attachment.Location.X = item.Location.X;
+                    break;
+                }
+            }
+
+            item.Location.X = slot;
+
+            InventoryUtil.UpdateItem(selectedItem);
         }
 
         private void CheckClick(Button button)
@@ -562,7 +590,19 @@ namespace DoS1.Menus
             for (int i = 0; i < item.Properties.Count; i++)
             {
                 Something property = item.Properties[i];
-                text += property.Name + ": " + property.Value;
+
+                if (property.Name.Contains("XP"))
+                {
+                    text += "Exp: " + property.Value + "/" + property.Max_Value;
+                }
+                else if (property.Name.Contains("Level"))
+                {
+                    text += "Level: " + property.Value + "/" + property.Max_Value;
+                }
+                else
+                {
+                    text += property.Name + ": " + property.Value;
+                }
 
                 if (i < item.Properties.Count - 1)
                 {
@@ -761,11 +801,11 @@ namespace DoS1.Menus
                 }
 
                 int Y = starting_Y + (height * 6) + (height / 2);
-                GetLabel("Properties").Region = new Region(starting_X - (width * 12), Y, width * 5, height);
-                GetPicture("Properties_Underline").Region = new Region(starting_X - (width * 12), Y + (height / 2), width * 5, height);
+                GetLabel("Properties").Region = new Region(starting_X - (width * 12), Y, width * 7, height);
+                GetPicture("Properties_Underline").Region = new Region(starting_X - (width * 12), Y + (height / 2), width * 7, height);
 
                 Label item_properties = GetLabel("Item_Properties");
-                item_properties.Region = new Region(starting_X - (width * 12), Y + height, width * 5, height);
+                item_properties.Region = new Region(starting_X - (width * 12), Y + height, width * 7, height);
                 item_properties.Text = "";
 
                 if (selectedItem.Type == "Weapon")
@@ -810,7 +850,7 @@ namespace DoS1.Menus
                         Something property = properties[i];
 
                         if (property.Name.Contains("Area") ||
-                            property.Name.Contains("Chance") ||
+                            property.Name.Contains("Death") ||
                             property.Name.Contains("Status") ||
                             property.Name.Contains("Drain") ||
                             property.Name.Contains("Resist") ||
@@ -820,7 +860,14 @@ namespace DoS1.Menus
                             property.Name.Contains("Counter") ||
                             property.Name.Contains("Disarm"))
                         {
-                            item_properties.Text += property.Name + " Chance: " + property.Value + "%";
+                            if (!property.Name.Contains("Chance"))
+                            {
+                                item_properties.Text += property.Name + " Chance: " + property.Value + "%";
+                            }
+                            else
+                            {
+                                item_properties.Text += property.Name + ": " + property.Value + "%";
+                            }
                         }
                         else
                         {
@@ -878,7 +925,7 @@ namespace DoS1.Menus
                         Something property = properties[i];
 
                         if (property.Name.Contains("Area") ||
-                            property.Name.Contains("Chance") ||
+                            property.Name.Contains("Death") ||
                             property.Name.Contains("Status") ||
                             property.Name.Contains("Drain") ||
                             property.Name.Contains("Resist") ||
@@ -888,7 +935,14 @@ namespace DoS1.Menus
                             property.Name.Contains("Counter") ||
                             property.Name.Contains("Disarm"))
                         {
-                            item_properties.Text += property.Name + " Chance: " + property.Value + "%";
+                            if (!property.Name.Contains("Chance"))
+                            {
+                                item_properties.Text += property.Name + " Chance: " + property.Value + "%";
+                            }
+                            else
+                            {
+                                item_properties.Text += property.Name + ": " + property.Value + "%";
+                            }
                         }
                         else
                         {

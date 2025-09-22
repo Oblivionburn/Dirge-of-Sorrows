@@ -1405,46 +1405,54 @@ namespace DoS1.Util
             return false;
         }
 
-        public static void UpdateRune_Level(Item rune)
+        public static void Increase_XP(Item rune, int amount)
         {
-            Something level = rune.GetProperty("Level Value");
             Something xp = rune.GetProperty("XP Value");
+            Something level = rune.GetProperty("Level Value");
 
-            //Don't increase XP if we've hit max level
-            if (level.Value < level.Max_Value)
+            if (level != null &&
+                xp != null)
             {
-                //Check if rune can increase level
-                float left_over = xp.Max_Value - xp.Value;
-                while (left_over <= 0)
+                if (level.Value < level.Max_Value)
                 {
-                    if (level != null)
+                    for (int i = 1; i <= amount; i++)
                     {
-                        //Increase rune level
-                        level.Value++;
-                        UpdateRune_Description(rune);
+                        xp.Value++;
 
-                        if (level.Value >= level.Max_Value)
+                        //Do we have enough XP to reach the next level?
+                        if (xp.Value >= xp.Max_Value)
                         {
-                            //We've hit max level
-                            level.Value = level.Max_Value;
-                            xp.Value = xp.Max_Value;
-                            break;
+                            Increase_Level(rune);
+
+                            if (level.Value == level.Max_Value)
+                            {
+                                break;
+                            }
                         }
-                        else
-                        {
-                            xp.Value -= xp.Max_Value;
-                            left_over = xp.Max_Value - xp.Value;
-                        }
-                    }
-                    else
-                    {
-                        break;
                     }
                 }
             }
-            else
+        }
+
+        public static void Increase_Level(Item rune)
+        {
+            Something xp = rune.GetProperty("XP Value");
+            if (xp != null)
             {
-                xp.Value = xp.Max_Value;
+                xp.Value = 0;
+            }
+
+            Something level = rune.GetProperty("Level Value");
+            if (level != null)
+            {
+                level.Value++;
+
+                if (level.Value == level.Max_Value)
+                {
+                    xp.Value = xp.Max_Value;
+                }
+
+                UpdateRune_Description(rune);
             }
         }
 
