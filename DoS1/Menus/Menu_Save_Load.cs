@@ -389,8 +389,6 @@ namespace DoS1.Menus
                 string save = Handler.Saves[num - 1];
                 Handler.Selected_Save = save;
 
-                InventoryUtil.GenAssets();
-
                 Util.Load.LoadGame();
                 GameUtil.LoadGame();
             }

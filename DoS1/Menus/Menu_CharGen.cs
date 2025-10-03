@@ -19,6 +19,8 @@ namespace DoS1.Menus
     {
         #region Variables
 
+        bool ControlsLoaded;
+
         Character leader;
         string LeaderName;
         int warning = 0;
@@ -464,7 +466,6 @@ namespace DoS1.Menus
             Active = false;
             Visible = false;
 
-            InventoryUtil.GenAssets();
             ArmyUtil.InitArmies();
 
             Character friend = CharacterUtil.NewCharacter_Random(Gender);
@@ -497,7 +498,7 @@ namespace DoS1.Menus
             GameUtil.NewGame();
         }
 
-        public override void Load(ContentManager content)
+        public override void Load()
         {
             Clear();
 
@@ -726,6 +727,7 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                 new Region(0, 0, 0, 0), false);
 
+            ControlsLoaded = true;
             Resize(Main.Game.Resolution);
         }
 
@@ -736,65 +738,69 @@ namespace DoS1.Menus
             float center_x = Main.Game.ScreenWidth / 2;
 
             int Y = (Main.Game.ScreenHeight / 2) - (height * 6);
-            GetLabel("Name").Region = new Region(center_x - (width * 6), Y, width * 2, height);
-            GetInput("Name").Region = new Region(center_x - (width * 4), Y, width * 8, height);
-            GetLabel("Warning").Region = new Region(center_x + (width * 4), Y, width * 4, height);
 
-            Y += (height * 2);
-            Label gender_label = GetLabel("GenderLabel");
-            gender_label.Region = new Region(center_x - (width * 6), Y, width * 2, height);
+            if (ControlsLoaded)
+            {
+                GetLabel("Name").Region = new Region(center_x - (width * 6), Y, width * 2, height);
+                GetInput("Name").Region = new Region(center_x - (width * 4), Y, width * 8, height);
+                GetLabel("Warning").Region = new Region(center_x + (width * 4), Y, width * 4, height);
 
-            Button gender_minus = GetButton("Gender_Minus");
-            gender_minus.Region = new Region(gender_label.Region.X + gender_label.Region.Width, Y, width, height);
+                Y += (height * 2);
+                Label gender_label = GetLabel("GenderLabel");
+                gender_label.Region = new Region(center_x - (width * 6), Y, width * 2, height);
 
-            Label gender = GetLabel("Gender");
-            gender.Region = new Region(gender_minus.Region.X + gender_minus.Region.Width, Y, width * 6, height);
+                Button gender_minus = GetButton("Gender_Minus");
+                gender_minus.Region = new Region(gender_label.Region.X + gender_label.Region.Width, Y, width, height);
 
-            GetButton("Gender_Plus").Region = new Region(gender.Region.X + gender.Region.Width, Y, width, height);
+                Label gender = GetLabel("Gender");
+                gender.Region = new Region(gender_minus.Region.X + gender_minus.Region.Width, Y, width * 6, height);
 
-            Y += height;
-            Picture body = GetPicture("Body");
-            body.Region = new Region(center_x - (width * 3), Y, width * 6, height * 8);
-            body.Image = new Rectangle(0, 0, body.Texture.Width / 4, body.Texture.Height);
+                GetButton("Gender_Plus").Region = new Region(gender.Region.X + gender.Region.Width, Y, width, height);
 
-            GetPicture("Head").Region = body.Region;
-            GetPicture("Head").Image = body.Image;
+                Y += height;
+                Picture body = GetPicture("Body");
+                body.Region = new Region(center_x - (width * 3), Y, width * 6, height * 8);
+                body.Image = new Rectangle(0, 0, body.Texture.Width / 4, body.Texture.Height);
 
-            GetPicture("Eyes").Region = body.Region;
-            GetPicture("Eyes").Image = body.Image;
+                GetPicture("Head").Region = body.Region;
+                GetPicture("Head").Image = body.Image;
 
-            GetPicture("Hair").Region = body.Region;
-            GetPicture("Hair").Image = body.Image;
+                GetPicture("Eyes").Region = body.Region;
+                GetPicture("Eyes").Image = body.Image;
 
-            GetLabel("HairStyle").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
-            GetButton("HairStyle_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("HairStyle_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                GetPicture("Hair").Region = body.Region;
+                GetPicture("Hair").Image = body.Image;
 
-            Y += height;
-            GetLabel("HairColor").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
-            GetButton("HairColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("HairColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                GetLabel("HairStyle").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
+                GetButton("HairStyle_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("HairStyle_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("Head").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
-            GetButton("Head_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("Head_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("HairColor").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
+                GetButton("HairColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("HairColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("EyeColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
-            GetButton("EyeColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("EyeColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("Head").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
+                GetButton("Head_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("Head_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("SkinColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
-            GetButton("SkinColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("SkinColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("EyeColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
+                GetButton("EyeColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("EyeColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y = (int)body.Region.Y + (int)body.Region.Height;
-            GetButton("Back").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("Next").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("SkinColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
+                GetButton("SkinColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("SkinColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            GetLabel("Examine").Region = new Region(0, 0, 0, 0);
+                Y = (int)body.Region.Y + (int)body.Region.Height;
+                GetButton("Back").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("Next").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+
+                GetLabel("Examine").Region = new Region(0, 0, 0, 0);
+            }
         }
 
         #endregion

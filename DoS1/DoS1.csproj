@@ -82,6 +82,7 @@
     <Compile Include="Menus\Menu_Alerts.cs" />
     <Compile Include="Menus\Menu_Inventory.cs" />
     <Compile Include="Menus\Menu_Item.cs" />
+    <Compile Include="Menus\Menu_Loading.cs" />
     <Compile Include="Menus\Menu_Save_Load.cs" />
     <Compile Include="Menus\Menu_Main.cs" />
     <Compile Include="Menus\Menu_Options.cs" />

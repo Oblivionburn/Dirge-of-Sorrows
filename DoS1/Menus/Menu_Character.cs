@@ -19,6 +19,7 @@ namespace DoS1.Menus
     {
         #region Variables
 
+        bool ControlsLoaded;
         Character character = null;
 
         int Top;
@@ -993,7 +994,7 @@ namespace DoS1.Menus
             return null;
         }
 
-        public override void Load(ContentManager content)
+        private void LoadControls()
         {
             Clear();
 
@@ -1110,7 +1111,7 @@ namespace DoS1.Menus
                 visible = true
             });
 
-            Resize(Main.Game.Resolution);
+            ControlsLoaded = true;
         }
 
         private void LoadCharacter()
@@ -1519,6 +1520,7 @@ namespace DoS1.Menus
 
         public override void Load()
         {
+            LoadControls();
             LoadCharacter();
 
             if (!Handler.ViewOnly_Character)
@@ -1615,18 +1617,21 @@ namespace DoS1.Menus
 
         public override void Resize(Point point)
         {
-            if (Visible)
+            if (ControlsLoaded)
             {
-                LoadCharacter();
-                ResizeInventory();
+                if (Visible)
+                {
+                    LoadCharacter();
+                    ResizeInventory();
+                }
+
+                GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+
+                GetButton("Back").Region = new Region(0, 0, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+
+                GetPicture("Highlight").Region = new Region(0, 0, 0, 0);
+                GetLabel("Examine").Region = new Region(0, 0, 0, 0);
             }
-
-            GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
-
-            GetButton("Back").Region = new Region(0, 0, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
-
-            GetPicture("Highlight").Region = new Region(0, 0, 0, 0);
-            GetLabel("Examine").Region = new Region(0, 0, 0, 0);
         }
 
         #endregion

@@ -1,19 +1,21 @@
 ﻿using System;
-using System.IO;
-using System.Timers;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using OP_Engine.Characters;
+using OP_Engine.Inputs;
+using OP_Engine.Inventories;
 using OP_Engine.Sounds;
+using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
-using OP_Engine.Inputs;
-using OP_Engine.Time;
-using OP_Engine.Inventories;
 
 using DoS1.Util;
 
@@ -41,6 +43,15 @@ namespace DoS1
 
         public static int TutorialStep;
         public static int StoryStep;
+
+        public static bool Loaded;
+        public static int Loading_Step;
+        public static string Loading_Message;
+        public static int Loading_IconCount;
+        public static int Loading_Current;
+        public static float Loading_Percent;
+        public static CancellationTokenSource Loading_TokenSource;
+        public static Task Loading_Task;
 
         public static bool LocalMap;
         public static int Level;
@@ -73,7 +84,7 @@ namespace DoS1
         public static Dictionary<int, Squad> AcademyRecruits = new Dictionary<int, Squad>();
         public static Squad TradingAcademy;
 
-        public static Timer CombatTimer = new Timer(1);
+        public static System.Timers.Timer CombatTimer = new System.Timers.Timer(1);
         public static bool Combat;
         public static int Element_Multiplier = 8;
         public static string Combat_Terrain;
@@ -183,21 +194,10 @@ namespace DoS1
             //Textures
             string[] textures =
             {
-                "Armors",
-                "Bodies",
                 "Controls",
-                "Effects",
-                "Eyes",
-                "Hairs",
-                "Heads",
-                "Helms",
-                "Icons",
                 "Particles",
                 "Screens",
                 "Shaders",
-                "Shields",
-                "Tiles",
-                "Weapons"
             };
             foreach (string dir in textures)
             {
@@ -301,6 +301,64 @@ namespace DoS1
             }
         }
 
+        public static void LoadTextures()
+        {
+            if (Main.Game.GraphicsManager.GraphicsDevice != null)
+            {
+                Loading_Current = 0;
+                Loading_IconCount = 0;
+                Loading_Message = "Loading Textures";
+
+                string[] dirs = { "Armors", "Bodies", "Effects", "Eyes", "Hairs", "Heads", "Helms", "Icons", "Shields", "Tiles", "Weapons" };
+
+                int total = 0;
+
+                DirectoryInfo dir = new DirectoryInfo(AssetManager.Directories["Textures"]);
+
+                foreach (var sub_dir in dir.GetDirectories())
+                {
+                    if (dirs.Contains(sub_dir.Name))
+                    {
+                        foreach (var file in sub_dir.GetFiles("*.png"))
+                        {
+                            total++;
+                        }
+                    }
+                }
+
+                foreach (var sub_dir in dir.GetDirectories())
+                {
+                    if (dirs.Contains(sub_dir.Name))
+                    {
+                        FileInfo[] files = sub_dir.GetFiles("*.png");
+
+                        int fileCount = files.Length;
+                        for (int i = 0; i < fileCount; i++)
+                        {
+                            FileInfo file = files[i];
+
+                            var name = Path.GetFileNameWithoutExtension(file.Name);
+                            if (!AssetManager.Textures.ContainsKey(name))
+                            {
+                                using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open))
+                                {
+                                    if (Main.Game.GraphicsManager.GraphicsDevice != null)
+                                    {
+                                        Texture2D texture = Texture2D.FromStream(Main.Game.GraphicsManager.GraphicsDevice, fileStream);
+                                        texture.Name = name;
+                                        AssetManager.Textures.Add(name, texture);
+
+                                        Loading_Current++;
+                                        Loading_Percent = (Loading_Current * 100) / total;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Get Stuff
@@ -309,6 +367,11 @@ namespace DoS1
         {
             ID++;
             return ID;
+        }
+
+        public static Character GetHero()
+        {
+            return CharacterManager.GetArmy("Ally").Squads[0].GetLeader();
         }
 
         #endregion

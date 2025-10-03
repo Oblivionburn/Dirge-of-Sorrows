@@ -17,6 +17,8 @@ namespace DoS1.Menus
     {
         #region Variables
 
+        bool ControlsLoaded;
+
         Character character;
 
         int warning = 0;
@@ -465,8 +467,201 @@ namespace DoS1.Menus
             MenuManager.ChangeMenu_Previous();
         }
 
+        private void LoadControls()
+        {
+            Clear();
+
+            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
+            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "", Color.DarkGray, AssetManager.Textures["TextFrame"],
+                new Region(0, 0, 0, 0), false, true);
+            GetInput("Name").Alignment_Horizontal = Alignment.Left;
+            GetInput("Name").Alignment_Verticle = Alignment.Center;
+            GetInput("Name").TextColor_Selected = Color.White;
+
+            AddPicture(Handler.GetID(), "Body", AssetManager.Textures["Left_Armor_Cloth_Cloth_Idle"], new Region(0, 0, 0, 0),
+                new Color(255, 255, 255, 255), true);
+            AddPicture(Handler.GetID(), "Head", AssetManager.Textures["Left_Light_Head1"], new Region(0, 0, 0, 0),
+                new Color(255, 255, 255, 255), true);
+            AddPicture(Handler.GetID(), "Eyes", AssetManager.Textures["Left_Eye"], new Region(0, 0, 0, 0),
+                Handler.EyeColors["Green"], true);
+            AddPicture(Handler.GetID(), "Hair", AssetManager.Textures["Left_Style1"], new Region(0, 0, 0, 0),
+                Handler.HairColors["Brown"], true);
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HairStyle", "Hair Style:", Color.White, new Region(0, 0, 0, 0), true);
+            GetLabel("HairStyle").Alignment_Horizontal = Alignment.Right;
+            GetLabel("HairStyle").Alignment_Verticle = Alignment.Center;
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "HairStyle_Minus",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "HairStyle_Plus",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HairColor", "Hair Color:", Color.White, new Region(0, 0, 0, 0), true);
+            GetLabel("HairColor").Alignment_Horizontal = Alignment.Right;
+            GetLabel("HairColor").Alignment_Verticle = Alignment.Center;
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "HairColor_Minus",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "HairColor_Plus",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Head", "Head:", Color.White, new Region(0, 0, 0, 0), true);
+            GetLabel("Head").Alignment_Horizontal = Alignment.Right;
+            GetLabel("Head").Alignment_Verticle = Alignment.Center;
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Head_Minus",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Head_Plus",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "EyeColor", "Eye Color:", Color.White, new Region(0, 0, 0, 0), true);
+            GetLabel("EyeColor").Alignment_Horizontal = Alignment.Right;
+            GetLabel("EyeColor").Alignment_Verticle = Alignment.Center;
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "EyeColor_Minus",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "EyeColor_Plus",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "SkinColor", "Skin Color:", Color.White, new Region(0, 0, 0, 0), true);
+            GetLabel("SkinColor").Alignment_Horizontal = Alignment.Right;
+            GetLabel("SkinColor").Alignment_Verticle = Alignment.Center;
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "SkinColor_Minus",
+                texture = AssetManager.Textures["Button_Remove"],
+                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = false,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "SkinColor_Plus",
+                texture = AssetManager.Textures["Button_Add"],
+                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Back",
+                hover_text = "Back",
+                texture = AssetManager.Textures["Button_Back"],
+                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Warning", "Name required!", Color.Red, new Region(0, 0, 0, 0), false);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+                new Region(0, 0, 0, 0), false);
+
+            ControlsLoaded = true;
+        }
+
         public override void Load()
         {
+            LoadControls();
             character = null;
 
             Army ally_army = CharacterManager.GetArmy("Ally");
@@ -674,253 +869,64 @@ namespace DoS1.Menus
             Resize(Main.Game.Resolution);
         }
 
-        public override void Load(ContentManager content)
-        {
-            Clear();
-
-            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
-            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "", Color.DarkGray, AssetManager.Textures["TextFrame"],
-                new Region(0, 0, 0, 0), false, true);
-            GetInput("Name").Alignment_Horizontal = Alignment.Left;
-            GetInput("Name").Alignment_Verticle = Alignment.Center;
-            GetInput("Name").TextColor_Selected = Color.White;
-
-            AddPicture(Handler.GetID(), "Body", AssetManager.Textures["Left_Armor_Cloth_Cloth_Idle"], new Region(0, 0, 0, 0),
-                new Color(255, 255, 255, 255), true);
-            AddPicture(Handler.GetID(), "Head", AssetManager.Textures["Left_Light_Head1"], new Region(0, 0, 0, 0),
-                new Color(255, 255, 255, 255), true);
-            AddPicture(Handler.GetID(), "Eyes", AssetManager.Textures["Left_Eye"], new Region(0, 0, 0, 0),
-                Handler.EyeColors["Green"], true);
-            AddPicture(Handler.GetID(), "Hair", AssetManager.Textures["Left_Style1"], new Region(0, 0, 0, 0),
-                Handler.HairColors["Brown"], true);
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HairStyle", "Hair Style:", Color.White, new Region(0, 0, 0, 0), true);
-            GetLabel("HairStyle").Alignment_Horizontal = Alignment.Right;
-            GetLabel("HairStyle").Alignment_Verticle = Alignment.Center;
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "HairStyle_Minus",
-                texture = AssetManager.Textures["Button_Remove"],
-                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = false,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "HairStyle_Plus",
-                texture = AssetManager.Textures["Button_Add"],
-                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HairColor", "Hair Color:", Color.White, new Region(0, 0, 0, 0), true);
-            GetLabel("HairColor").Alignment_Horizontal = Alignment.Right;
-            GetLabel("HairColor").Alignment_Verticle = Alignment.Center;
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "HairColor_Minus",
-                texture = AssetManager.Textures["Button_Remove"],
-                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = false,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "HairColor_Plus",
-                texture = AssetManager.Textures["Button_Add"],
-                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Head", "Head:", Color.White, new Region(0, 0, 0, 0), true);
-            GetLabel("Head").Alignment_Horizontal = Alignment.Right;
-            GetLabel("Head").Alignment_Verticle = Alignment.Center;
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "Head_Minus",
-                texture = AssetManager.Textures["Button_Remove"],
-                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = false,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "Head_Plus",
-                texture = AssetManager.Textures["Button_Add"],
-                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "EyeColor", "Eye Color:", Color.White, new Region(0, 0, 0, 0), true);
-            GetLabel("EyeColor").Alignment_Horizontal = Alignment.Right;
-            GetLabel("EyeColor").Alignment_Verticle = Alignment.Center;
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "EyeColor_Minus",
-                texture = AssetManager.Textures["Button_Remove"],
-                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = false,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "EyeColor_Plus",
-                texture = AssetManager.Textures["Button_Add"],
-                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "SkinColor", "Skin Color:", Color.White, new Region(0, 0, 0, 0), true);
-            GetLabel("SkinColor").Alignment_Horizontal = Alignment.Right;
-            GetLabel("SkinColor").Alignment_Verticle = Alignment.Center;
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "SkinColor_Minus",
-                texture = AssetManager.Textures["Button_Remove"],
-                texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Remove_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = false,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "SkinColor_Plus",
-                texture = AssetManager.Textures["Button_Add"],
-                texture_highlight = AssetManager.Textures["Button_Add_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Add_Disabled"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "Back",
-                hover_text = "Back",
-                texture = AssetManager.Textures["Button_Back"],
-                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                enabled = true,
-                visible = true
-            });
-
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Warning", "Name required!", Color.Red, new Region(0, 0, 0, 0), false);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
-                new Region(0, 0, 0, 0), false);
-
-            Resize(Main.Game.Resolution);
-        }
-
         public override void Resize(Point point)
         {
             int width = Main.Game.MenuSize.X;
             int height = Main.Game.MenuSize.Y;
             float center_x = Main.Game.ScreenWidth / 2;
 
-            GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+            if (ControlsLoaded)
+            {
+                GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
-            int Y = (Main.Game.ScreenHeight / 2) - (height * 6);
-            GetLabel("Name").Region = new Region(center_x - (width * 6), Y, width * 2, height);
-            GetInput("Name").Region = new Region(center_x - (width * 4), Y, width * 8, height);
-            GetLabel("Warning").Region = new Region(center_x + (width * 4), Y, width * 4, height);
+                int Y = (Main.Game.ScreenHeight / 2) - (height * 6);
+                GetLabel("Name").Region = new Region(center_x - (width * 6), Y, width * 2, height);
+                GetInput("Name").Region = new Region(center_x - (width * 4), Y, width * 8, height);
+                GetLabel("Warning").Region = new Region(center_x + (width * 4), Y, width * 4, height);
 
-            Y += (height * 2);
-            Picture body = GetPicture("Body");
-            body.Region = new Region(center_x - (width * 3), Y, width * 6, height * 8);
-            body.Image = new Rectangle(0, 0, body.Texture.Width / 4, body.Texture.Height);
+                Y += (height * 2);
+                Picture body = GetPicture("Body");
+                body.Region = new Region(center_x - (width * 3), Y, width * 6, height * 8);
+                body.Image = new Rectangle(0, 0, body.Texture.Width / 4, body.Texture.Height);
 
-            GetPicture("Head").Region = body.Region;
-            GetPicture("Head").Image = body.Image;
+                GetPicture("Head").Region = body.Region;
+                GetPicture("Head").Image = body.Image;
 
-            GetPicture("Eyes").Region = body.Region;
-            GetPicture("Eyes").Image = body.Image;
+                GetPicture("Eyes").Region = body.Region;
+                GetPicture("Eyes").Image = body.Image;
 
-            GetPicture("Hair").Region = body.Region;
-            GetPicture("Hair").Image = body.Image;
+                GetPicture("Hair").Region = body.Region;
+                GetPicture("Hair").Image = body.Image;
 
-            GetLabel("HairStyle").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
-            GetButton("HairStyle_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("HairStyle_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                GetLabel("HairStyle").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
+                GetButton("HairStyle_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("HairStyle_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("HairColor").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
-            GetButton("HairColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("HairColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("HairColor").Region = new Region(body.Region.X - (width * 5), Y, width * 4, height);
+                GetButton("HairColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("HairColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("Head").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
-            GetButton("Head_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("Head_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("Head").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
+                GetButton("Head_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("Head_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("EyeColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
-            GetButton("EyeColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("EyeColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("EyeColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
+                GetButton("EyeColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("EyeColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y += height;
-            GetLabel("SkinColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
-            GetButton("SkinColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
-            GetButton("SkinColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
+                Y += height;
+                GetLabel("SkinColor").Region = new Region(body.Region.X - (width * 4), Y, width * 3, height);
+                GetButton("SkinColor_Minus").Region = new Region(body.Region.X - width, Y, width, height);
+                GetButton("SkinColor_Plus").Region = new Region(body.Region.X + body.Region.Width, Y, width, height);
 
-            Y = (int)body.Region.Y + (int)body.Region.Height;
-            GetButton("Back").Region = new Region(body.Region.X + (body.Region.Width / 2) - (width / 2), Y, width, height);
+                Y = (int)body.Region.Y + (int)body.Region.Height;
+                GetButton("Back").Region = new Region(body.Region.X + (body.Region.Width / 2) - (width / 2), Y, width, height);
 
-            GetLabel("Examine").Region = new Region(0, 0, 0, 0);
+                GetLabel("Examine").Region = new Region(0, 0, 0, 0);
+            }
         }
 
         #endregion

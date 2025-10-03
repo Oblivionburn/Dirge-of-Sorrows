@@ -333,6 +333,7 @@ namespace DoS1
 
         private void LoadMenus()
         {
+            MenuManager.Menus.Add(new Menu_Loading(Content));
             MenuManager.Menus.Add(new Menu_UI(Content));
             MenuManager.Menus.Add(new Menu_Main(Content));
             MenuManager.Menus.Add(new Menu_Save_Load(Content));

@@ -113,13 +113,20 @@ namespace DoS1.Menus
 
                 SceneManager.GetScene("Title").Menu.Visible = false;
 
-                if (Handler.Saves.Count > 0)
+                if (Handler.Loaded)
                 {
-                    MenuManager.ChangeMenu("Save_Load");
+                    if (Handler.Saves.Count > 0)
+                    {
+                        MenuManager.ChangeMenu("Save_Load");
+                    }
+                    else
+                    {
+                        MenuManager.ChangeMenu("CharGen");
+                    }
                 }
                 else
                 {
-                    MenuManager.ChangeMenu("CharGen");
+                    MenuManager.ChangeMenu("Loading");
                 }
             }
             else if (button.Name == "SaveExit")
