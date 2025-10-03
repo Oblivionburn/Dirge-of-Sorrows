@@ -66,11 +66,17 @@ namespace DoS1.Scenes
                     }
                 }
 
-                if (Handler.Tutorials &&
-                    !Handler.Tutorial_Localmap)
+                if (Handler.StoryStep <= 5 ||
+                    (Handler.StoryStep >= 7 && Handler.StoryStep <= 9) ||
+                    Handler.StoryStep == 14 ||
+                    Handler.StoryStep == 19 ||
+                    (Handler.StoryStep >= 22 && Handler.StoryStep <= 28) ||
+                    Handler.StoryStep == 36 ||
+                    Handler.StoryStep == 37 ||
+                    (Handler.StoryStep >= 45 && Handler.StoryStep <= 48) ||
+                    Handler.StoryStep == 55)
                 {
-                    Handler.TutorialType = "Localmap";
-                    GameUtil.Alert_Tutorial();
+                    GameUtil.Alert_Story();
                 }
             }
         }

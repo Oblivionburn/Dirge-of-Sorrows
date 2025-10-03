@@ -29,19 +29,6 @@ namespace DoS1
         public static int Gold = 1000;
         public static long MainCharacter_ID;
         public static string AlertType;
-
-        public static bool Tutorials = true;
-        public static string TutorialType;
-        public static bool Tutorial_Worldmap;
-        public static bool Tutorial_Localmap;
-        public static bool Tutorial_Shop;
-        public static bool Tutorial_Academy;
-        public static bool Tutorial_Army;
-        public static bool Tutorial_Squad;
-        public static bool Tutorial_Character;
-        public static bool Tutorial_Item;
-
-        public static int TutorialStep;
         public static int StoryStep;
 
         public static bool Loaded;
@@ -77,8 +64,8 @@ namespace DoS1
         public static bool ViewOnly_Item = false;
 
         public static string ItemFilter;
-        public static Dictionary<int, Inventory> ShopInventories = new Dictionary<int, Inventory>();
-        public static Inventory TradingShop;
+        public static Dictionary<int, Inventory> MarketInventories = new Dictionary<int, Inventory>();
+        public static Inventory TradingMarket;
 
         public static int RecruitPrice = 100;
         public static Dictionary<int, Squad> AcademyRecruits = new Dictionary<int, Squad>();
@@ -97,8 +84,10 @@ namespace DoS1
         public static Character Dialogue_Character2;
 
         public static string[] SkinTones = new string[] { "Light", "Tan", "Dark", "Darkest" };
-        public static string[] HeadStyles = new string[] { "Head1", "Head2", "Head3", "Head4", "Head5", "Head6" };
-        public static string[] HairStyles = new string[] { "Style1", "Style2", "Style3", "Style4", "Style5", "Style6", "Bald"};
+        public static string[] HeadStyles_Male = new string[] { "Head1", "Head2", "Head3" };
+        public static string[] HeadStyles_Female = new string[] { "Head1", "Head2", "Head3" };
+        public static string[] HairStyles_Male = new string[] { "Style1", "Style2", "Style3", "Bald"};
+        public static string[] HairStyles_Female = new string[] { "Style1", "Style2", "Style3" };
 
         public static Dictionary<string, Color> HairColors = new Dictionary<string, Color>()
         {
@@ -118,8 +107,6 @@ namespace DoS1
             { "Cyan", new Color(0, 180, 200, 255) },
             { "Purple", new Color(120, 0, 160, 255) },
             { "Gold", new Color(200, 200, 140, 255) },
-            { "Red", new Color(160, 0, 0, 255) },
-            { "Black", new Color(32, 32, 32, 255) },
             { "Gray", new Color(160, 160, 160, 255) }
         };
 

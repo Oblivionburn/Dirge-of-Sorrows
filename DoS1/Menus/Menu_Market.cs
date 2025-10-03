@@ -15,7 +15,7 @@ using DoS1.Util;
 
 namespace DoS1.Menus
 {
-    public class Menu_Shop : Menu
+    public class Menu_Market : Menu
     {
         #region Variables
 
@@ -23,9 +23,9 @@ namespace DoS1.Menus
         List<Picture> GridList = new List<Picture>();
         List<Item> ItemList = new List<Item>();
 
-        int Top_Shop;
-        List<Picture> GridList_Shop = new List<Picture>();
-        List<Item> ItemList_Shop = new List<Item>();
+        int Top_Market;
+        List<Picture> GridList_Market = new List<Picture>();
+        List<Item> ItemList_Market = new List<Item>();
 
         int width;
         int height;
@@ -39,10 +39,10 @@ namespace DoS1.Menus
 
         #region Constructors
 
-        public Menu_Shop(ContentManager content)
+        public Menu_Market(ContentManager content)
         {
             ID = Handler.GetID();
-            Name = "Shop";
+            Name = "Market";
             Load(content);
         }
 
@@ -55,17 +55,15 @@ namespace DoS1.Menus
             if (Visible ||
                 Active)
             {
-                if (string.IsNullOrEmpty(Handler.AlertType) ||
-                    Handler.AlertType == "Generic")
+                if (Handler.StoryStep >= 12)
                 {
                     UpdateControls();
                 }
 
-                if (Handler.Tutorials &&
-                    !Handler.Tutorial_Shop)
+                if (Handler.StoryStep >= 10 &&
+                    Handler.StoryStep <= 13)
                 {
-                    Handler.TutorialType = "Shop";
-                    GameUtil.Alert_Tutorial();
+                    GameUtil.Alert_Story();
                 }
 
                 base.Update(gameRef, content);
@@ -116,9 +114,9 @@ namespace DoS1.Menus
                     }
                 }
 
-                if (Handler.TradingShop != null)
+                if (Handler.TradingMarket != null)
                 {
-                    foreach (Item item in Handler.TradingShop.Items)
+                    foreach (Item item in Handler.TradingMarket.Items)
                     {
                         if (item.Icon_Visible)
                         {
@@ -170,38 +168,41 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            foreach (Button button in Buttons)
+            if (Handler.StoryStep > 12)
             {
-                if (button.Visible &&
-                    button.Enabled)
+                foreach (Button button in Buttons)
                 {
-                    if (InputManager.MouseWithin(button.Region.ToRectangle))
+                    if (button.Visible &&
+                        button.Enabled)
                     {
-                        found = true;
-
-                        if (button.HoverText != null)
+                        if (InputManager.MouseWithin(button.Region.ToRectangle))
                         {
-                            GameUtil.Examine(this, button.HoverText);
+                            found = true;
+
+                            if (button.HoverText != null)
+                            {
+                                GameUtil.Examine(this, button.HoverText);
+                            }
+
+                            button.Opacity = 1;
+                            button.Selected = true;
+
+                            if (InputManager.Mouse_LB_Pressed)
+                            {
+                                found = false;
+                                CheckClick(button);
+
+                                button.Opacity = 0.8f;
+                                button.Selected = false;
+
+                                break;
+                            }
                         }
-
-                        button.Opacity = 1;
-                        button.Selected = true;
-
-                        if (InputManager.Mouse_LB_Pressed)
+                        else if (InputManager.Mouse.Moved)
                         {
-                            found = false;
-                            CheckClick(button);
-
                             button.Opacity = 0.8f;
                             button.Selected = false;
-
-                            break;
                         }
-                    }
-                    else if (InputManager.Mouse.Moved)
-                    {
-                        button.Opacity = 0.8f;
-                        button.Selected = false;
                     }
                 }
             }
@@ -264,7 +265,7 @@ namespace DoS1.Menus
 
             if (!found)
             {
-                foreach (Picture grid in GridList_Shop)
+                foreach (Picture grid in GridList_Market)
                 {
                     if (InputManager.MouseWithin(grid.Region.ToRectangle))
                     {
@@ -276,36 +277,36 @@ namespace DoS1.Menus
 
                         if (InputManager.Mouse_ScrolledDown)
                         {
-                            if (Handler.TradingShop != null)
+                            if (Handler.TradingMarket != null)
                             {
                                 Item last_item = null;
-                                if (ItemList_Shop.Count > 0)
+                                if (ItemList_Market.Count > 0)
                                 {
-                                    last_item = ItemList_Shop[ItemList_Shop.Count - 1];
+                                    last_item = ItemList_Market[ItemList_Market.Count - 1];
                                 }
 
                                 if (last_item != null)
                                 {
-                                    Top_Shop++;
+                                    Top_Market++;
 
-                                    if (Top_Shop > last_item.Location.Y)
+                                    if (Top_Market > last_item.Location.Y)
                                     {
-                                        Top_Shop = (int)last_item.Location.Y;
+                                        Top_Market = (int)last_item.Location.Y;
                                     }
                                 }
 
-                                ResizeShop();
+                                ResizeMarket();
                             }
                         }
                         else if (InputManager.Mouse_ScrolledUp)
                         {
-                            Top_Shop--;
-                            if (Top_Shop <= 0)
+                            Top_Market--;
+                            if (Top_Market <= 0)
                             {
-                                Top_Shop = 0;
+                                Top_Market = 0;
                             }
 
-                            ResizeShop();
+                            ResizeMarket();
                         }
 
                         break;
@@ -350,9 +351,9 @@ namespace DoS1.Menus
             }
 
             if (!found &&
-                Handler.TradingShop != null)
+                Handler.TradingMarket != null)
             {
-                foreach (Item item in Handler.TradingShop.Items)
+                foreach (Item item in Handler.TradingMarket.Items)
                 {
                     if (item.Icon_Visible)
                     {
@@ -393,8 +394,11 @@ namespace DoS1.Menus
                      button.Name == "Weapons" ||
                      button.Name == "Runes")
             {
-                current_filter = button.Name;
-                Filter();
+                if (Handler.StoryStep > 13)
+                {
+                    current_filter = button.Name;
+                    Filter();
+                }
             }
         }
 
@@ -412,6 +416,13 @@ namespace DoS1.Menus
             TimeManager.Paused = false;
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
+
+            if (Handler.StoryStep == 13)
+            {
+                MenuManager.GetMenu("Alerts").Visible = false;
+                Handler.StoryStep++;
+            }
+
             MenuManager.ChangeMenu_Previous();
             GameUtil.Toggle_Pause(false);
         }
@@ -420,17 +431,27 @@ namespace DoS1.Menus
         {
             if (Handler.Gold >= item.Buy_Price)
             {
-                AssetManager.PlaySound_Random("Purchase");
+                if ((Handler.StoryStep == 12 && item.Name == "Cloth Helm") ||
+                    Handler.StoryStep != 12)
+                {
+                    AssetManager.PlaySound_Random("Purchase");
 
-                Inventory inventory = InventoryManager.GetInventory("Ally");
-                inventory.Items.Add(item);
+                    Inventory inventory = InventoryManager.GetInventory("Ally");
+                    inventory.Items.Add(item);
 
-                Handler.TradingShop.Items.Remove(item);
+                    Handler.TradingMarket.Items.Remove(item);
 
-                Handler.Gold -= (int)item.Buy_Price;
-                GetLabel("Gold").Text = "Gold: " + Handler.Gold;
+                    Handler.Gold -= (int)item.Buy_Price;
+                    GetLabel("Gold").Text = "Gold: " + Handler.Gold;
 
-                Load();
+                    if (Handler.StoryStep == 12)
+                    {
+                        MenuManager.GetMenu("Alerts").Visible = false;
+                        Handler.StoryStep++;
+                    }
+
+                    Load();
+                }
             }
         }
 
@@ -441,7 +462,7 @@ namespace DoS1.Menus
             Inventory inventory = InventoryManager.GetInventory("Ally");
             inventory.Items.Remove(item);
 
-            Handler.TradingShop.Items.Add(item);
+            Handler.TradingMarket.Items.Add(item);
 
             Handler.Gold += (int)item.Buy_Price;
             GetLabel("Gold").Text = "Gold: " + Handler.Gold;
@@ -604,12 +625,12 @@ namespace DoS1.Menus
         private void Filter()
         {
             Top = 0;
-            Top_Shop = 0;
+            Top_Market = 0;
 
             ResizeGrids();
 
             ItemList.Clear();
-            ItemList_Shop.Clear();
+            ItemList_Market.Clear();
 
             string type = current_filter.Substring(0, current_filter.Length - 1);
 
@@ -621,8 +642,8 @@ namespace DoS1.Menus
 
             GetPicture("Arrow_Up").Visible = false;
             GetPicture("Arrow_Down").Visible = false;
-            GetPicture("Arrow_Up_Shop").Visible = false;
-            GetPicture("Arrow_Down_Shop").Visible = false;
+            GetPicture("Arrow_Up_Market").Visible = false;
+            GetPicture("Arrow_Down_Market").Visible = false;
 
             Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
@@ -656,30 +677,30 @@ namespace DoS1.Menus
                 }
             }
 
-            if (Handler.TradingShop != null)
+            if (Handler.TradingMarket != null)
             {
-                foreach (Item item in Handler.TradingShop.Items)
+                foreach (Item item in Handler.TradingMarket.Items)
                 {
                     item.Icon_Visible = false;
                 }
 
-                foreach (Item item in Handler.TradingShop.Items)
+                foreach (Item item in Handler.TradingMarket.Items)
                 {
                     if (item.Type == type)
                     {
-                        ItemList_Shop.Add(item);
+                        ItemList_Market.Add(item);
                     }
                 }
 
-                ItemList_Shop = InventoryUtil.SortItems(ItemList_Shop, sort_type);
+                ItemList_Market = InventoryUtil.SortItems(ItemList_Market, sort_type);
 
-                for (int i = 0; i < ItemList_Shop.Count; i++)
+                for (int i = 0; i < ItemList_Market.Count; i++)
                 {
-                    Item item = ItemList_Shop[i];
+                    Item item = ItemList_Market[i];
 
-                    if (i < GridList_Shop.Count)
+                    if (i < GridList_Market.Count)
                     {
-                        Picture grid = GridList_Shop[i];
+                        Picture grid = GridList_Market[i];
                         item.Icon_Region = new Region(grid.Region.X, grid.Region.Y, grid.Region.Width, grid.Region.Height);
                         item.Location = new Location(grid.Location.X, grid.Location.Y, 0);
                         item.Icon_Visible = true;
@@ -697,8 +718,8 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
-            AddPicture(Handler.GetID(), "Arrow_Up_Shop", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
-            AddPicture(Handler.GetID(), "Arrow_Down_Shop", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Arrow_Up_Market", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Arrow_Down_Market", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Gold", "Gold: 0", Color.Gold, new Region(0, 0, 0, 0), true);
 
@@ -706,7 +727,7 @@ namespace DoS1.Menus
             {
                 id = Handler.GetID(),
                 name = "Back",
-                hover_text = "Exit Shop",
+                hover_text = "Exit Market",
                 texture = AssetManager.Textures["Button_Back"],
                 texture_highlight = AssetManager.Textures["Button_Back_Hover"],
                 texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
@@ -803,7 +824,7 @@ namespace DoS1.Menus
                         grid.Location = new Location(x, y + Top, 0);
                     }
 
-                    grid = GetPicture("Shop,x:" + x.ToString() + ",y:" + y.ToString());
+                    grid = GetPicture("Market,x:" + x.ToString() + ",y:" + y.ToString());
                     if (grid != null)
                     {
                         grid.Region = new Region(other_starting_x + (width * x), starting_Y + (height * y), width, height);
@@ -825,8 +846,8 @@ namespace DoS1.Menus
             GetPicture("Arrow_Up").Region = new Region(starting_X - width, starting_Y, width, height);
             GetPicture("Arrow_Down").Region = new Region(starting_X - width, starting_Y + (height * 9), width, height);
 
-            GetPicture("Arrow_Up_Shop").Region = new Region(other_starting_x + (width * 10), starting_Y, width, height);
-            GetPicture("Arrow_Down_Shop").Region = new Region(other_starting_x + (width * 10), starting_Y + (height * 9), width, height);
+            GetPicture("Arrow_Up_Market").Region = new Region(other_starting_x + (width * 10), starting_Y, width, height);
+            GetPicture("Arrow_Down_Market").Region = new Region(other_starting_x + (width * 10), starting_Y + (height * 9), width, height);
         }
 
         private void ResizeInventory()
@@ -859,20 +880,20 @@ namespace DoS1.Menus
             }
         }
 
-        private void ResizeShop()
+        private void ResizeMarket()
         {
             ResizeGrids();
 
-            if (Handler.TradingShop != null)
+            if (Handler.TradingMarket != null)
             {
-                foreach (Item item in Handler.TradingShop.Items)
+                foreach (Item item in Handler.TradingMarket.Items)
                 {
                     item.Icon_Visible = false;
                 }
 
-                foreach (Item item in ItemList_Shop)
+                foreach (Item item in ItemList_Market)
                 {
-                    foreach (Picture grid in GridList_Shop)
+                    foreach (Picture grid in GridList_Market)
                     {
                         if (item.Location.X == grid.Location.X &&
                             item.Location.Y == grid.Location.Y)
@@ -884,7 +905,7 @@ namespace DoS1.Menus
                     }
                 }
 
-                DisplayArrows_Shop();
+                DisplayArrows_Market();
             }
         }
 
@@ -936,19 +957,19 @@ namespace DoS1.Menus
             }
         }
 
-        private void DisplayArrows_Shop()
+        private void DisplayArrows_Market()
         {
-            if (Handler.TradingShop != null)
+            if (Handler.TradingMarket != null)
             {
-                Picture arrow_down = GetPicture("Arrow_Down_Shop");
+                Picture arrow_down = GetPicture("Arrow_Down_Market");
 
                 bool down_visible = true;
-                int bottom_row = 9 + Top_Shop;
+                int bottom_row = 9 + Top_Market;
 
                 Item last_item = null;
-                if (ItemList_Shop.Count > 0)
+                if (ItemList_Market.Count > 0)
                 {
-                    last_item = ItemList_Shop[ItemList_Shop.Count - 1];
+                    last_item = ItemList_Market[ItemList_Market.Count - 1];
                 }
 
                 if (last_item != null)
@@ -972,8 +993,8 @@ namespace DoS1.Menus
                 arrow_down.Visible = down_visible;
             }
 
-            Picture arrow_up = GetPicture("Arrow_Up_Shop");
-            if (Top_Shop == 0)
+            Picture arrow_up = GetPicture("Arrow_Up_Market");
+            if (Top_Market == 0)
             {
                 arrow_up.Visible = false;
             }
@@ -988,7 +1009,7 @@ namespace DoS1.Menus
             LoadGrids();
             Filter();
             ResizeInventory();
-            ResizeShop();
+            ResizeMarket();
         }
 
         private void ClearGrids()
@@ -1004,11 +1025,11 @@ namespace DoS1.Menus
                         GridList.Remove(inventory_grid);
                     }
 
-                    Picture shop_grid = GetPicture("Shop,x:" + x.ToString() + ",y:" + y.ToString());
-                    if (shop_grid != null)
+                    Picture market_grid = GetPicture("Market,x:" + x.ToString() + ",y:" + y.ToString());
+                    if (market_grid != null)
                     {
-                        Pictures.Remove(shop_grid);
-                        GridList_Shop.Remove(shop_grid);
+                        Pictures.Remove(market_grid);
+                        GridList_Market.Remove(market_grid);
                     }
                 }
             }
@@ -1033,14 +1054,14 @@ namespace DoS1.Menus
                         GridList.Add(grid);
                     }
 
-                    AddPicture(Handler.GetID(), "Shop,x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
+                    AddPicture(Handler.GetID(), "Market,x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
                         new Region(other_starting_x + (width * x), starting_Y + (height * y), width, height), Color.White, true);
 
-                    grid = GetPicture("Shop,x:" + x.ToString() + ",y:" + y.ToString());
+                    grid = GetPicture("Market,x:" + x.ToString() + ",y:" + y.ToString());
                     if (grid != null)
                     {
                         grid.Location = new Location(x, y, 0);
-                        GridList_Shop.Add(grid);
+                        GridList_Market.Add(grid);
                     }
                 }
             }
@@ -1050,8 +1071,8 @@ namespace DoS1.Menus
             GetPicture("Arrow_Up").Region = new Region(starting_X - width, starting_Y, width, height);
             GetPicture("Arrow_Down").Region = new Region(starting_X - width, starting_Y + (height * 9), width, height);
 
-            GetPicture("Arrow_Up_Shop").Region = new Region(other_starting_x + (width * 10), starting_Y, width, height);
-            GetPicture("Arrow_Down_Shop").Region = new Region(other_starting_x + (width * 10), starting_Y + (height * 9), width, height);
+            GetPicture("Arrow_Up_Market").Region = new Region(other_starting_x + (width * 10), starting_Y, width, height);
+            GetPicture("Arrow_Down_Market").Region = new Region(other_starting_x + (width * 10), starting_Y + (height * 9), width, height);
         }
 
         public override void Resize(Point point)
@@ -1061,14 +1082,14 @@ namespace DoS1.Menus
             if (Visible)
             {
                 ResizeInventory();
-                ResizeShop();
+                ResizeMarket();
             }
 
             GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
             GetLabel("Gold").Region = new Region(starting_X, starting_Y - height, width * 10, height);
 
             Button back = GetButton("Back");
-            back.Region = new Region((Main.Game.ScreenWidth / 2) - (width / 2), starting_Y + (height * 11), width, height);
+            back.Region = new Region((Main.Game.ScreenWidth / 2) - (width / 2), starting_Y + (height * 11) + (height / 2), width, height);
 
             GetPicture("Highlight").Region = new Region(0, 0, 0, 0);
             GetLabel("Examine").Region = new Region(0, 0, 0, 0);

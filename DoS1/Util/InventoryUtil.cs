@@ -607,7 +607,6 @@ namespace DoS1.Util
             Inventory ally = InventoryManager.GetInventory("Ally");
             if (ally != null)
             {
-                AddItem(ally, "Iron", "Axe", "Weapon");
                 AddItem(ally, "Iron", "Mace", "Weapon");
                 AddItem(ally, "Elm", "Bow", "Weapon");
                 AddItem(ally, "Iron", "Sword", "Weapon");
@@ -1519,7 +1518,7 @@ namespace DoS1.Util
             }
         }
 
-        public static Inventory Gen_Shop(int depth)
+        public static Inventory Gen_Market(int depth)
         {
             Inventory inventory = new Inventory();
 

@@ -62,18 +62,12 @@ namespace DoS1.Menus
                 {
                     MoveItem();
                 }
-                else if (string.IsNullOrEmpty(Handler.AlertType) ||
-                         Handler.AlertType == "Generic")
-                {
-                    UpdateControls();
-                }
+                UpdateControls();
 
-                if (Handler.Tutorials &&
-                    !Handler.Tutorial_Item &&
-                    !Handler.ViewOnly_Item)
+                if (Handler.StoryStep == 33 ||
+                    Handler.StoryStep == 34)
                 {
-                    Handler.TutorialType = "Item";
-                    GameUtil.Alert_Tutorial();
+                    GameUtil.Alert_Story();
                 }
 
                 base.Update(gameRef, content);
@@ -497,6 +491,11 @@ namespace DoS1.Menus
                 item.Location.X = slot;
 
                 InventoryUtil.UpdateItem(selectedItem);
+
+                if (Handler.StoryStep == 33)
+                {
+                    Handler.StoryStep++;
+                }
             }
         }
 
@@ -537,7 +536,8 @@ namespace DoS1.Menus
             button.Opacity = 0.8f;
             button.Selected = false;
 
-            if (button.Name == "Back")
+            if (button.Name == "Back" &&
+                Handler.StoryStep >= 34)
             {
                 Back();
             }
@@ -547,6 +547,13 @@ namespace DoS1.Menus
         {
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
+
+            if (Handler.StoryStep == 34)
+            {
+                MenuManager.GetMenu("Alerts").Visible = false;
+                Handler.StoryStep++;
+            }
+
             MenuManager.ChangeMenu_Previous();
         }
 

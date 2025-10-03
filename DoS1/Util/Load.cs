@@ -93,10 +93,6 @@ namespace DoS1.Util
                         Main.Game.ResetScreen();
                         break;
 
-                    case "Tutorials":
-                        Handler.Tutorials = reader.Value == "True";
-                        break;
-
                     case "MusicEnabled":
                         SoundManager.MusicEnabled = reader.Value == "True";
                         break;
@@ -200,12 +196,12 @@ namespace DoS1.Util
                         VisitGameProperties(reader);
                         break;
 
-                    case "Shops":
-                        VisitShops(reader);
+                    case "Markets":
+                        VisitMarkets(reader);
 
                         if (Handler.LocalMap)
                         {
-                            Handler.TradingShop = Handler.ShopInventories[Handler.Level];
+                            Handler.TradingMarket = Handler.MarketInventories[Handler.Level];
                         }
                         break;
 
@@ -239,36 +235,8 @@ namespace DoS1.Util
                         Handler.MainCharacter_ID = long.Parse(reader.Value);
                         break;
 
-                    case "Tutorial_Worldmap":
-                        Handler.Tutorial_Worldmap = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Localmap":
-                        Handler.Tutorial_Localmap = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Shop":
-                        Handler.Tutorial_Shop = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Academy":
-                        Handler.Tutorial_Academy = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Army":
-                        Handler.Tutorial_Army = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Squad":
-                        Handler.Tutorial_Squad = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Character":
-                        Handler.Tutorial_Character = reader.Value == "True";
-                        break;
-
-                    case "Tutorial_Item":
-                        Handler.Tutorial_Item = reader.Value == "True";
+                    case "StoryStep":
+                        Handler.StoryStep = int.Parse(reader.Value);
                         break;
 
                     case "LocalMap":
@@ -352,36 +320,36 @@ namespace DoS1.Util
             }
         }
 
-        private static void VisitShops(XmlTextReader reader)
+        private static void VisitMarkets(XmlTextReader reader)
         {
             while (reader.Read())
             {
-                if (reader.Name == "Shops" && reader.NodeType == XmlNodeType.EndElement)
+                if (reader.Name == "Markets" && reader.NodeType == XmlNodeType.EndElement)
                     break;
 
                 switch (reader.Name)
                 {
-                    case "ShopProperties":
-                        VisitShop(reader);
+                    case "MarketProperties":
+                        VisitMarket(reader);
                         break;
 
                     case "Items":
                         Inventory inventory = new Inventory();
                         VisitItems(reader, inventory);
-                        Handler.ShopInventories[Handler.ShopInventories.Count - 1] = inventory;
+                        Handler.MarketInventories[Handler.MarketInventories.Count - 1] = inventory;
                         break;
                 }
             }
         }
 
-        private static void VisitShop(XmlTextReader reader)
+        private static void VisitMarket(XmlTextReader reader)
         {
             while (reader.MoveToNextAttribute())
             {
                 switch (reader.Name)
                 {
                     case "Level":
-                        Handler.ShopInventories.Add(int.Parse(reader.Value), new Inventory());
+                        Handler.MarketInventories.Add(int.Parse(reader.Value), new Inventory());
                         break;
                 }
             }

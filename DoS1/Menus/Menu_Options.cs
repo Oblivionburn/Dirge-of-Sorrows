@@ -184,18 +184,6 @@ namespace DoS1.Menus
 
                 GetLabel("Fullscreen").Text = "Fullscreen On";
             }
-            else if (button.Name == "TutorialsOn")
-            {
-                Handler.Tutorials = false;
-                button.Name = "TutorialsOff";
-                GetLabel("Tutorials").Text = "Tutorials Off";
-            }
-            else if (button.Name == "TutorialsOff")
-            {
-                Handler.Tutorials = true;
-                button.Name = "TutorialsOn";
-                GetLabel("Tutorials").Text = "Tutorials On";
-            }
             else if (button.Name == "MusicOn")
             {
                 GetProgressBar("Music").Visible = false;
@@ -408,41 +396,6 @@ namespace DoS1.Menus
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Fullscreen", "Fullscreen Off", Color.White, new Region(0, 0, 0, 0), true);
             }
 
-            if (Handler.Tutorials)
-            {
-                AddButton(new ButtonOptions
-                {
-                    id = Handler.GetID(),
-                    name = "TutorialsOn",
-                    hover_text = "Toggle Tutorials",
-                    texture = AssetManager.Textures["Button_Tutorials"],
-                    texture_highlight = AssetManager.Textures["Button_Tutorials_Hover"],
-                    region = new Region(0, 0, 0, 0),
-                    draw_color = Color.White,
-                    enabled = true,
-                    visible = true
-                });
-
-                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Tutorials", "Tutorials On", Color.White, new Region(0, 0, 0, 0), true);
-            }
-            else
-            {
-                AddButton(new ButtonOptions
-                {
-                    id = Handler.GetID(),
-                    name = "TutorialsOff",
-                    hover_text = "Toggle Tutorials",
-                    texture = AssetManager.Textures["Button_Tutorials"],
-                    texture_highlight = AssetManager.Textures["Button_Tutorials_Hover"],
-                    region = new Region(0, 0, 0, 0),
-                    draw_color = Color.White,
-                    enabled = true,
-                    visible = true
-                });
-
-                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Tutorials", "Tutorials Off", Color.White, new Region(0, 0, 0, 0), true);
-            }
-
             if (SoundManager.MusicEnabled)
             {
                 AddButton(new ButtonOptions
@@ -592,15 +545,6 @@ namespace DoS1.Menus
             }
             fullscreen.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
             GetLabel("Fullscreen").Region = new Region(fullscreen.Region.X + fullscreen.Region.Width, fullscreen.Region.Y, width, height);
-
-            Y += 1;
-            Button tutorials = GetButton("TutorialsOn");
-            if (tutorials == null)
-            {
-                tutorials = GetButton("TutorialsOff");
-            }
-            tutorials.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
-            GetLabel("Tutorials").Region = new Region(tutorials.Region.X + tutorials.Region.Width, tutorials.Region.Y, width, height);
 
             Y += 1;
             Button music = GetButton("MusicOn");

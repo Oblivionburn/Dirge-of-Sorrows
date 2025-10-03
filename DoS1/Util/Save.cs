@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inventories;
@@ -98,7 +100,6 @@ namespace DoS1.Util
 
             EnterNode("Options");
             Writer.WriteAttributeString("Fullscreen", Main.Game.GraphicsManager.IsFullScreen.ToString());
-            Writer.WriteAttributeString("Tutorials", Handler.Tutorials.ToString());
             Writer.WriteAttributeString("MusicEnabled", SoundManager.MusicEnabled.ToString());
             Writer.WriteAttributeString("MusicVolume", (SoundManager.MusicVolume * 10).ToString());
             Writer.WriteAttributeString("AmbientEnabled", SoundManager.AmbientEnabled.ToString());
@@ -181,14 +182,7 @@ namespace DoS1.Util
             Writer.WriteAttributeString("Gold", Handler.Gold.ToString());
             Writer.WriteAttributeString("MainCharacter_ID", Handler.MainCharacter_ID.ToString());
 
-            Writer.WriteAttributeString("Tutorial_Worldmap", Handler.Tutorial_Worldmap.ToString());
-            Writer.WriteAttributeString("Tutorial_Localmap", Handler.Tutorial_Localmap.ToString());
-            Writer.WriteAttributeString("Tutorial_Shop", Handler.Tutorial_Shop.ToString());
-            Writer.WriteAttributeString("Tutorial_Academy", Handler.Tutorial_Academy.ToString());
-            Writer.WriteAttributeString("Tutorial_Army", Handler.Tutorial_Army.ToString());
-            Writer.WriteAttributeString("Tutorial_Squad", Handler.Tutorial_Squad.ToString());
-            Writer.WriteAttributeString("Tutorial_Character", Handler.Tutorial_Character.ToString());
-            Writer.WriteAttributeString("Tutorial_Item", Handler.Tutorial_Item.ToString());
+            Writer.WriteAttributeString("StoryStep", Handler.StoryStep.ToString());
 
             Writer.WriteAttributeString("LocalMap", Handler.LocalMap.ToString());
             Writer.WriteAttributeString("Level", Handler.Level.ToString());
@@ -214,16 +208,16 @@ namespace DoS1.Util
             Writer.WriteAttributeString("Time_Milliseconds", TimeManager.Now.Milliseconds.ToString());
             ExitNode();
 
-            if (Handler.ShopInventories.Any())
+            if (Handler.MarketInventories.Any())
             {
-                EnterNode("Shops");
-                foreach (KeyValuePair<int, Inventory> shop in Handler.ShopInventories)
+                EnterNode("Markets");
+                foreach (KeyValuePair<int, Inventory> market in Handler.MarketInventories)
                 {
-                    EnterNode("ShopProperties");
-                    Writer.WriteAttributeString("Level", shop.Key.ToString());
+                    EnterNode("MarketProperties");
+                    Writer.WriteAttributeString("Level", market.Key.ToString());
                     ExitNode();
 
-                    SaveItems(shop.Value);
+                    SaveItems(market.Value);
                 }
                 ExitNode();
             }

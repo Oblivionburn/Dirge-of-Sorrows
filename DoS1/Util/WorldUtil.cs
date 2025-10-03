@@ -143,7 +143,12 @@ namespace DoS1.Util
                         }
 
                         Squad ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Combat_Ally_Squad);
+
                         Squad enemy_squad = CharacterManager.GetArmy("Enemy").GetSquad(Handler.Combat_Enemy_Squad);
+                        if (enemy_squad == null)
+                        {
+                            enemy_squad = CharacterManager.GetArmy("Special").GetSquad(Handler.Combat_Enemy_Squad);
+                        }
 
                         if (ally_squad != null &&
                             enemy_squad != null)
@@ -1070,6 +1075,23 @@ namespace DoS1.Util
             return null;
         }
 
+        public static Tile GetMarket()
+        {
+            World world = GetScene().World;
+            Map map = GetMap(world);
+            Layer locations = map.GetLayer("Locations");
+
+            foreach (Tile tile in locations.Tiles)
+            {
+                if (tile.Type.Contains("Market"))
+                {
+                    return tile;
+                }
+            }
+
+            return null;
+        }
+
         public static Squad GetNearest_Squad(Squad squad)
         {
             Army ally_army = CharacterManager.GetArmy("Ally");
@@ -1096,9 +1118,9 @@ namespace DoS1.Util
             {
                 location.Type = "Academy_" + squad.Type;
             }
-            else if (location.Type.Contains("Shop"))
+            else if (location.Type.Contains("Market"))
             {
-                location.Type = "Shop_" + squad.Type;
+                location.Type = "Market_" + squad.Type;
             }
             else if (location.Type.Contains("Base"))
             {
@@ -1250,7 +1272,16 @@ namespace DoS1.Util
                                     if (other_squad != null)
                                     {
                                         squad.Region = new Region(location.Region.X, location.Region.Y, location.Region.Width, location.Region.Height);
-                                        CombatUtil.StartCombat(map, ground, destination, squad, other_squad);
+
+                                        if (Handler.StoryStep > 48)
+                                        {
+                                            if (Handler.StoryStep == 49)
+                                            {
+                                                Handler.StoryStep++;
+                                            }
+
+                                            CombatUtil.StartCombat(map, ground, destination, squad, other_squad);
+                                        }
                                     }
 
                                     if (squad.Location.X == squad.Destination.X &&
@@ -1291,9 +1322,22 @@ namespace DoS1.Util
                                                 {
                                                     if (location_tile != null)
                                                     {
-                                                        GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                                        if (Handler.StoryStep == 10)
+                                                        {
+                                                            GameUtil.LocalPause();
+                                                            MenuManager.ChangeMenu("Market");
+                                                        }
+                                                        else if (Handler.StoryStep == 21)
+                                                        {
+                                                            CameraToTile(map, ground, location);
+                                                            Handler.StoryStep++;
+                                                        }
+                                                        else if (Handler.StoryStep > 48)
+                                                        {
+                                                            GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                                        }
                                                     }
-                                                    else
+                                                    else if (Handler.StoryStep > 48)
                                                     {
                                                         GameUtil.Alert_MoveFinished(squad);
                                                     }

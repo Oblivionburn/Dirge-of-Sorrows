@@ -54,11 +54,7 @@ namespace DoS1.Menus
             if (Visible ||
                 Active)
             {
-                if (string.IsNullOrEmpty(Handler.AlertType) ||
-                    Handler.AlertType == "Generic")
-                {
-                    UpdateControls();
-                }
+                UpdateControls();
 
                 Army reserve_army = CharacterManager.GetArmy("Reserves");
                 if (reserve_army != null &&
@@ -83,13 +79,6 @@ namespace DoS1.Menus
                             CharacterUtil.UpdateGear(character);
                         }
                     }
-                }
-
-                if (Handler.Tutorials &&
-                    !Handler.Tutorial_Academy)
-                {
-                    Handler.TutorialType = "Academy";
-                    GameUtil.Alert_Tutorial();
                 }
 
                 base.Update(gameRef, content);

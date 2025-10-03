@@ -58,23 +58,18 @@ namespace DoS1.Menus
                 {
                     MoveItem();
                 }
-                else if (string.IsNullOrEmpty(Handler.AlertType) ||
-                         Handler.AlertType == "Generic")
-                {
-                    UpdateControls();
-                }
+                UpdateControls();
 
                 if (character != null)
                 {
                     CharacterUtil.UpdateGear(character);
                 }
 
-                if (Handler.Tutorials &&
-                    !Handler.Tutorial_Character &&
-                    !Handler.ViewOnly_Character)
+                if (Handler.StoryStep == 16 ||
+                    Handler.StoryStep == 17 ||
+                    (Handler.StoryStep >= 30 && Handler.StoryStep <= 32))
                 {
-                    Handler.TutorialType = "Character";
-                    GameUtil.Alert_Tutorial();
+                    GameUtil.Alert_Story();
                 }
 
                 base.Update(gameRef, content);
@@ -156,7 +151,12 @@ namespace DoS1.Menus
             bool found_button = HoveringButton();
             bool found_stat = HoveringStat();
             bool found_grid = HoveringGrid();
-            bool found_item = HoveringItem();
+
+            bool found_item = false;
+            if (!moving)
+            {
+                found_item = HoveringItem();
+            }
 
             bool found_helm = HoveringSlot("Helm");
             bool found_armor = HoveringSlot("Armor");
@@ -237,38 +237,41 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            foreach (Button button in Buttons)
+            if (Handler.StoryStep != 16)
             {
-                if (button.Visible &&
-                    button.Enabled)
+                foreach (Button button in Buttons)
                 {
-                    if (InputManager.MouseWithin(button.Region.ToRectangle))
+                    if (button.Visible &&
+                        button.Enabled)
                     {
-                        found = true;
-
-                        if (button.HoverText != null)
+                        if (InputManager.MouseWithin(button.Region.ToRectangle))
                         {
-                            GameUtil.Examine(this, button.HoverText);
+                            found = true;
+
+                            if (button.HoverText != null)
+                            {
+                                GameUtil.Examine(this, button.HoverText);
+                            }
+
+                            button.Opacity = 1;
+                            button.Selected = true;
+
+                            if (InputManager.Mouse_LB_Pressed)
+                            {
+                                found = false;
+                                CheckClick(button);
+
+                                button.Opacity = 0.8f;
+                                button.Selected = false;
+
+                                break;
+                            }
                         }
-
-                        button.Opacity = 1;
-                        button.Selected = true;
-
-                        if (InputManager.Mouse_LB_Pressed)
+                        else if (InputManager.Mouse.Moved)
                         {
-                            found = false;
-                            CheckClick(button);
-
                             button.Opacity = 0.8f;
                             button.Selected = false;
-
-                            break;
                         }
-                    }
-                    else if (InputManager.Mouse.Moved)
-                    {
-                        button.Opacity = 0.8f;
-                        button.Selected = false;
                     }
                 }
             }
@@ -318,9 +321,17 @@ namespace DoS1.Menus
                                 InputManager.Mouse.Moved)
                             {
                                 found = false;
-                                moving = true;
-                                starting_pos = item.Icon_Region.ToRectangle;
-                                Handler.Selected_Item = item.ID;
+
+                                if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
+                                    Handler.StoryStep == 31 ||
+                                    Handler.StoryStep == 35 ||
+                                    Handler.StoryStep > 32)
+                                {
+                                    moving = true;
+                                    starting_pos = item.Icon_Region.ToRectangle;
+                                    Handler.Selected_Item = item.ID;
+                                }
+                                    
                                 break;
                             }
                             else if (InputManager.Mouse_RB_Pressed)
@@ -331,7 +342,11 @@ namespace DoS1.Menus
                                     if (slots.Value > 0)
                                     {
                                         found = false;
-                                        SelectItem(item.ID);
+
+                                        if (Handler.StoryStep > 32)
+                                        {
+                                            SelectItem(item.ID);
+                                        }
                                     }
                                 }
                             }
@@ -360,9 +375,17 @@ namespace DoS1.Menus
                                 !Handler.ViewOnly_Character)
                             {
                                 found = false;
-                                moving = true;
-                                starting_pos = item.Icon_Region.ToRectangle;
-                                Handler.Selected_Item = item.ID;
+
+                                if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
+                                    Handler.StoryStep == 31 ||
+                                    Handler.StoryStep == 35 ||
+                                    Handler.StoryStep > 32)
+                                {
+                                    moving = true;
+                                    starting_pos = item.Icon_Region.ToRectangle;
+                                    Handler.Selected_Item = item.ID;
+                                }
+
                                 break;
                             }
                             else if (InputManager.Mouse_RB_Pressed)
@@ -373,7 +396,17 @@ namespace DoS1.Menus
                                     if (slots.Value > 0)
                                     {
                                         found = false;
-                                        SelectItem(item.ID);
+
+                                        if (Handler.StoryStep >= 32)
+                                        {
+                                            if (Handler.StoryStep == 32)
+                                            {
+                                                MenuManager.GetMenu("Alerts").Visible = false;
+                                                Handler.StoryStep++;
+                                            }
+
+                                            SelectItem(item.ID);
+                                        }
                                     }
                                 }
                             }
@@ -560,6 +593,12 @@ namespace DoS1.Menus
                     }
                 }
             }
+
+            if (Handler.StoryStep == 16 ||
+                Handler.StoryStep == 31)
+            {
+                Handler.StoryStep++;
+            }
         }
 
         private void UnequipItem(Inventory main_inventory, Item item)
@@ -576,7 +615,10 @@ namespace DoS1.Menus
             button.Opacity = 0.8f;
             button.Selected = false;
 
-            if (button.Name == "Back")
+            if (button.Name == "Back" &&
+                Handler.StoryStep != 30 &&
+                Handler.StoryStep != 31 &&
+                Handler.StoryStep != 32)
             {
                 Back();
             }
@@ -590,6 +632,12 @@ namespace DoS1.Menus
                      button.Name == "Weapons")
             {
                 Filter(button.Name);
+
+                if (Handler.StoryStep == 30)
+                {
+                    MenuManager.GetMenu("Alerts").Visible = false;
+                    Handler.StoryStep++;
+                }
             }
         }
 
@@ -614,6 +662,12 @@ namespace DoS1.Menus
 
             character.HealthBar.Visible = false;
             character.ManaBar.Visible = false;
+
+            if (Handler.StoryStep == 17)
+            {
+                MenuManager.GetMenu("Alerts").Visible = false;
+                Handler.StoryStep++;
+            }
 
             MenuManager.ChangeMenu_Previous();
         }
@@ -1178,7 +1232,7 @@ namespace DoS1.Menus
                 GetLabel("Name").Region = new Region(char_pic.Region.X, char_pic.Region.Y - height, char_pic.Region.Width, height);
 
                 float X = char_pic.Region.X + char_pic.Region.Width;
-                float Y = char_pic.Region.Y + height;
+                float Y = char_pic.Region.Y;
 
                 GetPicture("Helm").Region = new Region(X, Y, width, height);
                 GetPicture("Armor").Region = new Region(X, Y + height, width, height);

@@ -223,7 +223,7 @@ namespace DoS1.Util
                 Add_EnemyBase(ground, layer);
                 ScatterLocations(ground, layer, "Town_Neutral", count);
 
-                ScatterLocations(ground, layer, "Shop_Neutral", 1);
+                ScatterLocations(ground, layer, "Market_Neutral", 1);
                 ScatterLocations(ground, layer, "Academy_Neutral", 1);
 
                 foreach (Tile location in layer.Tiles)

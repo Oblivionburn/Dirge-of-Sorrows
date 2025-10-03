@@ -12,11 +12,12 @@ namespace DoS1.Util
 {
     public static class CharacterUtil
     {
-        public static Character NewCharacter(string name, Vector2 formation, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor)
+        public static Character NewCharacter(string name, Vector2 formation, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor, string gender)
         {
             Character character = new Character();
             character.ID = Handler.GetID();
             character.Name = name;
+            character.Gender = gender;
             character.Level = 1;
             character.Animator.Frames = 4;
             character.Formation = new Vector2(formation.X, formation.Y);
@@ -46,7 +47,7 @@ namespace DoS1.Util
             item.Type = "Head";
             item.Location = new Location();
             item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + headStyle];
+            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + gender + "_" + headStyle];
             item.Image = character.Image;
             item.DrawColor = Color.White;
             item.Visible = true;
@@ -75,7 +76,7 @@ namespace DoS1.Util
                 item.Location = new Location();
                 item.Equipped = true;
                 item.DrawColor = Handler.HairColors[hairColor];
-                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + hairStyle];
+                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + gender + "_" + hairStyle];
                 item.Image = character.Image;
                 item.Visible = true;
                 character.Inventory.Items.Add(item);
@@ -100,12 +101,11 @@ namespace DoS1.Util
             return character;
         }
 
-        public static Character NewCharacter_Random(Vector2 formation, bool enemy)
+        public static Character NewCharacter_Random(Vector2 formation, bool enemy, int gender)
         {
             CryptoRandom random = new CryptoRandom();
 
             string name;
-            int gender = random.Next(0, 2);
             if (gender == 0)
             {
                 name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
@@ -156,10 +156,29 @@ namespace DoS1.Util
 
             string direction = character.Direction.ToString();
             string skin_tone = Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)];
-            string head_style = Handler.HeadStyles[random.Next(0, Handler.HeadStyles.Length)];
-            Color eye_color = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Value;
-            string hairStyle = Handler.HairStyles[random.Next(0, Handler.HairStyles.Length)];
+
+            string head_style;
+            if (gender == 0)
+            {
+                head_style = Handler.HeadStyles_Male[random.Next(0, Handler.HeadStyles_Male.Length)];
+            }
+            else
+            {
+                head_style = Handler.HeadStyles_Female[random.Next(0, Handler.HeadStyles_Female.Length)];
+            }
+
+            string hairStyle;
+            if (gender == 0)
+            {
+                hairStyle = Handler.HairStyles_Male[random.Next(0, Handler.HairStyles_Male.Length)];
+            }
+            else
+            {
+                hairStyle = Handler.HairStyles_Female[random.Next(0, Handler.HairStyles_Female.Length)];
+            }
+
             Color hair_color = Handler.HairColors.ElementAt(random.Next(0, 6)).Value;
+            Color eye_color = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Value;
 
             character.Texture = AssetManager.Textures[direction + "_Body_" + skin_tone + "_Idle"];
             character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
@@ -173,7 +192,7 @@ namespace DoS1.Util
             item.Type = "Head";
             item.Location = new Location();
             item.Equipped = true;
-            item.Texture = AssetManager.Textures[direction + "_" + skin_tone + "_" + head_style];
+            item.Texture = AssetManager.Textures[direction + "_" + skin_tone + "_" + character.Gender + "_" + head_style];
             item.Image = character.Image;
             item.Visible = true;
             character.Inventory.Items.Add(item);
@@ -201,7 +220,7 @@ namespace DoS1.Util
                 item.Location = new Location();
                 item.Equipped = true;
                 item.DrawColor = hair_color;
-                item.Texture = AssetManager.Textures[direction + "_" + hairStyle];
+                item.Texture = AssetManager.Textures[direction + "_" + character.Gender + "_" + hairStyle];
                 item.Image = character.Image;
                 item.Visible = true;
                 character.Inventory.Items.Add(item);
@@ -222,35 +241,6 @@ namespace DoS1.Util
             character.ManaBar.Max_Value = 100;
             character.ManaBar.Value = 100;
             character.ManaBar.Update();
-
-            return character;
-        }
-
-        public static Character NewCharacter_Random(int gender)
-        {
-            CryptoRandom random = new CryptoRandom();
-
-            string name;
-            if (gender == 0)
-            {
-                name = CharacterManager.FirstNames_Male[random.Next(0, CharacterManager.FirstNames_Male.Count)];
-            }
-            else
-            {
-                name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
-            }
-
-            Character character = NewCharacter_Random(new Vector2(0, 0), false);
-            character.Name = name;
-
-            if (gender == 0)
-            {
-                character.Gender = "Male";
-            }
-            else
-            {
-                character.Gender = "Female";
-            }
 
             return character;
         }

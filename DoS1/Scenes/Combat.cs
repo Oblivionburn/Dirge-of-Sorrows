@@ -102,9 +102,19 @@ namespace DoS1.Scenes
 
                 if (!TimeManager.Paused)
                 {
-                    UpdateControls();
+                    if (Handler.StoryStep > 44)
+                    {
+                        UpdateControls();
+                    }
+
                     AnimateMouseClick();
                     UpdateGrids();
+                }
+
+                if ((Handler.StoryStep >= 38 && Handler.StoryStep <= 44) ||
+                    (Handler.StoryStep >= 50 && Handler.StoryStep <= 54))
+                {
+                    GameUtil.Alert_Story();
                 }
             }
         }
@@ -2032,7 +2042,12 @@ namespace DoS1.Scenes
                 WorldGen.GenCombatMap();
 
                 ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Combat_Ally_Squad);
+
                 enemy_squad = CharacterManager.GetArmy("Enemy").GetSquad(Handler.Combat_Enemy_Squad);
+                if (enemy_squad == null)
+                {
+                    enemy_squad = CharacterManager.GetArmy("Special").GetSquad(Handler.Combat_Enemy_Squad);
+                }
 
                 if (Handler.Combat_Terrain == "Grass")
                 {

@@ -9,6 +9,7 @@ using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Utility;
+using OP_Engine.Inventories;
 
 using DoS1.Util;
 
@@ -68,11 +69,7 @@ namespace DoS1.Menus
                 {
                     MoveCharacter();
                 }
-                else if (string.IsNullOrEmpty(Handler.AlertType) ||
-                         Handler.AlertType == "Generic")
-                {
-                    UpdateControls();
-                }
+                UpdateControls();
 
                 Army ally_army = CharacterManager.GetArmy("Ally");
                 if (ally_army != null)
@@ -129,12 +126,12 @@ namespace DoS1.Menus
                     }
                 }
 
-                if (Handler.Tutorials &&
-                    !Handler.Tutorial_Squad &&
-                    !Handler.ViewOnly_Squad)
+                if (Handler.StoryStep == 6 ||
+                    Handler.StoryStep == 7 ||
+                    Handler.StoryStep == 15 ||
+                    Handler.StoryStep == 29)
                 {
-                    Handler.TutorialType = "Squad";
-                    GameUtil.Alert_Tutorial();
+                    GameUtil.Alert_Story();
                 }
 
                 base.Update(gameRef, content);
@@ -293,6 +290,9 @@ namespace DoS1.Menus
             if (!found_button &&
                 !found_squad &&
                 !found_grid &&
+                Handler.StoryStep != 6 &&
+                Handler.StoryStep != 7 &&
+                Handler.StoryStep != 15 &&
                 InputManager.Mouse_RB_Pressed)
             {
                 Back();
@@ -308,41 +308,45 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            foreach (Button button in Buttons)
+            if (Handler.StoryStep != 6 &&
+                Handler.StoryStep != 29)
             {
-                if (button.Visible &&
-                    button.Enabled)
+                foreach (Button button in Buttons)
                 {
-                    if (InputManager.MouseWithin(button.Region.ToRectangle))
+                    if (button.Visible &&
+                        button.Enabled)
                     {
-                        found = true;
-                        examining = true;
-
-                        if (button.HoverText != null)
+                        if (InputManager.MouseWithin(button.Region.ToRectangle))
                         {
-                            GameUtil.Examine(this, button.HoverText);
+                            found = true;
+                            examining = true;
+
+                            if (button.HoverText != null)
+                            {
+                                GameUtil.Examine(this, button.HoverText);
+                            }
+
+                            button.Opacity = 1;
+                            button.Selected = true;
+
+                            if (InputManager.Mouse_LB_Pressed)
+                            {
+                                found = false;
+                                examining = false;
+
+                                CheckClick(button);
+
+                                button.Opacity = 0.8f;
+                                button.Selected = false;
+
+                                break;
+                            }
                         }
-
-                        button.Opacity = 1;
-                        button.Selected = true;
-
-                        if (InputManager.Mouse_LB_Pressed)
+                        else if (InputManager.Mouse.Moved)
                         {
-                            found = false;
-                            examining = false;
-
-                            CheckClick(button);
-
                             button.Opacity = 0.8f;
                             button.Selected = false;
-
-                            break;
                         }
-                    }
-                    else if (InputManager.Mouse.Moved)
-                    {
-                        button.Opacity = 0.8f;
-                        button.Selected = false;
                     }
                 }
             }
@@ -395,7 +399,24 @@ namespace DoS1.Menus
                                         found = false;
                                         examining = false;
 
-                                        SelectCharacter(character.ID);
+                                        Character hero = Handler.GetHero();
+
+                                        if ((Handler.StoryStep == 15 && character.ID == hero.ID) ||
+                                            Handler.StoryStep > 18)
+                                        {
+                                            if (Handler.StoryStep == 15 ||
+                                                Handler.StoryStep == 29)
+                                            {
+                                                MenuManager.GetMenu("Alerts").Visible = false;
+                                                Handler.StoryStep++;
+                                            }
+                                            else if (Handler.StoryStep == 35)
+                                            {
+                                                MenuManager.GetMenu("Alerts").Visible = false;
+                                            }
+
+                                            SelectCharacter(character.ID);
+                                        }
                                     }
                                 }
                             }
@@ -593,7 +614,7 @@ namespace DoS1.Menus
                         {
                             SwapCharacters(ally_squad, moving_character, ally_squad, existing);
                         }
-                        else
+                        else if (existing.ID != Handler.GetHero().ID)
                         {
                             SwapCharacters(reserves, moving_character, ally_squad, existing);
 
@@ -625,6 +646,12 @@ namespace DoS1.Menus
                         {
                             ally_squad.Name = moving_character.Name;
                             ally_squad.Leader_ID = moving_character.ID;
+                        }
+
+                        if (Handler.StoryStep == 6)
+                        {
+                            MenuManager.GetMenu("Alerts").Visible = false;
+                            Handler.StoryStep++;
                         }
                     }
                 }
@@ -748,6 +775,12 @@ namespace DoS1.Menus
 
             if (button.Name == "Back")
             {
+                if (Handler.StoryStep == 7)
+                {
+                    MenuManager.GetMenu("Alerts").Visible = false;
+                    Handler.StoryStep++;
+                }
+
                 Back();
             }
         }
@@ -757,12 +790,54 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
-            if (MenuManager.PreviousMenu.Name != "Army")
+            bool okay = false;
+
+            if (Handler.StoryStep == 18)
             {
-                GameUtil.Toggle_Pause(false);
+                MenuManager.GetMenu("Alerts").Visible = false;
+                Handler.StoryStep++;
+
+                okay = true;
+            }
+            else if (Handler.StoryStep == 35)
+            {
+                bool missing_weapon = false;
+                foreach (Character character in squad.Characters)
+                {
+                    Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                    if (weapon == null)
+                    {
+                        missing_weapon = true;
+                        break;
+                    }
+                }
+
+                if (missing_weapon)
+                {
+                    GameUtil.Alert_Story();
+                }
+                else
+                {
+                    MenuManager.GetMenu("Alerts").Visible = false;
+                    Handler.StoryStep++;
+
+                    okay = true;
+                }
+            }
+            else
+            {
+                okay = true;
             }
 
-            MenuManager.ChangeMenu_Previous();
+            if (okay)
+            {
+                if (MenuManager.PreviousMenu.Name != "Army")
+                {
+                    GameUtil.Toggle_Pause(false);
+                }
+
+                MenuManager.ChangeMenu_Previous();
+            }
         }
 
         private void SelectCharacter(long id)

@@ -27,9 +27,9 @@ namespace DoS1.Menus
         int Head;
         int Skin;
         int HairStyle;
-        string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White", "Purple", "Blue", "Cyan", "Green", "Pink" };
+        string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White" };
         int HairColor;
-        string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Red", "Black", "Gray" };
+        string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Gray" };
         int EyeColor;
 
         #endregion
@@ -263,26 +263,52 @@ namespace DoS1.Menus
                 }
 
                 GetPicture("Hair").Visible = true;
-                GetPicture("Hair").Texture = AssetManager.Textures["Left_" + Handler.HairStyles[HairStyle]];
+
+                if (character.Gender == "Male")
+                {
+                    GetPicture("Hair").Texture = AssetManager.Textures["Left_" + character.Gender + "_" + Handler.HairStyles_Male[HairStyle]];
+                }
+                else
+                {
+                    GetPicture("Hair").Texture = AssetManager.Textures["Left_" + character.Gender + "_" + Handler.HairStyles_Female[HairStyle]];
+                }
             }
             else if (button.Name == "HairStyle_Plus")
             {
                 GetButton("HairStyle_Minus").Enabled = true;
 
-                if (HairStyle < Handler.HairStyles.Length - 1)
+                if (character.Gender == "Male")
                 {
-                    HairStyle++;
-                }
+                    if (HairStyle < Handler.HairStyles_Male.Length - 1)
+                    {
+                        HairStyle++;
+                    }
 
-                if (HairStyle == Handler.HairStyles.Length - 1)
-                {
-                    button.Enabled = false;
-                    GetPicture("Hair").Visible = false;
+                    if (HairStyle == Handler.HairStyles_Male.Length - 1)
+                    {
+                        button.Enabled = false;
+                        GetPicture("Hair").Visible = false;
+                    }
+                    else
+                    {
+                        GetPicture("Hair").Visible = true;
+                        GetPicture("Hair").Texture = AssetManager.Textures["Left_" + character.Gender + "_" + Handler.HairStyles_Male[HairStyle]];
+                    }
                 }
                 else
                 {
+                    if (HairStyle < Handler.HairStyles_Female.Length - 1)
+                    {
+                        HairStyle++;
+                    }
+
+                    if (HairStyle == Handler.HairStyles_Female.Length - 1)
+                    {
+                        button.Enabled = false;
+                    }
+
                     GetPicture("Hair").Visible = true;
-                    GetPicture("Hair").Texture = AssetManager.Textures["Left_" + Handler.HairStyles[HairStyle]];
+                    GetPicture("Hair").Texture = AssetManager.Textures["Left_" + character.Gender + "_" + Handler.HairStyles_Female[HairStyle]];
                 }
             }
             else if (button.Name == "HairColor_Minus")
@@ -331,23 +357,47 @@ namespace DoS1.Menus
                     button.Enabled = false;
                 }
 
-                GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+                if (character.Gender == "Male")
+                {
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Male[Head]];
+                }
+                else
+                {
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Female[Head]];
+                }
             }
             else if (button.Name == "Head_Plus")
             {
                 GetButton("Head_Minus").Enabled = true;
 
-                if (Head < Handler.HeadStyles.Length - 1)
+                if (character.Gender == "Male")
                 {
-                    Head++;
-                }
+                    if (Head < Handler.HeadStyles_Male.Length - 1)
+                    {
+                        Head++;
+                    }
 
-                if (Head == Handler.HeadStyles.Length - 1)
+                    if (Head == Handler.HeadStyles_Male.Length - 1)
+                    {
+                        button.Enabled = false;
+                    }
+
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Male[Head]];
+                }
+                else
                 {
-                    button.Enabled = false;
-                }
+                    if (Head < Handler.HeadStyles_Female.Length - 1)
+                    {
+                        Head++;
+                    }
 
-                GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+                    if (Head == Handler.HeadStyles_Female.Length - 1)
+                    {
+                        button.Enabled = false;
+                    }
+
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Female[Head]];
+                }
             }
             else if (button.Name == "EyeColor_Minus")
             {
@@ -395,7 +445,14 @@ namespace DoS1.Menus
                     button.Enabled = false;
                 }
 
-                GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+                if (character.Gender == "Male")
+                {
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Male[Head]];
+                }
+                else
+                {
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Female[Head]];
+                }
 
                 Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
                 if (armor == null)
@@ -417,7 +474,14 @@ namespace DoS1.Menus
                     button.Enabled = false;
                 }
 
-                GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+                if (character.Gender == "Male")
+                {
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Male[Head]];
+                }
+                else
+                {
+                    GetPicture("Head").Texture = AssetManager.Textures["Left_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Female[Head]];
+                }
 
                 Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
                 if (armor == null)
@@ -448,7 +512,15 @@ namespace DoS1.Menus
             character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
 
             Item head = character.Inventory.GetItem("Head");
-            head.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + Handler.SkinTones[Skin] + "_" + Handler.HeadStyles[Head]];
+
+            if (character.Gender == "Male")
+            {
+                head.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Male[Head]];
+            }
+            else
+            {
+                head.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + Handler.SkinTones[Skin] + "_" + character.Gender + "_" + Handler.HeadStyles_Female[Head]];
+            }
             head.Image = character.Image;
 
             character.Inventory.GetItem("Eyes").DrawColor = Handler.EyeColors[EyeColors[EyeColor]];
@@ -456,7 +528,15 @@ namespace DoS1.Menus
             Item hair = character.Inventory.GetItem("Hair");
             if (hair != null)
             {
-                hair.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + Handler.HairStyles[HairStyle]];
+                if (character.Gender == "Male")
+                {
+                    hair.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + character.Gender + "_" + Handler.HairStyles_Male[HairStyle]];
+                }
+                else
+                {
+                    hair.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + character.Gender + "_" + Handler.HairStyles_Female[HairStyle]];
+                }
+                
                 hair.Image = character.Image;
                 hair.DrawColor = Handler.HairColors[HairColors[HairColor]];
             }
@@ -482,11 +562,11 @@ namespace DoS1.Menus
 
             AddPicture(Handler.GetID(), "Body", AssetManager.Textures["Left_Armor_Cloth_Cloth_Idle"], new Region(0, 0, 0, 0),
                 new Color(255, 255, 255, 255), true);
-            AddPicture(Handler.GetID(), "Head", AssetManager.Textures["Left_Light_Head1"], new Region(0, 0, 0, 0),
+            AddPicture(Handler.GetID(), "Head", AssetManager.Textures["Left_Light_Male_Head1"], new Region(0, 0, 0, 0),
                 new Color(255, 255, 255, 255), true);
             AddPicture(Handler.GetID(), "Eyes", AssetManager.Textures["Left_Eye"], new Region(0, 0, 0, 0),
                 Handler.EyeColors["Green"], true);
-            AddPicture(Handler.GetID(), "Hair", AssetManager.Textures["Left_Style1"], new Region(0, 0, 0, 0),
+            AddPicture(Handler.GetID(), "Hair", AssetManager.Textures["Left_Male_Style1"], new Region(0, 0, 0, 0),
                 Handler.HairColors["Brown"], true);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HairStyle", "Hair Style:", Color.White, new Region(0, 0, 0, 0), true);
@@ -738,29 +818,60 @@ namespace DoS1.Menus
                     }
                 }
 
-                string headStyle = headParts[2];
-                for (int i = 0; i < Handler.HeadStyles.Length; i++)
+                if (character.Gender == "Male")
                 {
-                    string style = Handler.HeadStyles[i];
-                    if (style == headStyle)
+                    string headStyle = headParts[3];
+                    for (int i = 0; i < Handler.HeadStyles_Male.Length; i++)
                     {
-                        Head = i;
-
-                        if (Head == 0)
+                        string style = Handler.HeadStyles_Male[i];
+                        if (style == headStyle)
                         {
-                            GetButton("Head_Minus").Enabled = false;
-                        }
-                        else
-                        {
-                            GetButton("Head_Minus").Enabled = true;
-                        }
+                            Head = i;
 
-                        if (Head == Handler.HeadStyles.Length - 1)
-                        {
-                            GetButton("Head_Plus").Enabled = false;
-                        }
+                            if (Head == 0)
+                            {
+                                GetButton("Head_Minus").Enabled = false;
+                            }
+                            else
+                            {
+                                GetButton("Head_Minus").Enabled = true;
+                            }
 
-                        break;
+                            if (Head == Handler.HeadStyles_Male.Length - 1)
+                            {
+                                GetButton("Head_Plus").Enabled = false;
+                            }
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    string headStyle = headParts[3];
+                    for (int i = 0; i < Handler.HeadStyles_Female.Length; i++)
+                    {
+                        string style = Handler.HeadStyles_Female[i];
+                        if (style == headStyle)
+                        {
+                            Head = i;
+
+                            if (Head == 0)
+                            {
+                                GetButton("Head_Minus").Enabled = false;
+                            }
+                            else
+                            {
+                                GetButton("Head_Minus").Enabled = true;
+                            }
+
+                            if (Head == Handler.HeadStyles_Female.Length - 1)
+                            {
+                                GetButton("Head_Plus").Enabled = false;
+                            }
+
+                            break;
+                        }
                     }
                 }
 
@@ -804,29 +915,60 @@ namespace DoS1.Menus
 
                     string[] hairParts = hair.Texture.Name.Split('_');
 
-                    string hairStyle = hairParts[1];
-                    for (int i = 0; i < Handler.HairStyles.Length; i++)
+                    if (character.Gender == "Male")
                     {
-                        string style = Handler.HairStyles[i];
-                        if (style == hairStyle)
+                        string hairStyle = hairParts[1];
+                        for (int i = 0; i < Handler.HairStyles_Male.Length; i++)
                         {
-                            HairStyle = i;
-
-                            if (HairStyle == 0)
+                            string style = Handler.HairStyles_Male[i];
+                            if (style == hairStyle)
                             {
-                                GetButton("HairStyle_Minus").Enabled = false;
-                            }
-                            else
-                            {
-                                GetButton("HairStyle_Minus").Enabled = true;
-                            }
+                                HairStyle = i;
 
-                            if (HairStyle == Handler.HairStyles.Length - 1)
-                            {
-                                GetButton("HairStyle_Plus").Enabled = false;
-                            }
+                                if (HairStyle == 0)
+                                {
+                                    GetButton("HairStyle_Minus").Enabled = false;
+                                }
+                                else
+                                {
+                                    GetButton("HairStyle_Minus").Enabled = true;
+                                }
 
-                            break;
+                                if (HairStyle == Handler.HairStyles_Male.Length - 1)
+                                {
+                                    GetButton("HairStyle_Plus").Enabled = false;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string hairStyle = hairParts[1];
+                        for (int i = 0; i < Handler.HairStyles_Female.Length; i++)
+                        {
+                            string style = Handler.HairStyles_Female[i];
+                            if (style == hairStyle)
+                            {
+                                HairStyle = i;
+
+                                if (HairStyle == 0)
+                                {
+                                    GetButton("HairStyle_Minus").Enabled = false;
+                                }
+                                else
+                                {
+                                    GetButton("HairStyle_Minus").Enabled = true;
+                                }
+
+                                if (HairStyle == Handler.HairStyles_Female.Length - 1)
+                                {
+                                    GetButton("HairStyle_Plus").Enabled = false;
+                                }
+
+                                break;
+                            }
                         }
                     }
 
@@ -862,7 +1004,7 @@ namespace DoS1.Menus
                 {
                     GetButton("HairStyle_Plus").Enabled = false;
                     GetPicture("Hair").Visible = false;
-                    HairStyle = Handler.HairStyles.Length - 1;
+                    HairStyle = Handler.HairStyles_Male.Length - 1;
                 }
             }
 

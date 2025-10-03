@@ -344,7 +344,7 @@ namespace DoS1
             MenuManager.Menus.Add(new Menu_Character(Content));
             MenuManager.Menus.Add(new Menu_Inventory(Content));
             MenuManager.Menus.Add(new Menu_Item(Content));
-            MenuManager.Menus.Add(new Menu_Shop(Content));
+            MenuManager.Menus.Add(new Menu_Market(Content));
             MenuManager.Menus.Add(new Menu_Academy(Content));
             MenuManager.Menus.Add(new Menu_Alerts(Content));
             MenuManager.Menus.Add(new Menu_CharEdit(Content));

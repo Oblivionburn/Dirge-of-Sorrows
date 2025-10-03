@@ -53,6 +53,17 @@ namespace DoS1.Util
             Squad reserves_squad = NewSquad("Reserves");
             reserves.Squads.Add(reserves_squad);
 
+            //Special army
+            Army special = new Army
+            {
+                ID = Handler.GetID(),
+                Name = "Special"
+            };
+            CharacterManager.Armies.Add(special);
+
+            Squad special_squad = NewSquad("Special");
+            special.Squads.Add(special_squad);
+
             //Enemy
             Army enemies = new Army
             {
@@ -143,12 +154,12 @@ namespace DoS1.Util
                     }
                 }
 
-                Gen_EnemySquad(enemy_squad, map_level + 1);
+                Gen_EnemySquad(enemy_squad, map_level + 1, -1, -1, -1, -1);
                 army.Squads.Add(enemy_squad);
             }
         }
 
-        public static void Gen_EnemySquad(Squad squad, int map_level)
+        public static void Gen_EnemySquad(Squad squad, int map_level, int chars_override, int class_type_override, int min_tier_override, int max_tier_override)
         {
             int min_chars = (int)Math.Ceiling((double)map_level / 5);
             int max_chars = (int)Math.Ceiling((double)map_level / 2);
@@ -159,6 +170,11 @@ namespace DoS1.Util
 
             CryptoRandom random = new CryptoRandom();
             int chars = random.Next(min_chars, max_chars + 1);
+
+            if (chars_override != -1)
+            {
+                chars = chars_override;
+            }
 
             for (int i = 0; i < chars; i++)
             {
@@ -195,13 +211,22 @@ namespace DoS1.Util
                     continue;
                 }
 
-                Character character = CharacterUtil.NewCharacter_Random(formation, true);
+                Character character = CharacterUtil.NewCharacter_Random(formation, true, random.Next(0, 2));
 
                 //Highest min value is 8 at level 20
                 int min_tier = (int)Math.Ceiling(map_level / 2.5);
+                if (min_tier_override != -1)
+                {
+                    min_tier = min_tier_override;
+                }
 
                 //Max is always 10 once we reach level 15+
                 int max_tier = (int)Math.Ceiling(map_level / 1.5);
+                if (max_tier_override != -1)
+                {
+                    max_tier = max_tier_override;
+                }
+
                 if (max_tier > 10)
                 {
                     max_tier = 10;
@@ -209,6 +234,12 @@ namespace DoS1.Util
 
                 random = new CryptoRandom();
                 int class_type = random.Next(0, 3);
+
+                if (class_type_override != -1)
+                {
+                    class_type = class_type_override;
+                }
+
                 if (class_type == 0)
                 {
                     #region Warrior Gear
@@ -728,7 +759,8 @@ namespace DoS1.Util
 
             for (int i = 0; i < 20; i++)
             {
-                Character character = CharacterUtil.NewCharacter_Random(new Vector2(x, y), false);
+                CryptoRandom random = new CryptoRandom();
+                Character character = CharacterUtil.NewCharacter_Random(new Vector2(x, y), false, random.Next(0, 2));
 
                 InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                 InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);

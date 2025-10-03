@@ -1,17 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using DoS1.Util;
+using FMOD;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-
-using OP_Engine.Scenes;
-using OP_Engine.Menus;
-using OP_Engine.Controls;
-using OP_Engine.Sounds;
-using OP_Engine.Utility;
-using OP_Engine.Inputs;
-using OP_Engine.Tiles;
+using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Characters;
-
-using DoS1.Util;
+using OP_Engine.Controls;
+using OP_Engine.Inputs;
+using OP_Engine.Menus;
+using OP_Engine.Scenes;
+using OP_Engine.Sounds;
+using OP_Engine.Tiles;
+using OP_Engine.Utility;
 
 namespace DoS1.Menus
 {
@@ -221,6 +220,7 @@ namespace DoS1.Menus
         private void CheckClick(Button button)
         {
             AssetManager.PlaySound_Random("Click");
+            InputManager.Mouse.Flush();
 
             if (button.Name == "Alert")
             {
@@ -240,6 +240,13 @@ namespace DoS1.Menus
 
                     Scene combat = SceneManager.GetScene("Combat");
                     combat.Load();
+
+                    if (Handler.StoryStep == 38 ||
+                        Handler.StoryStep == 50)
+                    {
+                        combat.Menu.GetButton("Retreat").Enabled = false;
+                        GameUtil.Toggle_Pause_Combat(false);
+                    }
 
                     SceneManager.ChangeScene(combat);
 
@@ -269,16 +276,20 @@ namespace DoS1.Menus
                 else if (button.Text == "[Continue]" ||
                          button.Text == "[Click here to continue]")
                 {
-                    if (Handler.AlertType == "Tutorial")
+                    if (Handler.AlertType == "Story")
                     {
-                        ContinueTutorials();
+                        ContinueStory();
+
+                        if (Handler.StoryStep != 38)
+                        {
+                            Close();
+                        }
                     }
                     else
                     {
                         GameUtil.Toggle_Pause(false);
+                        Close();
                     }
-
-                    Close();
                 }
                 else if (button.Text == "[Retreat]")
                 {
@@ -326,9 +337,9 @@ namespace DoS1.Menus
                 Tile location = WorldUtil.GetLocation(squad);
                 if (location != null)
                 {
-                    if (location.Type.Contains("Shop"))
+                    if (location.Type.Contains("Market"))
                     {
-                        type = "Shop";
+                        type = "Market";
                     }
                     else if (location.Type.Contains("Academy"))
                     {
@@ -339,9 +350,9 @@ namespace DoS1.Menus
 
             Close();
 
-            if (type == "Shop")
+            if (type == "Market")
             {
-                MenuManager.ChangeMenu("Shop");
+                MenuManager.ChangeMenu("Market");
             }
             else if (type == "Academy")
             {
@@ -423,89 +434,60 @@ namespace DoS1.Menus
             }
         }
 
-        private void ContinueTutorials()
+        private void ContinueStory()
         {
-            if (Handler.TutorialType == "Worldmap")
+            if (Handler.StoryStep <= 4 ||
+                Handler.StoryStep == 8 ||
+                Handler.StoryStep == 19 ||
+                Handler.StoryStep == 48 |
+                Handler.StoryStep == 55)
             {
-                if (Handler.TutorialStep < 1)
-                {
-                    Handler.TutorialStep++;
-                }
-                else
-                {
-                    Handler.TutorialStep = 0;
-                    Handler.Tutorial_Worldmap = true;
-                    GameUtil.Toggle_Pause(false);
-                }
+                Handler.StoryStep++;
+                GameUtil.Toggle_Pause(false);
             }
-            else if (Handler.TutorialType == "Localmap")
+            else if (Handler.StoryStep == 10 ||
+                     Handler.StoryStep == 11 ||
+                     (Handler.StoryStep >= 22 && Handler.StoryStep <= 26) ||
+                     Handler.StoryStep == 36 ||
+                     (Handler.StoryStep >= 38 && Handler.StoryStep <= 43) ||
+                     (Handler.StoryStep >= 45 && Handler.StoryStep <= 46) ||
+                     Handler.StoryStep == 47 ||
+                     (Handler.StoryStep >= 50 && Handler.StoryStep <= 53))
             {
-                if (Handler.TutorialStep < 5)
-                {
-                    Handler.TutorialStep++;
-                }
-                else
-                {
-                    Handler.TutorialStep = 0;
-                    Handler.Tutorial_Localmap = true;
-                    GameUtil.Toggle_Pause(false);
-                }
+                Handler.StoryStep++;
             }
-            else if (Handler.TutorialType == "Army")
+            else if (Handler.StoryStep == 44 ||
+                     Handler.StoryStep == 54)
             {
-                if (Handler.TutorialStep < 2)
-                {
-                    Handler.TutorialStep++;
-                }
-                else
-                {
-                    Handler.TutorialStep = 0;
-                    Handler.Tutorial_Army = true;
-                }
+                Handler.StoryStep++;
+                GameUtil.Toggle_Pause_Combat(false);
             }
-            else if (Handler.TutorialType == "Squad")
+            else if (Handler.StoryStep == 27)
             {
-                if (Handler.TutorialStep < 5)
-                {
-                    Handler.TutorialStep++;
-                }
-                else
-                {
-                    Handler.TutorialStep = 0;
-                    Handler.Tutorial_Squad = true;
-                }
+                InventoryUtil.BeginningInventory();
+                Handler.StoryStep++;
             }
-            else if (Handler.TutorialType == "Character")
+            else if (Handler.StoryStep == 37)
             {
-                if (Handler.TutorialStep < 2)
+                Handler.StoryStep++;
+                Close();
+
+                Army special = CharacterManager.GetArmy("Special");
+                Scene scene = WorldUtil.GetScene();
+                Map map = WorldUtil.GetMap(scene.World);
+                Layer ground = map.GetLayer("Ground");
+                Tile ally_base = WorldUtil.Get_Base(map, "Ally");
+
+                Squad squad = ArmyUtil.Get_Squad(Handler.GetHero());
+                if (squad != null)
                 {
-                    Handler.TutorialStep++;
+                    Squad enemy_squad = ArmyUtil.NewSquad("Enemy");
+                    special.Squads.Add(enemy_squad);
+
+                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 3, 3);
+                    
+                    CombatUtil.StartCombat(map, ground, ally_base, squad, enemy_squad);
                 }
-                else
-                {
-                    Handler.TutorialStep = 0;
-                    Handler.Tutorial_Character = true;
-                }
-            }
-            else if (Handler.TutorialType == "Item")
-            {
-                if (Handler.TutorialStep < 1)
-                {
-                    Handler.TutorialStep++;
-                }
-                else
-                {
-                    Handler.TutorialStep = 0;
-                    Handler.Tutorial_Item = true;
-                }
-            }
-            else if (Handler.TutorialType == "Shop")
-            {
-                Handler.Tutorial_Shop = true;
-            }
-            else if (Handler.TutorialType == "Academy")
-            {
-                Handler.Tutorial_Academy = true;
             }
         }
 
@@ -658,8 +640,10 @@ namespace DoS1.Menus
 
             GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
 
+            int Y = Main.Game.ScreenHeight - (height * 6);
+
             Label dialogue = GetLabel("Dialogue");
-            dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Main.Game.ScreenHeight - (height * 7), width * 10, height * 4);
+            dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Y, width * 10, height * 4);
 
             int name_height = (int)(dialogue.Region.Height / 6);
             GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X, dialogue.Region.Y - name_height, dialogue.Region.Width, name_height);
