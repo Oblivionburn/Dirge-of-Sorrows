@@ -6,7 +6,7 @@
 >Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 
 <br><br>
-### <ins>Features currently in the game</ins>:
+## <ins>Features currently in the game</ins>:
 - **Auto-battler combat**
   - 3x3 squad formation - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
@@ -37,7 +37,7 @@
 - Intro of the story, which also serves as the tutorial for the game
 
 <br><br>
-### <ins>Planned features not yet implemented</ins>:
+## <ins>Planned features not yet implemented</ins>:
 - More Story/Lore
 - Side-quests for special armor/weapons
 - Finding hidden items in the world
