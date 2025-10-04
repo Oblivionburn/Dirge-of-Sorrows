@@ -29,7 +29,8 @@
   - Note: stat increases per Level happen automatically based on equipped weapon
 - **14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time**
 - **Intro of the story, which also serves as the tutorial for the game**
-#
+
+<br><br>
 ### <ins>Planned features not yet implemented</ins>:
 - More Story/Lore
 - Side-quests for special armor/weapons
