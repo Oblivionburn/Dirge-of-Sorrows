@@ -41,6 +41,6 @@
 ## <ins>Planned features not yet implemented</ins>:
 - More of the story
 - Side-quests for special armor/weapons
-- Finding hidden items in the world
+- Finding items hidden on Local Maps
 - More music for variety
 - Hopefully some graphical improvements
