@@ -15,10 +15,10 @@
   - 1 Enemy Base (capturing it completes a map)
   - At least 1 Market Town to purchase equipment
   - At least 1 Academy Town to recruit more characters
-  - Neutral Towns to capture/liberate for passive gold income
+  - Neutral Towns to capture/liberate for passive gold income (1 gold each per in-game hour which stacks across all maps)
   - Various types of terrain that effect movement speed, and general biome based on Worldmap position
 - Randomly generated enemy squads which increase in amount/difficulty across locations
-- Capturing/liberating towns yields 1 gold each, every in-game hour (stacks across every map)
+- Capturing/liberating towns yields 
 - Individual character XP/Level progression with 4 combat stats:
   - Strength - increases melee/bow weapon damage
   - Intelligence - increases grimoire(magic) damage
