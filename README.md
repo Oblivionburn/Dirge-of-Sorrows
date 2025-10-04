@@ -5,7 +5,7 @@
 >[!NOTE]
 >Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 #
-### <ins>Features currently in the game</ins>:
+## <ins>Features currently in the game</ins>:
 - **Auto-battler combat**
   - 3x3 squad formation - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
@@ -29,7 +29,7 @@
 - **14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time**
 - **Intro of the story, which also serves as the tutorial for the game**
 #
-### <ins>Planned features not yet implemented</ins>:
+## <ins>Planned features not yet implemented</ins>:
 - More Story/Lore
 - Side-quests for special armor/weapons
 - Finding hidden items in the world
