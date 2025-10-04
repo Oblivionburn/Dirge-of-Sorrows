@@ -21,10 +21,10 @@
   - Biome aesthetic based on Worldmap position
 - Randomly generated enemy squads which increase in amount/difficulty across locations
 - Individual character XP/Level progression and 4 combat stats:
-  - Strength - increases melee/bow weapon damage
-  - Intelligence - increases grimoire (magic) weapon damage
-  - Dexterity - increases hit chance with melee/bow weapons
-  - Agility - increases dodge chance
+  - Strength - effects melee/bow weapon damage
+  - Intelligence - effects grimoire (magic) weapon damage
+  - Dexterity - effects chance to hit with melee/bow weapons
+  - Agility - effects chance to dodge melee/bow weapon attacks
   - Note: stat increases per Level happen automatically based on equipped weapon
 - 14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time
 - Intro of the story, which also serves as the tutorial for the game
