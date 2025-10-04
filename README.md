@@ -23,7 +23,7 @@
 - Individual character XP/Level progression and 4 combat stats:
   - Strength - increases melee/bow weapon damage
   - Intelligence - increases grimoire (magic) weapon damage
-  - Dexterity - increases hit chance with melee/bow weapons (magic always hits)
+  - Dexterity - increases hit chance with melee/bow weapons
   - Agility - increases dodge chance
   - Note: stat increases per Level happen automatically based on equipped weapon
 - 14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time
