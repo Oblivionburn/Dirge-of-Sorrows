@@ -22,7 +22,7 @@
 - Randomly generated enemy squads which increase in amount/difficulty across locations
 - Individual character XP/Level progression with 4 combat stats:
   - Strength - increases melee/bow weapon damage
-  - Intelligence - increases grimoire(magic) damage
+  - Intelligence - increases grimoire (magic) weapon damage
   - Dexterity - increases hit chance with melee/bow weapons (magic always hits)
   - Agility - increases dodge chance
   - Note: stat increases per Level happen automatically based on equipped weapon
