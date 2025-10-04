@@ -16,7 +16,7 @@
 #
 ### Planned features not yet implemented:
 - More Story/Lore
-- Side-quests
-- Finding unique items hidden in the world
+- Side-quests for special armor/weapons
+- Finding hidden items in the world
 - More music for variety
 - Hopefully some graphical improvements
