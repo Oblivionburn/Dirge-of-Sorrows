@@ -9,7 +9,7 @@
 - Auto-battler combat
   - 3x3 squad formations (position effects damage dealt and received)
   - No classes (characters are what they wear)
-- Randomly generated Worldmap with 20 locations that can be clicked to enter their Local Map
+- Randomly generated Worldmap with 20 locations progressively unlocked (each location has a Local Map where battle takes place)
 - Local Maps consist of:
   - 1 Player Base
   - 1 Enemy Base (capturing it completes a map)
