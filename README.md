@@ -14,8 +14,8 @@
 - Randomly generated Local Maps consisting of:
   - 1 Player Base
   - 1 Enemy Base (capturing it completes a map)
-  - At least 1 Market Town where you can purchase armor/weapons to equip on characters
-  - At least 1 Academy Town where you can recruit more characters for your army
+  - At least 1 Market Town - where you can purchase armor/weapons to equip on characters
+  - At least 1 Academy Town - where you can recruit more characters for your army
   - Neutral Towns to capture/liberate for passive gold income (1 gold each per in-game hour which stacks across all maps)
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
