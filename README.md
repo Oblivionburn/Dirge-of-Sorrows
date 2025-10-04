@@ -1,4 +1,4 @@
-![](/assets/Title_Banner.png)
+![](/Assets/Title_Banner.png)
 ### This is the source code for a low-fantasy RPG/Strategy auto-battler game (e.g. like Ogre Battle) being built using [OP Game Engine](https://github.com/Oblivionburn/OP_Engine) in VS 2022.
 #
 # Current state: Playable Alpha
