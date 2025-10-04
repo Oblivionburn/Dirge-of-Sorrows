@@ -6,12 +6,12 @@
 >Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 #
 ### <ins>Features currently in the game</ins>:
-- Auto-battler combat
+- **Auto-battler combat**
   - 3x3 squad formation - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
-- Randomly generated Worldmap with 20 battle locations to unlock
+- **Randomly generated Worldmap with 20 battle locations to unlock**
   - Selecting a location takes you to a Local Map where battle takes place
-- Randomly generated Local Maps consisting of:
+- **Randomly generated Local Maps consisting of:**
   - 1 Player Base
   - 1 Enemy Base (capturing it completes a map)
   - 1+ Market Towns - where you can purchase armor/weapons to equip on characters
@@ -19,15 +19,15 @@
   - Neutral Towns to capture/liberate for passive gold income (1 gold each per in-game hour which stacks across all maps)
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
-- Randomly generated enemy squads which increase in amount/difficulty across locations
-- Individual character XP/Level progression and 4 combat stats:
+- **Randomly generated enemy squads which increase in amount/difficulty across locations**
+- **Individual character XP/Level progression and 4 combat stats:**
   - Strength - effects melee/bow weapon damage
   - Intelligence - effects grimoire (magic) weapon damage
   - Dexterity - effects chance to hit with melee/bow weapons
   - Agility - effects chance to dodge melee/bow weapon attacks
   - Note: stat increases per Level happen automatically based on equipped weapon
-- 14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time
-- Intro of the story, which also serves as the tutorial for the game
+- **14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time**
+- **Intro of the story, which also serves as the tutorial for the game**
 #
 ### <ins>Planned features not yet implemented</ins>:
 - More Story/Lore
