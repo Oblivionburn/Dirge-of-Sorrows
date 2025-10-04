@@ -6,6 +6,7 @@
 >Releases will only be available on github up through Beta (v0.9.X.X) state of the game, but source code will stay updated for those who wish to see the inner-workings of the game, its history of changes, and/or to compile their own modded version.
 ><br><br>After 1.0 release, the game will need to be purchased on Steam to acquire the needed media files (e.g. music, sounds, and textures) for the game to function.
 
+<br><br>
 For discussion/suggestions/bug-reporting:<br>
 [<img src="https://github.com/Oblivionburn/Oblivionburn-Productions/blob/main/images/Discord.png">](https://discord.gg/zDkb3C9)
 
