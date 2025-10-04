@@ -10,12 +10,13 @@
   - 3x3 squad formations (position effects damage dealt and received)
   - No classes (characters are what they wear)
 - Randomly generated Worldmap with 20 locations that can be clicked to enter their Local Map
-- Randomly generated Local Maps consisting of:
+- Local Maps consist of:
   - 1 Player Base
   - 1 Enemy Base (capturing it completes a map)
   - At least 1 Market Town to purchase equipment
   - At least 1 Academy Town to recruit more characters
-  - Neutral Towns to capture/liberate
+  - Neutral Towns to capture/liberate for passive gold income
+  - Various types of terrain that effect movement speed
 - Randomly generated enemy squads in every Local Map which increase in amount/difficulty/equipment across locations on the Worldmap
 - Capturing/liberating towns yields 1 gold each, every in-game hour (stacks across every map)
 - Individual character XP/Level progression with 4 combat stats:
