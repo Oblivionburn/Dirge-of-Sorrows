@@ -16,7 +16,7 @@
   - At least 1 Market Town to purchase equipment
   - At least 1 Academy Town to recruit more characters
   - Neutral Towns to capture/liberate for passive gold income
-  - Various types of terrain that effect movement speed and general biome based on Worldmap position
+  - Various types of terrain that effect movement speed, and general biome based on Worldmap position
 - Randomly generated enemy squads which increase in amount/difficulty/equipment across locations
 - Capturing/liberating towns yields 1 gold each, every in-game hour (stacks across every map)
 - Individual character XP/Level progression with 4 combat stats:
