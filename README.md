@@ -10,6 +10,7 @@
 - **Auto-battler combat**
   - 3x3 squad formation - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
+<br><br>
 - **Randomly generated Worldmap with 20 battle locations to unlock**
   - Selecting a location takes you to a Local Map where battle takes place
 - **Randomly generated Local Maps consisting of:**
