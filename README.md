@@ -19,7 +19,6 @@
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
 - Randomly generated enemy squads which increase in amount/difficulty across locations
-- Capturing/liberating towns yields 
 - Individual character XP/Level progression with 4 combat stats:
   - Strength - increases melee/bow weapon damage
   - Intelligence - increases grimoire(magic) damage
