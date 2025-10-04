@@ -6,7 +6,9 @@
 >Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 #
 ### Features currently in the game:
-- Auto-battler combat with 3x3 squad formations and no character classes (characters are what they wear)
+- Auto-battler combat
+  - 3x3 squad formations
+  - No classes (characters are what they wear)
 - Randomly generated Worldmap with 20 locations that can be clicked to enter their Local Map
 - Randomly generated Local Maps consisting of:
   - 1 Player Base
