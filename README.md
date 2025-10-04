@@ -18,7 +18,11 @@
   - Neutral Towns to capture/liberate
 - Randomly generated enemy squads in every Local Map which increase in amount/difficulty/equipment across locations on the Worldmap
 - Capturing/liberating towns yields 1 gold each, every in-game hour (stacks across every map)
-- Individual character XP/Level progression with 4 combat stats: Strength, Intelligence, Dexterity, and Agility
+- Individual character XP/Level progression with 4 combat stats:
+  - Strength - increases melee/bow weapon damage
+  - Intelligence - increases magic damage
+  - Dexterity - increases hit chance with melee/bow weapons (magic always hits)
+  - Agility - increases dodge chance
 - Armor/Weapons that can be equipped on characters
 - 14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time
 - Intro of the story, which also serves as the tutorial for the game
