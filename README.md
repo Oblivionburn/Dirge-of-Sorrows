@@ -7,7 +7,7 @@
 ><br><br>After 1.0 release, the game will need to be purchased on Steam to acquire the needed media files (e.g. music, sounds, and textures) for the game to function.
 
 For discussion/suggestions/bug-reporting:
-[<img src="[path/to/image.png](https://github.com/Oblivionburn/Oblivionburn-Productions/blob/main/images/Discord.png)">](https://discord.gg/zDkb3C9)
+[<img src="https://github.com/Oblivionburn/Oblivionburn-Productions/blob/main/images/Discord.png">](https://discord.gg/zDkb3C9)
 
 <br><br>
 ## <ins>Features currently in the game</ins>:
