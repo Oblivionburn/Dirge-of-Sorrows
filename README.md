@@ -1,11 +1,11 @@
 # Dirge of Sorrows
 ### This is the source code for a low-fantasy RPG/Strategy auto-battler game (e.g. like Ogre Battle) being built using [OP Game Engine](https://github.com/Oblivionburn/OP_Engine) in VS 2022.
 #
-/
+ 
 # Current state: Playable Alpha
 ###### Releases will only be available up through Beta state of the game prior to actual release on Steam, but code changes will stay updated on here and remain available for those who wish to compile their own modded version. After release of the game, the game will need to be purchased on Steam to acquire media files for the Content folder (e.g. music, sounds, and textures).
 #
-/
+ 
 ### Features currently in the game:
 - Randomly generated Worldmap with 20 locations that can be clicked to enter their Local Map
 - Randomly generated Local Maps consisting of a Player Base, an Enemy Base to capture, a Market Town to purchase equipment, an Academy Town to recruit more characters, and Neutral Towns to capture/liberate
