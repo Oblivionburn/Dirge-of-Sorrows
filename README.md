@@ -23,7 +23,7 @@
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
 <br><br>
-- **Randomly generated enemy squads which increase in amount/difficulty across locations**
+- Randomly generated enemy squads which increase in amount/difficulty across locations
 <br><br>
 - **Individual character XP/Level progression and 4 combat stats:**
   - Strength - effects melee/bow weapon damage
@@ -32,9 +32,9 @@
   - Agility - effects chance to dodge melee/bow weapon attacks
   - Note: stat increases per Level happen automatically based on equipped weapon
 <br><br>
-- **14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time**
+- 14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time
 <br><br>
-- **Intro of the story, which also serves as the tutorial for the game**
+- Intro of the story, which also serves as the tutorial for the game
 
 <br><br>
 ### <ins>Planned features not yet implemented</ins>:
