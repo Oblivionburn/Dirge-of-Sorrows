@@ -7,7 +7,7 @@
 #
 ### Features currently in the game:
 - Auto-battler combat
-  - 3x3 squad formations
+  - 3x3 squad formations (position effects damage dealt and received)
   - No classes (characters are what they wear)
 - Randomly generated Worldmap with 20 locations that can be clicked to enter their Local Map
 - Randomly generated Local Maps consisting of:
