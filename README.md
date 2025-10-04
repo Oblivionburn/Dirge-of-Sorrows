@@ -9,8 +9,8 @@
 - Auto-battler combat
   - 3x3 squad formations (position in the formation effects damage dealt and received)
   - No classes (characters are what they wear)
-- Randomly generated Worldmap with 20 locations progressively unlocked -- each location has a Local Map where battle takes place
-- Local Maps consist of:
+- Randomly generated Worldmap with 20 locations, progressively unlocked, with each location containing a Local Map where battle takes place
+- Randomly generated Local Maps consisting of:
   - 1 Player Base
   - 1 Enemy Base (capturing it completes a map)
   - At least 1 Market Town to purchase equipment
