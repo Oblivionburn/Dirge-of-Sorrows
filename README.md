@@ -39,7 +39,7 @@
 
 <br><br>
 ## <ins>Planned features not yet implemented</ins>:
-- More Story/Lore
+- More of the story
 - Side-quests for special armor/weapons
 - Finding hidden items in the world
 - More music for variety
