@@ -4,7 +4,7 @@
 # Current state: Playable Alpha
 >[!NOTE]
 >Releases will only be available on github up through Beta (v0.9.X.X) state of the game, but code changes will stay updated on here for those who wish to see the inner-workings of the game and/or to compile their own modded version.
->After 1.0 release, the game will need to be purchased on Steam to acquire needed media files (e.g. music, sounds, and textures).
+><br>After 1.0 release, the game will need to be purchased on Steam to acquire needed media files (e.g. music, sounds, and textures).
 
 <br><br>
 ## <ins>Features currently in the game</ins>:
