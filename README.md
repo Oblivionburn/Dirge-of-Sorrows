@@ -23,7 +23,7 @@
   - Intelligence - increases grimoire(magic) damage
   - Dexterity - increases hit chance with melee/bow weapons (magic always hits)
   - Agility - increases dodge chance
-  - Note: stat increase per Level is determined by equipped weapon
+  - Note: stat increases per Level happen automatically based on equipped weapon
 - Armor/Weapons that can be equipped on characters
 - 14 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), which also have XP/Level progression to increase their effectiveness over time
 - Intro of the story, which also serves as the tutorial for the game
