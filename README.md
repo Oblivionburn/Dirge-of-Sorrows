@@ -10,6 +10,7 @@
   - 3x3 squad formation - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
 - Randomly generated Worldmap with 20 battle locations to unlock that progress in size/difficulty
+  - Selecting a location takes you to a Local Map where battle takes place
 - Randomly generated Local Maps consisting of:
   - 1 Player Base
   - 1 Enemy Base (capturing it completes a map)
