@@ -107,6 +107,7 @@
     <Compile Include="Util\oPathing.cs" />
     <Compile Include="Util\RuneUtil.cs" />
     <Compile Include="Util\Save.cs" />
+    <Compile Include="Util\ShaderUtil.cs" />
     <Compile Include="Util\WorldGen.cs" />
     <Compile Include="Util\WorldUtil.cs" />
   </ItemGroup>

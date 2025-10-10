@@ -113,11 +113,11 @@ namespace DoS1.Menus
                             {
                                 if (character.Visible)
                                 {
-                                    Effect effect = AssetManager.Shaders["Grayscale"];
-                                    effect.Parameters["percent"].SetValue(0f);
+                                    Effect Grayscale = AssetManager.Shaders["Grayscale"];
+                                    Grayscale.Parameters["percent"].SetValue(0f);
 
                                     spriteBatch.End();
-                                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, effect, null);
+                                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, Grayscale, null);
 
                                     CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, Color.White);
 

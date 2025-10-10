@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-
-using Microsoft.Xna.Framework;
-
+﻿using Microsoft.Xna.Framework;
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -15,6 +9,10 @@ using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace DoS1.Util
 {
@@ -220,6 +218,21 @@ namespace DoS1.Util
 
         public static void ReturnToWorldmap()
         {
+            SoundManager.AmbientFade = 1;
+            SoundManager.StopAmbient();
+
+            foreach (Weather weather in WeatherManager.Weathers)
+            {
+                weather.TransitionTime = 0;
+                weather.ParticleManager.Particles.Clear();
+                weather.Visible = false;
+            }
+
+            WeatherManager.Transitioning = false;
+            WeatherManager.Lightning = false;
+            WeatherManager.TransitionType = WeatherTransition.None;
+            WeatherManager.CurrentWeather = WeatherType.Clear;
+
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
 
             Handler.LocalMap = false;
@@ -498,7 +511,9 @@ namespace DoS1.Util
 
         public static void Alert_Location(Map map, Layer ground, Squad squad, Tile location)
         {
-            LocalPause();
+            Toggle_Pause(false);
+
+            Squad hero_squad = ArmyUtil.Get_Squad(Handler.GetHero());
 
             Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "Location";
@@ -543,8 +558,6 @@ namespace DoS1.Util
                 WorldUtil.ChangeLocation(location, squad);
             }
 
-            WorldUtil.CameraToTile(map, ground, location);
-
             string message;
             if (liberated)
             {
@@ -573,7 +586,14 @@ namespace DoS1.Util
             }
             else if (is_base)
             {
-                message += " This is our current base of operations. We could retreat inside to deploy again later.";
+                if (hero_squad.ID != squad.ID)
+                {
+                    message += " This is our current base of operations. We could retreat inside to deploy again later.";
+                }
+                else
+                {
+                    message += " This is our current base of operations.";
+                }
             }
 
             message += "\"";
@@ -594,22 +614,44 @@ namespace DoS1.Util
 
             if (!captured_enemy_base)
             {
-                if (is_base)
+                if (hero_squad.ID != squad.ID)
                 {
-                    Button option1 = alerts.GetButton("Dialogue_Option1");
-                    option1.Text = "[Retreat]";
-                    option1.Visible = true;
+                    if (is_base)
+                    {
+                        Button option1 = alerts.GetButton("Dialogue_Option1");
+                        option1.Text = "[Retreat]";
+                        option1.Visible = true;
+                    }
+                    else
+                    {
+                        Button option1 = alerts.GetButton("Dialogue_Option1");
+                        option1.Text = "[Enter Town]";
+                        option1.Visible = true;
+                    }
+
+                    Button option2 = alerts.GetButton("Dialogue_Option2");
+                    option2.Text = "[Continue]";
+                    option2.Visible = true;
                 }
                 else
                 {
-                    Button option1 = alerts.GetButton("Dialogue_Option1");
-                    option1.Text = "[Enter Town]";
-                    option1.Visible = true;
-                }
+                    if (!is_base)
+                    {
+                        Button option1 = alerts.GetButton("Dialogue_Option1");
+                        option1.Text = "[Enter Town]";
+                        option1.Visible = true;
 
-                Button option2 = alerts.GetButton("Dialogue_Option2");
-                option2.Text = "[Continue]";
-                option2.Visible = true;
+                        Button option2 = alerts.GetButton("Dialogue_Option2");
+                        option2.Text = "[Continue]";
+                        option2.Visible = true;
+                    }
+                    else
+                    {
+                        Button option1 = alerts.GetButton("Dialogue_Option1");
+                        option1.Text = "[Continue]";
+                        option1.Visible = true;
+                    }
+                }
             }
             else
             {
@@ -630,9 +672,10 @@ namespace DoS1.Util
             }
         }
 
-        public static void Alert_MoveFinished(Squad squad)
+        public static void Alert_MoveFinished(Map map, Layer ground, Squad squad, Tile location)
         {
-            LocalPause();
+            Toggle_Pause(false);
+            WorldUtil.CameraToTile(map, ground, location);
 
             Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "MoveFinished";
@@ -654,8 +697,12 @@ namespace DoS1.Util
             picture.Visible = true;
 
             Button option1 = alerts.GetButton("Dialogue_Option1");
-            option1.Text = "[Continue]";
+            option1.Text = "[Hold Position]";
             option1.Visible = true;
+
+            Button option2 = alerts.GetButton("Dialogue_Option2");
+            option2.Text = "[Continue Moving]";
+            option2.Visible = true;
         }
 
         public static void Alert_Capture(Map map, Layer ground, Tile location)
@@ -695,6 +742,32 @@ namespace DoS1.Util
             {
                 option1.Text = "[Continue]";
             }
+        }
+
+        public static void Alert_Tutorial()
+        {
+            LocalPause();
+
+            Handler.AlertType = "Tutorial";
+
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
+
+            Label dialogue_name = alerts.GetLabel("Dialogue_Name");
+            dialogue_name.Visible = true;
+            dialogue_name.Text = "System";
+
+            Label dialogue = alerts.GetLabel("Dialogue");
+            dialogue.Visible = true;
+            dialogue.Text = "Enable Tutorial?";
+
+            Button option1 = alerts.GetButton("Dialogue_Option1");
+            option1.Text = "[Yes - Start Tutorial]";
+            option1.Visible = true;
+
+            Button option2 = alerts.GetButton("Dialogue_Option2");
+            option2.Text = "[No - Skip Tutorial]";
+            option2.Visible = true;
         }
 
         public static void Alert_Story()

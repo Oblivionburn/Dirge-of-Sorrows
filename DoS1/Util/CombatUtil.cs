@@ -1267,7 +1267,7 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Fire"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                            Color.White * 0.8f, true);
                     break;
 
                 case "Lightning":
@@ -1275,7 +1275,7 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                            Color.White * 0.8f, true);
                     break;
 
                 case "Earth":

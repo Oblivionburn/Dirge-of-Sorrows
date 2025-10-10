@@ -27,6 +27,7 @@ namespace DoS1.Menus
         List<Item> ItemList = new List<Item>();
 
         bool moving;
+        Item movingItem = null;
         Rectangle starting_pos;
 
         int width;
@@ -120,7 +121,12 @@ namespace DoS1.Menus
                     {
                         if (item.Icon_Visible)
                         {
-                            item.Draw(spriteBatch, Main.Game.Resolution, Color.White);
+                            if ((movingItem != null &&
+                                item.ID != movingItem.ID) ||
+                                movingItem == null)
+                            {
+                                item.Draw(spriteBatch, Main.Game.Resolution, Color.White);
+                            }
                         }
                     }
                 }
@@ -143,19 +149,38 @@ namespace DoS1.Menus
                 {
                     label.Draw(spriteBatch);
                 }
+
+                if (movingItem != null)
+                {
+                    movingItem.Draw(spriteBatch, Main.Game.Resolution, Color.White);
+                }
             }
         }
 
         private void UpdateControls()
         {
-            bool found_button = HoveringButton();
-            bool found_stat = HoveringStat();
-            bool found_grid = HoveringGrid();
+            bool found_grid = false;
+            if (!Handler.ViewOnly_Character)
+            {
+                found_grid = HoveringGrid();
+            }
+
+            bool found_button = false;
+            if (!moving)
+            {
+                found_button = HoveringButton();
+            }
 
             bool found_item = false;
             if (!moving)
             {
                 found_item = HoveringItem();
+            }
+
+            bool found_stat = false;
+            if (!moving)
+            {
+                found_stat = HoveringStat();
             }
 
             bool found_helm = HoveringSlot("Helm");
@@ -329,7 +354,7 @@ namespace DoS1.Menus
                                 {
                                     moving = true;
                                     starting_pos = item.Icon_Region.ToRectangle;
-                                    Handler.Selected_Item = item.ID;
+                                    movingItem = item;
                                 }
                                     
                                 break;
@@ -383,7 +408,7 @@ namespace DoS1.Menus
                                 {
                                     moving = true;
                                     starting_pos = item.Icon_Region.ToRectangle;
-                                    Handler.Selected_Item = item.ID;
+                                    movingItem = item;
                                 }
 
                                 break;
@@ -463,89 +488,62 @@ namespace DoS1.Menus
             Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)
             {
-                Item item = null;
-                bool equipped = false;
-
-                foreach (Item existing in inventory.Items)
+                if (InputManager.Mouse_LB_Held)
                 {
-                    if (existing.ID == Handler.Selected_Item)
-                    {
-                        item = existing;
-                        break;
-                    }
+                    movingItem.Icon_Region = new Region(InputManager.Mouse.X - (width / 2), InputManager.Mouse.Y - (height / 2), width, height);
                 }
-
-                if (item == null)
+                else
                 {
-                    foreach (Item existing in character.Inventory.Items)
+                    moving = false;
+
+                    if (!movingItem.Equipped)
                     {
-                        if (existing.ID == Handler.Selected_Item &&
-                            existing.Equipped)
+                        bool found_helm = HoveringSlot("Helm");
+                        bool found_armor = HoveringSlot("Armor");
+                        bool found_shield = HoveringSlot("Shield");
+                        bool found_weapon = HoveringSlot("Weapon");
+
+                        if (!found_helm &&
+                            !found_armor &&
+                            !found_shield &&
+                            !found_weapon)
                         {
-                            equipped = true;
-                            item = existing;
-                            break;
+                            movingItem.Icon_Region = new Region(starting_pos.X, starting_pos.Y, starting_pos.Width, starting_pos.Height);
                         }
-                    }
-                }
-
-                if (item != null)
-                {
-                    if (InputManager.Mouse_LB_Held)
-                    {
-                        item.Icon_Region = new Region(InputManager.Mouse.X - (width / 2), InputManager.Mouse.Y - (height / 2), width, height);
-                    }
-                    else
-                    {
-                        moving = false;
-
-                        if (!equipped)
+                        else if ((found_helm && movingItem.Type == "Helm") ||
+                                 (found_armor && movingItem.Type == "Armor") ||
+                                 (found_shield && movingItem.Type == "Shield") ||
+                                 (found_weapon && movingItem.Type == "Weapon"))
                         {
-                            bool found_helm = HoveringSlot("Helm");
-                            bool found_armor = HoveringSlot("Armor");
-                            bool found_shield = HoveringSlot("Shield");
-                            bool found_weapon = HoveringSlot("Weapon");
-
-                            if (!found_helm &&
-                                !found_armor &&
-                                !found_shield &&
-                                !found_weapon)
+                            Item equipped_item = InventoryUtil.Get_EquippedItem(character, movingItem.Type);
+                            if (equipped_item != null)
                             {
-                                item.Icon_Region = new Region(starting_pos.X, starting_pos.Y, starting_pos.Width, starting_pos.Height);
-                            }
-                            else if ((found_helm && item.Type == "Helm") ||
-                                     (found_armor && item.Type == "Armor") ||
-                                     (found_shield && item.Type == "Shield") ||
-                                     (found_weapon && item.Type == "Weapon"))
-                            {
-                                Item equipped_item = InventoryUtil.Get_EquippedItem(character, item.Type);
-                                if (equipped_item != null)
-                                {
-                                    SwapItems(inventory, item, equipped_item);
-                                }
-                                else
-                                {
-                                    EquipItem(inventory, item);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            bool found_grid = HoveringGrid();
-                            if (!found_grid)
-                            {
-                                item.Icon_Region = new Region(starting_pos.X, starting_pos.Y, starting_pos.Width, starting_pos.Height);
+                                SwapItems(inventory, movingItem, equipped_item);
                             }
                             else
                             {
-                                UnequipItem(inventory, item);
+                                EquipItem(inventory, movingItem);
                             }
                         }
-
-                        Filter(Handler.ItemFilter);
-                        LoadCharacter();
-                        ResizeInventory();
                     }
+                    else
+                    {
+                        bool found_grid = HoveringGrid();
+                        if (!found_grid)
+                        {
+                            movingItem.Icon_Region = new Region(starting_pos.X, starting_pos.Y, starting_pos.Width, starting_pos.Height);
+                        }
+                        else
+                        {
+                            UnequipItem(inventory, movingItem);
+                        }
+                    }
+
+                    Filter(Handler.ItemFilter);
+                    LoadCharacter();
+                    ResizeInventory();
+
+                    movingItem = null;
                 }
             }
         }

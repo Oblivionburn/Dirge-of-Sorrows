@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,12 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
-using OP_Engine.Tiles;
-using OP_Engine.Utility;
 using OP_Engine.Menus;
-using OP_Engine.Weathers;
 using OP_Engine.Particles;
 using OP_Engine.Scenes;
+using OP_Engine.Tiles;
+using OP_Engine.Utility;
+using OP_Engine.Weathers;
 
 namespace DoS1.Util
 {
@@ -81,7 +81,18 @@ namespace DoS1.Util
 
                     if (current == null)
                     {
-                        current = ground.GetTile(new Vector2(ground.Columns / 2, ground.Rows / 2));
+                        int x = Main.Game.ScreenWidth / 2;
+                        int y = Main.Game.ScreenHeight / 2;
+
+                        foreach (Tile tile in ground.Tiles)
+                        {
+                            if (x >= tile.Region.X && x < tile.Region.X + tile.Region.Width &&
+                                y >= tile.Region.Y && y < tile.Region.Y + tile.Region.Height)
+                            {
+                                current = tile;
+                                break;
+                            }
+                        }
                     }
 
                     if (current != null)
@@ -208,7 +219,7 @@ namespace DoS1.Util
             if (target != null)
             {
                 target.Region.X = Main.Game.Resolution.X / 2 - (Main.Game.TileSize.X / 2);
-                target.Region.Y = Main.Game.Resolution.Y / 2 - (Main.Game.TileSize.Y / 2);
+                target.Region.Y = Main.Game.Resolution.Y / 2 + (Main.Game.TileSize.Y / 2);
 
                 ResizeMap(map, ground, target, false);
             }
@@ -221,45 +232,48 @@ namespace DoS1.Util
 
             foreach (Tile tile in ground.Tiles)
             {
-                int x_diff = (int)tile.Location.X - (int)current.Location.X;
-                if (x_diff < 0)
+                if (tile.ID != current.ID)
                 {
-                    x_diff *= -1;
-                }
+                    int x_diff = (int)tile.Location.X - (int)current.Location.X;
+                    if (x_diff < 0)
+                    {
+                        x_diff *= -1;
+                    }
 
-                int y_diff = (int)tile.Location.Y - (int)current.Location.Y;
-                if (y_diff < 0)
-                {
-                    y_diff *= -1;
-                }
+                    int y_diff = (int)tile.Location.Y - (int)current.Location.Y;
+                    if (y_diff < 0)
+                    {
+                        y_diff *= -1;
+                    }
 
-                tile.Region.Width = Main.Game.TileSize.X;
-                tile.Region.Height = Main.Game.TileSize.Y;
+                    tile.Region.Width = Main.Game.TileSize.X;
+                    tile.Region.Height = Main.Game.TileSize.Y;
 
-                if (tile.Location.X < current.Location.X)
-                {
-                    tile.Region.X = current.Region.X - (x_diff * Main.Game.TileSize.X);
-                }
-                else if (tile.Location.X > current.Location.X)
-                {
-                    tile.Region.X = current.Region.X + (x_diff * Main.Game.TileSize.X);
-                }
-                else if (tile.Location.X == current.Location.X)
-                {
-                    tile.Region.X = current.Region.X;
-                }
+                    if (tile.Location.X < current.Location.X)
+                    {
+                        tile.Region.X = current.Region.X - (x_diff * Main.Game.TileSize.X);
+                    }
+                    else if (tile.Location.X > current.Location.X)
+                    {
+                        tile.Region.X = current.Region.X + (x_diff * Main.Game.TileSize.X);
+                    }
+                    else if (tile.Location.X == current.Location.X)
+                    {
+                        tile.Region.X = current.Region.X;
+                    }
 
-                if (tile.Location.Y < current.Location.Y)
-                {
-                    tile.Region.Y = current.Region.Y - (y_diff * Main.Game.TileSize.Y);
-                }
-                else if (tile.Location.Y > current.Location.Y)
-                {
-                    tile.Region.Y = current.Region.Y + (y_diff * Main.Game.TileSize.Y);
-                }
-                else if (tile.Location.Y == current.Location.Y)
-                {
-                    tile.Region.Y = current.Region.Y;
+                    if (tile.Location.Y < current.Location.Y)
+                    {
+                        tile.Region.Y = current.Region.Y - (y_diff * Main.Game.TileSize.Y);
+                    }
+                    else if (tile.Location.Y > current.Location.Y)
+                    {
+                        tile.Region.Y = current.Region.Y + (y_diff * Main.Game.TileSize.Y);
+                    }
+                    else if (tile.Location.Y == current.Location.Y)
+                    {
+                        tile.Region.Y = current.Region.Y;
+                    }
                 }
             }
 
@@ -1317,6 +1331,7 @@ namespace DoS1.Util
                                             {
                                                 Layer locations = map.GetLayer("Locations");
                                                 Tile location_tile = locations.GetTile(new Vector3(squad.Destination.X, squad.Destination.Y, 0));
+                                                location = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
 
                                                 if (squad.Type == "Ally")
                                                 {
@@ -1324,7 +1339,7 @@ namespace DoS1.Util
                                                     {
                                                         if (Handler.StoryStep == 10)
                                                         {
-                                                            GameUtil.LocalPause();
+                                                            GameUtil.Toggle_Pause(false);
                                                             MenuManager.ChangeMenu("Market");
                                                         }
                                                         else if (Handler.StoryStep == 21)
@@ -1334,23 +1349,70 @@ namespace DoS1.Util
                                                         }
                                                         else if (Handler.StoryStep > 48)
                                                         {
+                                                            CameraToTile(map, ground, location);
                                                             GameUtil.Alert_Location(map, ground, squad, location_tile);
                                                         }
                                                     }
                                                     else if (Handler.StoryStep > 48)
                                                     {
-                                                        GameUtil.Alert_MoveFinished(squad);
+                                                        GameUtil.Alert_MoveFinished(map, ground, squad, location);
                                                     }
                                                 }
                                                 else if (squad.Type == "Enemy")
                                                 {
+                                                    CryptoRandom random = new CryptoRandom();
+                                                    bool new_choice = false;
+
                                                     if (location_tile != null)
                                                     {
                                                         GameUtil.Alert_Capture(map, ground, location_tile);
                                                         ChangeLocation(location_tile, squad);
+
+                                                        if (squad.Assignment == "Guard Nearest Town")
+                                                        {
+                                                            int choice = random.Next(0, 2);
+                                                            if (choice == 0)
+                                                            {
+                                                                squad.Assignment = "Sleeper";
+                                                                AI_Util.Set_NextTarget(map, ground, army, squad);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            new_choice = true;
+                                                        }
                                                     }
-                                                    else if (squad.Assignment != "Guard Base")
+                                                    else
                                                     {
+                                                        new_choice = true;
+                                                    }
+
+                                                    if (new_choice)
+                                                    {
+                                                        int choice = random.Next(0, 5);
+                                                        switch (choice)
+                                                        {
+                                                            case 0:
+                                                                squad.Assignment = "Attack Base";
+                                                                break;
+
+                                                            case 1:
+                                                                squad.Assignment = "Capture Nearest Town";
+                                                                break;
+
+                                                            case 2:
+                                                                squad.Assignment = "Guard Nearest Town";
+                                                                break;
+
+                                                            case 3:
+                                                                squad.Assignment = "Attack Nearest Squad";
+                                                                break;
+
+                                                            case 4:
+                                                                squad.Assignment = "Sleeper";
+                                                                break;
+                                                        }
+
                                                         AI_Util.Set_NextTarget(map, ground, army, squad);
                                                     }
                                                 }
@@ -1433,6 +1495,22 @@ namespace DoS1.Util
             {
                 Handler.Gold += gold;
                 GameUtil.Alert_Generic("Gold +" + gold, Color.Gold);
+            }
+        }
+
+        public static void EnterTown(string type)
+        {
+            if (type.Contains("Market"))
+            {
+                MenuManager.ChangeMenu("Market");
+            }
+            else if (type.Contains("Academy"))
+            {
+                MenuManager.ChangeMenu("Academy");
+            }
+            else
+            {
+                //Lore
             }
         }
 

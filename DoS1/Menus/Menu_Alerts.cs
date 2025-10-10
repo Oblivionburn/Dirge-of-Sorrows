@@ -1,8 +1,7 @@
-﻿using DoS1.Util;
-using FMOD;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -11,6 +10,8 @@ using OP_Engine.Scenes;
 using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
+
+using DoS1.Util;
 
 namespace DoS1.Menus
 {
@@ -244,7 +245,7 @@ namespace DoS1.Menus
                     if (Handler.StoryStep == 38 ||
                         Handler.StoryStep == 50)
                     {
-                        combat.Menu.GetButton("Retreat").Enabled = false;
+                        combat.Menu.GetButton("Retreat").Visible = false;
                         GameUtil.Toggle_Pause_Combat(false);
                     }
 
@@ -263,13 +264,19 @@ namespace DoS1.Menus
                 }
                 else if (button.Text == "[Retreat]")
                 {
-                    Undeploy();
+                    ArmyUtil.Undeploy();
                     Close();
                     GameUtil.Toggle_Pause(false);
                 }
                 else if (button.Text == "[Claim Region]")
                 {
                     UnlockNextLocation();
+                    Close();
+                    GameUtil.Toggle_Pause(false);
+                }
+                else if (button.Text == "[Yes - Start Tutorial]")
+                {
+                    Handler.StoryStep = 0;
                     Close();
                     GameUtil.Toggle_Pause(false);
                 }
@@ -296,6 +303,11 @@ namespace DoS1.Menus
                     Close();
                     GameUtil.ReturnToWorldmap();
                 }
+                else if (button.Text == "[Hold Position]")
+                {
+                    GameUtil.Toggle_Pause(false);
+                    Close();
+                }
             }
             else if (button.Name == "Dialogue_Option2")
             {
@@ -303,6 +315,27 @@ namespace DoS1.Menus
                 {
                     Close();
                     GameUtil.Toggle_Pause(false);
+                }
+                else if (button.Text == "[No - Skip Tutorial]")
+                {
+                    Handler.StoryStep = 56;
+                    InventoryUtil.BeginningInventory();
+                    Close();
+                    GameUtil.Toggle_Pause(false);
+                }
+                else if (button.Text == "[Continue Moving]")
+                {
+                    Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
+                    Handler.Selected_Token = squad.ID;
+
+                    Menu ui = MenuManager.GetMenu("UI");
+                    Picture highlight = ui.GetPicture("Highlight");
+                    highlight.Region = squad.Region;
+                    highlight.Visible = true;
+                    highlight.DrawColor = new Color(0, 0, 255, 255);
+                    highlight.Texture = AssetManager.Textures["Highlight_Circle"];
+
+                    Close();
                 }
             }
             else if (button.Name == "Dialogue_Option3")
@@ -350,27 +383,13 @@ namespace DoS1.Menus
 
             Close();
 
-            if (type == "Market")
-            {
-                MenuManager.ChangeMenu("Market");
-            }
-            else if (type == "Academy")
-            {
-                MenuManager.ChangeMenu("Academy");
-            }
-            else
+            if (type == "Town")
             {
                 GameUtil.Toggle_Pause(false);
             }
-        }
-
-        private void Undeploy()
-        {
-            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
-            if (squad != null)
+            else
             {
-                squad.Visible = false;
-                squad.Active = false;
+                WorldUtil.EnterTown(type);
             }
         }
 

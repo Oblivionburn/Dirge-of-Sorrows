@@ -131,26 +131,28 @@ namespace DoS1.Util
                 else
                 {
                     CryptoRandom random = new CryptoRandom();
-                    int task = random.Next(0, 5);
-                    if (task == 0)
+                    int choice = random.Next(0, 5);
+                    switch (choice)
                     {
-                        enemy_squad.Assignment = "Attack Base";
-                    }
-                    else if (task == 1)
-                    {
-                        enemy_squad.Assignment = "Capture Nearest Town";
-                    }
-                    else if (task == 2)
-                    {
-                        enemy_squad.Assignment = "Guard Nearest Town";
-                    }
-                    else if (task == 3)
-                    {
-                        enemy_squad.Assignment = "Attack Nearest Squad";
-                    }
-                    else if (task == 4)
-                    {
-                        enemy_squad.Assignment = "Sleeper";
+                        case 0:
+                            enemy_squad.Assignment = "Attack Base";
+                            break;
+
+                        case 1:
+                            enemy_squad.Assignment = "Capture Nearest Town";
+                            break;
+
+                        case 2:
+                            enemy_squad.Assignment = "Guard Nearest Town";
+                            break;
+
+                        case 3:
+                            enemy_squad.Assignment = "Attack Nearest Squad";
+                            break;
+
+                        case 4:
+                            enemy_squad.Assignment = "Sleeper";
+                            break;
                     }
                 }
 
@@ -1062,6 +1064,16 @@ namespace DoS1.Util
                 menu.GetPicture("Highlight").DrawColor = new Color(255, 255, 255, 255);
 
                 pathing.Visible = false;
+            }
+        }
+
+        public static void Undeploy()
+        {
+            Squad squad = Get_Squad(Handler.Dialogue_Character2);
+            if (squad != null)
+            {
+                squad.Visible = false;
+                squad.Active = false;
             }
         }
 

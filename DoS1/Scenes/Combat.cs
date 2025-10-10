@@ -7,16 +7,16 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 using OP_Engine.Characters;
+using OP_Engine.Controls;
+using OP_Engine.Inputs;
+using OP_Engine.Inventories;
+using OP_Engine.Menus;
+using OP_Engine.Rendering;
 using OP_Engine.Scenes;
 using OP_Engine.Sounds;
 using OP_Engine.Tiles;
-using OP_Engine.Utility;
-using OP_Engine.Rendering;
 using OP_Engine.Time;
-using OP_Engine.Controls;
-using OP_Engine.Inventories;
-using OP_Engine.Inputs;
-using OP_Engine.Menus;
+using OP_Engine.Utility;
 using OP_Engine.Weathers;
 
 using DoS1.Util;
@@ -178,7 +178,7 @@ namespace DoS1.Scenes
                                     {
                                         received_damage = true;
                                         CharacterUtil.DrawCharacter(spriteBatch, character, damage.DrawColor);
-                                        damage.DrawColor = Color.Lerp(damage.DrawColor, color, 0.05f);
+                                        damage.DrawColor = Color.Lerp(damage.DrawColor, color, 0.025f);
                                     }
                                 }
 
@@ -219,7 +219,34 @@ namespace DoS1.Scenes
                     if (picture.Name == "Damage" ||
                         picture.Name == "Cast")
                     {
-                        picture.Draw(spriteBatch);
+                        if (picture.Texture.Name == "Lightning" ||
+                            picture.Texture.Name == "Fire" ||
+                            picture.Texture.Name == "Ice" ||
+                            picture.Texture.Name == "Heal" ||
+                            picture.Texture.Name == "Slash_Right" ||
+                            picture.Texture.Name == "Slash_Left" ||
+                            picture.Texture.Name == "Thump")
+                        {
+                            int radius = 2;
+                            if (picture.Texture.Name == "Fire")
+                            {
+                                radius = 5;
+                            }
+                            else if (picture.Texture.Name == "Ice" ||
+                                     picture.Texture.Name == "Heal" ||
+                                     picture.Texture.Name == "Slash_Right" ||
+                                     picture.Texture.Name == "Slash_Left" ||
+                                     picture.Texture.Name == "Thump")
+                            {
+                                radius = 1;
+                            }
+
+                            ShaderUtil.Apply_GaussianBlur(spriteBatch, radius, picture.Texture, picture.Region, picture.Image, picture.DrawColor, picture.Opacity);
+                        }
+                        else
+                        {
+                            spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
+                        }
                     }
                 }
 

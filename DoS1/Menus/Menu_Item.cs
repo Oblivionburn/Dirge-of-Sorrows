@@ -171,10 +171,25 @@ namespace DoS1.Menus
 
         private void UpdateControls()
         {
-            bool found_button = HoveringButton();
-            bool found_grid = HoveringGrid();
-            bool found_item = HoveringItem();
             bool found_slot = HoveringSlot();
+
+            bool found_grid = false;
+            if (!Handler.ViewOnly_Item)
+            {
+                found_grid = HoveringGrid();
+            }
+
+            bool found_button = false;
+            if (!moving)
+            {
+                found_button = HoveringButton();
+            }
+
+            bool found_item = false;
+            if (!moving)
+            {
+                found_item = HoveringItem();
+            }
 
             if (!found_grid &&
                 !found_slot)

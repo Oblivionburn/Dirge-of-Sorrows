@@ -29,7 +29,7 @@ namespace DoS1
         public static int Gold = 1000;
         public static long MainCharacter_ID;
         public static string AlertType;
-        public static int StoryStep;
+        public static int StoryStep = -1;
 
         public static bool Loaded;
         public static int Loading_Step;
