@@ -627,16 +627,7 @@ namespace DoS1.Util
                 {
                     case "CharacterProperties":
                         character = new Character();
-
-                        int xp = 10;
-                        for (int i = 2; i <= 100; i++)
-                        {
-                            character.XP_Needed_ForLevels.Add(i, xp);
-                            xp += 2;
-                        }
-
                         VisitCharacter(reader, character);
-
                         squad.Characters.Add(character);
                         break;
 
@@ -675,6 +666,10 @@ namespace DoS1.Util
 
                     case "Level":
                         character.Level = int.Parse(reader.Value);
+                        break;
+
+                    case "XP":
+                        character.XP = int.Parse(reader.Value);
                         break;
 
                     case "Texture":

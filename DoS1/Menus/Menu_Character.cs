@@ -152,7 +152,7 @@ namespace DoS1.Menus
 
                 if (movingItem != null)
                 {
-                    movingItem.Draw(spriteBatch, Main.Game.Resolution, Color.White);
+                    spriteBatch.Draw(movingItem.Icon, movingItem.Icon_Region.ToRectangle, movingItem.Icon_Image, Color.White);
                 }
             }
         }
@@ -1296,7 +1296,7 @@ namespace DoS1.Menus
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label xp = GetLabel("XP");
                 xp.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
-                xp.Text = "EXP: " + character.XP + "/" + character.XP_Needed_ForLevels[character.Level + 1];
+                xp.Text = "EXP: " + character.XP + "/" + Handler.XP_Needed_ForLevels[character.Level + 1];
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label strength = GetLabel("STR");

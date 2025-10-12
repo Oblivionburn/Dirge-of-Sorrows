@@ -117,6 +117,7 @@ namespace DoS1
         public static string Selected_Save;
 
         public static oPathing Pathing = new oPathing();
+        public static Dictionary<int, int> XP_Needed_ForLevels = new Dictionary<int, int>();
 
         #endregion
 
@@ -135,6 +136,13 @@ namespace DoS1
 
         public static void Init(Game game)
         {
+            int xp = 10;
+            for (int i = 2; i <= 100; i++)
+            {
+                XP_Needed_ForLevels.Add(i, xp);
+                xp += 2;
+            }
+
             AssetManager.Init(game, Environment.CurrentDirectory + @"\Content");
 
             Load_Init();

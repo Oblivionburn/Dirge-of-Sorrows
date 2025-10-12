@@ -1050,8 +1050,7 @@ namespace DoS1.Scenes
                             {
                                 if (target.Type == "Enemy")
                                 {
-                                    gold += 100;
-                                    xp += 2;
+                                    Reward();
                                 }
                                 else if (target.ID == Handler.MainCharacter_ID)
                                 {
@@ -1098,8 +1097,7 @@ namespace DoS1.Scenes
                                 {
                                     if (target.Type == "Enemy")
                                     {
-                                        gold += 100;
-                                        xp += 2;
+                                        Reward();
                                     }
                                     else if (target.ID == Handler.MainCharacter_ID)
                                     {
@@ -1172,8 +1170,7 @@ namespace DoS1.Scenes
                                             {
                                                 if (target.Type == "Enemy")
                                                 {
-                                                    gold += 100;
-                                                    xp += 2;
+                                                    Reward();
                                                 }
                                                 else if (target.ID == Handler.MainCharacter_ID)
                                                 {
@@ -1227,8 +1224,7 @@ namespace DoS1.Scenes
                         {
                             if (target.Type == "Enemy")
                             {
-                                gold += 100;
-                                xp += 2;
+                                Reward();
                             }
                             else if (target.ID == Handler.MainCharacter_ID)
                             {
@@ -1799,6 +1795,12 @@ namespace DoS1.Scenes
             button.Visible = true;
 
             ResetCombat_Final();
+        }
+
+        private void Reward()
+        {
+            gold += 200;
+            xp += 2;
         }
 
         private void Leave()

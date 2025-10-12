@@ -144,26 +144,12 @@ namespace DoS1
                                     Handler.Combat)
                                 {
                                     LostFocus = true;
+                                    TimeManager.Paused = true;
+                                    SoundManager.AmbientPaused = true;
 
                                     if (Handler.Combat)
                                     {
                                         GameUtil.Toggle_Pause_Combat(false);
-                                    }
-                                    else if (!TimeManager.Paused)
-                                    {
-                                        SoundManager.AmbientPaused = true;
-
-                                        OP_Engine.Menus.Menu alerts = MenuManager.GetMenu("Alerts");
-
-                                        OP_Engine.Menus.Menu currentMenu = MenuManager.GetCurrentMenu();
-                                        if (currentMenu.Name != "Army" &&
-                                            currentMenu.Name != "Squad" &&
-                                            currentMenu.Name != "Character" &&
-                                            currentMenu.Name != "Item" &&
-                                            !alerts.Visible)
-                                        {
-                                            TimeManager.Paused = true;
-                                        }
                                     }
                                 }
                             }
@@ -175,14 +161,12 @@ namespace DoS1
                             if (LostFocus)
                             {
                                 LostFocus = false;
+                                TimeManager.Paused = false;
+                                SoundManager.AmbientPaused = false;
 
                                 if (Handler.Combat)
                                 {
                                     GameUtil.Toggle_Pause_Combat(false);
-                                }
-                                else
-                                {
-                                    TimeManager.Paused = false;
                                 }
                             }
 

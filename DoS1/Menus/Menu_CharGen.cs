@@ -593,14 +593,8 @@ namespace DoS1.Menus
             Squad squad = army.Squads[0];
             squad.Name = LeaderName;
 
-            if (Gender == 0)
-            {
-                leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles_Male[HairStyle], HairColors[HairColor], Handler.HeadStyles_Male[Head], EyeColors[EyeColor], Handler.SkinTones[Skin], "Male");
-            }
-            else
-            {
-                leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), Handler.HairStyles_Female[HairStyle], HairColors[HairColor], Handler.HeadStyles_Female[Head], EyeColors[EyeColor], Handler.SkinTones[Skin], "Female");
-            }
+            leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), "Ally", Direction.Left, Handler.HairStyles_Male[HairStyle], HairColors[HairColor],
+                Handler.HeadStyles_Male[Head], EyeColors[EyeColor], Handler.SkinTones[Skin], Gender == 0 ? "Male" : "Female");
 
             squad.Characters.Add(leader);
             squad.Leader_ID = leader.ID;

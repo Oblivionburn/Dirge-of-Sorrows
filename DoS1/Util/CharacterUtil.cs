@@ -12,74 +12,68 @@ namespace DoS1.Util
 {
     public static class CharacterUtil
     {
-        public static Character NewCharacter(string name, Vector2 formation, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor, string gender)
+        public static Character NewCharacter(string name, Vector2 formation, string type, Direction direction, string hairStyle, string hairColor, string headStyle, string eyeColor, string skinColor, string gender)
         {
-            Character character = new Character();
-            character.ID = Handler.GetID();
-            character.Name = name;
-            character.Gender = gender;
-            character.Level = 1;
-            character.Animator.Frames = 4;
-            character.Formation = new Vector2(formation.X, formation.Y);
-            character.Type = "Ally";
-            character.Direction = Direction.Left;
-            character.Texture = AssetManager.Textures[character.Direction.ToString() + "_Body_" + skinColor + "_Idle"];
-            character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
-
-            int xp = 10;
-            for (int i = 2; i <= 100; i++)
+            Character character = new Character
             {
-                character.XP_Needed_ForLevels.Add(i, xp);
-                xp += 2;
-            }
+                ID = Handler.GetID(),
+                Name = name,
+                Gender = gender,
+                Level = 1,
+                Formation = new Vector2(formation.X, formation.Y),
+                Type = type,
+                Direction = direction,
+                Texture = AssetManager.Textures[direction.ToString() + "_Body_" + skinColor + "_Idle"]
+            };
+            character.Animator.Frames = 4;
+            character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
+            character.Inventory.Name = name;
 
             character.Stats.Add(new Something { Name = "STR", Value = 10, Max_Value = 100 });
             character.Stats.Add(new Something { Name = "INT", Value = 10, Max_Value = 100 });
             character.Stats.Add(new Something { Name = "DEX", Value = 10, Max_Value = 100 });
             character.Stats.Add(new Something { Name = "AGI", Value = 10, Max_Value = 100 });
 
-            character.Inventory.Name = name;
+            character.Inventory.Items.Add(new Item
+            {
+                ID = Handler.GetID(),
+                Name = "Head",
+                Type = "Head",
+                Location = new Location(),
+                Equipped = true,
+                Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + gender + "_" + headStyle],
+                Image = character.Image,
+                DrawColor = Color.White,
+                Visible = true
+            });
 
-            //Add head
-            Item item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Head";
-            item.Type = "Head";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + gender + "_" + headStyle];
-            item.Image = character.Image;
-            item.DrawColor = Color.White;
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
+            character.Inventory.Items.Add(new Item
+            {
+                ID = Handler.GetID(),
+                Name = "Eyes",
+                Type = "Eyes",
+                Location = new Location(),
+                Equipped = true,
+                Texture = AssetManager.Textures[character.Direction.ToString() + "_Eye"],
+                Image = character.Image,
+                DrawColor = Handler.EyeColors[eyeColor],
+                Visible = true
+            });
 
-            //Add eyes
-            item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Eyes";
-            item.Type = "Eyes";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
-            item.Image = character.Image;
-            item.DrawColor = Handler.EyeColors[eyeColor];
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            //Add hair
             if (hairStyle != "Bald")
             {
-                item = new Item();
-                item.ID = Handler.GetID();
-                item.Name = "Hair";
-                item.Type = "Hair";
-                item.Location = new Location();
-                item.Equipped = true;
-                item.DrawColor = Handler.HairColors[hairColor];
-                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + gender + "_" + hairStyle];
-                item.Image = character.Image;
-                item.Visible = true;
-                character.Inventory.Items.Add(item);
+                character.Inventory.Items.Add(new Item
+                {
+                    ID = Handler.GetID(),
+                    Name = "Hair",
+                    Type = "Hair",
+                    Location = new Location(),
+                    Equipped = true,
+                    DrawColor = Handler.HairColors[hairColor],
+                    Texture = AssetManager.Textures[character.Direction.ToString() + "_" + gender + "_" + hairStyle],
+                    Image = character.Image,
+                    Visible = true
+                });
             }
 
             character.HealthBar.Base_Texture = AssetManager.Textures["ProgressBase"];
@@ -115,56 +109,14 @@ namespace DoS1.Util
                 name = CharacterManager.FirstNames_Female[random.Next(0, CharacterManager.FirstNames_Female.Count)];
             }
 
-            Character character = new Character();
-            character.ID = Handler.GetID();
-            character.Name = name;
-            character.Level = 1;
-            character.Animator.Frames = 4;
-            character.Formation = new Vector2(formation.X, formation.Y);
-
+            string headStyle;
             if (gender == 0)
             {
-                character.Gender = "Male";
+                headStyle = Handler.HeadStyles_Male[random.Next(0, Handler.HeadStyles_Male.Length)];
             }
             else
             {
-                character.Gender = "Female";
-            }
-
-            int xp = 10;
-            for (int i = 2; i <= 100; i++)
-            {
-                character.XP_Needed_ForLevels.Add(i, xp);
-                xp += 2;
-            }
-
-            character.Stats.Add(new Something { Name = "STR", Value = 10, Max_Value = 100 });
-            character.Stats.Add(new Something { Name = "INT", Value = 10, Max_Value = 100 });
-            character.Stats.Add(new Something { Name = "DEX", Value = 10, Max_Value = 100 });
-            character.Stats.Add(new Something { Name = "AGI", Value = 10, Max_Value = 100 });
-
-            if (enemy)
-            {
-                character.Type = "Enemy";
-                character.Direction = Direction.Right;
-            }
-            else
-            {
-                character.Type = "Ally";
-                character.Direction = Direction.Left;
-            }
-
-            string direction = character.Direction.ToString();
-            string skin_tone = Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)];
-
-            string head_style;
-            if (gender == 0)
-            {
-                head_style = Handler.HeadStyles_Male[random.Next(0, Handler.HeadStyles_Male.Length)];
-            }
-            else
-            {
-                head_style = Handler.HeadStyles_Female[random.Next(0, Handler.HeadStyles_Female.Length)];
+                headStyle = Handler.HeadStyles_Female[random.Next(0, Handler.HeadStyles_Female.Length)];
             }
 
             string hairStyle;
@@ -177,72 +129,12 @@ namespace DoS1.Util
                 hairStyle = Handler.HairStyles_Female[random.Next(0, Handler.HairStyles_Female.Length)];
             }
 
-            Color hair_color = Handler.HairColors.ElementAt(random.Next(0, 6)).Value;
-            Color eye_color = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Value;
+            string hairColor = Handler.HairColors.ElementAt(random.Next(0, Handler.HairColors.Count)).Key;
+            string eyeColor = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Key;
+            string skinColor = Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)];
 
-            character.Texture = AssetManager.Textures[direction + "_Body_" + skin_tone + "_Idle"];
-            character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
-
-            character.Inventory.Name = name;
-
-            //Add head
-            Item item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Head";
-            item.Type = "Head";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[direction + "_" + skin_tone + "_" + character.Gender + "_" + head_style];
-            item.Image = character.Image;
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            //Add eyes
-            item = new Item();
-            item.ID = Handler.GetID();
-            item.Name = "Eyes";
-            item.Type = "Eyes";
-            item.Location = new Location();
-            item.Equipped = true;
-            item.Texture = AssetManager.Textures[direction + "_Eye"];
-            item.Image = character.Image;
-            item.DrawColor = eye_color;
-            item.Visible = true;
-            character.Inventory.Items.Add(item);
-
-            if (hairStyle != "Bald")
-            {
-                //Add hair
-                item = new Item();
-                item.ID = Handler.GetID();
-                item.Name = "Hair";
-                item.Type = "Hair";
-                item.Location = new Location();
-                item.Equipped = true;
-                item.DrawColor = hair_color;
-                item.Texture = AssetManager.Textures[direction + "_" + character.Gender + "_" + hairStyle];
-                item.Image = character.Image;
-                item.Visible = true;
-                character.Inventory.Items.Add(item);
-            }
-
-            character.HealthBar.Base_Texture = AssetManager.Textures["ProgressBase"];
-            character.HealthBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
-            character.HealthBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
-            character.HealthBar.DrawColor = Color.Red;
-            character.HealthBar.Max_Value = 100;
-            character.HealthBar.Value = 100;
-            character.HealthBar.Update();
-
-            character.ManaBar.Base_Texture = AssetManager.Textures["ProgressBase"];
-            character.ManaBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
-            character.ManaBar.Bar_Image = new Rectangle(0, 0, 0, character.HealthBar.Base_Texture.Height);
-            character.ManaBar.DrawColor = Color.Blue;
-            character.ManaBar.Max_Value = 100;
-            character.ManaBar.Value = 100;
-            character.ManaBar.Update();
-
-            return character;
+            return NewCharacter(name, formation, enemy ? "Enemy" : "Ally", enemy ? Direction.Right : Direction.Left, hairStyle, 
+                hairColor, headStyle, eyeColor, skinColor, gender == 0 ? "Male" : "Female");
         }
 
         public static void DrawCharacter(SpriteBatch spriteBatch, Character character, Color color)
@@ -539,7 +431,7 @@ namespace DoS1.Util
                     character.XP++;
 
                     //Do we have enough XP to reach the next level?
-                    if (character.XP >= character.XP_Needed_ForLevels[character.Level + 1])
+                    if (character.XP >= Handler.XP_Needed_ForLevels[character.Level + 1])
                     {
                         levels_gained++;
                         Increase_Level(character);

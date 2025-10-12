@@ -533,6 +533,7 @@ namespace DoS1.Util
                 Writer.WriteAttributeString("Name", character.Name);
                 Writer.WriteAttributeString("Type", character.Type);
                 Writer.WriteAttributeString("Level", character.Level.ToString());
+                Writer.WriteAttributeString("XP", character.XP.ToString());
                 Writer.WriteAttributeString("Texture", character.Texture.Name);
                 Writer.WriteAttributeString("Formation", character.Formation.X.ToString() + "," + character.Formation.Y.ToString());
                 Writer.WriteAttributeString("Region", character.Region.X.ToString() + "," + character.Region.Y.ToString() + "," +
