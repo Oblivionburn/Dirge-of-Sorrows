@@ -156,7 +156,7 @@ namespace DoS1.Menus
             }
             else
             {
-                GetPicture("Arrow_Up").DrawColor = Color.White * 0.4f;
+                GetPicture("Arrow_Up").DrawColor = Color.White * 0f;
             }
 
             if (Handler.Saves.Count > 5 &&
@@ -166,7 +166,7 @@ namespace DoS1.Menus
             }
             else
             {
-                GetPicture("Arrow_Down").DrawColor = Color.White * 0.4f;
+                GetPicture("Arrow_Down").DrawColor = Color.White * 0f;
             }
 
             if (InputManager.KeyPressed("Esc"))
@@ -611,8 +611,8 @@ namespace DoS1.Menus
                             id = Handler.GetID(),
                             name = "Save" + i.ToString() + "_Delete",
                             hover_text = "Delete " + save,
-                            texture = AssetManager.Textures["Button_Remove"],
-                            texture_highlight = AssetManager.Textures["Button_Remove_Hover"],
+                            texture = AssetManager.Textures["Button_Trash"],
+                            texture_highlight = AssetManager.Textures["Button_Trash_Hover"],
                             region = new Region(0, 0, 0, 0),
                             draw_color = Color.White * 0.8f,
                             enabled = true,
@@ -632,8 +632,8 @@ namespace DoS1.Menus
             AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
 
             AddPicture(Handler.GetID(), "SaveList", AssetManager.Textures["Frame_Full"], new Region(0, 0, 0, 0), Color.White * 0.8f, true);
-            AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White * 0.4f, true);
-            AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White * 0.4f, true);
+            AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White * 0f, true);
+            AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White * 0f, true);
 
             AddButton(new ButtonOptions
             {

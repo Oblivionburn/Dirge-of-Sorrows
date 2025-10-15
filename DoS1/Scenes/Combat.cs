@@ -108,6 +108,7 @@ namespace DoS1.Scenes
                     }
 
                     AnimateMouseClick();
+                    AnimateCharacters();
                     UpdateGrids();
                 }
 
@@ -223,22 +224,12 @@ namespace DoS1.Scenes
                             picture.Texture.Name == "Fire" ||
                             picture.Texture.Name == "Ice" ||
                             picture.Texture.Name == "Heal" ||
-                            picture.Texture.Name == "Slash_Right" ||
-                            picture.Texture.Name == "Slash_Left" ||
                             picture.Texture.Name == "Thump")
                         {
-                            int radius = 2;
+                            int radius = 1;
                             if (picture.Texture.Name == "Fire")
                             {
                                 radius = 5;
-                            }
-                            else if (picture.Texture.Name == "Ice" ||
-                                     picture.Texture.Name == "Heal" ||
-                                     picture.Texture.Name == "Slash_Right" ||
-                                     picture.Texture.Name == "Slash_Left" ||
-                                     picture.Texture.Name == "Thump")
-                            {
-                                radius = 1;
                             }
 
                             ShaderUtil.Apply_GaussianBlur(spriteBatch, radius, picture.Texture, picture.Region, picture.Image, picture.DrawColor, picture.Opacity);
@@ -385,11 +376,11 @@ namespace DoS1.Scenes
         {
             if (!step)
             {
-                step = true;
-
                 if (!TimeManager.Paused &&
                     !Handler.CombatPause)
                 {
+                    step = true;
+
                     if (current_character != null)
                     {
                         Tile origin_tile = CombatUtil.OriginTile(World, current_character);
@@ -645,6 +636,11 @@ namespace DoS1.Scenes
                                     {
                                         if (DamageEffectExists())
                                         {
+                                            if (effect_frame % 8 == 0)
+                                            {
+                                                AnimateDamageShake();
+                                            }
+
                                             if (effect_frame >= animation_speed * 4)
                                             {
                                                 ClearDamageEffects();
@@ -1303,6 +1299,16 @@ namespace DoS1.Scenes
                     i--;
                 }
             }
+
+            foreach (Character character in targets)
+            {
+                Tile origin_tile = CombatUtil.OriginTile(World, character);
+                if (character.Region.X != origin_tile.Region.X)
+                {
+                    character.Region = new Region(origin_tile.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
+                    CharacterUtil.UpdateGear(character);
+                }
+            }
         }
 
         private bool DamageLabelExists()
@@ -1413,6 +1419,50 @@ namespace DoS1.Scenes
             }
         }
 
+        private void AnimateDamageShake()
+        {
+            foreach (Character character in targets)
+            {
+                Something damage = character.GetStatusEffect("Damage");
+                if (damage != null)
+                {
+                    Label damage_label = Menu.GetLabel(damage.ID);
+                    if (damage_label != null)
+                    {
+                        bool shakeFound = false;
+                        for (int i = 0; i < character.Tags.Count; i++)
+                        {
+                            if (character.Tags[i].Contains("Shake"))
+                            {
+                                shakeFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!shakeFound)
+                        {
+                            character.Tags.Add("Shake1");
+                        }
+                        else if (character.Tags.Contains("Shake1"))
+                        {
+                            character.Tags.Remove("Shake1");
+                            character.Tags.Add("Shake2");
+                        }
+                        else if (character.Tags.Contains("Shake2"))
+                        {
+                            character.Tags.Remove("Shake2");
+                            character.Tags.Add("Shake3");
+                        }
+                        else if (character.Tags.Contains("Shake3"))
+                        {
+                            character.Tags.Remove("Shake3");
+                            character.Tags.Add("Shake4");
+                        }
+                    }
+                }
+            }
+        }
+
         private void AnimateMouseClick()
         {
             Picture mouseClick = Menu.GetPicture("MouseClick");
@@ -1433,6 +1483,146 @@ namespace DoS1.Scenes
                 else
                 {
                     mouseClickDelay++;
+                }
+            }
+        }
+
+        private void AnimateCharacters()
+        {
+            if (!Handler.CombatPause)
+            {
+                if (ally_squad != null)
+                {
+                    foreach (Character character in ally_squad.Characters)
+                    {
+                        if (character.Tags.Contains("Animation_Idle"))
+                        {
+                            CharacterUtil.AnimateIdle(character);
+                        }
+                    }
+                }
+
+                if (enemy_squad != null)
+                {
+                    foreach (Character character in enemy_squad.Characters)
+                    {
+                        if (character.Tags.Contains("Animation_Idle"))
+                        {
+                            CharacterUtil.AnimateIdle(character);
+                        }
+                    }
+                }
+
+                foreach (Character character in targets)
+                {
+                    Tile origin_tile = CombatUtil.OriginTile(World, character);
+                    float speed = 1;
+
+                    CryptoRandom random = new CryptoRandom();
+                    int choice = random.Next(1, 5);
+                    switch (choice)
+                    {
+                        case 1:
+                            speed = 2;
+                            break;
+
+                        case 2:
+                            speed = 4;
+                            break;
+
+                        case 3:
+                            speed = 8;
+                            break;
+
+                        case 4:
+                            speed = 12;
+                            break;
+                    }
+
+                    if (character.Tags.Contains("Shake1"))
+                    {
+                        float x = origin_tile.Region.X;
+                        float distance = origin_tile.Region.Width / 4;
+
+                        if (character.Type == "Ally")
+                        {
+                            x += distance;
+                            if (character.Region.X < x)
+                            {
+                                CombatUtil.MoveBack(character, distance / speed);
+                            }
+                        }
+                        else if (character.Type == "Enemy")
+                        {
+                            x -= distance;
+                            if (character.Region.X > x)
+                            {
+                                CombatUtil.MoveBack(character, distance / speed);
+                            }
+                        }
+                    }
+                    else if (character.Tags.Contains("Shake2"))
+                    {
+                        float x = origin_tile.Region.X;
+                        float distance = origin_tile.Region.Width / 4;
+
+                        if (character.Type == "Ally")
+                        {
+                            x -= distance;
+                            if (character.Region.X > x)
+                            {
+                                CombatUtil.MoveForward(character, distance / speed);
+                            }
+                        }
+                        else if (character.Type == "Enemy")
+                        {
+                            x += distance;
+                            if (character.Region.X < x)
+                            {
+                                CombatUtil.MoveForward(character, distance / speed);
+                            }
+                        }
+                    }
+                    else if (character.Tags.Contains("Shake3"))
+                    {
+                        float x = origin_tile.Region.X;
+                        float distance = origin_tile.Region.Width / 8;
+
+                        if (character.Type == "Ally")
+                        {
+                            x += distance;
+                            if (character.Region.X < x)
+                            {
+                                CombatUtil.MoveBack(character, distance / speed);
+                            }
+                        }
+                        else if (character.Type == "Enemy")
+                        {
+                            x -= distance;
+                            if (character.Region.X > x)
+                            {
+                                CombatUtil.MoveBack(character, distance / speed);
+                            }
+                        }
+                    }
+                    else if (character.Tags.Contains("Shake4"))
+                    {
+                        float distance = 0;
+
+                        if (character.Type == "Ally")
+                        {
+                            distance = character.Region.X - origin_tile.Region.X;
+                        }
+                        else if (character.Type == "Enemy")
+                        {
+                            distance = origin_tile.Region.X - character.Region.X;
+                        }
+
+                        if (character.Region.X != origin_tile.Region.X)
+                        {
+                            CombatUtil.MoveForward(character, distance / (speed / 2));
+                        }
+                    }
                 }
             }
         }
@@ -1565,6 +1755,22 @@ namespace DoS1.Scenes
             ep_cost = 0;
             targets.Clear();
             current_character = null;
+
+            if (ally_squad != null)
+            {
+                foreach (Character character in ally_squad.Characters)
+                {
+                    character.Tags.Clear();
+                }
+            }
+
+            if (enemy_squad != null)
+            {
+                foreach (Character character in enemy_squad.Characters)
+                {
+                    character.Tags.Clear();
+                }
+            }
         }
 
         private void ResetCombat_Final()

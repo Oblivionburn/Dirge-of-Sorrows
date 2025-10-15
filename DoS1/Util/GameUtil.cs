@@ -1,4 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+
+using Microsoft.Xna.Framework;
+
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -9,10 +15,6 @@ using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace DoS1.Util
 {
@@ -736,7 +738,7 @@ namespace DoS1.Util
 
             if (location.Type == "Base_Ally")
             {
-                option1.Text = "[Retreat]";
+                option1.Text = "[Retreat to Worldmap]";
             }
             else
             {
@@ -1600,13 +1602,20 @@ namespace DoS1.Util
 
         public static void SecondChanged(object sender, EventArgs e)
         {
-            WorldUtil.MoveSquads();
+            if (Handler.LocalMap)
+            {
+                WorldUtil.MoveSquads();
+            }
         }
 
         public static void MinuteChanged(object sender, EventArgs e)
         {
             WorldUtil.AnimateTiles();
-            WorldUtil.RestSquads();
+
+            if (Handler.LocalMap)
+            {
+                WorldUtil.RestSquads();
+            }
         }
 
         private static void HourChanged(object sender, EventArgs e)

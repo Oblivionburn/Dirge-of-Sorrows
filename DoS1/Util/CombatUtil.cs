@@ -54,7 +54,17 @@ namespace DoS1.Util
                 }
             }
 
+            Menu ui = MenuManager.GetMenu("UI");
+            Label examine = ui.GetLabel("Examine");
+            examine.Visible = false;
+
+            Layer pathing = map.GetLayer("Pathing");
+            pathing.Visible = false;
+            pathing.Tiles.Clear();
+
             squad.Path.Clear();
+            other_squad.Path.Clear();
+
             Main.Timer.Stop();
             WorldUtil.CameraToTile(map, ground, destination);
             GameUtil.Alert_Combat(squad.Name, other_squad.Name);
@@ -75,6 +85,15 @@ namespace DoS1.Util
                 character.Texture = AssetManager.Textures[texture];
                 if (character.Texture != null)
                 {
+                    for (int i = 0; i < character.Tags.Count; i++)
+                    {
+                        if (character.Tags[i].Contains("Animation"))
+                        {
+                            character.Tags.Remove(character.Tags[i]);
+                            i--;
+                        }
+                    }
+
                     Item item = InventoryUtil.Get_EquippedItem(character, "Armor");
                     if (item != null)
                     {
@@ -90,6 +109,7 @@ namespace DoS1.Util
                     }
 
                     CharacterUtil.ResetAnimation(character);
+                    character.Tags.Add("Animation_" + type);
                 }
             }
         }
@@ -747,6 +767,8 @@ namespace DoS1.Util
                 {
                     character.Region.X += move_speed;
                 }
+
+                CharacterUtil.UpdateGear(character);
             }
         }
 
@@ -763,6 +785,8 @@ namespace DoS1.Util
                 {
                     character.Region.X -= move_speed;
                 }
+
+                CharacterUtil.UpdateGear(character);
             }
         }
 
@@ -1247,18 +1271,36 @@ namespace DoS1.Util
                         {
                             AssetManager.PlaySound_Random("Thump");
 
-                            menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
-                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    Color.White, true);
+                            if (character.Type == "Ally")
+                            {
+                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Right"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                                        Color.White, true);
+                            }
+                            else if (character.Type == "Enemy")
+                            {
+                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Left"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                                        Color.White, true);
+                            }
                         }
                     }
                     else
                     {
                         AssetManager.PlaySound_Random("Thump");
 
-                        menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump"],
-                            new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                Color.White, true);
+                        if (character.Type == "Ally")
+                        {
+                            menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Right"],
+                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                                    Color.White, true);
+                        }
+                        else if (character.Type == "Enemy")
+                        {
+                            menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Left"],
+                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
+                                    Color.White, true);
+                        }
                     }
                     break;
 
@@ -1275,7 +1317,7 @@ namespace DoS1.Util
 
                     menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.8f, true);
+                            Color.White * 0.9f, true);
                     break;
 
                 case "Earth":
@@ -1337,7 +1379,7 @@ namespace DoS1.Util
             }
 
             Picture effect = Get_LastDamagePicture(menu);
-            effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
+            effect.Image = new Rectangle(0, 0, effect.Texture.Height, effect.Texture.Height);
         }
 
         public static void AddEffect_Status(Menu menu, Character character, string status)

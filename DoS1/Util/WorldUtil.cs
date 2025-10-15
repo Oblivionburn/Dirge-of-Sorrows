@@ -360,6 +360,10 @@ namespace DoS1.Util
                         }
                     }
                 }
+
+                Menu ui = MenuManager.GetMenu("UI");
+                ui.GetPicture("Highlight").Visible = false;
+                ui.GetPicture("Select").Visible = false;
             }
         }
 

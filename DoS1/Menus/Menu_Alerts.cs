@@ -298,7 +298,7 @@ namespace DoS1.Menus
                         Close();
                     }
                 }
-                else if (button.Text == "[Retreat]")
+                else if (button.Text == "[Retreat to Worldmap]")
                 {
                     Close();
                     GameUtil.ReturnToWorldmap();

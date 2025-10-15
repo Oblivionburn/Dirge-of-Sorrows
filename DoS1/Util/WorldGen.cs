@@ -336,6 +336,7 @@ namespace DoS1.Util
                 }
                 else if (type.Contains("Forest"))
                 {
+                    random = new CryptoRandom();
                     GenIslands(layer, random.Next(world.Maps.Count + 2, world.Maps.Count + 7));
 
                     random = new CryptoRandom();

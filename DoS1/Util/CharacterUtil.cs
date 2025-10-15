@@ -23,6 +23,7 @@ namespace DoS1.Util
                 Formation = new Vector2(formation.X, formation.Y),
                 Type = type,
                 Direction = direction,
+                Region = new Region(),
                 Texture = AssetManager.Textures[direction.ToString() + "_Body_" + skinColor + "_Idle"]
             };
             character.Animator.Frames = 4;
@@ -166,7 +167,19 @@ namespace DoS1.Util
                 Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
                 if (eyes != null)
                 {
-                    spriteBatch.Draw(eyes.Texture, eyes.Region.ToRectangle, eyes.Image, eyes.DrawColor);
+                    if (eyes.Visible)
+                    {
+                        spriteBatch.Draw(eyes.Texture, eyes.Region.ToRectangle, eyes.Image, eyes.DrawColor);
+                    }
+                    else
+                    {
+                        string[] parts = character.Texture.Name.Split('_');
+                        string direction = parts[0];
+                        string skin_tone = parts[2];
+                        string closed_eye = direction + "_Eye_Closed_" + skin_tone;
+
+                        spriteBatch.Draw(AssetManager.Textures[closed_eye], eyes.Region.ToRectangle, eyes.Image, color);
+                    }
                 }
 
                 Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
@@ -380,6 +393,29 @@ namespace DoS1.Util
         {
             character.Animator.Animate(character);
             UpdateGear(character);
+        }
+
+        public static void AnimateIdle(Character character)
+        {
+            if (Utility.RandomPercent(2))
+            {
+                Animate(character);
+            }
+
+            Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
+            if (eyes.Visible)
+            {
+                CryptoRandom random = new CryptoRandom();
+                int num = random.Next(0, 151);
+                if (num <= 0)
+                {
+                    eyes.Visible = false;
+                }
+            }
+            else if (Utility.RandomPercent(5))
+            {
+                eyes.Visible = true;
+            }
         }
 
         public static void ResetAnimation(Character character)
