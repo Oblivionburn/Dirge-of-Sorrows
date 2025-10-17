@@ -383,8 +383,10 @@ namespace DoS1.Menus
                 }
                 
                 character.Formation = new Vector2(x, y);
+                character.HealthBar.Visible = false;
+                character.ManaBar.Visible = false;
+
                 reserves.Characters.Add(character);
-                
                 squad.Characters.Remove(character);
                 i--;
             }

@@ -617,7 +617,7 @@ namespace DoS1.Menus
             Clear();
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
-            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "Type name here", Color.DarkGray, AssetManager.Textures["ButtonFrame_Large"],
+            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", string.IsNullOrEmpty(LeaderName) ? "Type name here" : LeaderName, Color.DarkGray, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false, true);
             GetInput("Name").Alignment_Horizontal = Alignment.Left;
             GetInput("Name").Alignment_Verticle = Alignment.Center;

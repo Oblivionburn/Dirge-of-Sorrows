@@ -161,6 +161,7 @@ namespace DoS1.Util
             Handler.TradingAcademy = null;
             Handler.LocalMap = false;
             Handler.LocalPause = false;
+            Handler.StoryStep = -1;
             Handler.Gold = 1000;
 
             TimeManager.Paused = false;

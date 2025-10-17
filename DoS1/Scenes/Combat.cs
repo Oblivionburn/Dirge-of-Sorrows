@@ -1495,7 +1495,8 @@ namespace DoS1.Scenes
                 {
                     foreach (Character character in ally_squad.Characters)
                     {
-                        if (character.Tags.Contains("Animation_Idle"))
+                        if (!character.Dead &&
+                            character.Tags.Contains("Animation_Idle"))
                         {
                             CharacterUtil.AnimateIdle(character);
                         }
@@ -1506,121 +1507,126 @@ namespace DoS1.Scenes
                 {
                     foreach (Character character in enemy_squad.Characters)
                     {
-                        if (character.Tags.Contains("Animation_Idle"))
+                        if (!character.Dead &&
+                            character.Tags.Contains("Animation_Idle"))
                         {
                             CharacterUtil.AnimateIdle(character);
                         }
                     }
                 }
 
-                foreach (Character character in targets)
+                for (int i = 0; i < targets.Count; i++)
                 {
-                    Tile origin_tile = CombatUtil.OriginTile(World, character);
-                    float speed = 1;
-
-                    CryptoRandom random = new CryptoRandom();
-                    int choice = random.Next(1, 5);
-                    switch (choice)
+                    Character character = targets[i];
+                    if (!character.Dead)
                     {
-                        case 1:
-                            speed = 2;
-                            break;
+                        Tile origin_tile = CombatUtil.OriginTile(World, character);
+                        float speed = 1;
 
-                        case 2:
-                            speed = 4;
-                            break;
-
-                        case 3:
-                            speed = 8;
-                            break;
-
-                        case 4:
-                            speed = 12;
-                            break;
-                    }
-
-                    if (character.Tags.Contains("Shake1"))
-                    {
-                        float x = origin_tile.Region.X;
-                        float distance = origin_tile.Region.Width / 4;
-
-                        if (character.Type == "Ally")
+                        CryptoRandom random = new CryptoRandom();
+                        int choice = random.Next(1, 5);
+                        switch (choice)
                         {
-                            x += distance;
-                            if (character.Region.X < x)
+                            case 1:
+                                speed = 2;
+                                break;
+
+                            case 2:
+                                speed = 4;
+                                break;
+
+                            case 3:
+                                speed = 8;
+                                break;
+
+                            case 4:
+                                speed = 12;
+                                break;
+                        }
+
+                        if (character.Tags.Contains("Shake1"))
+                        {
+                            float x = origin_tile.Region.X;
+                            float distance = origin_tile.Region.Width / 4;
+
+                            if (character.Type == "Ally")
                             {
-                                CombatUtil.MoveBack(character, distance / speed);
+                                x += distance;
+                                if (character.Region.X < x)
+                                {
+                                    CombatUtil.MoveBack(character, distance / speed);
+                                }
+                            }
+                            else if (character.Type == "Enemy")
+                            {
+                                x -= distance;
+                                if (character.Region.X > x)
+                                {
+                                    CombatUtil.MoveBack(character, distance / speed);
+                                }
                             }
                         }
-                        else if (character.Type == "Enemy")
+                        else if (character.Tags.Contains("Shake2"))
                         {
-                            x -= distance;
-                            if (character.Region.X > x)
-                            {
-                                CombatUtil.MoveBack(character, distance / speed);
-                            }
-                        }
-                    }
-                    else if (character.Tags.Contains("Shake2"))
-                    {
-                        float x = origin_tile.Region.X;
-                        float distance = origin_tile.Region.Width / 4;
+                            float x = origin_tile.Region.X;
+                            float distance = origin_tile.Region.Width / 4;
 
-                        if (character.Type == "Ally")
-                        {
-                            x -= distance;
-                            if (character.Region.X > x)
+                            if (character.Type == "Ally")
                             {
-                                CombatUtil.MoveForward(character, distance / speed);
+                                x -= distance;
+                                if (character.Region.X > x)
+                                {
+                                    CombatUtil.MoveForward(character, distance / speed);
+                                }
+                            }
+                            else if (character.Type == "Enemy")
+                            {
+                                x += distance;
+                                if (character.Region.X < x)
+                                {
+                                    CombatUtil.MoveForward(character, distance / speed);
+                                }
                             }
                         }
-                        else if (character.Type == "Enemy")
+                        else if (character.Tags.Contains("Shake3"))
                         {
-                            x += distance;
-                            if (character.Region.X < x)
-                            {
-                                CombatUtil.MoveForward(character, distance / speed);
-                            }
-                        }
-                    }
-                    else if (character.Tags.Contains("Shake3"))
-                    {
-                        float x = origin_tile.Region.X;
-                        float distance = origin_tile.Region.Width / 8;
+                            float x = origin_tile.Region.X;
+                            float distance = origin_tile.Region.Width / 8;
 
-                        if (character.Type == "Ally")
-                        {
-                            x += distance;
-                            if (character.Region.X < x)
+                            if (character.Type == "Ally")
                             {
-                                CombatUtil.MoveBack(character, distance / speed);
+                                x += distance;
+                                if (character.Region.X < x)
+                                {
+                                    CombatUtil.MoveBack(character, distance / speed);
+                                }
+                            }
+                            else if (character.Type == "Enemy")
+                            {
+                                x -= distance;
+                                if (character.Region.X > x)
+                                {
+                                    CombatUtil.MoveBack(character, distance / speed);
+                                }
                             }
                         }
-                        else if (character.Type == "Enemy")
+                        else if (character.Tags.Contains("Shake4"))
                         {
-                            x -= distance;
-                            if (character.Region.X > x)
+                            float distance = 0;
+
+                            if (character.Type == "Ally")
                             {
-                                CombatUtil.MoveBack(character, distance / speed);
+                                distance = character.Region.X - origin_tile.Region.X;
                             }
-                        }
-                    }
-                    else if (character.Tags.Contains("Shake4"))
-                    {
-                        float distance = 0;
+                            else if (character.Type == "Enemy")
+                            {
+                                distance = origin_tile.Region.X - character.Region.X;
+                            }
 
-                        if (character.Type == "Ally")
-                        {
-                            distance = character.Region.X - origin_tile.Region.X;
-                        }
-                        else if (character.Type == "Enemy")
-                        {
-                            distance = origin_tile.Region.X - character.Region.X;
-                        }
-
-                        if (character.Region.X != origin_tile.Region.X)
-                        {
-                            CombatUtil.MoveForward(character, distance / (speed / 2));
+                            if (character.Region.X != origin_tile.Region.X)
+                            {
+                                CombatUtil.MoveForward(character, distance / (speed / 2));
+                            }
                         }
                     }
                 }

@@ -246,49 +246,52 @@ namespace DoS1.Menus
                 }
             }
 
-            if (InputManager.Mouse_LB_Held &&
-                InputManager.Mouse.Moved)
+            if (!Handler.TokenMenu)
             {
-                Handler.MoveGridDelay++;
-
-                if (Handler.MoveGridDelay >= 4)
+                if (InputManager.Mouse_LB_Held &&
+                    InputManager.Mouse.Moved)
                 {
-                    WorldUtil.MoveGrid(world);
+                    Handler.MoveGridDelay++;
+
+                    if (Handler.MoveGridDelay >= 4)
+                    {
+                        WorldUtil.MoveGrid(world);
+                    }
                 }
-            }
 
-            if (InputManager.Mouse_ScrolledUp)
-            {
-                WorldUtil.ZoomIn();
-            }
-            else if (InputManager.Mouse_ScrolledDown)
-            {
-                WorldUtil.ZoomOut();
-            }
-
-            if (InputManager.KeyPressed("Space"))
-            {
-                GameUtil.Toggle_Pause(true);
-            }
-            else if (InputManager.KeyPressed("Esc"))
-            {
-                TimeManager.Paused = true;
-                Active = false;
-                Visible = false;
-                MenuManager.ChangeMenu("Main");
-            }
-            else if (InputManager.KeyPressed("Debug"))
-            {
-                if (!Main.Game.Debugging)
+                if (InputManager.Mouse_ScrolledUp)
                 {
-                    Main.Game.Debugging = true;
-                    Handler.Gold = 10000;
-                    GetLabel("Debug").Visible = true;
+                    WorldUtil.ZoomIn();
                 }
-                else
+                else if (InputManager.Mouse_ScrolledDown)
                 {
-                    Main.Game.Debugging = false;
-                    GetLabel("Debug").Visible = false;
+                    WorldUtil.ZoomOut();
+                }
+
+                if (InputManager.KeyPressed("Space"))
+                {
+                    GameUtil.Toggle_Pause(true);
+                }
+                else if (InputManager.KeyPressed("Esc"))
+                {
+                    TimeManager.Paused = true;
+                    Active = false;
+                    Visible = false;
+                    MenuManager.ChangeMenu("Main");
+                }
+                else if (InputManager.KeyPressed("Debug"))
+                {
+                    if (!Main.Game.Debugging)
+                    {
+                        Main.Game.Debugging = true;
+                        Handler.Gold = 10000;
+                        GetLabel("Debug").Visible = true;
+                    }
+                    else
+                    {
+                        Main.Game.Debugging = false;
+                        GetLabel("Debug").Visible = false;
+                    }
                 }
             }
         }
@@ -297,7 +300,7 @@ namespace DoS1.Menus
         {
             bool found = false;
 
-            if (Handler.StoryStep > 48 &&
+            if (Handler.StoryStep >= 20 &&
                 Handler.Selected_Token == -1)
             {
                 foreach (Button button in Buttons)
@@ -843,6 +846,8 @@ namespace DoS1.Menus
                         enabled = true,
                         visible = true
                     });
+
+                    Handler.TokenMenu = true;
                 }
 
                 GameUtil.Toggle_Pause(false);
@@ -892,6 +897,8 @@ namespace DoS1.Menus
                                 enabled = true,
                                 visible = true
                             });
+
+                            Handler.TokenMenu = true;
                         }
                         else
                         {
@@ -934,6 +941,8 @@ namespace DoS1.Menus
                             enabled = true,
                             visible = true
                         });
+
+                        Handler.TokenMenu = true;
                     }
                 }
                 else
@@ -1110,7 +1119,8 @@ namespace DoS1.Menus
             if (squad != null)
             {
                 SelectingTown = false;
-                ArmyUtil.Undeploy();
+                squad.Visible = false;
+                squad.Active = false;
                 GameUtil.Toggle_Pause(false);
             }
         }
@@ -1146,6 +1156,8 @@ namespace DoS1.Menus
                     i--;
                 }
             }
+
+            Handler.TokenMenu = false;
         }
 
         private void UpdateTime()
