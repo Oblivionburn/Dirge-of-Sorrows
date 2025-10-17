@@ -45,7 +45,5 @@ For discussion/suggestions/bug-reporting:<br>
 ## <ins>Planned features not yet implemented</ins>:
 - More of the story
 - Encyclopedia for fuller explanations of mechanics and to list what all the different Status Effects do
-- Side-quests for special armor/weapons
-- Finding items hidden on Local Maps
 - More music for variety
 - Hopefully some graphical improvements
