@@ -136,8 +136,8 @@ namespace DoS1.Menus
         {
             Clear();
 
-            AddProgressBar(Handler.GetID(), "Loading1", 100, 0, 1, AssetManager.Textures["ProgressBase_Large"], AssetManager.Textures["ProgressBar_Large"],
-                new Region(0, 0, 0, 0), new Color(100, 0, 0, 255), true);
+            AddProgressBar(Handler.GetID(), "Loading1", 100, 0, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
+                new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Loading1", "Initializing (0%)", Color.White, new Region(0, 0, 0, 0), true);
 
             Resize(Main.Game.Resolution);
@@ -153,7 +153,7 @@ namespace DoS1.Menus
 
             ProgressBar bar = GetProgressBar("Loading1");
             bar.Base_Region = new Region(X - (Width * 8), Y, Width * 16, Height);
-            GetLabel("Loading1").Region = new Region(bar.Base_Region.X, bar.Base_Region.Y, bar.Base_Region.Width, bar.Base_Region.Height);
+            GetLabel("Loading1").Region = new Region(X - (Width * 6), bar.Base_Region.Y, Width * 12, Height);
         }
 
         #endregion

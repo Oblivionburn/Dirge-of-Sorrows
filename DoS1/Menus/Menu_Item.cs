@@ -1121,7 +1121,7 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Item_Name", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Item_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Properties", "Properties", Color.White, new Region(0, 0, 0, 0), true);
-            AddPicture(Handler.GetID(), "Properties_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.White, true);
+            AddPicture(Handler.GetID(), "Properties_Underline", AssetManager.Textures["Underline"], new Region(0, 0, 0, 0), Color.White, true);
 
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White, false);
             AddPicture(Handler.GetID(), "Arrow_Down", AssetManager.Textures["ArrowIcon_Down"], new Region(0, 0, 0, 0), Color.White, false);
@@ -1141,7 +1141,7 @@ namespace DoS1.Menus
             });
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);
 
             ControlsLoaded = true;

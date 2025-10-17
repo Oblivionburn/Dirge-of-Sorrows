@@ -63,6 +63,7 @@ namespace DoS1.Menus
 
                 if (character != null)
                 {
+                    CharacterUtil.AnimateIdle(character);
                     CharacterUtil.UpdateGear(character);
                 }
 
@@ -1058,7 +1059,7 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "", Color.White, new Region(0, 0, 0, 0), true);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats", "Stats", Color.IndianRed, new Region(0, 0, 0, 0), true);
-            AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.IndianRed, true);
+            AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Underline"], new Region(0, 0, 0, 0), Color.IndianRed, true);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Level", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "XP", "", Color.White, new Region(0, 0, 0, 0), true);
@@ -1069,7 +1070,7 @@ namespace DoS1.Menus
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment", "Equipment", Color.Gold, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Equipment_Properties", "", Color.White, new Region(0, 0, 0, 0), true);
-            AddPicture(Handler.GetID(), "Equipment_Underline", AssetManager.Textures["Path_WE"], new Region(0, 0, 0, 0), Color.Gold, true);
+            AddPicture(Handler.GetID(), "Equipment_Underline", AssetManager.Textures["Underline"], new Region(0, 0, 0, 0), Color.Gold, true);
 
             AddPicture(Handler.GetID(), "Character", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White, false);
 
@@ -1108,7 +1109,7 @@ namespace DoS1.Menus
             });
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);
 
             AddButton(new ButtonOptions

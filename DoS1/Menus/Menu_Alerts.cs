@@ -519,8 +519,8 @@ namespace DoS1.Menus
                 id = Handler.GetID(),
                 name = "Alert",
                 font = AssetManager.Fonts["ControlFont"],
-                texture = AssetManager.Textures["TextFrame"],
-                texture_highlight = AssetManager.Textures["TextFrame"],
+                texture = AssetManager.Textures["Frame_Large"],
+                texture_highlight = AssetManager.Textures["Frame_Large"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White,
                 draw_color_selected = Color.Red,
@@ -571,16 +571,17 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Dialogue",
                 text = "",
-                text_color = Color.White,
+                text_color = new Color(99, 82, 71),
                 alignment_verticle = Alignment.Top,
                 alignment_horizontal = Alignment.Left,
-                texture = AssetManager.Textures["TextFrame"],
+                texture = AssetManager.Textures["Frame_Text"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = new Color(64, 64, 64, 255),
+                draw_color = Color.White,
                 visible = false
             });
             Label dialogue = GetLabel("Dialogue");
             dialogue.AutoScale = false;
+            dialogue.Margin = 16;
             dialogue.Scale = 1;
 
             AddLabel(new LabelOptions
@@ -589,15 +590,17 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Dialogue_Name",
                 text = "",
-                text_color = Color.White,
+                text_color = new Color(99, 82, 71),
+                alignment_verticle = Alignment.Top,
                 alignment_horizontal = Alignment.Center,
-                texture = AssetManager.Textures["ButtonFrame_Wide"],
+                texture = AssetManager.Textures["Frame_Text_Wide"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = new Color(64, 64, 64, 255),
+                draw_color = Color.White,
                 visible = false
             });
             Label dialogue_name = GetLabel("Dialogue_Name");
             dialogue_name.AutoScale = false;
+            dialogue_name.Margin = 4;
             dialogue_name.Scale = 1;
 
             AddPicture(Handler.GetID(), "Dialogue_Portrait1", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
@@ -612,10 +615,10 @@ namespace DoS1.Menus
                 texture = AssetManager.Textures["ButtonFrame_Wide"],
                 texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = new Color(64, 64, 64, 255),
+                draw_color = Color.White * 0.9f,
                 draw_color_selected = Color.White,
-                text_color = Color.White,
-                text_selected_color = Color.Red,
+                text_color = Color.Black,
+                text_selected_color = Color.White,
                 enabled = true
             });
 
@@ -627,10 +630,10 @@ namespace DoS1.Menus
                 texture = AssetManager.Textures["ButtonFrame_Wide"],
                 texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = new Color(64, 64, 64, 255),
+                draw_color = Color.White * 0.9f,
                 draw_color_selected = Color.White,
-                text_color = Color.White,
-                text_selected_color = Color.Red,
+                text_color = Color.Black,
+                text_selected_color = Color.White,
                 enabled = true
             });
 
@@ -642,10 +645,10 @@ namespace DoS1.Menus
                 texture = AssetManager.Textures["ButtonFrame_Wide"],
                 texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = new Color(64, 64, 64, 255),
+                draw_color = Color.White * 0.9f,
                 draw_color_selected = Color.White,
-                text_color = Color.White,
-                text_selected_color = Color.Red,
+                text_color = Color.Black,
+                text_selected_color = Color.White,
                 enabled = true
             });
 
@@ -665,7 +668,7 @@ namespace DoS1.Menus
             dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Y, width * 10, height * 4);
 
             int name_height = (int)(dialogue.Region.Height / 6);
-            GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X, dialogue.Region.Y - name_height, dialogue.Region.Width, name_height);
+            GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X + (dialogue.Region.X / 4), dialogue.Region.Y - name_height, dialogue.Region.Width / 2, name_height);
 
             GetPicture("Dialogue_Portrait1").Region = new Region(dialogue.Region.X - (width * 3), dialogue.Region.Y - (height * 3), width * 3, height * 3);
             GetPicture("Dialogue_Portrait2").Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 3), width * 3, height * 3);

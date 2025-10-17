@@ -82,6 +82,7 @@ namespace DoS1.Menus
                             {
                                 if (character.Visible)
                                 {
+                                    CharacterUtil.AnimateIdle(character);
                                     CharacterUtil.UpdateGear(character);
                                 }
                             }
@@ -102,6 +103,7 @@ namespace DoS1.Menus
                             {
                                 if (character.Visible)
                                 {
+                                    CharacterUtil.AnimateIdle(character);
                                     CharacterUtil.UpdateGear(character);
                                 }
                             }
@@ -120,6 +122,7 @@ namespace DoS1.Menus
                         {
                             if (character.Visible)
                             {
+                                CharacterUtil.AnimateIdle(character);
                                 CharacterUtil.UpdateGear(character);
                             }
                         }
@@ -905,7 +908,7 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name_Reserves", "Reserves", Color.White, new Region(0, 0, 0, 0), false);
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);
 
             Resize(Main.Game.Resolution);

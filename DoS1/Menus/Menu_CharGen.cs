@@ -617,7 +617,7 @@ namespace DoS1.Menus
             Clear();
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
-            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "Type name here", Color.DarkGray, AssetManager.Textures["TextFrame"],
+            AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", "Type name here", Color.DarkGray, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false, true);
             GetInput("Name").Alignment_Horizontal = Alignment.Left;
             GetInput("Name").Alignment_Verticle = Alignment.Center;
@@ -841,7 +841,7 @@ namespace DoS1.Menus
             });
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Warning", "Name required!", Color.Red, new Region(0, 0, 0, 0), false);
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);
 
             ControlsLoaded = true;

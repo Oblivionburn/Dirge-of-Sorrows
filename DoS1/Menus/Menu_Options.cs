@@ -522,7 +522,7 @@ namespace DoS1.Menus
             }
             GetVolume(GetProgressBar("Sound"));
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);
 
             Resize(Main.Game.Resolution);

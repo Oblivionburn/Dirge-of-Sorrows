@@ -1,8 +1,10 @@
-﻿using DoS1.Util;
-using FMOD;
+﻿using System.Linq;
+using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -13,8 +15,8 @@ using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
-using System.Collections.Generic;
-using System.Linq;
+
+using DoS1.Util;
 
 namespace DoS1.Menus
 {
@@ -428,53 +430,60 @@ namespace DoS1.Menus
                                 }
                                 else if (InputManager.Mouse_RB_Pressed)
                                 {
-                                    Handler.Selected_Squad = squad.ID;
-
-                                    Handler.ViewOnly_Squad = true;
-                                    Handler.ViewOnly_Character = true;
-                                    Handler.ViewOnly_Item = true;
-
-                                    DeselectToken(map);
-                                    highlight.Visible = false;
-                                    GetLabel("Examine").Visible = false;
-
-                                    Layer locations = map.GetLayer("Locations");
-                                    Tile location_tile = locations.GetTile(new Vector3(squad.Location.X, squad.Location.Y, 0));
-                                    if (location_tile != null &&
-                                        squad.Type == "Ally")
+                                    if (Handler.Selected_Token != -1)
                                     {
-                                        if (location_tile.Type.Contains("Market") ||
-                                            location_tile.Type.Contains("Academy") ||
-                                            location_tile.Type.Contains("Ally"))
-                                        {
-                                            Handler.ViewOnly_Squad = false;
-                                            Handler.ViewOnly_Character = false;
-                                            Handler.ViewOnly_Item = false;
+                                        DeselectToken(map);
+                                    }
+                                    else
+                                    {
+                                        Handler.Selected_Squad = squad.ID;
 
-                                            if (Handler.StoryStep == 5 ||
-                                                Handler.StoryStep == 14 ||
-                                                Handler.StoryStep == 28)
+                                        Handler.ViewOnly_Squad = true;
+                                        Handler.ViewOnly_Character = true;
+                                        Handler.ViewOnly_Item = true;
+
+                                        DeselectToken(map);
+                                        highlight.Visible = false;
+                                        GetLabel("Examine").Visible = false;
+
+                                        Layer locations = map.GetLayer("Locations");
+                                        Tile location_tile = locations.GetTile(new Vector3(squad.Location.X, squad.Location.Y, 0));
+                                        if (location_tile != null &&
+                                            squad.Type == "Ally")
+                                        {
+                                            if (location_tile.Type.Contains("Market") ||
+                                                location_tile.Type.Contains("Academy") ||
+                                                location_tile.Type.Contains("Ally"))
                                             {
-                                                MenuManager.GetMenu("Alerts").Visible = false;
-                                                Handler.StoryStep++;
+                                                Handler.ViewOnly_Squad = false;
+                                                Handler.ViewOnly_Character = false;
+                                                Handler.ViewOnly_Item = false;
+
+                                                if (Handler.StoryStep == 5 ||
+                                                    Handler.StoryStep == 14 ||
+                                                    Handler.StoryStep == 28)
+                                                {
+                                                    MenuManager.GetMenu("Alerts").Visible = false;
+                                                    Handler.StoryStep++;
+                                                }
                                             }
                                         }
-                                    }
 
-                                    if (!Handler.ViewOnly_Squad &&
-                                        (Handler.StoryStep == 5 || 
-                                         Handler.StoryStep == 14 ||
-                                         Handler.StoryStep == 28))
-                                    {
-                                        InputManager.Mouse.Flush();
-                                        MenuManager.ChangeMenu("Squad");
-                                    }
-                                    else if (Handler.StoryStep != 5 &&
-                                             Handler.StoryStep != 14 &&
-                                             Handler.StoryStep != 28)
-                                    {
-                                        InputManager.Mouse.Flush();
-                                        MenuManager.ChangeMenu("Squad");
+                                        if (!Handler.ViewOnly_Squad &&
+                                            (Handler.StoryStep == 5 ||
+                                             Handler.StoryStep == 14 ||
+                                             Handler.StoryStep == 28))
+                                        {
+                                            InputManager.Mouse.Flush();
+                                            MenuManager.ChangeMenu("Squad");
+                                        }
+                                        else if (Handler.StoryStep != 5 &&
+                                                 Handler.StoryStep != 14 &&
+                                                 Handler.StoryStep != 28)
+                                        {
+                                            InputManager.Mouse.Flush();
+                                            MenuManager.ChangeMenu("Squad");
+                                        }
                                     }
                                 }
                                 else if (Handler.Selected_Token == -1)
@@ -1375,7 +1384,7 @@ namespace DoS1.Menus
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Alert", "", Color.White, new Region(0, 0, 0, 0), false);
 
-            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);
 
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
