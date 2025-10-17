@@ -196,9 +196,7 @@ namespace DoS1.Util
 
             if (Utility.RandomPercent(counter_chance))
             {
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], attacker.ID, "Damage", "Pierced!", new Color(86, 127, 93, 255),
-                    new Region(attacker.Region.X - (attacker.Region.Width / 8), attacker.Region.Y - ((attacker.Region.Width / 8) * 6),
-                        attacker.Region.Width + ((attacker.Region.Width / 8) * 2), attacker.Region.Width + ((attacker.Region.Width / 8) * 2)), false);
+                AddCombatLabel(menu, attacker, "Pierced!", new Color(86, 127, 93, 255));
 
                 Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
 
@@ -288,9 +286,7 @@ namespace DoS1.Util
 
             if (Utility.RandomPercent(counter_chance))
             {
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "Countered!", new Color(86, 127, 93, 255),
-                    new Region(defender.Region.X - (defender.Region.Width / 8), defender.Region.Y - ((defender.Region.Width / 8) * 6),
-                            defender.Region.Width + ((defender.Region.Width / 8) * 2), defender.Region.Width + ((defender.Region.Width / 8) * 2)), false);
+                AddCombatLabel(menu, defender, "Countered!", new Color(86, 127, 93, 255));
 
                 Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
 
@@ -428,9 +424,7 @@ namespace DoS1.Util
                 Item defender_weapon = InventoryUtil.Get_EquippedItem(defender, "Weapon");
                 defender.Inventory.Items.Remove(defender_weapon);
 
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "Disarmed!", new Color(125, 115, 62, 255),
-                    new Region(defender.Region.X - (defender.Region.Width / 8), defender.Region.Y - ((defender.Region.Width / 8) * 6),
-                            defender.Region.Width + ((defender.Region.Width / 8) * 2), defender.Region.Width + ((defender.Region.Width / 8) * 2)), false);
+                AddCombatLabel(menu, defender, "Disarmed!", new Color(125, 115, 62, 255));
             }
 
             StatusEffect(menu, defender, attacker_weapon, element, false);
@@ -510,9 +504,7 @@ namespace DoS1.Util
                 Item attacker_weapon = InventoryUtil.Get_EquippedItem(attacker, "Weapon");
                 attacker.Inventory.Items.Remove(attacker_weapon);
 
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], attacker.ID, "Damage", "Disarmed!", new Color(125, 115, 62, 255),
-                    new Region(attacker.Region.X - (attacker.Region.Width / 8), attacker.Region.Y - ((attacker.Region.Width / 8) * 6),
-                        attacker.Region.Width + ((attacker.Region.Width / 8) * 2), attacker.Region.Width + ((attacker.Region.Width / 8) * 2)), false);
+                AddCombatLabel(menu, attacker, "Disarmed!", new Color(125, 115, 62, 255));
             }
         }
 
@@ -1186,10 +1178,7 @@ namespace DoS1.Util
                                     if (!string.IsNullOrEmpty(status_name))
                                     {
                                         Color damage_color = GameUtil.Get_EffectColor(status_name);
-
-                                        menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "+" + status_name, damage_color,
-                                            new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
-                                                defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), false);
+                                        AddCombatLabel(menu, defender, "+" + status_name, damage_color);
                                     }
                                 }
                             }
@@ -1365,9 +1354,7 @@ namespace DoS1.Util
 
         public static void Time_Dodge(Menu menu, Character defender)
         {
-            menu.AddLabel(AssetManager.Fonts["ControlFont"], defender.ID, "Damage", "Dodged!", new Color(255, 140, 20, 255),
-                new Region(defender.HealthBar.Base_Region.X, defender.Region.Y - ((defender.HealthBar.Base_Region.Width / 4) * 3),
-                    defender.HealthBar.Base_Region.Width, defender.HealthBar.Base_Region.Width), false);
+            AddCombatLabel(menu, defender, "Dodged!", new Color(255, 140, 20, 255));
 
             Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
 
@@ -1394,15 +1381,21 @@ namespace DoS1.Util
 
                 if (Utility.RandomPercent(chance))
                 {
-                    menu.AddLabel(AssetManager.Fonts["ControlFont"], attacker.ID, "Damage", "Again!", new Color(255, 140, 20, 255),
-                        new Region(attacker.Region.X, attacker.Region.Y - ((attacker.Region.Width / 8) * 5),
-                            attacker.Region.Width, attacker.Region.Width), true);
-
+                    AddCombatLabel(menu, attacker, "Again!", new Color(255, 140, 20, 255));
                     return true;
                 }
             }
 
             return false;
+        }
+
+        public static void AddCombatLabel(Menu menu, Character character, string text, Color text_color)
+        {
+            menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", text, text_color,
+                new Region(character.HealthBar.Base_Region.X - (character.HealthBar.Base_Region.Width / 4),
+                           character.Region.Y - ((character.HealthBar.Base_Region.Width / 8) * 3),
+                           character.HealthBar.Base_Region.Width + (character.HealthBar.Base_Region.Width / 2),
+                           Main.Game.MenuSize_Y), false);
         }
 
         public static void Increase_XP(Item rune, int amount)

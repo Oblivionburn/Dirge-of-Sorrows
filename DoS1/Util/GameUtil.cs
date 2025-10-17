@@ -46,8 +46,8 @@ namespace DoS1.Util
             TimeManager.Now.OnMinutesChange -= MinuteChanged;
             TimeManager.Now.OnMinutesChange += MinuteChanged;
 
-            TimeManager.Now.OnHoursChange -= HourChanged;
-            TimeManager.Now.OnHoursChange += HourChanged;
+            TimeManager.Now.OnDaysChange -= DayChanged;
+            TimeManager.Now.OnDaysChange += DayChanged;
 
             Main.Game.GameStarted = true;
             Toggle_MainMenu();
@@ -99,8 +99,8 @@ namespace DoS1.Util
             TimeManager.Now.OnMinutesChange -= MinuteChanged;
             TimeManager.Now.OnMinutesChange += MinuteChanged;
 
-            TimeManager.Now.OnHoursChange -= HourChanged;
-            TimeManager.Now.OnHoursChange += HourChanged;
+            TimeManager.Now.OnDaysChange -= DayChanged;
+            TimeManager.Now.OnDaysChange += DayChanged;
 
             Main.Game.GameStarted = true;
             Toggle_MainMenu();
@@ -1365,9 +1365,8 @@ namespace DoS1.Util
                 Character local_lord = enemy_squad.Characters[0];
 
                 dialogue_name.Text = "System";
-                message = "You're now free to do as you please, and your objective is clear: kill " + local_lord.Name + ".\n- If your HP is low, you can park your" +
-                    " squad at a Town/Base to recover 1 HP/EP per minute.\n- You will also now gain 1 Gold per hour for each Town you have liberated/captured." +
-                    "\n\nGood luck!";
+                message = "You're now free to do as you please, and your objective is clear: kill " + local_lord.Name + ".\n\n- If your HP/EP is low, you can park your" +
+                    " squad at a Town/Base to recover 1 HP/EP per minute.\n- You will now gain 1 Gold per Town you control at the start of every day.";
 
                 Button option1 = alerts.GetButton("Dialogue_Option1");
                 option1.Text = "[Click here to continue]";
@@ -1619,7 +1618,7 @@ namespace DoS1.Util
             }
         }
 
-        private static void HourChanged(object sender, EventArgs e)
+        private static void DayChanged(object sender, EventArgs e)
         {
             if (Handler.StoryStep > 48)
             {

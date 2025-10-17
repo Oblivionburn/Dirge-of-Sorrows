@@ -1393,41 +1393,16 @@ namespace DoS1.Util
 
                                                     if (new_choice)
                                                     {
-                                                        int choice = random.Next(0, 5);
-                                                        switch (choice)
-                                                        {
-                                                            case 0:
-                                                                squad.Assignment = "Attack Base";
-                                                                break;
-
-                                                            case 1:
-                                                                squad.Assignment = "Capture Nearest Town";
-                                                                break;
-
-                                                            case 2:
-                                                                squad.Assignment = "Guard Nearest Town";
-                                                                break;
-
-                                                            case 3:
-                                                                squad.Assignment = "Attack Nearest Squad";
-                                                                break;
-
-                                                            case 4:
-                                                                squad.Assignment = "Sleeper";
-                                                                break;
-                                                        }
-
-                                                        AI_Util.Set_NextTarget(map, ground, army, squad);
+                                                        AI_Util.Get_NewTarget(map, ground, army, squad);
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                else if (squad.Type == "Enemy" &&
-                                         squad.Assignment != "Guard Base")
+                                else if (squad.Type == "Enemy")
                                 {
-                                    AI_Util.Set_NextTarget(map, ground, army, squad);
+                                    AI_Util.Get_NewTarget(map, ground, army, squad);
                                 }
                             }
                         }

@@ -1095,9 +1095,7 @@ namespace DoS1.Util
                         character.ManaBar.Update();
                     }
 
-                    menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", statusEffect.Name + "! (+" + damage.ToString() + ")", damage_color,
-                        new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
-                            character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), false);
+                    RuneUtil.AddCombatLabel(menu, character, statusEffect.Name + "! (+" + damage.ToString() + ")", damage_color);
                 }
                 else
                 {
@@ -1117,16 +1115,12 @@ namespace DoS1.Util
                         ally_total_damage += damage;
                     }
 
-                    menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", statusEffect.Name + "! (-" + damage.ToString() + ")", damage_color,
-                        new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
-                            character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), false);
+                    RuneUtil.AddCombatLabel(menu, character, statusEffect.Name + "! (-" + damage.ToString() + ")", damage_color);
                 }
             }
             else
             {
-                menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", statusEffect.Name + "!", damage_color,
-                    new Region(character.HealthBar.Base_Region.X, character.Region.Y - ((character.HealthBar.Base_Region.Width / 4) * 3),
-                        character.HealthBar.Base_Region.Width, character.HealthBar.Base_Region.Width), false);
+                RuneUtil.AddCombatLabel(menu, character, statusEffect.Name + "!", damage_color);
             }
 
             Label new_damage_label = menu.Labels[menu.Labels.Count - 1];
