@@ -43,7 +43,7 @@ For discussion/suggestions/bug-reporting:<br>
 
 <br><br>
 ## <ins>Planned features not yet implemented</ins>:
-- More of the story
 - Encyclopedia for fuller explanations of mechanics and to list what all the different Status Effects do
+- More of the story
 - More music for variety
 - Hopefully some graphical improvements
