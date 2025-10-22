@@ -53,6 +53,22 @@ namespace DoS1.Menus
             if (Visible &&
                 !TimeManager.Paused)
             {
+                if (!Handler.LocalPause)
+                {
+                    UpdateTime();
+                    UpdateGold();
+                    UpdateAlerts();
+                }
+
+                if (Handler.StoryStep == -1)
+                {
+                    GameUtil.Alert_Tutorial();
+                }
+                else if (Handler.StoryStep == 0)
+                {
+                    GameUtil.Alert_Story();
+                }
+
                 Scene scene = WorldUtil.GetScene();
 
                 if (Handler.StoryStep <= 0 ||
@@ -71,13 +87,6 @@ namespace DoS1.Menus
                     {
                         UpdateControls(scene.World);
                     }
-                }
-
-                if (!Handler.LocalPause)
-                {
-                    UpdateTime();
-                    UpdateGold();
-                    UpdateAlerts();
                 }
 
                 base.Update(gameRef, content);
@@ -314,6 +323,7 @@ namespace DoS1.Menus
 
                             if (button.HoverText != null)
                             {
+                                GetLabel("Examine").TextColor = Color.White;
                                 GameUtil.Examine(this, button.HoverText);
                             }
 
@@ -363,6 +373,16 @@ namespace DoS1.Menus
                             {
                                 hovered_squad = squad;
 
+                                Label examine = GetLabel("Examine");
+                                if (squad.Type == "Enemy")
+                                {
+                                    examine.TextColor = Color.Red;
+                                }
+                                else
+                                {
+                                    examine.TextColor = Color.Blue;
+                                }
+
                                 Map map = WorldUtil.GetMap(world);
 
                                 if (Handler.Selected_Token == -1)
@@ -372,12 +392,12 @@ namespace DoS1.Menus
 
                                     if (squad.Type == "Ally")
                                     {
-                                        highlight.DrawColor = new Color(0, 0, 255, 255);
+                                        highlight.DrawColor = Color.Blue;
                                         highlight.Texture = AssetManager.Textures["Highlight_Circle"];
                                     }
                                     else if (squad.Type == "Enemy")
                                     {
-                                        highlight.DrawColor = new Color(255, 0, 0, 255);
+                                        highlight.DrawColor = Color.Red;
                                         highlight.Texture = AssetManager.Textures["Highlight_Circle"];
                                     }
 
@@ -399,7 +419,7 @@ namespace DoS1.Menus
                                     select.Texture = AssetManager.Textures["Highlight_Circle"];
                                     select.Region = squad.Region;
                                     select.Visible = true;
-                                    select.DrawColor = new Color(255, 0, 0, 255);
+                                    select.DrawColor = Color.Red;
 
                                     GameUtil.Examine(this, squad.Name);
                                 }
@@ -496,7 +516,7 @@ namespace DoS1.Menus
                             }
                             else if (Handler.Selected_Token == squad.ID)
                             {
-                                highlight.DrawColor = new Color(0, 0, 255, 255);
+                                highlight.DrawColor = Color.Blue;
                             }
                         }
                     }
@@ -526,6 +546,7 @@ namespace DoS1.Menus
                     {
                         found = true;
 
+                        GetLabel("Examine").TextColor = Color.White;
                         GameUtil.Examine(this, location.Name);
 
                         if (Handler.Selected_Token == -1)
@@ -836,8 +857,8 @@ namespace DoS1.Menus
                         font = AssetManager.Fonts["ControlFont"],
                         name = "Squad_" + squad.ID + "_Multiple",
                         text = squad.Name,
-                        texture = AssetManager.Textures["ButtonFrame"],
-                        texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                        texture = AssetManager.Textures["ButtonFrame_Large"],
+                        texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
                         region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + (Main.Game.MenuSize.Y * i), Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
                         draw_color = new Color(128, 128, 128, 255),
                         draw_color_selected = Color.White,
@@ -870,8 +891,8 @@ namespace DoS1.Menus
                                 font = AssetManager.Fonts["ControlFont"],
                                 name = "Squad_" + selected_squad.ID + "_Base",
                                 text = "Retreat",
-                                texture = AssetManager.Textures["ButtonFrame"],
-                                texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                                texture = AssetManager.Textures["ButtonFrame_Large"],
+                                texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
                                 region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
                                 draw_color = new Color(128, 128, 128, 255),
                                 draw_color_selected = Color.White,
@@ -887,8 +908,8 @@ namespace DoS1.Menus
                                 font = AssetManager.Fonts["ControlFont"],
                                 name = "Squad_" + selected_squad.ID + "_Move",
                                 text = "Move",
-                                texture = AssetManager.Textures["ButtonFrame"],
-                                texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                                texture = AssetManager.Textures["ButtonFrame_Large"],
+                                texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
                                 region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + Main.Game.MenuSize.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
                                 draw_color = new Color(128, 128, 128, 255),
                                 draw_color_selected = Color.White,
@@ -914,8 +935,8 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Squad_" + selected_squad.ID + "_Town",
                             text = "Enter Town",
-                            texture = AssetManager.Textures["ButtonFrame"],
-                            texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                            texture = AssetManager.Textures["ButtonFrame_Large"],
+                            texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
                             region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
                             draw_color = new Color(128, 128, 128, 255),
                             draw_color_selected = Color.White,
@@ -931,8 +952,8 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Squad_" + selected_squad.ID + "_Move",
                             text = "Move",
-                            texture = AssetManager.Textures["ButtonFrame"],
-                            texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                            texture = AssetManager.Textures["ButtonFrame_Large"],
+                            texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
                             region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + Main.Game.MenuSize.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
                             draw_color = new Color(128, 128, 128, 255),
                             draw_color_selected = Color.White,

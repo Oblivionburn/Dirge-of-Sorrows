@@ -464,7 +464,7 @@ namespace DoS1.Util
             alert.Visible = true;
         }
 
-        public static void Alert_Combat(string attacker_name, string defender_name)
+        public static void Alert_Combat(Squad attacker, Squad defender)
         {
             Handler.LocalPause = true;
             SoundManager.AmbientPaused = true;
@@ -487,29 +487,47 @@ namespace DoS1.Util
 
             alerts.GetLabel("Dialogue_Name").Visible = false;
 
-            Button alert = alerts.GetButton("Alert");
-            alert.Selected = false;
-            alert.Opacity = 1;
-            alert.Visible = true;
+            Label dialogue = alerts.GetLabel("Dialogue");
+            dialogue.Text = "";
+            dialogue.Visible = true;
 
-            Label attacker = alerts.GetLabel("Combat_Attacker");
-            attacker.Text = attacker_name;
-            attacker.Region = new Region(alert.Region.X, alert.Region.Y, alert.Region.Width, height);
-            attacker.Visible = true;
+            float Y = dialogue.Region.Y + (height / 2);
+
+            Label combat_attacker = alerts.GetLabel("Combat_Attacker");
+            combat_attacker.Text = attacker.Name;
+            combat_attacker.Region = new Region(dialogue.Region.X, Y, dialogue.Region.Width, height);
+            combat_attacker.Visible = true;
+
+            if (attacker.Type == "Enemy")
+            {
+                combat_attacker.TextColor = Color.Red;
+            }
+            else
+            {
+                combat_attacker.TextColor = Color.Blue;
+            }
 
             Label vs = alerts.GetLabel("Combat_VS");
-            vs.Region = new Region(alert.Region.X, alert.Region.Y + height, alert.Region.Width, height);
+            vs.Region = new Region(dialogue.Region.X, Y + height, dialogue.Region.Width, height);
             vs.Visible = true;
 
-            Label defender = alerts.GetLabel("Combat_Defender");
-            defender.Text = defender_name;
-            defender.Region = new Region(alert.Region.X, alert.Region.Y + (height * 2), alert.Region.Width, height);
-            defender.Visible = true;
+            Label combat_defender = alerts.GetLabel("Combat_Defender");
+            combat_defender.Text = defender.Name;
+            combat_defender.Region = new Region(dialogue.Region.X, Y + (height * 2), dialogue.Region.Width, height);
+            combat_defender.Visible = true;
 
-            Picture mouseClick = alerts.GetPicture("MouseClick");
-            mouseClick.Region = new Region(alert.Region.X + alert.Region.Width, alert.Region.Y + alert.Region.Height - height, height, height);
-            mouseClick.Image = new Rectangle(0, 0, mouseClick.Texture.Width / 4, mouseClick.Texture.Height);
-            mouseClick.Visible = true;
+            if (defender.Type == "Enemy")
+            {
+                combat_defender.TextColor = Color.Red;
+            }
+            else
+            {
+                combat_defender.TextColor = Color.Blue;
+            }
+
+            Button option1 = alerts.GetButton("Dialogue_Option1");
+            option1.Text = "Fight!";
+            option1.Visible = true;
         }
 
         public static void Alert_Location(Map map, Layer ground, Squad squad, Tile location)
@@ -1012,7 +1030,7 @@ namespace DoS1.Util
                 LocalPause();
 
                 dialogue_name.Text = "System";
-                message = "Right-click your character in the formation to change their equipment.";
+                message = "Right-click " + hero.Name + " in the formation to change their equipment.";
             }
             else if (Handler.StoryStep == 16)
             {

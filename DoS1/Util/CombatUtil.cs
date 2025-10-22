@@ -67,7 +67,7 @@ namespace DoS1.Util
 
             Main.Timer.Stop();
             WorldUtil.CameraToTile(map, ground, destination);
-            GameUtil.Alert_Combat(squad.Name, other_squad.Name);
+            GameUtil.Alert_Combat(squad, other_squad);
         }
 
         public static void SwitchAnimation(Character character, string type)

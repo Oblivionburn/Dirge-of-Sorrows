@@ -19,7 +19,7 @@ namespace DoS1.Menus
     {
         #region Variables
 
-        private int mouseClickDelay = 0;
+        
 
         #endregion
 
@@ -41,8 +41,6 @@ namespace DoS1.Menus
             if (Visible)
             {
                 UpdateControls();
-                UpdateAlerts();
-
                 base.Update(gameRef, content);
             }
         }
@@ -51,56 +49,26 @@ namespace DoS1.Menus
         {
             if (Visible)
             {
-                foreach (Picture picture in Pictures)
+                foreach (Label label in Labels)
                 {
-                    if (picture.Name != "Highlight" &&
-                        picture.Name != "Select")
+                    if (label.Name == "Dialogue")
                     {
-                        picture.Draw(spriteBatch);
-                    }
-                }
-
-                foreach (Picture picture in Pictures)
-                {
-                    if (picture.Name == "Highlight")
-                    {
-                        picture.Draw(spriteBatch);
+                        label.Draw(spriteBatch);
                         break;
-                    }
-                }
-
-                foreach (Picture picture in Pictures)
-                {
-                    if (picture.Name == "Select")
-                    {
-                        picture.Draw(spriteBatch);
-                        break;
-                    }
-                }
-
-                foreach (Button button in Buttons)
-                {
-                    if (button.Name != "Dialogue_Option1" &&
-                        button.Name != "Dialogue_Option2" &&
-                        button.Name != "Dialogue_Option3")
-                    {
-                        button.Draw(spriteBatch);
                     }
                 }
 
                 foreach (Label label in Labels)
                 {
-                    label.Draw(spriteBatch);
+                    if (label.Name != "Dialogue")
+                    {
+                        label.Draw(spriteBatch);
+                    }
                 }
 
                 foreach (Button button in Buttons)
                 {
-                    if (button.Name == "Dialogue_Option1" ||
-                        button.Name == "Dialogue_Option2" ||
-                        button.Name == "Dialogue_Option3")
-                    {
-                        button.Draw(spriteBatch);
-                    }
+                    button.Draw(spriteBatch);
                 }
 
                 Picture portrait1 = GetPicture("Dialogue_Portrait1");
@@ -126,22 +94,7 @@ namespace DoS1.Menus
                 {
                     if (InputManager.MouseWithin(button.Region.ToRectangle))
                     {
-                        if (button.HoverText != null)
-                        {
-                            GameUtil.Examine(this, button.HoverText);
-                        }
-
                         button.Selected = true;
-
-                        if (button.Name == "Alert")
-                        {
-                            if (Handler.AlertType == "Combat")
-                            {
-                                GetLabel("Combat_Attacker").TextColor = button.TextColor_Selected;
-                                GetLabel("Combat_VS").TextColor = button.TextColor_Selected;
-                                GetLabel("Combat_Defender").TextColor = button.TextColor_Selected;
-                            }
-                        }
 
                         if (InputManager.Mouse_LB_Pressed)
                         {
@@ -153,69 +106,9 @@ namespace DoS1.Menus
                     else if (InputManager.Mouse.Moved)
                     {
                         button.Selected = false;
-
-                        if (button.Name == "Alert")
-                        {
-                            if (Handler.AlertType == "Combat")
-                            {
-                                GetLabel("Combat_Attacker").TextColor = button.TextColor;
-                                GetLabel("Combat_VS").TextColor = button.TextColor;
-                                GetLabel("Combat_Defender").TextColor = button.TextColor;
-                            }
-                        }
                     }
                 }
             }
-        }
-
-        private void UpdateAlerts()
-        {
-            foreach (Button button in Buttons)
-            {
-                if (button.Visible &&
-                    button.Enabled)
-                {
-                    if (button.Name == "Alert" ||
-                        button.Name == "Dialogue_Option1" ||
-                        button.Name == "Dialogue_Option2" ||
-                        button.Name == "Dialogue_Option3")
-                    {
-                        if (InputManager.MouseWithin(button.Region.ToRectangle))
-                        {
-                            button.Selected = true;
-
-                            if (button.Name == "Alert" &&
-                                Handler.AlertType == "Combat")
-                            {
-                                GetLabel("Combat_Attacker").TextColor = button.TextColor_Selected;
-                                GetLabel("Combat_VS").TextColor = button.TextColor_Selected;
-                                GetLabel("Combat_Defender").TextColor = button.TextColor_Selected;
-                            }
-
-                            if (InputManager.Mouse_LB_Pressed)
-                            {
-                                CheckClick(button);
-                                button.Selected = false;
-                                break;
-                            }
-                        }
-                        else if (InputManager.Mouse.Moved)
-                        {
-                            button.Selected = false;
-
-                            if (button.Name == "Alert" &&
-                                Handler.AlertType == "Combat")
-                            {
-                                GetLabel("Combat_Attacker").TextColor = button.TextColor;
-                                GetLabel("Combat_VS").TextColor = button.TextColor;
-                                GetLabel("Combat_Defender").TextColor = button.TextColor;
-                            }
-                        }
-                    }
-                }
-            }
-
-            AnimateMouseClick();
         }
 
         private void CheckClick(Button button)
@@ -228,35 +121,10 @@ namespace DoS1.Menus
                 if (Handler.AlertType == "Combat")
                 {
                     button.Visible = false;
-                    GetLabel("Combat_Attacker").Visible = false;
-                    GetLabel("Combat_VS").Visible = false;
-                    GetLabel("Combat_Defender").Visible = false;
-                    GetPicture("MouseClick").Visible = false;
-
-                    Active = false;
-                    Visible = false;
-
-                    SoundManager.StopMusic();
-                    SoundManager.NeedMusic = true;
-
-                    Scene combat = SceneManager.GetScene("Combat");
-                    combat.Load();
-
-                    if (Handler.StoryStep == 38 ||
-                        Handler.StoryStep == 50)
-                    {
-                        combat.Menu.GetButton("Retreat").Visible = false;
-                        GameUtil.Toggle_Pause_Combat(false);
-                    }
-
-                    SceneManager.ChangeScene(combat);
-
-                    Handler.Combat = true;
-                    Handler.AlertType = "";
-                    SoundManager.AmbientPaused = false;
+                    
                 }
             }
-            else if (button.Name == "Dialogue_Option1")
+            if (button.Name == "Dialogue_Option1")
             {
                 if (button.Text == "[Enter Town]")
                 {
@@ -308,6 +176,27 @@ namespace DoS1.Menus
                     GameUtil.Toggle_Pause(false);
                     Close();
                 }
+                else if (button.Text == "Fight!")
+                {
+                    SoundManager.StopMusic();
+                    SoundManager.NeedMusic = true;
+
+                    Scene combat = SceneManager.GetScene("Combat");
+                    combat.Load();
+
+                    if (Handler.StoryStep == 38 ||
+                        Handler.StoryStep == 50)
+                    {
+                        combat.Menu.GetButton("Retreat").Visible = false;
+                        GameUtil.Toggle_Pause_Combat(false);
+                    }
+
+                    SceneManager.ChangeScene(combat);
+
+                    Handler.Combat = true;
+                    SoundManager.AmbientPaused = false;
+                    Close();
+                }
             }
             else if (button.Name == "Dialogue_Option2")
             {
@@ -352,6 +241,9 @@ namespace DoS1.Menus
             Handler.Dialogue_Character1 = null;
             Handler.Dialogue_Character2 = null;
 
+            GetLabel("Combat_Attacker").Visible = false;
+            GetLabel("Combat_VS").Visible = false;
+            GetLabel("Combat_Defender").Visible = false;
             GetLabel("Dialogue").Visible = false;
             GetButton("Dialogue_Option1").Visible = false;
             GetButton("Dialogue_Option2").Visible = false;
@@ -429,30 +321,6 @@ namespace DoS1.Menus
             WorldGen.AlignRegions(map);
         }
 
-        private void AnimateMouseClick()
-        {
-            Picture mouseClick = GetPicture("MouseClick");
-            if (mouseClick.Visible)
-            {
-                if (mouseClickDelay >= 10)
-                {
-                    mouseClickDelay = 0;
-
-                    int X = mouseClick.Image.X + mouseClick.Image.Height;
-                    if (X >= mouseClick.Texture.Width)
-                    {
-                        X = 0;
-                    }
-
-                    mouseClick.Image = new Rectangle(X, mouseClick.Image.Y, mouseClick.Image.Width, mouseClick.Image.Height);
-                }
-                else
-                {
-                    mouseClickDelay++;
-                }
-            }
-        }
-
         private void ContinueStory()
         {
             if (Handler.StoryStep <= 4 ||
@@ -514,28 +382,13 @@ namespace DoS1.Menus
         {
             Clear();
 
-            AddButton(new ButtonOptions
-            {
-                id = Handler.GetID(),
-                name = "Alert",
-                font = AssetManager.Fonts["ControlFont"],
-                texture = AssetManager.Textures["Frame_Large"],
-                texture_highlight = AssetManager.Textures["Frame_Large"],
-                region = new Region(0, 0, 0, 0),
-                draw_color = Color.White,
-                draw_color_selected = Color.Red,
-                text_color = Color.Red,
-                text_selected_color = Color.White,
-                enabled = true
-            });
-
             AddLabel(new LabelOptions
             {
                 id = Handler.GetID(),
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Combat_Attacker",
                 text = "",
-                text_color = Color.Red,
+                text_color = new Color(59, 42, 51),
                 alignment_horizontal = Alignment.Center,
                 region = new Region(0, 0, 0, 0),
                 visible = false
@@ -547,7 +400,7 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Combat_VS",
                 text = "vs",
-                text_color = Color.Red,
+                text_color = new Color(59, 42, 51),
                 alignment_horizontal = Alignment.Center,
                 region = new Region(0, 0, 0, 0),
                 visible = false
@@ -559,7 +412,7 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Combat_Defender",
                 text = "",
-                text_color = Color.Red,
+                text_color = new Color(59, 42, 51),
                 alignment_horizontal = Alignment.Center,
                 region = new Region(0, 0, 0, 0),
                 visible = false
@@ -603,9 +456,8 @@ namespace DoS1.Menus
             dialogue_name.Margin = 4;
             dialogue_name.Scale = 1;
 
-            AddPicture(Handler.GetID(), "Dialogue_Portrait1", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
-            AddPicture(Handler.GetID(), "Dialogue_Portrait2", AssetManager.Textures["Grid"], new Region(0, 0, 0, 0), Color.White, false);
-            AddPicture(Handler.GetID(), "MouseClick", AssetManager.Textures["LeftClick"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Dialogue_Portrait1", AssetManager.Textures["Frame_Portrait"], new Region(0, 0, 0, 0), Color.White, false);
+            AddPicture(Handler.GetID(), "Dialogue_Portrait2", AssetManager.Textures["Frame_Portrait"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddButton(new ButtonOptions
             {
@@ -660,18 +512,16 @@ namespace DoS1.Menus
             int width = Main.Game.MenuSize.X;
             int height = Main.Game.MenuSize.X;
 
-            GetButton("Alert").Region = new Region((Main.Game.ScreenWidth / 2) - (width * 4), Main.Game.ScreenHeight - (height * 5), width * 8, height * 3);
-
             int Y = Main.Game.ScreenHeight - (height * 6);
 
             Label dialogue = GetLabel("Dialogue");
             dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Y, width * 10, height * 4);
 
             int name_height = (int)(dialogue.Region.Height / 6);
-            GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X + (dialogue.Region.X / 4), dialogue.Region.Y - name_height, dialogue.Region.Width / 2, name_height);
+            GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X + (width * 3), dialogue.Region.Y - name_height, dialogue.Region.Width - (width * 6), name_height);
 
-            GetPicture("Dialogue_Portrait1").Region = new Region(dialogue.Region.X - (width * 3), dialogue.Region.Y - (height * 3), width * 3, height * 3);
-            GetPicture("Dialogue_Portrait2").Region = new Region(dialogue.Region.X + dialogue.Region.Width, dialogue.Region.Y - (height * 3), width * 3, height * 3);
+            GetPicture("Dialogue_Portrait1").Region = new Region(dialogue.Region.X, dialogue.Region.Y - (height * 3), width * 3, height * 3);
+            GetPicture("Dialogue_Portrait2").Region = new Region(dialogue.Region.X + dialogue.Region.Width - (width * 3), dialogue.Region.Y - (height * 3), width * 3, height * 3);
 
             Button option1 = GetButton("Dialogue_Option1");
             option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height, dialogue.Region.Width, name_height);

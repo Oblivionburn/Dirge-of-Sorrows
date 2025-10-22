@@ -107,7 +107,6 @@ namespace DoS1.Scenes
                         UpdateControls();
                     }
 
-                    AnimateMouseClick();
                     AnimateCharacters();
                     UpdateGrids();
                 }
@@ -207,7 +206,6 @@ namespace DoS1.Scenes
                         picture.Name != "Damage" &&
                         picture.Name != "Cast" &&
                         picture.Name != "Result" &&
-                        picture.Name != "MouseClick" &&
                         picture.Name != "Background")
                     {
                         picture.Draw(spriteBatch);
@@ -251,7 +249,6 @@ namespace DoS1.Scenes
                 }
 
                 Menu.GetPicture("Result").Draw(spriteBatch);
-                Menu.GetPicture("MouseClick").Draw(spriteBatch);
 
                 foreach (Button button in Menu.Buttons)
                 {
@@ -298,11 +295,7 @@ namespace DoS1.Scenes
                         {
                             CheckClick(button);
 
-                            if (button.Name != "Result")
-                            {
-                                button.Opacity = 0.9f;
-                            }
-                            
+                            button.Opacity = 0.9f;
                             button.Selected = false;
 
                             break;
@@ -310,11 +303,7 @@ namespace DoS1.Scenes
                     }
                     else if (InputManager.Mouse.Moved)
                     {
-                        if (button.Name != "Result")
-                        {
-                            button.Opacity = 0.9f;
-                        }
-
+                        button.Opacity = 0.9f;
                         button.Selected = false;
                     }
                 }
@@ -1463,30 +1452,6 @@ namespace DoS1.Scenes
             }
         }
 
-        private void AnimateMouseClick()
-        {
-            Picture mouseClick = Menu.GetPicture("MouseClick");
-            if (mouseClick.Visible)
-            {
-                if (mouseClickDelay >= 10)
-                {
-                    mouseClickDelay = 0;
-
-                    int X = mouseClick.Image.X + mouseClick.Image.Height;
-                    if (X >= mouseClick.Texture.Width)
-                    {
-                        X = 0;
-                    }
-
-                    mouseClick.Image = new Rectangle(X, mouseClick.Image.Y, mouseClick.Image.Width, mouseClick.Image.Height);
-                }
-                else
-                {
-                    mouseClickDelay++;
-                }
-            }
-        }
-
         private void AnimateCharacters()
         {
             if (!Handler.CombatPause)
@@ -1875,25 +1840,26 @@ namespace DoS1.Scenes
                 }
             }
 
-            Button button = Menu.GetButton("Result");
+            Label label = Menu.GetLabel("Result");
+            label.Visible = true;
 
             if (!enemy_squad.Characters.Any())
             {
                 won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
-                button.Text = ally_squad.Name + " was victorious!";
+                label.Text = ally_squad.Name + " was victorious!";
             }
             else if (!ally_squad.Characters.Any())
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                button.Text = ally_squad.Name + " was defeated!";
+                label.Text = ally_squad.Name + " was defeated!";
             }
             else if (enemy_total_damage > ally_total_damage)
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                button.Text = ally_squad.Name + " was defeated!\n\n" +
+                label.Text = ally_squad.Name + " was defeated!\n\n" +
                     ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
                     enemy_squad.Name + " Total Damage: " + enemy_total_damage;
             }
@@ -1901,7 +1867,7 @@ namespace DoS1.Scenes
             {
                 won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
-                button.Text = ally_squad.Name + " was victorious!\n\n" +
+                label.Text = ally_squad.Name + " was victorious!\n\n" +
                     ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
                     enemy_squad.Name + " Total Damage: " + enemy_total_damage;
             }
@@ -1909,7 +1875,7 @@ namespace DoS1.Scenes
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Draw"];
-                button.Text = "Both parties are retreating.";
+                label.Text = "Both parties are retreating.";
             }
 
             Menu.GetButton("Retreat").Visible = false;
@@ -1917,8 +1883,7 @@ namespace DoS1.Scenes
             Menu.GetButton("Speed").Visible = false;
 
             Menu.GetPicture("Result").Visible = true;
-            Menu.GetPicture("MouseClick").Visible = true;
-            button.Visible = true;
+            Menu.GetButton("Result").Visible = true;
 
             if (won_battle)
             {
@@ -1926,15 +1891,15 @@ namespace DoS1.Scenes
                     xp > 0)
                 {
                     Handler.Gold += gold;
-                    button.Text += "\n\n" + gold + " Gold was looted!";
-                    button.Text += "\n\n" + xp + " XP was gained!";
+                    label.Text += "\n\n" + gold + " Gold was looted!";
+                    label.Text += "\n\n" + xp + " XP was gained!";
 
                     foreach (Character character in ally_squad.Characters)
                     {
                         int levels_gained = CombatUtil.GainExp(character, xp);
                         if (levels_gained > 0)
                         {
-                            button.Text += "\n" + character.Name + " is now Level " + character.Level + "!";
+                            label.Text += "\n" + character.Name + " is now Level " + character.Level + "!";
                         }
                     }
                 }
@@ -1961,26 +1926,26 @@ namespace DoS1.Scenes
             battleResult.Texture = AssetManager.Textures["Defeat"];
             battleResult.Visible = true;
 
-            Button button = Menu.GetButton("Result");
-            button.Text = ally_squad.Name + " is retreating...";
+            Label label = Menu.GetLabel("Result");
+            label.Text = ally_squad.Name + " is retreating...";
+            label.Visible = true;
 
+            Menu.GetButton("Result").Visible = true;
             Menu.GetButton("Retreat").Visible = false;
-            Menu.GetPicture("MouseClick").Visible = true;
-            button.Visible = true;
 
             if (gold > 0 ||
                 xp > 0)
             {
                 Handler.Gold += gold;
-                button.Text += "\n\n" + gold + " Gold was looted!";
-                button.Text += "\n\n" + xp + " XP was gained!";
+                label.Text += "\n\n" + gold + " Gold was looted!";
+                label.Text += "\n\n" + xp + " XP was gained!";
 
                 foreach (Character character in ally_squad.Characters)
                 {
                     int levels_gained = CombatUtil.GainExp(character, xp);
                     if (levels_gained > 0)
                     {
-                        button.Text += "\n" + character.Name + " is now Level " + character.Level + "!";
+                        label.Text += "\n" + character.Name + " is now Level " + character.Level + "!";
                     }
                 }
             }
@@ -1993,18 +1958,18 @@ namespace DoS1.Scenes
             SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
 
-            Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
+            Picture battleResult = Menu.GetPicture("Result");
+            battleResult.Texture = AssetManager.Textures["Defeat"];
+            battleResult.Visible = true;
 
-            Button button = Menu.GetButton("Result");
-            button.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
+            Label label = Menu.GetLabel("Result");
+            label.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
+            label.Visible = true;
 
+            Menu.GetButton("Result").Visible = true;
             Menu.GetButton("Retreat").Visible = false;
             Menu.GetButton("PlayPause").Visible = false;
             Menu.GetButton("Speed").Visible = false;
-
-            Menu.GetPicture("Result").Visible = true;
-            Menu.GetPicture("MouseClick").Visible = true;
-            button.Visible = true;
 
             ResetCombat_Final();
         }
@@ -2404,8 +2369,8 @@ namespace DoS1.Scenes
                     font = AssetManager.Fonts["ControlFont"],
                     name = "Retreat",
                     text = "Retreat",
-                    texture = AssetManager.Textures["ButtonFrame"],
-                    texture_highlight = AssetManager.Textures["ButtonFrame_Highlight"],
+                    texture = AssetManager.Textures["ButtonFrame_Large"],
+                    texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
                     region = new Region(0, 0, 0, 0),
                     draw_color = Color.White,
                     draw_color_selected = Color.White,
@@ -2422,21 +2387,32 @@ namespace DoS1.Scenes
                 Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                     new Region(0, 0, 0, 0), false);
 
-                Menu.AddPicture(Handler.GetID(), "MouseClick", AssetManager.Textures["LeftClick"], new Region(0, 0, 0, 0), Color.White, false);
-                Picture mouseClick = Menu.GetPicture("MouseClick");
-                mouseClick.Image = new Rectangle(0, 0, mouseClick.Texture.Width / 4, mouseClick.Texture.Height);
-
-                Menu.AddButton(new ButtonOptions
+                Menu.AddLabel(new LabelOptions
                 {
                     id = Handler.GetID(),
                     font = AssetManager.Fonts["ControlFont"],
                     name = "Result",
-                    texture = AssetManager.Textures["Frame_Large"],
-                    texture_highlight = AssetManager.Textures["Frame_Large"],
+                    texture = AssetManager.Textures["Frame_Text"],
+                    text_color = new Color(99, 82, 71),
+                    alignment_verticle = Alignment.Center,
+                    alignment_horizontal = Alignment.Center,
                     region = new Region(0, 0, 0, 0),
                     draw_color = Color.White,
-                    draw_color_selected = Color.Red,
-                    text_color = Color.Red,
+                    visible = false
+                });
+
+                Menu.AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "Result",
+                    text = "[Click here to continue]",
+                    font = AssetManager.Fonts["ControlFont"],
+                    texture = AssetManager.Textures["ButtonFrame_Wide"],
+                    texture_highlight = AssetManager.Textures["ButtonFrame_Wide"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White * 0.9f,
+                    draw_color_selected = Color.White,
+                    text_color = Color.Black,
                     text_selected_color = Color.White,
                     enabled = true,
                     visible = false
@@ -2473,14 +2449,16 @@ namespace DoS1.Scenes
 
                 Menu.GetPicture("Result").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
+                int Y = Main.Game.ScreenHeight - (height * 6);
+                Label result_label = Menu.GetLabel("Result");
+                result_label.Region = new Region((Main.Game.ScreenWidth / 2) - (height * 5), Y, height * 10, height * 4);
+
                 Button result = Menu.GetButton("Result");
-                result.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 5), 
-                    Main.Game.ScreenHeight - (Main.Game.MenuSize.X * 8), Main.Game.MenuSize.X * 10, height * 6);
+                result.Region = new Region(result_label.Region.X, result_label.Region.Y + result_label.Region.Height, result_label.Region.Width, (result_label.Region.Height / 6));
 
                 Menu.GetButton("PlayPause").Region = new Region((Main.Game.ScreenWidth / 2) - Main.Game.MenuSize.X, Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
                 Menu.GetButton("Speed").Region = new Region(Main.Game.ScreenWidth / 2, Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
-                Menu.GetButton("Retreat").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2), result.Region.Y + result.Region.Height, Main.Game.MenuSize.X * 4, height);
-                Menu.GetPicture("MouseClick").Region = new Region(result.Region.X + result.Region.Width, result.Region.Y + result.Region.Height - height, height, height);
+                Menu.GetButton("Retreat").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2), result_label.Region.Y + result_label.Region.Height - height, Main.Game.MenuSize.X * 4, height);
 
                 Menu.GetLabel("Debug").Region = new Region((Main.Game.Resolution.X / 2) - (Main.Game.MenuSize.X * 5), 0, Main.Game.MenuSize.X * 10, height);
                 Menu.GetLabel("Examine").Region = new Region(0, 0, 0, 0);
