@@ -48,6 +48,9 @@ namespace DoS1.Util
                 Visible = true
             });
 
+            Texture2D eyeTexture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
+            Texture2D newEyeTexture = GameUtil.CopyTexture_NewColor(eyeTexture, Handler.EyeColors[eyeColor]);
+
             character.Inventory.Items.Add(new Item
             {
                 ID = Handler.GetID(),
@@ -55,14 +58,17 @@ namespace DoS1.Util
                 Type = "Eyes",
                 Location = new Location(),
                 Equipped = true,
-                Texture = AssetManager.Textures[character.Direction.ToString() + "_Eye"],
+                Texture = newEyeTexture,
                 Image = character.Image,
-                DrawColor = Handler.EyeColors[eyeColor],
+                DrawColor = Color.White,
                 Visible = true
             });
 
             if (hairStyle != "Bald")
             {
+                Texture2D hairTexture = AssetManager.Textures[character.Direction.ToString() + "_" + gender + "_" + hairStyle];
+                Texture2D newHairTexture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[hairColor]);
+
                 character.Inventory.Items.Add(new Item
                 {
                     ID = Handler.GetID(),
@@ -70,8 +76,8 @@ namespace DoS1.Util
                     Type = "Hair",
                     Location = new Location(),
                     Equipped = true,
-                    DrawColor = Handler.HairColors[hairColor],
-                    Texture = AssetManager.Textures[character.Direction.ToString() + "_" + gender + "_" + hairStyle],
+                    DrawColor = Color.White,
+                    Texture = newHairTexture,
                     Image = character.Image,
                     Visible = true
                 });
@@ -169,7 +175,7 @@ namespace DoS1.Util
                 {
                     if (eyes.Visible)
                     {
-                        spriteBatch.Draw(eyes.Texture, eyes.Region.ToRectangle, eyes.Image, eyes.DrawColor);
+                        spriteBatch.Draw(eyes.Texture, eyes.Region.ToRectangle, eyes.Image, color);
                     }
                     else
                     {
@@ -185,7 +191,7 @@ namespace DoS1.Util
                 Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
                 if (hair != null)
                 {
-                    spriteBatch.Draw(hair.Texture, hair.Region.ToRectangle, hair.Image, hair.DrawColor);
+                    spriteBatch.Draw(hair.Texture, hair.Region.ToRectangle, hair.Image, color);
                 }
 
                 Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
@@ -222,6 +228,80 @@ namespace DoS1.Util
                     {
                         spriteBatch.Draw(weapon.Icon, weapon.Icon_Region.ToRectangle, weapon.Icon_Image, Color.White);
                     }
+                }
+
+                if (character.HealthBar.Visible)
+                {
+                    character.HealthBar.Draw(spriteBatch);
+                }
+
+                if (character.ManaBar.Visible)
+                {
+                    character.ManaBar.Draw(spriteBatch);
+                }
+            }
+        }
+
+        public static void DrawCharacter_Combat(SpriteBatch spriteBatch, Character character, Color color)
+        {
+            if (character != null &&
+                !character.Dead)
+            {
+                Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+                if (shield != null)
+                {
+                    spriteBatch.Draw(shield.Texture, shield.Region.ToRectangle, shield.Image, color);
+                }
+
+                //Draw body
+                spriteBatch.Draw(character.Texture, character.Region.ToRectangle, character.Image, color);
+
+                Item head = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (head != null)
+                {
+                    spriteBatch.Draw(head.Texture, head.Region.ToRectangle, head.Image, color);
+                }
+
+                Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (eyes != null)
+                {
+                    if (eyes.Visible)
+                    {
+                        spriteBatch.Draw(eyes.Texture, eyes.Region.ToRectangle, eyes.Image, color);
+                    }
+                    else
+                    {
+                        string[] parts = character.Texture.Name.Split('_');
+                        string direction = parts[0];
+                        string skin_tone = parts[2];
+                        string closed_eye = direction + "_Eye_Closed_" + skin_tone;
+
+                        spriteBatch.Draw(AssetManager.Textures[closed_eye], eyes.Region.ToRectangle, eyes.Image, color);
+                    }
+                }
+
+                Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (hair != null)
+                {
+                    spriteBatch.Draw(hair.Texture, hair.Region.ToRectangle, hair.Image, color);
+                }
+
+                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (helm != null)
+                {
+                    spriteBatch.Draw(helm.Texture, helm.Region.ToRectangle, helm.Image, color);
+                }
+
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor != null)
+                {
+                    spriteBatch.Draw(armor.Texture, armor.Region.ToRectangle, armor.Image, color);
+                }
+
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
+                {
+                    spriteBatch.Draw(weapon.Texture, weapon.Region.ToRectangle, weapon.Image, color);
                 }
 
                 if (character.HealthBar.Visible)
@@ -342,13 +422,13 @@ namespace DoS1.Util
                 item = InventoryUtil.Get_EquippedItem(character, "Eyes");
                 if (item != null)
                 {
-                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), item.DrawColor);
+                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
 
                 item = InventoryUtil.Get_EquippedItem(character, "Hair");
                 if (item != null)
                 {
-                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), item.DrawColor);
+                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
 
                 item = InventoryUtil.Get_EquippedItem(character, "Helm");
@@ -372,6 +452,64 @@ namespace DoS1.Util
                     }
                 }
             }
+        }
+
+        public static Color Get_EyeColor(Character character)
+        {
+            Texture2D texture = character.Inventory.GetItem("Eyes").Texture;
+
+            Color[] colors = new Color[texture.Width * texture.Height];
+            texture.GetData(colors);
+
+            int count = colors.Length;
+            for (int i = 0; i < count; i++)
+            {
+                Color color = colors[i];
+                if (color.R == 0 &&
+                    color.G == 0 &&
+                    color.B == 0 &&
+                    color.A == 0)
+                {
+                    
+                }
+                else
+                {
+                    return color;
+                }
+            }
+
+            return new Color(0, 0, 0, 0);
+        }
+
+        public static Color Get_HairColor(Character character)
+        {
+            Item hair = character.Inventory.GetItem("Hair");
+            if (hair != null)
+            {
+                Texture2D texture = hair.Texture;
+
+                Color[] colors = new Color[texture.Width * texture.Height];
+                texture.GetData(colors);
+
+                int count = colors.Length;
+                for (int i = 0; i < count; i++)
+                {
+                    Color color = colors[i];
+                    if (color.R == 0 &&
+                        color.G == 0 &&
+                        color.B == 0 &&
+                        color.A == 0)
+                    {
+
+                    }
+                    else
+                    {
+                        return color;
+                    }
+                }
+            }
+
+            return new Color(0, 0, 0, 0);
         }
 
         public static void ResizeBars(Character character)

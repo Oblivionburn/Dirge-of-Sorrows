@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 using OP_Engine.Characters;
 using OP_Engine.Controls;
@@ -69,6 +70,9 @@ namespace DoS1.Util
                     Thread.Sleep(100);
                 }
             }
+
+            Main.Game.Zoom = 1.5f;
+            Main.Game.ResolutionChange();
 
             Map map = WorldUtil.GetMap(scene.World);
             WorldUtil.Resize_OnStart(map);
@@ -448,6 +452,40 @@ namespace DoS1.Util
             }
 
             return new Color(0, 0, 0, 0);
+        }
+
+        public static Texture2D CopyTexture_NewColor(Texture2D texture, Color new_color)
+        {
+            int width = texture.Width;
+            int height = texture.Height;
+
+            RenderTarget2D renderTarget = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, width, height)
+            {
+                Name = texture.Name
+            };
+
+            while (Main.Drawing)
+            {
+                Thread.Sleep(1);
+            }
+
+            if (!Main.Drawing)
+            {
+                Main.PauseDrawing = true;
+
+                Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(renderTarget);
+                Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
+
+                Main.Game.SpriteBatch.Begin();
+                Main.Game.SpriteBatch.Draw(texture, Vector2.Zero, new_color);
+                Main.Game.SpriteBatch.End();
+
+                Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(null);
+
+                Main.PauseDrawing = false;
+            }
+
+            return renderTarget;
         }
 
         public static void Alert_Generic(string message, Color color)

@@ -28,7 +28,6 @@ namespace DoS1.Scenes
         #region Variables
 
         private bool step;
-        private int mouseClickDelay = 0;
 
         private Squad ally_squad;
         private Squad enemy_squad;
@@ -123,9 +122,11 @@ namespace DoS1.Scenes
         {
             if (Visible)
             {
-                Menu.GetPicture("Background").Draw(spriteBatch);
+                Picture background = Menu.GetPicture("Background");
+                background.DrawColor = RenderingManager.Lighting.DrawColor;
+                background.Draw(spriteBatch);
 
-                World.Draw(spriteBatch, Main.Game.Resolution, color);
+                Color lightColor = Color.Lerp(Color.White, RenderingManager.Lighting.DrawColor, 0.5f);
 
                 if (ally_squad != null)
                 {
@@ -145,14 +146,14 @@ namespace DoS1.Scenes
                                     if (damage_label != null)
                                     {
                                         received_damage = true;
-                                        CharacterUtil.DrawCharacter(spriteBatch, character, damage.DrawColor);
-                                        damage.DrawColor = Color.Lerp(damage.DrawColor, color, 0.025f);
+                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                        damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
                                     }
                                 }
 
                                 if (!received_damage)
                                 {
-                                    CharacterUtil.DrawCharacter(spriteBatch, character, color);
+                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
                                 }
                             }
                         }
@@ -177,14 +178,14 @@ namespace DoS1.Scenes
                                     if (damage_label != null)
                                     {
                                         received_damage = true;
-                                        CharacterUtil.DrawCharacter(spriteBatch, character, damage.DrawColor);
-                                        damage.DrawColor = Color.Lerp(damage.DrawColor, color, 0.025f);
+                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                        damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
                                     }
                                 }
 
                                 if (!received_damage)
                                 {
-                                    CharacterUtil.DrawCharacter(spriteBatch, character, color);
+                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
                                 }
                             }
                         }
@@ -1927,9 +1928,10 @@ namespace DoS1.Scenes
             battleResult.Visible = true;
 
             Label label = Menu.GetLabel("Result");
-            label.Text = ally_squad.Name + " is retreating...";
             label.Visible = true;
 
+            string text = ally_squad.Name + " is retreating...";
+            
             Menu.GetButton("Result").Visible = true;
             Menu.GetButton("Retreat").Visible = false;
 
@@ -1937,18 +1939,24 @@ namespace DoS1.Scenes
                 xp > 0)
             {
                 Handler.Gold += gold;
-                label.Text += "\n\n" + gold + " Gold was looted!";
-                label.Text += "\n\n" + xp + " XP was gained!";
+                text += "\n\n" + gold + " Gold was looted!";
+                text += "\n\n" + xp + " XP was gained!";
 
                 foreach (Character character in ally_squad.Characters)
                 {
                     int levels_gained = CombatUtil.GainExp(character, xp);
                     if (levels_gained > 0)
                     {
-                        label.Text += "\n" + character.Name + " is now Level " + character.Level + "!";
+                        text += "\n" + character.Name + " is now Level " + character.Level + "!";
                     }
                 }
             }
+            else
+            {
+                label.Margin = 20;
+            }
+
+            label.Text = GameUtil.WrapText(text);
 
             ResetCombat_Final();
         }
@@ -2025,6 +2033,7 @@ namespace DoS1.Scenes
             SoundManager.AmbientPaused = false;
 
             SceneManager.ChangeScene("Localmap");
+            Main.Game.ResolutionChange();
 
             Main.Timer.Start();
             GameUtil.Toggle_Pause(false);
@@ -2255,50 +2264,52 @@ namespace DoS1.Scenes
                     enemy_squad = CharacterManager.GetArmy("Special").GetSquad(Handler.Combat_Enemy_Squad);
                 }
 
+                Color backdropColor = Color.White;
+
                 if (Handler.Combat_Terrain == "Grass")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Grass"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Grass"], new Region(0, 0, 0, 0), backdropColor, true);
                 }
                 else if (Handler.Combat_Terrain == "Water")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Water"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Water"], new Region(0, 0, 0, 0), backdropColor, true);
                 }
                 else if (Handler.Combat_Terrain == "Desert")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Desert"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Desert"], new Region(0, 0, 0, 0), backdropColor, true);
                 }
                 else if (Handler.Combat_Terrain == "Snow")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Snow"], new Region(0, 0, 0, 0), backdropColor, true);
                 }
                 else if (Handler.Combat_Terrain == "Ice")
                 {
-                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Ice"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                    Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Ice"], new Region(0, 0, 0, 0), backdropColor, true);
                 }
                 else if (Handler.Combat_Terrain.Contains("Forest"))
                 {
                     if (Handler.Combat_Terrain.Contains("Snow"))
                     {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Forest_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Forest_Snow"], new Region(0, 0, 0, 0), backdropColor, true);
                     }
                     else
                     {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Forest"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Forest"], new Region(0, 0, 0, 0), backdropColor, true);
                     }
                 }
                 else if (Handler.Combat_Terrain.Contains("Mountains"))
                 {
                     if (Handler.Combat_Terrain.Contains("Snow"))
                     {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains_Snow"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains_Snow"], new Region(0, 0, 0, 0), backdropColor, true);
                     }
                     else if (Handler.Combat_Terrain.Contains("Desert"))
                     {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains_Desert"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains_Desert"], new Region(0, 0, 0, 0), backdropColor, true);
                     }
                     else
                     {
-                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains"], new Region(0, 0, 0, 0), RenderingManager.Lighting.DrawColor, true);
+                        Menu.AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Backdrop_Mountains"], new Region(0, 0, 0, 0), backdropColor, true);
                     }
                 }
 

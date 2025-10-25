@@ -49,6 +49,11 @@ namespace DoS1.Menus
         {
             if (Visible)
             {
+                foreach (Picture picture in Pictures)
+                {
+                    picture.Draw(spriteBatch);
+                }
+
                 foreach (Label label in Labels)
                 {
                     if (label.Name == "Dialogue")

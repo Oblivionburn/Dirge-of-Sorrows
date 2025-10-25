@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 
@@ -523,22 +524,55 @@ namespace DoS1.Menus
             }
             head.Image = character.Image;
 
-            character.Inventory.GetItem("Eyes").DrawColor = Handler.EyeColors[EyeColors[EyeColor]];
+            Item eyes = character.Inventory.GetItem("Eyes");
+            Texture2D eyeTexture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
+            eyes.Texture = GameUtil.CopyTexture_NewColor(eyeTexture, Handler.EyeColors[EyeColors[EyeColor]]);
+            eyes.Image = character.Image;
+
+            Texture2D hairTexture = null;
+
+            if (character.Gender == "Male")
+            {
+                if (HairStyle < Handler.HairStyles_Male.Length - 1)
+                {
+                    hairTexture = AssetManager.Textures[character.Direction.ToString() + "_" + character.Gender + "_" + Handler.HairStyles_Male[HairStyle]];
+                }
+            }
+            else
+            {
+                if (HairStyle < Handler.HairStyles_Female.Length - 1)
+                {
+                    hairTexture = AssetManager.Textures[character.Direction.ToString() + "_" + character.Gender + "_" + Handler.HairStyles_Female[HairStyle]];
+                }
+            }
 
             Item hair = character.Inventory.GetItem("Hair");
             if (hair != null)
             {
-                if (character.Gender == "Male")
+                if (hairTexture != null)
                 {
-                    hair.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + character.Gender + "_" + Handler.HairStyles_Male[HairStyle]];
+                    hair.Texture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[HairColors[HairColor]]);
+                    hair.Image = character.Image;
                 }
                 else
                 {
-                    hair.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + character.Gender + "_" + Handler.HairStyles_Female[HairStyle]];
+                    character.Inventory.Items.Remove(hair);
                 }
-                
-                hair.Image = character.Image;
-                hair.DrawColor = Handler.HairColors[HairColors[HairColor]];
+            }
+            else if (hairTexture != null)
+            {
+                character.Inventory.Items.Add(new Item
+                {
+                    ID = Handler.GetID(),
+                    Name = "Hair",
+                    Type = "Hair",
+                    Location = new Location(),
+                    Equipped = true,
+                    DrawColor = Color.White,
+                    Texture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[HairColors[HairColor]]),
+                    Image = character.Image,
+                    Visible = true
+                });
             }
 
             InputManager.Mouse.Flush();
@@ -875,15 +909,15 @@ namespace DoS1.Menus
                     }
                 }
 
-                Item eyes = character.Inventory.GetItem("Eyes");
-                GetPicture("Eyes").DrawColor = eyes.DrawColor;
+                Color eyeColor = CharacterUtil.Get_EyeColor(character);
+                GetPicture("Eyes").DrawColor = eyeColor;
 
                 int eyeColorNum = 0;
                 foreach (var color in Handler.EyeColors)
                 {
-                    if (color.Value.R == eyes.DrawColor.R &&
-                        color.Value.G == eyes.DrawColor.G &&
-                        color.Value.B == eyes.DrawColor.B)
+                    if (color.Value.R == eyeColor.R &&
+                        color.Value.G == eyeColor.G &&
+                        color.Value.B == eyeColor.B)
                     {
                         EyeColor = eyeColorNum;
                         if (EyeColor == 0)
@@ -906,18 +940,21 @@ namespace DoS1.Menus
                     eyeColorNum++;
                 }
 
+                Color hairColor = CharacterUtil.Get_HairColor(character);
+
                 Item hair = character.Inventory.GetItem("Hair");
                 if (hair != null)
                 {
-                    GetPicture("Hair").Texture = hair.Texture;
-                    GetPicture("Hair").DrawColor = hair.DrawColor;
-                    GetPicture("Hair").Visible = true;
-
                     string[] hairParts = hair.Texture.Name.Split('_');
+                    Texture2D hairTexture = AssetManager.Textures["Left_Male_" + hairParts[2]];
+
+                    GetPicture("Hair").Texture = hairTexture;
+                    GetPicture("Hair").DrawColor = hairColor;
+                    GetPicture("Hair").Visible = true;
 
                     if (character.Gender == "Male")
                     {
-                        string hairStyle = hairParts[1];
+                        string hairStyle = hairParts[2];
                         for (int i = 0; i < Handler.HairStyles_Male.Length; i++)
                         {
                             string style = Handler.HairStyles_Male[i];
@@ -975,9 +1012,9 @@ namespace DoS1.Menus
                     int hairColorNum = 0;
                     foreach (var color in Handler.HairColors)
                     {
-                        if (color.Value.R == hair.DrawColor.R &&
-                            color.Value.G == hair.DrawColor.G &&
-                            color.Value.B == hair.DrawColor.B)
+                        if (color.Value.R == hairColor.R &&
+                            color.Value.G == hairColor.G &&
+                            color.Value.B == hairColor.B)
                         {
                             HairColor = hairColorNum;
                             if (HairColor == 0)
@@ -1002,6 +1039,7 @@ namespace DoS1.Menus
                 }
                 else
                 {
+                    GetButton("HairStyle_Minus").Enabled = true;
                     GetButton("HairStyle_Plus").Enabled = false;
                     GetPicture("Hair").Visible = false;
                     HairStyle = Handler.HairStyles_Male.Length - 1;
