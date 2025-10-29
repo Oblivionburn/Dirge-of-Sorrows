@@ -1253,8 +1253,8 @@ namespace DoS1.Menus
 
         private void SpeedToggle()
         {
-            Main.TimeSpeed += 4;
-            if (Main.TimeSpeed >= 20)
+            Main.TimeSpeed += 2;
+            if (Main.TimeSpeed > 10)
             {
                 Main.TimeSpeed = 4;
             }
@@ -1269,21 +1269,21 @@ namespace DoS1.Menus
                     button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
                     break;
 
-                case 8:
+                case 6:
                     button.HoverText = "Time x2";
                     button.Texture = AssetManager.Textures["Button_Speed2"];
                     button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
                     button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
                     break;
 
-                case 12:
+                case 8:
                     button.HoverText = "Time x3";
                     button.Texture = AssetManager.Textures["Button_Speed3"];
                     button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
                     button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
                     break;
 
-                case 16:
+                case 10:
                     button.HoverText = "Time x4";
                     button.Texture = AssetManager.Textures["Button_Speed4"];
                     button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
@@ -1391,21 +1391,21 @@ namespace DoS1.Menus
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
                     break;
 
-                case 8:
+                case 6:
                     speed_button.HoverText = "Time x2";
                     speed_button.Texture = AssetManager.Textures["Button_Speed2"];
                     speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
                     break;
 
-                case 12:
+                case 8:
                     speed_button.HoverText = "Time x3";
                     speed_button.Texture = AssetManager.Textures["Button_Speed3"];
                     speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
                     break;
 
-                case 16:
+                case 10:
                     speed_button.HoverText = "Time x4";
                     speed_button.Texture = AssetManager.Textures["Button_Speed4"];
                     speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];

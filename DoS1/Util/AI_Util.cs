@@ -101,37 +101,41 @@ namespace DoS1.Util
                 squad.Assignment != "Guard Nearest Town")
             {
                 CryptoRandom random = new CryptoRandom();
-
-                int choice = random.Next(0, 7);
-                switch (choice)
+                int chance = random.Next(0, 61);
+                if (chance == 0)
                 {
-                    case 0:
-                        squad.Assignment = "Attack Base";
-                        break;
+                    random = new CryptoRandom();
+                    int choice = random.Next(0, 7);
+                    switch (choice)
+                    {
+                        case 0:
+                            squad.Assignment = "Attack Base";
+                            break;
 
-                    case 1:
-                        squad.Assignment = "Capture Nearest Town";
-                        break;
+                        case 1:
+                            squad.Assignment = "Capture Nearest Town";
+                            break;
 
-                    case 2:
-                        squad.Assignment = "Guard Nearest Town";
-                        break;
+                        case 2:
+                            squad.Assignment = "Guard Nearest Town";
+                            break;
 
-                    case 3:
-                        squad.Assignment = "Attack Nearest Squad";
-                        break;
+                        case 3:
+                            squad.Assignment = "Attack Nearest Squad";
+                            break;
 
-                    case 4:
-                        squad.Assignment = "Attack Hero Squad";
-                        break;
+                        case 4:
+                            squad.Assignment = "Attack Hero Squad";
+                            break;
 
-                    case 5:
-                        squad.Assignment = "Sleeper";
-                        break;
+                        case 5:
+                            squad.Assignment = "Sleeper";
+                            break;
 
-                    case 6:
-                        squad.Assignment = "Opportunist";
-                        break;
+                        case 6:
+                            squad.Assignment = "Opportunist";
+                            break;
+                    }
                 }
 
                 Set_NextTarget(map, ground, army, squad);

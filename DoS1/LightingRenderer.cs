@@ -50,7 +50,8 @@ namespace DoS1
                 map = scene.World.Maps[0];
             }
 
-            if (map != null)
+            if (map != null &&
+                !Handler.Combat)
             {
                 List<Vector2> light_sources = new List<Vector2>();
 
