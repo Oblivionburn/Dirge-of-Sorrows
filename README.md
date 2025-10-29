@@ -39,7 +39,7 @@ For discussion/suggestions/bug-reporting:<br>
 <br><br>
 - 14 types of Runes that can be attached to armor/weapons, and paired for various effects (similar to FF7 materia system), with XP/Level progression which increases their effectiveness
 <br><br>
-- Intro of the story
+- Intro tutorial/story
 
 <br><br>
 ## <ins>Planned features not yet implemented</ins>:
