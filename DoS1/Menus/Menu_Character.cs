@@ -540,7 +540,7 @@ namespace DoS1.Menus
                         }
                     }
 
-                    Filter(Handler.ItemFilter);
+                    Filter(Get_ItemFilter(movingItem));
                     LoadCharacter();
                     ResizeInventory();
 
@@ -979,6 +979,24 @@ namespace DoS1.Menus
             }
                 
             examine.Visible = true;
+        }
+
+        private string Get_ItemFilter(Item item)
+        {
+            if (item.Type == "Helm")
+            {
+                return "Helms";
+            }
+            else if (item.Type == "Armor")
+            {
+                return "Armors";
+            }
+            else if (item.Type == "Shield")
+            {
+                return "Shields";
+            }
+
+            return "Weapons";
         }
 
         private void Filter(string filter)
