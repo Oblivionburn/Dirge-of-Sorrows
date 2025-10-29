@@ -367,6 +367,164 @@ namespace DoS1.Util
             }
         }
 
+        public static void ResetMap_Combat(Squad ally_squad)
+        {
+            Scene scene = SceneManager.GetScene("Localmap");
+            Map map = GetMap(scene.World);
+            Layer ground = map.GetLayer("Ground");
+
+            Tile current = ground.GetTile(new Vector2(ally_squad.Location.X, ally_squad.Location.Y));
+            if (current != null)
+            {
+                current.Region.Width = Main.Game.TileSize.X;
+                current.Region.Height = Main.Game.TileSize.Y;
+
+                foreach (Tile tile in ground.Tiles)
+                {
+                    if (tile.ID != current.ID)
+                    {
+                        int x_diff = (int)tile.Location.X - (int)current.Location.X;
+                        if (x_diff < 0)
+                        {
+                            x_diff *= -1;
+                        }
+
+                        int y_diff = (int)tile.Location.Y - (int)current.Location.Y;
+                        if (y_diff < 0)
+                        {
+                            y_diff *= -1;
+                        }
+
+                        tile.Region.Width = Main.Game.TileSize.X;
+                        tile.Region.Height = Main.Game.TileSize.Y;
+
+                        if (tile.Location.X < current.Location.X)
+                        {
+                            tile.Region.X = current.Region.X - (x_diff * Main.Game.TileSize.X);
+                        }
+                        else if (tile.Location.X > current.Location.X)
+                        {
+                            tile.Region.X = current.Region.X + (x_diff * Main.Game.TileSize.X);
+                        }
+                        else if (tile.Location.X == current.Location.X)
+                        {
+                            tile.Region.X = current.Region.X;
+                        }
+
+                        if (tile.Location.Y < current.Location.Y)
+                        {
+                            tile.Region.Y = current.Region.Y - (y_diff * Main.Game.TileSize.Y);
+                        }
+                        else if (tile.Location.Y > current.Location.Y)
+                        {
+                            tile.Region.Y = current.Region.Y + (y_diff * Main.Game.TileSize.Y);
+                        }
+                        else if (tile.Location.Y == current.Location.Y)
+                        {
+                            tile.Region.Y = current.Region.Y;
+                        }
+                    }
+                }
+
+                foreach (Army army in CharacterManager.Armies)
+                {
+                    if (army.Name != "Special")
+                    {
+                        foreach (Squad squad in army.Squads)
+                        {
+                            if (squad.Region != null)
+                            {
+                                if (squad.Moving)
+                                {
+                                    int x_diff = (int)squad.Location.X - (int)current.Location.X;
+                                    if (x_diff < 0)
+                                    {
+                                        x_diff *= -1;
+                                    }
+
+                                    int y_diff = (int)squad.Location.Y - (int)current.Location.Y;
+                                    if (y_diff < 0)
+                                    {
+                                        y_diff *= -1;
+                                    }
+
+                                    squad.Region.Width = Main.Game.TileSize.X;
+                                    squad.Region.Height = Main.Game.TileSize.Y;
+
+                                    if (squad.Location.X < current.Location.X)
+                                    {
+                                        squad.Region.X = current.Region.X - (x_diff * Main.Game.TileSize.X);
+                                    }
+                                    else if (squad.Location.X > current.Location.X)
+                                    {
+                                        squad.Region.X = current.Region.X + (x_diff * Main.Game.TileSize.X);
+                                    }
+                                    else if (squad.Location.X == current.Location.X)
+                                    {
+                                        squad.Region.X = current.Region.X;
+                                    }
+
+                                    if (squad.Location.Y < current.Location.Y)
+                                    {
+                                        squad.Region.Y = current.Region.Y - (y_diff * Main.Game.TileSize.Y);
+                                    }
+                                    else if (squad.Location.Y > current.Location.Y)
+                                    {
+                                        squad.Region.Y = current.Region.Y + (y_diff * Main.Game.TileSize.Y);
+                                    }
+                                    else if (squad.Location.Y == current.Location.Y)
+                                    {
+                                        squad.Region.Y = current.Region.Y;
+                                    }
+
+                                    Vector2 squad_screen_location = new Vector2(squad.Region.X + squad.Region.Width / 2,
+                                    squad.Region.Y + squad.Region.Height / 2);
+
+                                    float new_speed = Get_TerrainSpeed(map, squad_screen_location);
+                                    float move_percent = squad.Moved / squad.Move_TotalDistance;
+
+                                    squad.Moved = move_percent * Main.Game.TileSize.X;
+                                    squad.Speed = new_speed;
+                                    squad.Move_TotalDistance = Main.Game.TileSize.X;
+
+                                    Tile current_tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+                                    if (squad.Destination.X < current_tile.Location.X)
+                                    {
+                                        squad.Region.X -= squad.Moved;
+                                    }
+                                    else if (squad.Destination.X > current_tile.Location.X)
+                                    {
+                                        squad.Region.X += squad.Moved;
+                                    }
+
+                                    if (squad.Destination.Y < current_tile.Location.Y)
+                                    {
+                                        squad.Region.Y -= squad.Moved;
+                                    }
+                                    else if (squad.Destination.Y > current_tile.Location.Y)
+                                    {
+                                        squad.Region.Y += squad.Moved;
+                                    }
+                                }
+                                else
+                                {
+                                    Tile tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+                                    if (tile != null)
+                                    {
+                                        squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Menu ui = MenuManager.GetMenu("UI");
+                ui.GetPicture("Highlight").Visible = false;
+                ui.GetPicture("Select").Visible = false;
+            }
+        }
+
         public static void MoveGrid(World world)
         {
             if (world.Maps.Any())
@@ -1249,160 +1407,172 @@ namespace DoS1.Util
 
                         foreach (Army army in CharacterManager.Armies)
                         {
-                            foreach (Squad squad in army.Squads)
+                            if (army.Name != "Reserves" &&
+                                army.Name != "Special")
                             {
-                                if (squad.Path.Any())
+                                foreach (Squad squad in army.Squads)
                                 {
-                                    ALocation path = squad.Path[0];
-
-                                    Vector2 path_location = new Vector2(path.X, path.Y);
-                                    Vector2 squad_screen_location = new Vector2(squad.Region.X + squad.Region.Width / 2, 
-                                        squad.Region.Y + squad.Region.Height / 2);
-                                    Vector2 squad_tile_location = new Vector2(squad.Location.X, squad.Location.Y);
-
-                                    if (squad_tile_location.X < path_location.X)
+                                    if (squad.Path.Any() &&
+                                        squad.Region != null)
                                     {
-                                        squad.Direction = Direction.East;
-                                    }
-                                    else if (squad_tile_location.X > path_location.X)
-                                    {
-                                        squad.Direction = Direction.West;
-                                    }
-                                    else if (squad_tile_location.Y < path_location.Y)
-                                    {
-                                        squad.Direction = Direction.South;
-                                    }
-                                    else if (squad_tile_location.Y > path_location.Y)
-                                    {
-                                        squad.Direction = Direction.North;
-                                    }
+                                        ALocation path = squad.Path[0];
 
-                                    Tile destination = ground.GetTile(path_location);
-                                    Tile location = ground.GetTile(squad_tile_location);
+                                        Vector2 path_location = new Vector2(path.X, path.Y);
+                                        Vector2 squad_screen_location = new Vector2(squad.Region.X + squad.Region.Width / 2,
+                                            squad.Region.Y + squad.Region.Height / 2);
+                                        Vector2 squad_tile_location = new Vector2(squad.Location.X, squad.Location.Y);
 
-                                    squad.Move_TotalDistance = Main.Game.TileSize.X;
-                                    squad.Moving = true;
-                                    squad.Speed = Get_TerrainSpeed(map, squad_screen_location);
-                                    squad.Destination = new Location(path_location.X, path_location.Y, 0);
-                                    squad.Update();
-
-                                    Squad other_squad = CheckSquadCollision(squad);
-                                    if (other_squad != null)
-                                    {
-                                        squad.Region = new Region(location.Region.X, location.Region.Y, location.Region.Width, location.Region.Height);
-
-                                        if (Handler.StoryStep > 48)
+                                        if (squad_tile_location.X < path_location.X)
                                         {
-                                            if (Handler.StoryStep == 49)
-                                            {
-                                                Handler.StoryStep++;
-                                            }
-
-                                            CombatUtil.StartCombat(map, ground, destination, squad, other_squad);
+                                            squad.Direction = Direction.East;
                                         }
-                                    }
-
-                                    if (squad.Location.X == squad.Destination.X &&
-                                        squad.Location.Y == squad.Destination.Y)
-                                    {
-                                        squad.Region = new Region(destination.Region.X, destination.Region.Y, destination.Region.Width, destination.Region.Height);
-
-                                        if (Handler.Hovering_Squad != null &&
-                                            Handler.Hovering_Squad.ID == squad.ID)
+                                        else if (squad_tile_location.X > path_location.X)
                                         {
-                                            //Fix highlight region reference breaking after setting new Region on squad
-                                            Menu menu = MenuManager.GetMenu("UI");
-                                            Picture highlight = menu.GetPicture("Highlight");
-                                            highlight.Region = squad.Region;
+                                            squad.Direction = Direction.West;
+                                        }
+                                        else if (squad_tile_location.Y < path_location.Y)
+                                        {
+                                            squad.Direction = Direction.South;
+                                        }
+                                        else if (squad_tile_location.Y > path_location.Y)
+                                        {
+                                            squad.Direction = Direction.North;
                                         }
 
-                                        squad.Path.Remove(path);
+                                        Tile destination = ground.GetTile(path_location);
+                                        Tile location = ground.GetTile(squad_tile_location);
 
-                                        Squad target = ArmyUtil.Get_TargetSquad(squad.GetLeader().Target_ID);
-                                        if (target != null)
-                                        {
-                                            //Chase targeted squad
-                                            Tile target_location = ground.GetTile(new Vector2(target.Location.X, target.Location.Y));
-                                            if (target_location != null)
-                                            {
-                                                ArmyUtil.SetPath(map, squad, target_location);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            //Check if landing at location
-                                            if (!squad.Path.Any())
-                                            {
-                                                Layer locations = map.GetLayer("Locations");
-                                                Tile location_tile = locations.GetTile(new Vector3(squad.Destination.X, squad.Destination.Y, 0));
-                                                location = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+                                        squad.Move_TotalDistance = Main.Game.TileSize.X;
+                                        squad.Moving = true;
+                                        squad.Speed = Get_TerrainSpeed(map, squad_screen_location);
+                                        squad.Destination = new Location(path_location.X, path_location.Y, 0);
+                                        squad.Update();
 
-                                                if (squad.Type == "Ally")
+                                        Squad other_squad = CheckSquadCollision(squad);
+                                        if (other_squad != null)
+                                        {
+                                            squad.Region = new Region(location.Region.X, location.Region.Y, location.Region.Width, location.Region.Height);
+                                            squad.Moving = false;
+
+                                            Vector2 other_squad_location = new Vector2(other_squad.Location.X, other_squad.Location.Y);
+                                            Tile other_location = ground.GetTile(other_squad_location);
+
+                                            other_squad.Region = new Region(other_location.Region.X, other_location.Region.Y, other_location.Region.Width, other_location.Region.Height);
+                                            other_squad.Moving = false;
+
+                                            if (Handler.StoryStep > 48)
+                                            {
+                                                if (Handler.StoryStep == 49)
                                                 {
-                                                    if (location_tile != null)
+                                                    Handler.StoryStep++;
+                                                }
+
+                                                CombatUtil.StartCombat(map, ground, destination, squad, other_squad);
+                                            }
+                                        }
+
+                                        if (squad.Location.X == squad.Destination.X &&
+                                            squad.Location.Y == squad.Destination.Y)
+                                        {
+                                            squad.Region = new Region(destination.Region.X, destination.Region.Y, destination.Region.Width, destination.Region.Height);
+
+                                            if (Handler.Hovering_Squad != null &&
+                                                Handler.Hovering_Squad.ID == squad.ID)
+                                            {
+                                                //Fix highlight region reference breaking after setting new Region on squad
+                                                Menu menu = MenuManager.GetMenu("UI");
+                                                Picture highlight = menu.GetPicture("Highlight");
+                                                highlight.Region = squad.Region;
+                                            }
+
+                                            squad.Path.Remove(path);
+
+                                            Squad target = ArmyUtil.Get_TargetSquad(squad.GetLeader().Target_ID);
+                                            if (target != null)
+                                            {
+                                                //Chase targeted squad
+                                                Tile target_location = ground.GetTile(new Vector2(target.Location.X, target.Location.Y));
+                                                if (target_location != null)
+                                                {
+                                                    ArmyUtil.SetPath(map, squad, target_location);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                //Check if landing at location
+                                                if (!squad.Path.Any())
+                                                {
+                                                    Layer locations = map.GetLayer("Locations");
+                                                    Tile location_tile = locations.GetTile(new Vector3(squad.Destination.X, squad.Destination.Y, 0));
+                                                    location = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+
+                                                    if (squad.Type == "Ally")
                                                     {
-                                                        if (Handler.StoryStep == 10)
+                                                        if (location_tile != null)
                                                         {
-                                                            GameUtil.Toggle_Pause(false);
-                                                            MenuManager.ChangeMenu("Market");
-                                                        }
-                                                        else if (Handler.StoryStep == 21)
-                                                        {
-                                                            CameraToTile(map, ground, location);
-                                                            Handler.StoryStep++;
+                                                            if (Handler.StoryStep == 10)
+                                                            {
+                                                                GameUtil.Toggle_Pause(false);
+                                                                MenuManager.ChangeMenu("Market");
+                                                            }
+                                                            else if (Handler.StoryStep == 21)
+                                                            {
+                                                                CameraToTile(map, ground, location);
+                                                                Handler.StoryStep++;
+                                                            }
+                                                            else if (Handler.StoryStep > 48)
+                                                            {
+                                                                CameraToTile(map, ground, location);
+                                                                GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                                            }
                                                         }
                                                         else if (Handler.StoryStep > 48)
                                                         {
-                                                            CameraToTile(map, ground, location);
-                                                            GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                                            GameUtil.Alert_MoveFinished(map, ground, squad, location);
                                                         }
                                                     }
-                                                    else if (Handler.StoryStep > 48)
+                                                    else if (squad.Type == "Enemy")
                                                     {
-                                                        GameUtil.Alert_MoveFinished(map, ground, squad, location);
-                                                    }
-                                                }
-                                                else if (squad.Type == "Enemy")
-                                                {
-                                                    CryptoRandom random = new CryptoRandom();
-                                                    bool new_choice = false;
+                                                        CryptoRandom random = new CryptoRandom();
+                                                        bool new_choice = false;
 
-                                                    if (location_tile != null)
-                                                    {
-                                                        GameUtil.Alert_Capture(map, ground, location_tile);
-                                                        ChangeLocation(location_tile, squad);
-
-                                                        if (squad.Assignment == "Guard Nearest Town")
+                                                        if (location_tile != null)
                                                         {
-                                                            int choice = random.Next(0, 2);
-                                                            if (choice == 0)
+                                                            GameUtil.Alert_Capture(map, ground, location_tile);
+                                                            ChangeLocation(location_tile, squad);
+
+                                                            if (squad.Assignment == "Guard Nearest Town")
                                                             {
-                                                                squad.Assignment = "Sleeper";
-                                                                AI_Util.Set_NextTarget(map, ground, army, squad);
+                                                                int choice = random.Next(0, 2);
+                                                                if (choice == 0)
+                                                                {
+                                                                    squad.Assignment = "Sleeper";
+                                                                    AI_Util.Set_NextTarget(map, ground, army, squad);
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                new_choice = true;
                                                             }
                                                         }
                                                         else
                                                         {
                                                             new_choice = true;
                                                         }
-                                                    }
-                                                    else
-                                                    {
-                                                        new_choice = true;
-                                                    }
 
-                                                    if (new_choice)
-                                                    {
-                                                        AI_Util.Get_NewTarget(map, ground, army, squad);
+                                                        if (new_choice)
+                                                        {
+                                                            AI_Util.Get_NewTarget(map, ground, army, squad);
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                else if (squad.Type == "Enemy")
-                                {
-                                    AI_Util.Get_NewTarget(map, ground, army, squad);
+                                    else if (squad.Type == "Enemy")
+                                    {
+                                        AI_Util.Get_NewTarget(map, ground, army, squad);
+                                    }
                                 }
                             }
                         }

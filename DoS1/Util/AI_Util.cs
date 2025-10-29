@@ -96,6 +96,7 @@ namespace DoS1.Util
         public static void Get_NewTarget(Map map, Layer ground, Army army, Squad squad)
         {
             if (squad.Assignment != "Guard Base" &&
+                squad.Assignment != "Attack Base" &&
                 squad.Assignment != "Sleeper" &&
                 squad.Assignment != "Guard Nearest Town")
             {
@@ -133,6 +134,12 @@ namespace DoS1.Util
                         break;
                 }
 
+                Set_NextTarget(map, ground, army, squad);
+            }
+            else if (squad.Assignment == "Attack Base" ||
+                     squad.Assignment == "Sleeper" ||
+                     squad.Assignment == "Guard Nearest Town")
+            {
                 Set_NextTarget(map, ground, army, squad);
             }
         }

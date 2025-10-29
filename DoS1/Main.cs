@@ -35,7 +35,7 @@ namespace DoS1
         public static bool Drawing;
         public static bool PauseDrawing;
 
-        public static int TimeSpeed = 1;
+        public static int TimeSpeed = 4;
         public static int CombatSpeed = 2;
         public static double GameTime;
         public static System.Timers.Timer Timer = new System.Timers.Timer(1);

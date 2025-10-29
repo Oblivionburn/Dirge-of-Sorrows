@@ -481,9 +481,69 @@ namespace DoS1.Util
             return new Color(0, 0, 0, 0);
         }
 
+        public static Color Get_EyeColor(Item eyes)
+        {
+            if (eyes != null)
+            {
+                Texture2D texture = eyes.Texture;
+
+                Color[] colors = new Color[texture.Width * texture.Height];
+                texture.GetData(colors);
+
+                int count = colors.Length;
+                for (int i = 0; i < count; i++)
+                {
+                    Color color = colors[i];
+                    if (color.R == 0 &&
+                        color.G == 0 &&
+                        color.B == 0 &&
+                        color.A == 0)
+                    {
+
+                    }
+                    else
+                    {
+                        return color;
+                    }
+                }
+            }
+
+            return new Color(0, 0, 0, 0);
+        }
+
         public static Color Get_HairColor(Character character)
         {
             Item hair = character.Inventory.GetItem("Hair");
+            if (hair != null)
+            {
+                Texture2D texture = hair.Texture;
+
+                Color[] colors = new Color[texture.Width * texture.Height];
+                texture.GetData(colors);
+
+                int count = colors.Length;
+                for (int i = 0; i < count; i++)
+                {
+                    Color color = colors[i];
+                    if (color.R == 0 &&
+                        color.G == 0 &&
+                        color.B == 0 &&
+                        color.A == 0)
+                    {
+
+                    }
+                    else
+                    {
+                        return color;
+                    }
+                }
+            }
+
+            return new Color(0, 0, 0, 0);
+        }
+
+        public static Color Get_HairColor(Item hair)
+        {
             if (hair != null)
             {
                 Texture2D texture = hair.Texture;
@@ -553,6 +613,40 @@ namespace DoS1.Util
             else if (Utility.RandomPercent(5))
             {
                 eyes.Visible = true;
+            }
+        }
+
+        public static void SwitchAnimation(Character character, string type)
+        {
+            if (character != null &&
+                character.Texture != null)
+            {
+                string[] parts = character.Texture.Name.Split('_');
+                string direction = parts[0];
+                string category = parts[1];
+                string skin_tone = parts[2];
+
+                string body_texture = direction + "_" + category + "_" + skin_tone + "_" + type;
+
+                character.Texture = AssetManager.Textures[body_texture];
+                if (character.Texture != null)
+                {
+                    Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                    if (armor != null)
+                    {
+                        string armor_texture = direction + "_Armor_" + armor.Categories[0] + "_" + armor.Materials[0] + "_" + type;
+                        armor.Texture = AssetManager.Textures[armor_texture];
+                    }
+
+                    Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                    if (weapon != null)
+                    {
+                        string weapon_texture = direction + "_Weapon_" + weapon.Categories[0] + "_" + weapon.Materials[0] + "_" + type;
+                        weapon.Texture = AssetManager.Textures[weapon_texture];
+                    }
+
+                    ResetAnimation(character);
+                }
             }
         }
 

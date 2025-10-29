@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
+using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Scenes;
 using OP_Engine.Sounds;
@@ -186,6 +187,10 @@ namespace DoS1.Util
             SceneManager.ChangeScene("Title");
 
             CharacterManager.Armies.Clear();
+
+            Inventory inventory = InventoryManager.GetInventory("Ally");
+            inventory.Items.Clear();
+
             SceneManager.GetScene("Worldmap").World.Maps.Clear();
             SceneManager.GetScene("Localmap").World.Maps.Clear();
 
@@ -249,10 +254,23 @@ namespace DoS1.Util
             ui.GetButton("Worldmap").Visible = false;
             ui.GetButton("PlayPause").Enabled = false;
 
-            Army army = CharacterManager.GetArmy("Ally");
-            foreach (Squad squad in army.Squads)
+            Army enemy_army = CharacterManager.GetArmy("Enemy");
+            foreach (Squad squad in enemy_army.Squads)
+            {
+                foreach (Character character in squad.Characters)
+                {
+                    character.Inventory.Items.Clear();
+                }
+                squad.Characters.Clear();
+            }
+            enemy_army.Squads.Clear();
+
+            Army ally_army = CharacterManager.GetArmy("Ally");
+            foreach (Squad squad in ally_army.Squads)
             {
                 squad.Active = false;
+                squad.Path.Clear();
+                squad.Moving = false;
 
                 foreach (Character character in squad.Characters)
                 {
@@ -260,6 +278,9 @@ namespace DoS1.Util
                     character.ManaBar.Value = character.ManaBar.Max_Value;
                 }
             }
+
+            Menu main = MenuManager.GetMenu("Main");
+            main.GetButton("Save").Visible = true;
 
             SceneManager.ChangeScene("Worldmap");
 
@@ -304,7 +325,7 @@ namespace DoS1.Util
             string result = "";
 
             List<string> text_parts = new List<string>();
-            int max_length = 50;
+            int max_length = 49;
 
             string full_text = text;
             if (full_text.Length > max_length)
@@ -566,6 +587,9 @@ namespace DoS1.Util
             Button option1 = alerts.GetButton("Dialogue_Option1");
             option1.Text = "Fight!";
             option1.Visible = true;
+
+            Button option2 = alerts.GetButton("Dialogue_Option2");
+            option2.Visible = false;
         }
 
         public static void Alert_Location(Map map, Layer ground, Squad squad, Tile location)
@@ -680,21 +704,13 @@ namespace DoS1.Util
                         Button option1 = alerts.GetButton("Dialogue_Option1");
                         option1.Text = "[Retreat]";
                         option1.Visible = true;
-                    }
-                    else
-                    {
-                        Button option1 = alerts.GetButton("Dialogue_Option1");
-                        option1.Text = "[Enter Town]";
-                        option1.Visible = true;
-                    }
 
-                    Button option2 = alerts.GetButton("Dialogue_Option2");
-                    option2.Text = "[Continue]";
-                    option2.Visible = true;
-                }
-                else
-                {
-                    if (!is_base)
+                        Button option2 = alerts.GetButton("Dialogue_Option2");
+                        option2.Text = "[Continue]";
+                        option2.Visible = true;
+                    }
+                    else if (is_market ||
+                             is_academy)
                     {
                         Button option1 = alerts.GetButton("Dialogue_Option1");
                         option1.Text = "[Enter Town]";
@@ -703,6 +719,35 @@ namespace DoS1.Util
                         Button option2 = alerts.GetButton("Dialogue_Option2");
                         option2.Text = "[Continue]";
                         option2.Visible = true;
+                    }
+                    else
+                    {
+                        Button option1 = alerts.GetButton("Dialogue_Option1");
+                        option1.Text = "[Continue]";
+                        option1.Visible = true;
+                    }
+                }
+                else
+                {
+                    if (!is_base)
+                    {
+                        if (is_market ||
+                            is_academy)
+                        {
+                            Button option1 = alerts.GetButton("Dialogue_Option1");
+                            option1.Text = "[Enter Town]";
+                            option1.Visible = true;
+
+                            Button option2 = alerts.GetButton("Dialogue_Option2");
+                            option2.Text = "[Continue]";
+                            option2.Visible = true;
+                        }
+                        else
+                        {
+                            Button option1 = alerts.GetButton("Dialogue_Option1");
+                            option1.Text = "[Continue]";
+                            option1.Visible = true;
+                        }
                     }
                     else
                     {
@@ -1643,6 +1688,11 @@ namespace DoS1.Util
                 menu.GetButton("Back").Visible = true;
                 menu.GetButton("Play").Visible = false;
 
+                if (!Handler.LocalMap)
+                {
+                    menu.GetButton("Save").Visible = true;
+                }
+
                 menu.GetButton("SaveExit").Visible = true;
                 menu.GetButton("Exit").Visible = false;
             }
@@ -1651,6 +1701,7 @@ namespace DoS1.Util
                 menu.GetButton("Back").Visible = false;
                 menu.GetButton("Play").Visible = true;
 
+                menu.GetButton("Save").Visible = false;
                 menu.GetButton("SaveExit").Visible = false;
                 menu.GetButton("Exit").Visible = true;
             }

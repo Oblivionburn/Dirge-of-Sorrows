@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 using OP_Engine.Characters;
 using OP_Engine.Inventories;
@@ -128,6 +129,10 @@ namespace DoS1.Util
                 {
                     case "TimeSpeed":
                         Main.TimeSpeed = int.Parse(reader.Value);
+                        if (Main.TimeSpeed < 4)
+                        {
+                            Main.TimeSpeed = 4;
+                        }
                         break;
 
                     case "CombatSpeed":
@@ -445,7 +450,18 @@ namespace DoS1.Util
                         int G = int.Parse(color_parts[1]);
                         int B = int.Parse(color_parts[2]);
 
-                        item.DrawColor = new Color(R, G, B, 255);
+                        if (item.Name.Contains("Eye") ||
+                            item.Name.Contains("Hair"))
+                        {
+                            Texture2D newTexture = GameUtil.CopyTexture_NewColor(item.Texture, new Color(R, G, B, 255));
+                            item.Texture = newTexture;
+                            item.Image = new Rectangle(0, 0, item.Texture.Width / 4, item.Texture.Height);
+                            item.DrawColor = Color.White;
+                        }
+                        else
+                        {
+                            item.DrawColor = new Color(R, G, B, 255);
+                        }
                         break;
 
                     case "Visible":
@@ -658,6 +674,10 @@ namespace DoS1.Util
 
                     case "Name":
                         character.Name = reader.Value;
+                        break;
+
+                    case "Gender":
+                        character.Gender = reader.Value;
                         break;
 
                     case "Type":

@@ -1084,6 +1084,8 @@ namespace DoS1.Menus
                             id = character.ID;
                             character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
                             character.Visible = true;
+
+                            CharacterUtil.SwitchAnimation(character, "Idle");
                             CharacterUtil.ResizeBars(character);
                         }
 

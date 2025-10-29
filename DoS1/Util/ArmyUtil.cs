@@ -890,6 +890,7 @@ namespace DoS1.Util
         {
             if (map != null &&
                 squad != null &&
+                squad.Region != null &&
                 destination != null)
             {
                 Layer ground = map.GetLayer("Ground");

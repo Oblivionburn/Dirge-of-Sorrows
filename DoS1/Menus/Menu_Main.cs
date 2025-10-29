@@ -129,6 +129,12 @@ namespace DoS1.Menus
                     MenuManager.ChangeMenu("Loading");
                 }
             }
+            else if (button.Name == "Save")
+            {
+                Save.SaveGame();
+                Close();
+                GameUtil.Alert_Generic("Game saved!", Color.LimeGreen);
+            }
             else if (button.Name == "SaveExit")
             {
                 Save.SaveGame();
@@ -196,6 +202,19 @@ namespace DoS1.Menus
             AddButton(new ButtonOptions
             {
                 id = Handler.GetID(),
+                name = "Save",
+                hover_text = "Save",
+                texture = AssetManager.Textures["Button_Save"],
+                texture_highlight = AssetManager.Textures["Button_Save_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = false
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
                 name = "Options",
                 hover_text = "Options",
                 texture = AssetManager.Textures["Button_Options"],
@@ -251,7 +270,11 @@ namespace DoS1.Menus
             Button play = GetButton("Play");
             play.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
 
-            Y += 2;
+            Y++;
+            Button save = GetButton("Save");
+            save.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+
+            Y++;
             Button options = GetButton("Options");
             options.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
 

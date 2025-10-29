@@ -422,7 +422,15 @@ namespace DoS1.Util
             if (Utility.RandomPercent(chance))
             {
                 Item defender_weapon = InventoryUtil.Get_EquippedItem(defender, "Weapon");
+                InventoryUtil.UnequipItem(defender, defender_weapon);
+
                 defender.Inventory.Items.Remove(defender_weapon);
+
+                if (defender.Type == "Ally")
+                {
+                    Inventory inventory = InventoryManager.GetInventory("Ally");
+                    inventory.Items.Add(defender_weapon);
+                }
 
                 AddCombatLabel(menu, defender, "Disarmed!", new Color(125, 115, 62, 255));
             }
@@ -502,7 +510,15 @@ namespace DoS1.Util
             if (Utility.RandomPercent(chance))
             {
                 Item attacker_weapon = InventoryUtil.Get_EquippedItem(attacker, "Weapon");
+                InventoryUtil.UnequipItem(attacker, attacker_weapon);
+
                 attacker.Inventory.Items.Remove(attacker_weapon);
+
+                if (attacker.Type == "Ally")
+                {
+                    Inventory inventory = InventoryManager.GetInventory("Ally");
+                    inventory.Items.Add(attacker_weapon);
+                }
 
                 AddCombatLabel(menu, attacker, "Disarmed!", new Color(125, 115, 62, 255));
             }

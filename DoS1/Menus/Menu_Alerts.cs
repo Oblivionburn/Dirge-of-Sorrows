@@ -10,6 +10,7 @@ using OP_Engine.Scenes;
 using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
+using OP_Engine.Inventories;
 
 using DoS1.Util;
 
@@ -376,7 +377,14 @@ namespace DoS1.Menus
                     Squad enemy_squad = ArmyUtil.NewSquad("Enemy");
                     special.Squads.Add(enemy_squad);
 
-                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 3, 3);
+                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 2, 2);
+                    foreach (Character character in enemy_squad.Characters)
+                    {
+                        foreach (Item item in character.Inventory.Items)
+                        {
+                            item.Attachments.Clear();
+                        }
+                    }
                     
                     CombatUtil.StartCombat(map, ground, ally_base, squad, enemy_squad);
                 }

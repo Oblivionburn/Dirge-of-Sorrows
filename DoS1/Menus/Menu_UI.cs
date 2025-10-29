@@ -744,6 +744,9 @@ namespace DoS1.Menus
                     Handler.StoryStep++;
                 }
 
+                Menu main = MenuManager.GetMenu("Main");
+                main.GetButton("Save").Visible = false;
+
                 //Switch to local map
                 SceneManager.ChangeScene("Localmap");
                 WorldUtil.Resize_OnStart(localmap);
@@ -927,7 +930,8 @@ namespace DoS1.Menus
                             SelectingTown = false;
                         }
                     }
-                    else
+                    else if (location.Type.Contains("Market") ||
+                             location.Type.Contains("Academy"))
                     {
                         AddButton(new ButtonOptions
                         {
@@ -964,6 +968,11 @@ namespace DoS1.Menus
                         });
 
                         Handler.TokenMenu = true;
+                    }
+                    else
+                    {
+                        Handler.Selected_Token = selected_squad.ID;
+                        SelectingTown = false;
                     }
                 }
                 else
@@ -1244,41 +1253,42 @@ namespace DoS1.Menus
 
         private void SpeedToggle()
         {
-            Main.TimeSpeed++;
-            if (Main.TimeSpeed >= 5)
+            Main.TimeSpeed += 4;
+            if (Main.TimeSpeed >= 20)
             {
-                Main.TimeSpeed = 1;
+                Main.TimeSpeed = 4;
             }
 
             Button button = GetButton("Speed");
+            switch (Main.TimeSpeed)
+            {
+                case 4:
+                    button.HoverText = "Time x1";
+                    button.Texture = AssetManager.Textures["Button_Speed1"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
+                    break;
 
-            if (Main.TimeSpeed == 1)
-            {
-                button.HoverText = "Time x1";
-                button.Texture = AssetManager.Textures["Button_Speed1"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
-            }
-            else if (Main.TimeSpeed == 2)
-            {
-                button.HoverText = "Time x2";
-                button.Texture = AssetManager.Textures["Button_Speed2"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
-            }
-            else if (Main.TimeSpeed == 3)
-            {
-                button.HoverText = "Time x3";
-                button.Texture = AssetManager.Textures["Button_Speed3"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
-            }
-            else if (Main.TimeSpeed == 4)
-            {
-                button.HoverText = "Time x4";
-                button.Texture = AssetManager.Textures["Button_Speed4"];
-                button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
-                button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
+                case 8:
+                    button.HoverText = "Time x2";
+                    button.Texture = AssetManager.Textures["Button_Speed2"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
+                    break;
+
+                case 12:
+                    button.HoverText = "Time x3";
+                    button.Texture = AssetManager.Textures["Button_Speed3"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
+                    break;
+
+                case 16:
+                    button.HoverText = "Time x4";
+                    button.Texture = AssetManager.Textures["Button_Speed4"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
+                    break;
             }
 
             Save.ExportINI();
@@ -1372,33 +1382,35 @@ namespace DoS1.Menus
             });
 
             Button speed_button = GetButton("Speed");
-            if (Main.TimeSpeed == 1)
+            switch (Main.TimeSpeed)
             {
-                speed_button.HoverText = "Time x1";
-                speed_button.Texture = AssetManager.Textures["Button_Speed1"];
-                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
-                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
-            }
-            else if (Main.TimeSpeed == 2)
-            {
-                speed_button.HoverText = "Time x2";
-                speed_button.Texture = AssetManager.Textures["Button_Speed2"];
-                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
-                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
-            }
-            else if (Main.TimeSpeed == 3)
-            {
-                speed_button.HoverText = "Time x3";
-                speed_button.Texture = AssetManager.Textures["Button_Speed3"];
-                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
-                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
-            }
-            else if (Main.TimeSpeed == 4)
-            {
-                speed_button.HoverText = "Time x4";
-                speed_button.Texture = AssetManager.Textures["Button_Speed4"];
-                speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
-                speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
+                case 4:
+                    speed_button.HoverText = "Time x1";
+                    speed_button.Texture = AssetManager.Textures["Button_Speed1"];
+                    speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
+                    speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
+                    break;
+
+                case 8:
+                    speed_button.HoverText = "Time x2";
+                    speed_button.Texture = AssetManager.Textures["Button_Speed2"];
+                    speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
+                    speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
+                    break;
+
+                case 12:
+                    speed_button.HoverText = "Time x3";
+                    speed_button.Texture = AssetManager.Textures["Button_Speed3"];
+                    speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
+                    speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
+                    break;
+
+                case 16:
+                    speed_button.HoverText = "Time x4";
+                    speed_button.Texture = AssetManager.Textures["Button_Speed4"];
+                    speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
+                    speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
+                    break;
             }
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Debug", "Debugging", Color.White, new Region(0, 0, 0, 0), false);

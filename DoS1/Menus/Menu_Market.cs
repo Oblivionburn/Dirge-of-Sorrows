@@ -462,6 +462,20 @@ namespace DoS1.Menus
             Inventory inventory = InventoryManager.GetInventory("Ally");
             inventory.Items.Remove(item);
 
+            int count = item.Attachments.Count;
+            if (count > 0)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    Item attachment = item.Attachments[i];
+
+                    inventory.Items.Add(attachment);
+
+                    item.Attachments.Remove(attachment);
+                    i--;
+                }
+            }
+
             Handler.TradingMarket.Items.Add(item);
 
             Handler.Gold += (int)item.Buy_Price;

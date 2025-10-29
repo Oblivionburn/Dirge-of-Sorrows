@@ -72,45 +72,20 @@ namespace DoS1.Util
 
         public static void SwitchAnimation(Character character, string type)
         {
-            if (character != null &&
-                character.Texture != null)
+            if (character != null)
             {
-                string[] parts = character.Texture.Name.Split('_');
-                string direction = parts[0];
-                string category = parts[1];
-                string skin_tone = parts[2];
+                CharacterUtil.SwitchAnimation(character, type);
 
-                string texture = direction + "_" + category + "_" + skin_tone + "_" + type;
-
-                character.Texture = AssetManager.Textures[texture];
-                if (character.Texture != null)
+                for (int i = 0; i < character.Tags.Count; i++)
                 {
-                    for (int i = 0; i < character.Tags.Count; i++)
+                    if (character.Tags[i].Contains("Animation"))
                     {
-                        if (character.Tags[i].Contains("Animation"))
-                        {
-                            character.Tags.Remove(character.Tags[i]);
-                            i--;
-                        }
+                        character.Tags.Remove(character.Tags[i]);
+                        i--;
                     }
-
-                    Item item = InventoryUtil.Get_EquippedItem(character, "Armor");
-                    if (item != null)
-                    {
-                        texture = direction + "_Armor_" + item.Categories[0] + "_" + item.Materials[0] + "_" + type;
-                        item.Texture = AssetManager.Textures[texture];
-                    }
-
-                    item = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                    if (item != null)
-                    {
-                        texture = direction + "_Weapon_" + item.Categories[0] + "_" + item.Materials[0] + "_" + type;
-                        item.Texture = AssetManager.Textures[texture];
-                    }
-
-                    CharacterUtil.ResetAnimation(character);
-                    character.Tags.Add("Animation_" + type);
                 }
+
+                character.Tags.Add("Animation_" + type);
             }
         }
 

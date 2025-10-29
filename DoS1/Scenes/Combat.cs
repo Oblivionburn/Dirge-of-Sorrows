@@ -827,13 +827,13 @@ namespace DoS1.Scenes
             {
                 Menu.AddPicture(Handler.GetID(), "Cast", AssetManager.Textures["Cast"],
                     new Region(current_character.Region.X, current_character.Region.Y, current_character.Region.Width, current_character.Region.Height),
-                        RenderingManager.Lighting.DrawColor * 0.9f, true);
+                        Color.White, true);
             }
             else if (current_character.Type == "Enemy")
             {
                 Menu.AddPicture(Handler.GetID(), "Cast", AssetManager.Textures["EvilCast"],
                     new Region(current_character.Region.X, current_character.Region.Y, current_character.Region.Width, current_character.Region.Height),
-                        RenderingManager.Lighting.DrawColor * 0.9f, true);
+                        Color.White, true);
             }
 
             Picture cast = Menu.GetPicture("Cast");
@@ -1732,6 +1732,7 @@ namespace DoS1.Scenes
             {
                 foreach (Character character in ally_squad.Characters)
                 {
+                    CharacterUtil.SwitchAnimation(character, "Idle");
                     character.Tags.Clear();
                 }
             }
@@ -1740,6 +1741,7 @@ namespace DoS1.Scenes
             {
                 foreach (Character character in enemy_squad.Characters)
                 {
+                    CharacterUtil.SwitchAnimation(character, "Idle");
                     character.Tags.Clear();
                 }
             }
@@ -2028,12 +2030,12 @@ namespace DoS1.Scenes
             ui.Active = true;
             ui.Visible = true;
 
+            WorldUtil.ResetMap_Combat(ally_squad);
+            SceneManager.ChangeScene("Localmap");
+
             SoundManager.StopMusic();
             SoundManager.NeedMusic = true;
             SoundManager.AmbientPaused = false;
-
-            SceneManager.ChangeScene("Localmap");
-            Main.Game.ResolutionChange();
 
             Main.Timer.Start();
             GameUtil.Toggle_Pause(false);

@@ -266,8 +266,23 @@ namespace DoS1.Util
 
                 if (item.DrawColor != default)
                 {
-                    Writer.WriteAttributeString("DrawColor", item.DrawColor.R.ToString() + "," + item.DrawColor.G.ToString() + "," +
-                        item.DrawColor.B.ToString());
+                    if (item.Name.Contains("Eye"))
+                    {
+                        Color eyeColor = CharacterUtil.Get_EyeColor(item);
+                        Writer.WriteAttributeString("DrawColor", eyeColor.R.ToString() + "," + eyeColor.G.ToString() + "," +
+                            eyeColor.B.ToString());
+                    }
+                    else if (item.Name.Contains("Hair"))
+                    {
+                        Color hairColor = CharacterUtil.Get_HairColor(item);
+                        Writer.WriteAttributeString("DrawColor", hairColor.R.ToString() + "," + hairColor.G.ToString() + "," +
+                            hairColor.B.ToString());
+                    }
+                    else
+                    {
+                        Writer.WriteAttributeString("DrawColor", item.DrawColor.R.ToString() + "," + item.DrawColor.G.ToString() + "," +
+                            item.DrawColor.B.ToString());
+                    }
                 }
                 else
                 {
@@ -531,6 +546,7 @@ namespace DoS1.Util
                 EnterNode("CharacterProperties");
                 Writer.WriteAttributeString("ID", character.ID.ToString());
                 Writer.WriteAttributeString("Name", character.Name);
+                Writer.WriteAttributeString("Gender", character.Gender);
                 Writer.WriteAttributeString("Type", character.Type);
                 Writer.WriteAttributeString("Level", character.Level.ToString());
                 Writer.WriteAttributeString("XP", character.XP.ToString());

@@ -1222,7 +1222,20 @@ namespace DoS1.Util
                     }
                     else if (current.Location.Y == destination.Location.Y)
                     {
-                        //Same Location
+                        #region Destination
+
+                        if (previous_direction == Direction.Up ||
+                            previous_direction == Direction.Down)
+                        {
+                            road = "Road_NS";
+                        }
+                        else if (previous_direction == Direction.Right ||
+                                 previous_direction == Direction.Left)
+                        {
+                            road = "Road_WE";
+                        }
+
+                        #endregion
                     }
                 }
 

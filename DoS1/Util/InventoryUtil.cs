@@ -1019,7 +1019,8 @@ namespace DoS1.Util
                 {
                     //Check for existing property
                     Something property = item.GetProperty(element + " " + effect);
-                    if (property == null)
+                    if (property == null &&
+                        element != "Area")
                     {
                         property = item.GetProperty(effect);
                     }
@@ -1174,12 +1175,6 @@ namespace DoS1.Util
                 }
 
                 #endregion
-
-                if (!string.IsNullOrEmpty(effect))
-                {
-                    //Increase price per rune
-                    item.Buy_Price += rune.Buy_Price;
-                }
             }
         }
 

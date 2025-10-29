@@ -349,7 +349,7 @@ namespace DoS1.Menus
                                 found = false;
 
                                 if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
-                                    Handler.StoryStep == 31 ||
+                                    (Handler.StoryStep == 31 && InventoryUtil.IsWeapon(item)) ||
                                     Handler.StoryStep == 35 ||
                                     Handler.StoryStep > 32)
                                 {
@@ -403,7 +403,7 @@ namespace DoS1.Menus
                                 found = false;
 
                                 if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
-                                    Handler.StoryStep == 31 ||
+                                    (Handler.StoryStep == 31 && InventoryUtil.IsWeapon(item)) ||
                                     Handler.StoryStep == 35 ||
                                     Handler.StoryStep > 32)
                                 {
