@@ -297,7 +297,7 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 20, 0));
+            properties.Add(NewProperty("Physical", "Damage", 30, 0));
             properties.Add(NewProperty("EP", "Cost", 4, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 100;
@@ -309,13 +309,13 @@ namespace DoS1.Util
             item.Buy_Price = 200;
             items.Add(item);
 
-            properties[0].Value = 60;
+            properties[0].Value = 50;
             properties[1].Value = 8;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 300;
             items.Add(item);
 
-            properties[0].Value = 80;
+            properties[0].Value = 60;
             properties[1].Value = 10;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 400;
@@ -332,28 +332,28 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 25, 0));
+            properties.Add(NewProperty("Physical", "Damage", 35, 0));
             properties.Add(NewProperty("Rune", "Slots", 3, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 125;
             items.Add(item);
 
-            properties[0].Value = 50;
+            properties[0].Value = 45;
             properties[1].Value = 3;
             properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 250;
             items.Add(item);
 
-            properties[0].Value = 75;
+            properties[0].Value = 55;
             properties[1].Value = 3;
             properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 375;
             items.Add(item);
 
-            properties[0].Value = 100;
+            properties[0].Value = 65;
             properties[1].Value = 3;
             properties[2].Value = 4;
             item = NewItem(type, category, "Steel", properties);
@@ -371,7 +371,7 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 30, 0));
+            properties.Add(NewProperty("Physical", "Damage", 40, 0));
             properties.Add(NewProperty("Rune", "Slots", 2, 0));
             properties.Add(NewProperty("EP", "Cost", 2, 0));
             Item item = NewItem(type, category, "Iron", properties);
@@ -385,14 +385,14 @@ namespace DoS1.Util
             item.Buy_Price = 300;
             items.Add(item);
 
-            properties[0].Value = 90;
+            properties[0].Value = 80;
             properties[1].Value = 2;
             properties[2].Value = 4;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 450;
             items.Add(item);
 
-            properties[0].Value = 120;
+            properties[0].Value = 100;
             properties[1].Value = 2;
             properties[2].Value = 5;
             item = NewItem(type, category, "Steel", properties);
@@ -410,7 +410,7 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 35, 0));
+            properties.Add(NewProperty("Physical", "Damage", 45, 0));
             properties.Add(NewProperty("Rune", "Slots", 1, 0));
             properties.Add(NewProperty("EP", "Cost", 3, 0));
             Item item = NewItem(type, category, "Elm", properties);
@@ -424,14 +424,14 @@ namespace DoS1.Util
             item.Buy_Price = 350;
             items.Add(item);
 
-            properties[0].Value = 105;
+            properties[0].Value = 95;
             properties[1].Value = 1;
             properties[2].Value = 8;
             item = NewItem(type, category, "Oak", properties);
             item.Buy_Price = 525;
             items.Add(item);
 
-            properties[0].Value = 140;
+            properties[0].Value = 120;
             properties[1].Value = 1;
             properties[2].Value = 10;
             item = NewItem(type, category, "Ebony", properties);
@@ -687,7 +687,8 @@ namespace DoS1.Util
             for (int i = 0; i < item.Properties.Count; i++)
             {
                 Something property = item.Properties[i];
-                if (!property.Name.Contains("Physical") &&
+                if (property.Name != "Physical Defense" &&
+                    property.Name != "Physical Damage" &&
                     property.Name != "Rune Slots" &&
                     property.Name != "EP Cost")
                 {

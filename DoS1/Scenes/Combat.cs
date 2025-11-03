@@ -2245,7 +2245,7 @@ namespace DoS1.Scenes
 
             move_speed = base_move_speed * (Main.CombatSpeed / 2);
 
-            Save.ExportINI();
+            SaveUtil.ExportINI();
 
             effect_frame = 0;
         }

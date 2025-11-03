@@ -1,13 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.IO;
+using System.Threading;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
-using OP_Engine.Scenes;
-using OP_Engine.Menus;
-using OP_Engine.Inputs;
 using OP_Engine.Controls;
+using OP_Engine.Inputs;
+using OP_Engine.Menus;
+using OP_Engine.Scenes;
+using OP_Engine.Sounds;
 using OP_Engine.Time;
 using OP_Engine.Utility;
-using OP_Engine.Sounds;
 
 using DoS1.Util;
 
@@ -131,13 +134,48 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Save")
             {
-                Save.SaveGame();
-                Close();
+                SaveUtil.SaveGame();
+
+                Main.Portrait = null;
+                Main.SavePortrait = true;
+
+                while (Main.Portrait == null)
+                {
+                    Thread.Sleep(1);
+                }
+
+                string saveDir = Path.Combine(AssetManager.Directories["Saves"], Handler.Selected_Save);
+                string portraitFile = Path.Combine(saveDir, "portrait.png");
+                using (FileStream stream = File.OpenWrite(portraitFile))
+                {
+                    Main.Portrait.SaveAsPng(stream, Main.Game.MenuSize.X * 2, Main.Game.MenuSize.Y * 2);
+                }
+
+                Handler.Selected_Save = Handler.GetHero().Name;
                 GameUtil.Alert_Generic("Game saved!", Color.LimeGreen);
+
+                Close();
             }
             else if (button.Name == "SaveExit")
             {
-                Save.SaveGame();
+                SaveUtil.SaveGame();
+
+                Main.Portrait = null;
+                Main.SavePortrait = true;
+
+                while (Main.Portrait == null)
+                {
+                    Thread.Sleep(1);
+                }
+
+                string saveDir = Path.Combine(AssetManager.Directories["Saves"], Handler.Selected_Save);
+                string portraitFile = Path.Combine(saveDir, "portrait.png");
+                using (FileStream stream = File.OpenWrite(portraitFile))
+                {
+                    Main.Portrait.SaveAsPng(stream, Main.Game.MenuSize.X * 2, Main.Game.MenuSize.Y * 2);
+                }
+
+                Handler.SortSaves();
                 GameUtil.ReturnToTitle();
             }
             else if (button.Name == "Options")

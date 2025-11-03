@@ -18,7 +18,7 @@ using OP_Engine.Utility;
 
 namespace DoS1.Util
 {
-    public static class Save
+    public static class SaveUtil
     {
         #region Variables
 
@@ -99,6 +99,7 @@ namespace DoS1.Util
             #region Options
 
             EnterNode("Options");
+            Writer.WriteAttributeString("AutoSave", Handler.AutoSave.ToString());
             Writer.WriteAttributeString("Fullscreen", Main.Game.GraphicsManager.IsFullScreen.ToString());
             Writer.WriteAttributeString("MusicEnabled", SoundManager.MusicEnabled.ToString());
             Writer.WriteAttributeString("MusicVolume", (SoundManager.MusicVolume * 10).ToString());
@@ -146,7 +147,6 @@ namespace DoS1.Util
             ExportArmies();
             ExportInventory();
             ExportWorld();
-            ExportPortrait(saveDir);
         }
 
         private static void ExportGame()
@@ -556,7 +556,9 @@ namespace DoS1.Util
                     character.Region.Width.ToString() + "," + character.Region.Height.ToString());
                 Writer.WriteAttributeString("Direction", character.Direction.ToString());
                 Writer.WriteAttributeString("HP_Value", character.HealthBar.Value.ToString());
+                Writer.WriteAttributeString("HP_Max_Value", character.HealthBar.Value.ToString());
                 Writer.WriteAttributeString("EP_Value", character.ManaBar.Value.ToString());
+                Writer.WriteAttributeString("EP_Max_Value", character.ManaBar.Value.ToString());
                 ExitNode();
 
                 EnterNode("Stats");
@@ -778,35 +780,28 @@ namespace DoS1.Util
             ExitNode();
         }
 
-        private static void ExportPortrait(string saveDir)
+        public static RenderTarget2D ExportPortrait()
         {
-            string portraitFile = Path.Combine(saveDir, "portrait.png");
-
-            //Set render target
             RenderTarget2D portrait = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y * 3);
+
             Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(portrait);
             Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Black);
 
-            //Get lead character
             Character leader = CharacterManager.GetArmy("Ally").Squads[0].Characters[0];
 
-            //Create dummy portrait box
             Picture portraitBox = new Picture
             {
                 Texture = AssetManager.Textures["Spot"],
                 Region = new Region(0, 0, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y * 3)
             };
 
-            //Render portrait to target
             Main.Game.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             CharacterUtil.DrawCharacter_Portrait(Main.Game.SpriteBatch, portraitBox, leader);
             Main.Game.SpriteBatch.End();
 
-            //Save file
-            using (FileStream stream = File.OpenWrite(portraitFile))
-            {
-                portrait.SaveAsPng(stream, Main.Game.MenuSize.X * 2, Main.Game.MenuSize.Y * 2);
-            }
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(null);
+
+            return portrait;
         }
 
         #endregion

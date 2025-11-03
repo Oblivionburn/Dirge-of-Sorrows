@@ -101,7 +101,7 @@ namespace DoS1.Util
                 squad.Assignment != "Guard Nearest Town")
             {
                 CryptoRandom random = new CryptoRandom();
-                int chance = random.Next(0, 61);
+                int chance = random.Next(0, 201);
                 if (chance == 0)
                 {
                     random = new CryptoRandom();

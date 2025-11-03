@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -47,6 +48,9 @@ namespace DoS1.Util
 
             TimeManager.Now.OnMinutesChange -= MinuteChanged;
             TimeManager.Now.OnMinutesChange += MinuteChanged;
+
+            TimeManager.Now.OnHoursChange -= HourChanged;
+            TimeManager.Now.OnHoursChange += HourChanged;
 
             TimeManager.Now.OnDaysChange -= DayChanged;
             TimeManager.Now.OnDaysChange += DayChanged;
@@ -103,6 +107,9 @@ namespace DoS1.Util
 
             TimeManager.Now.OnMinutesChange -= MinuteChanged;
             TimeManager.Now.OnMinutesChange += MinuteChanged;
+
+            TimeManager.Now.OnHoursChange -= HourChanged;
+            TimeManager.Now.OnHoursChange += HourChanged;
 
             TimeManager.Now.OnDaysChange -= DayChanged;
             TimeManager.Now.OnDaysChange += DayChanged;
@@ -492,7 +499,7 @@ namespace DoS1.Util
 
             if (!Main.Drawing)
             {
-                Main.PauseDrawing = true;
+                Handler.PauseDrawing = true;
 
                 Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(renderTarget);
                 Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
@@ -503,7 +510,7 @@ namespace DoS1.Util
 
                 Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(null);
 
-                Main.PauseDrawing = false;
+                Handler.PauseDrawing = false;
             }
 
             return renderTarget;
@@ -1722,6 +1729,35 @@ namespace DoS1.Util
             if (Handler.LocalMap)
             {
                 WorldUtil.RestSquads();
+            }
+        }
+
+        public static void HourChanged(object sender, EventArgs e)
+        {
+            if (Handler.AutoSave &&
+                TimeManager.Now.Hours == 12 &&
+                Handler.LocalMap)
+            {
+                Handler.Selected_Save = "AutoSave";
+                SaveUtil.SaveGame();
+
+                Main.Portrait = null;
+                Main.SavePortrait = true;
+
+                while (Main.Portrait == null)
+                {
+                    Thread.Sleep(1);
+                }
+
+                string saveDir = Path.Combine(AssetManager.Directories["Saves"], Handler.Selected_Save);
+                string portraitFile = Path.Combine(saveDir, "portrait.png");
+                using (FileStream stream = File.OpenWrite(portraitFile))
+                {
+                    Main.Portrait.SaveAsPng(stream, Main.Game.MenuSize.X * 2, Main.Game.MenuSize.Y * 2);
+                }
+
+                Handler.Selected_Save = Handler.GetHero().Name;
+                Alert_Generic("Game saved!", Color.LimeGreen);
             }
         }
 

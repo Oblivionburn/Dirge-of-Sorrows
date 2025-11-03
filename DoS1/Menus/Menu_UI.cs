@@ -1291,7 +1291,7 @@ namespace DoS1.Menus
                     break;
             }
 
-            Save.ExportINI();
+            SaveUtil.ExportINI();
         }
 
         public override void Load(ContentManager content)

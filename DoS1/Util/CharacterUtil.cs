@@ -551,22 +551,8 @@ namespace DoS1.Util
                 Color[] colors = new Color[texture.Width * texture.Height];
                 texture.GetData(colors);
 
-                int count = colors.Length;
-                for (int i = 0; i < count; i++)
-                {
-                    Color color = colors[i];
-                    if (color.R == 0 &&
-                        color.G == 0 &&
-                        color.B == 0 &&
-                        color.A == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        return color;
-                    }
-                }
+                int index = (40 * texture.Width) + 340;
+                return colors[index];
             }
 
             return new Color(0, 0, 0, 0);
@@ -721,6 +707,16 @@ namespace DoS1.Util
 
             character.XP = 0;
             character.Level++;
+
+            character.HealthBar.Max_Value += 20;
+
+            character.HealthBar.Value += 20;
+            if (character.HealthBar.Value > character.HealthBar.Max_Value)
+            {
+                character.HealthBar.Value = character.HealthBar.Max_Value;
+            }
+
+            character.HealthBar.Update();
 
             //Increase stat
             random = new CryptoRandom();

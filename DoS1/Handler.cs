@@ -30,6 +30,7 @@ namespace DoS1
         public static long MainCharacter_ID;
         public static string AlertType;
         public static int StoryStep = -1;
+        public static bool AutoSave;
 
         public static bool Loaded;
         public static int Loading_Step;
@@ -51,6 +52,7 @@ namespace DoS1
         public static bool ManualPause;
         public static bool LocalPause;
         public static bool CombatPause;
+        public static bool PauseDrawing;
 
         public static long Selected_Token = -1;
 
@@ -165,17 +167,19 @@ namespace DoS1
                 {
                     Saves.Add(saveDir.Name);
                 }
+
+                SortSaves();
             }
 
             string config = AssetManager.Files["Config"];
             if (!File.Exists(config))
             {
                 File.Create(config).Close();
-                Save.ExportINI();
+                SaveUtil.ExportINI();
             }
             else
             {
-                Load.ParseINI(config);
+                LoadUtil.ParseINI(config);
             }
         }
 
@@ -268,6 +272,32 @@ namespace DoS1
                 AssetManager.Textures["Snow"],
                 AssetManager.Textures["Storm"]
             });
+        }
+
+        public static void SortSaves()
+        {
+            for (int i = 0; i < Saves.Count; i++)
+            {
+                for (int j = 0; j < Saves.Count - 1; j++)
+                {
+                    int day_a = LoadUtil.Get_Day(Saves[j]);
+                    int hour_a = LoadUtil.Get_Hour(Saves[j]);
+                    int minute_a = LoadUtil.Get_Minute(Saves[j]);
+                    int total_a = ((day_a * 24) * 60) + (hour_a * 60) + minute_a;
+
+                    int day_b = LoadUtil.Get_Day(Saves[j + 1]);
+                    int hour_b = LoadUtil.Get_Hour(Saves[j + 1]);
+                    int minute_b = LoadUtil.Get_Minute(Saves[j + 1]);
+                    int total_b = ((day_b * 24) * 60) + (hour_b * 60) + minute_b;
+
+                    if (total_a < total_b)
+                    {
+                        string temp = Saves[j];
+                        Saves[j] = Saves[j + 1];
+                        Saves[j + 1] = temp;
+                    }
+                }
+            }
         }
 
         #endregion

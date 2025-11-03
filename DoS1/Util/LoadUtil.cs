@@ -15,7 +15,7 @@ using OP_Engine.Utility;
 
 namespace DoS1.Util
 {
-    public static class Load
+    public static class LoadUtil
     {
         #region Variables
 
@@ -82,6 +82,10 @@ namespace DoS1.Util
             {
                 switch (reader.Name)
                 {
+                    case "AutoSave":
+                        Handler.AutoSave = reader.Value == "True";
+                        break;
+
                     case "Fullscreen":
                         if (reader.Value == "True")
                         {
@@ -723,6 +727,11 @@ namespace DoS1.Util
                         character.HealthBar.Update();
                         break;
 
+                    case "HP_Max_Value":
+                        character.HealthBar.Max_Value = float.Parse(reader.Value);
+                        character.HealthBar.Update();
+                        break;
+
                     case "EP_Value":
                         character.ManaBar.Base_Texture = AssetManager.Textures["ProgressBase"];
                         character.ManaBar.Bar_Texture = AssetManager.Textures["ProgressBar"];
@@ -730,6 +739,11 @@ namespace DoS1.Util
                         character.ManaBar.DrawColor = Color.Blue;
                         character.ManaBar.Max_Value = 100;
                         character.ManaBar.Value = float.Parse(reader.Value);
+                        character.ManaBar.Update();
+                        break;
+
+                    case "EP_Max_Value":
+                        character.ManaBar.Max_Value = float.Parse(reader.Value);
                         character.ManaBar.Update();
                         break;
                 }
@@ -1486,6 +1500,157 @@ namespace DoS1.Util
         }
 
         #endregion
+
+        #endregion
+
+        #region Get Data
+
+        public static int Get_Day(string save)
+        {
+            int day = 0;
+
+            string saveDir = Path.Combine(AssetManager.Directories["Saves"], save);
+            string gameDat = Path.Combine(saveDir, "game.dat");
+
+            using (XmlTextReader reader = new XmlTextReader(File.OpenRead(gameDat)))
+            {
+                try
+                {
+                    while (reader.Read())
+                    {
+                        switch (reader.Name)
+                        {
+                            case "Game":
+                                while (reader.Read())
+                                {
+                                    if (reader.Name == "Game" && reader.NodeType == XmlNodeType.EndElement)
+                                        break;
+
+                                    switch (reader.Name)
+                                    {
+                                        case "GameProperties":
+                                            while (reader.MoveToNextAttribute())
+                                            {
+                                                switch (reader.Name)
+                                                {
+                                                    case "Time_Days":
+                                                        day = int.Parse(reader.Value);
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.Game.CrashHandler(e);
+                }
+            }
+
+            return day;
+        }
+
+        public static int Get_Minute(string save)
+        {
+            int minute = 0;
+
+            string saveDir = Path.Combine(AssetManager.Directories["Saves"], save);
+            string gameDat = Path.Combine(saveDir, "game.dat");
+
+            using (XmlTextReader reader = new XmlTextReader(File.OpenRead(gameDat)))
+            {
+                try
+                {
+                    while (reader.Read())
+                    {
+                        switch (reader.Name)
+                        {
+                            case "Game":
+                                while (reader.Read())
+                                {
+                                    if (reader.Name == "Game" && reader.NodeType == XmlNodeType.EndElement)
+                                        break;
+
+                                    switch (reader.Name)
+                                    {
+                                        case "GameProperties":
+                                            while (reader.MoveToNextAttribute())
+                                            {
+                                                switch (reader.Name)
+                                                {
+                                                    case "Time_Minutes":
+                                                        minute = int.Parse(reader.Value);
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.Game.CrashHandler(e);
+                }
+            }
+
+            return minute;
+        }
+
+        public static int Get_Hour(string save)
+        {
+            int hour = 0;
+
+            string saveDir = Path.Combine(AssetManager.Directories["Saves"], save);
+            string gameDat = Path.Combine(saveDir, "game.dat");
+
+            using (XmlTextReader reader = new XmlTextReader(File.OpenRead(gameDat)))
+            {
+                try
+                {
+                    while (reader.Read())
+                    {
+                        switch (reader.Name)
+                        {
+                            case "Game":
+                                while (reader.Read())
+                                {
+                                    if (reader.Name == "Game" && reader.NodeType == XmlNodeType.EndElement)
+                                        break;
+
+                                    switch (reader.Name)
+                                    {
+                                        case "GameProperties":
+                                            while (reader.MoveToNextAttribute())
+                                            {
+                                                switch (reader.Name)
+                                                {
+                                                    case "Time_Hours":
+                                                        hour = int.Parse(reader.Value);
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.Game.CrashHandler(e);
+                }
+            }
+
+            return hour;
+        }
 
         #endregion
 

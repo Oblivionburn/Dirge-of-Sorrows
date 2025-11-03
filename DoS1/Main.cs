@@ -33,7 +33,9 @@ namespace DoS1
         public static string Version;
         public static bool LostFocus;
         public static bool Drawing;
-        public static bool PauseDrawing;
+
+        public static bool SavePortrait;
+        public static RenderTarget2D Portrait;
 
         public static int TimeSpeed = 4;
         public static int CombatSpeed = 2;
@@ -223,13 +225,19 @@ namespace DoS1
                     Game.Window.ClientBounds.Height > 0)
                 {
                     if (Game.SpriteBatch != null &&
-                        !PauseDrawing)
+                        !Handler.PauseDrawing)
                     {
                         Drawing = true;
 
                         if (RenderingManager.UsingDefaults &&
                             Game.GraphicsManager != null)
                         {
+                            if (SavePortrait)
+                            {
+                                Portrait = SaveUtil.ExportPortrait();
+                                SavePortrait = false;
+                            }
+
                             //Set ambient light in case the color changed
                             RenderingManager.LightingRenderer.GraphicsClearColor = RenderingManager.Lighting.DrawColor;
 
@@ -283,12 +291,6 @@ namespace DoS1
                             MenuManager.Draw(Game.SpriteBatch);
 
                             Game.SpriteBatch.End();
-                        }
-
-                        int count = RenderingManager.Renderers.Count;
-                        for (int i = 0; i < count; i++)
-                        {
-                            RenderingManager.Renderers[i].Draw(Game.SpriteBatch, Game.Resolution);
                         }
 
                         Drawing = false;

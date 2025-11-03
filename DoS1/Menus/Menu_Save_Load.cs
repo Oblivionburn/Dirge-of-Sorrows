@@ -389,7 +389,7 @@ namespace DoS1.Menus
                 string save = Handler.Saves[num - 1];
                 Handler.Selected_Save = save;
 
-                Util.Load.LoadGame();
+                Util.LoadUtil.LoadGame();
                 GameUtil.LoadGame();
             }
         }
@@ -415,6 +415,12 @@ namespace DoS1.Menus
                 if (saveName != null)
                 {
                     saveName.TextColor = Color.White;
+                }
+
+                Label saveTime = GetLabel("Save" + save + "_Time");
+                if (saveTime != null)
+                {
+                    saveTime.TextColor = Color.White;
                 }
 
                 Label saveDate = GetLabel("Save" + save + "_Date");
@@ -448,12 +454,71 @@ namespace DoS1.Menus
                     saveName.TextColor = Color.White * 0.8f;
                 }
 
+                Label saveTime = GetLabel("Save" + save + "_Time");
+                if (saveTime != null)
+                {
+                    saveTime.TextColor = Color.White * 0.8f;
+                }
+
                 Label saveDate = GetLabel("Save" + save + "_Date");
                 if (saveDate != null)
                 {
                     saveDate.TextColor = Color.White * 0.8f;
                 }
             }
+        }
+
+        private string GetTime(int day, int hour, int minute)
+        {
+            string time_day = "Day " + day;
+
+            string time = "";
+            string minutes = "";
+            string hours = "";
+            bool pm = false;
+
+            if (hour > 12)
+            {
+                hour = hour - 12;
+                pm = true;
+            }
+            else if (hour == 0)
+            {
+                hour = 12;
+            }
+            else if (hour == 12)
+            {
+                pm = true;
+            }
+
+            if (hour < 10)
+            {
+                hours = "0" + hour.ToString();
+            }
+            else
+            {
+                hours = hour.ToString();
+            }
+
+            if (minute < 10)
+            {
+                minutes = "0" + minute.ToString();
+            }
+            else
+            {
+                minutes = minute.ToString();
+            }
+
+            if (pm == false)
+            {
+                time = hours + ":" + minutes + " AM";
+            }
+            else
+            {
+                time = hours + ":" + minutes + " PM";
+            }
+
+            return time_day + ", " + time;
         }
 
         public override void Close()
@@ -491,6 +556,12 @@ namespace DoS1.Menus
                 if (saveName != null)
                 {
                     Labels.Remove(saveName);
+                }
+
+                Label saveTime = GetLabel("Save" + i.ToString() + "_Time");
+                if (saveTime != null)
+                {
+                    Labels.Remove(saveTime);
                 }
 
                 Label saveDate = GetLabel("Save" + i.ToString() + "_Date");
@@ -548,6 +619,11 @@ namespace DoS1.Menus
 
                     if (saveDir != null)
                     {
+                        int day = Util.LoadUtil.Get_Day(save);
+                        int hour = Util.LoadUtil.Get_Hour(save);
+                        int minute = Util.LoadUtil.Get_Minute(save);
+                        string time = GetTime(day, hour, minute);
+
                         AddButton(new ButtonOptions
                         {
                             id = Handler.GetID(),
@@ -589,7 +665,18 @@ namespace DoS1.Menus
                             id = Handler.GetID(),
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Name",
-                            text = save,
+                            text = "Save Name:   " + save,
+                            text_color = Color.White * 0.8f,
+                            region = new Region(0, 0, 0, 0),
+                            visible = true
+                        });
+
+                        AddLabel(new LabelOptions
+                        {
+                            id = Handler.GetID(),
+                            font = AssetManager.Fonts["ControlFont"],
+                            name = "Save" + i.ToString() + "_Time",
+                            text = "Save Time:   " + time,
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true
@@ -600,7 +687,7 @@ namespace DoS1.Menus
                             id = Handler.GetID(),
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Date",
-                            text = saveDir.LastWriteTime.ToString("MM-dd-yyyy hh:mm tt"),
+                            text = "File Date:   " + saveDir.LastWriteTime.ToString("MM-dd-yyyy hh:mm tt"),
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true
@@ -694,21 +781,28 @@ namespace DoS1.Menus
                     float margin = saveButton.Region.Height / 10;
 
                     Picture savePortrait = GetPicture("Save" + i.ToString() + "_Portrait");
-                    savePortrait.Region = new Region(saveNum.Region.X + saveNum.Region.Width + margin, saveButton.Region.Y + margin, (Main.Game.MenuSize.X * 2) - (margin * 2), saveHeight - (margin * 2));
+                    if (savePortrait != null)
+                    {
+                        savePortrait.Region = new Region(saveNum.Region.X + saveNum.Region.Width + margin, saveButton.Region.Y + margin, (Main.Game.MenuSize.X * 2) - (margin * 2), saveHeight - (margin * 2));
 
-                    float saveName_X = saveNum.Region.X + saveNum.Region.Width + savePortrait.Region.Width + (margin * 2);
-                    float dataWidth = saveWidth - saveNum.Region.Width - savePortrait.Region.Width - Main.Game.MenuSize.X;
+                        float saveName_X = saveNum.Region.X + saveNum.Region.Width + savePortrait.Region.Width + (margin * 2);
+                        float dataWidth = saveWidth - saveNum.Region.Width - savePortrait.Region.Width - Main.Game.MenuSize.X;
 
-                    Label saveName = GetLabel("Save" + i.ToString() + "_Name");
-                    saveName.Alignment_Horizontal = Alignment.Left;
-                    saveName.Region = new Region(saveName_X, saveButton.Region.Y, dataWidth, Main.Game.MenuSize.Y);
+                        Label saveName = GetLabel("Save" + i.ToString() + "_Name");
+                        saveName.Alignment_Horizontal = Alignment.Left;
+                        saveName.Region = new Region(saveName_X, saveButton.Region.Y, dataWidth, saveButton.Region.Height / 3);
 
-                    Label saveDate = GetLabel("Save" + i.ToString() + "_Date");
-                    saveDate.Alignment_Horizontal = Alignment.Left;
-                    saveDate.Region = new Region(saveName_X, saveButton.Region.Y + Main.Game.MenuSize.Y, dataWidth, Main.Game.MenuSize.Y);
+                        Label saveTime = GetLabel("Save" + i.ToString() + "_Time");
+                        saveTime.Alignment_Horizontal = Alignment.Left;
+                        saveTime.Region = new Region(saveName_X, saveButton.Region.Y + (saveButton.Region.Height / 3), dataWidth, saveButton.Region.Height / 3);
 
-                    Button saveDelete = GetButton("Save" + i.ToString() + "_Delete");
-                    saveDelete.Region = new Region(X + saveWidth - Main.Game.MenuSize.X, Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+                        Label saveDate = GetLabel("Save" + i.ToString() + "_Date");
+                        saveDate.Alignment_Horizontal = Alignment.Left;
+                        saveDate.Region = new Region(saveName_X, saveButton.Region.Y + ((saveButton.Region.Height / 3) * 2), dataWidth, saveButton.Region.Height / 3);
+
+                        Button saveDelete = GetButton("Save" + i.ToString() + "_Delete");
+                        saveDelete.Region = new Region(X + saveWidth - Main.Game.MenuSize.X, Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+                    }
 
                     Y += saveHeight;
                 }

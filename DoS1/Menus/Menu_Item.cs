@@ -442,7 +442,7 @@ namespace DoS1.Menus
                         if (found_grid)
                         {
                             reset = false;
-                            Unattach(movingItem);
+                            Detach(movingItem);
                             movingItem = null;
                         }
                         else
@@ -514,7 +514,7 @@ namespace DoS1.Menus
             }
         }
 
-        private void Unattach(Item item)
+        private void Detach(Item item)
         {
             Inventory inventory = InventoryManager.GetInventory("Ally");
             if (inventory != null)

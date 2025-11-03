@@ -103,10 +103,10 @@
     <Compile Include="Util\CombatUtil.cs" />
     <Compile Include="Util\GameUtil.cs" />
     <Compile Include="Util\InventoryUtil.cs" />
-    <Compile Include="Util\Load.cs" />
+    <Compile Include="Util\LoadUtil.cs" />
     <Compile Include="Util\oPathing.cs" />
     <Compile Include="Util\RuneUtil.cs" />
-    <Compile Include="Util\Save.cs" />
+    <Compile Include="Util\SaveUtil.cs" />
     <Compile Include="Util\ShaderUtil.cs" />
     <Compile Include="Util\WorldGen.cs" />
     <Compile Include="Util\WorldUtil.cs" />

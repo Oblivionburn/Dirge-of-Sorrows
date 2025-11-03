@@ -158,9 +158,21 @@ namespace DoS1.Menus
 
             if (button.Name == "Back")
             {
-                Save.ExportINI();
+                SaveUtil.ExportINI();
                 InputManager.Mouse.Flush();
                 MenuManager.ChangeMenu_Previous();
+            }
+            else if (button.Name == "AutoSaveOn")
+            {
+                Handler.AutoSave = false;
+                button.Name = "AutoSaveOff";
+                GetLabel("AutoSave").Text = "AutoSave Off";
+            }
+            else if (button.Name == "AutoSaveOff")
+            {
+                Handler.AutoSave = true;
+                button.Name = "AutoSaveOn";
+                GetLabel("AutoSave").Text = "AutoSave On";
             }
             else if (button.Name == "FullscreenOn")
             {
@@ -360,6 +372,42 @@ namespace DoS1.Menus
                 visible = true
             });
 
+            if (Handler.AutoSave)
+            {
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "AutoSaveOn",
+                    hover_text = "Toggle AutoSave",
+                    texture = AssetManager.Textures["Button_Save"],
+                    texture_highlight = AssetManager.Textures["Button_Save_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
+                GetButton("AutoSaveOn").Value = 1;
+                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "AutoSave", "AutoSave On", Color.White, new Region(0, 0, 0, 0), true);
+            }
+            else
+            {
+                AddButton(new ButtonOptions
+                {
+                    id = Handler.GetID(),
+                    name = "AutoSaveOff",
+                    hover_text = "Toggle AutoSave",
+                    texture = AssetManager.Textures["Button_Save"],
+                    texture_highlight = AssetManager.Textures["Button_Save_Hover"],
+                    region = new Region(0, 0, 0, 0),
+                    draw_color = Color.White,
+                    enabled = true,
+                    visible = true
+                });
+
+                AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "AutoSave", "AutoSave Off", Color.White, new Region(0, 0, 0, 0), true);
+            }
+
             if (Main.Game.GraphicsManager.IsFullScreen)
             {
                 AddButton(new ButtonOptions
@@ -414,7 +462,7 @@ namespace DoS1.Menus
                 GetButton("MusicOn").Value = 1;
 
                 AddProgressBar(Handler.GetID(), "Music", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
-                    new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), true);
+                    new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), true);
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Music", "", Color.White, new Region(0, 0, 0, 0), true);
             }
             else
@@ -433,7 +481,7 @@ namespace DoS1.Menus
                 });
 
                 AddProgressBar(Handler.GetID(), "Music", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
-                    new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), false);
+                    new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), false);
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Music", "", Color.White, new Region(0, 0, 0, 0), true);
             }
             GetVolume(GetProgressBar("Music"));
@@ -456,7 +504,7 @@ namespace DoS1.Menus
                 GetButton("AmbienceOn").Value = 1;
 
                 AddProgressBar(Handler.GetID(), "Ambience", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
-                    new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), true);
+                    new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), true);
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Ambience", "", Color.White, new Region(0, 0, 0, 0), true);
             }
             else
@@ -475,7 +523,7 @@ namespace DoS1.Menus
                 });
 
                 AddProgressBar(Handler.GetID(), "Ambience", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
-                    new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), false);
+                    new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), false);
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Ambience", "", Color.White, new Region(0, 0, 0, 0), true);
             }
             GetVolume(GetProgressBar("Ambience"));
@@ -498,7 +546,7 @@ namespace DoS1.Menus
                 GetButton("SoundOn").Value = 1;
 
                 AddProgressBar(Handler.GetID(), "Sound", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
-                    new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), true);
+                    new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), true);
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Sound", "", Color.White, new Region(0, 0, 0, 0), true);
             }
             else
@@ -517,7 +565,7 @@ namespace DoS1.Menus
                 });
 
                 AddProgressBar(Handler.GetID(), "Sound", 100, 100, 1, AssetManager.Textures["ProgressBase"], AssetManager.Textures["ProgressBar"],
-                    new Region(0, 0, 0, 0), new Color(0, 200, 200, 255), false);
+                    new Region(0, 0, 0, 0), new Color(150, 0, 0, 255), false);
                 AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Sound", "", Color.White, new Region(0, 0, 0, 0), true);
             }
             GetVolume(GetProgressBar("Sound"));
@@ -538,6 +586,15 @@ namespace DoS1.Menus
             GetButton("Back").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
 
             Y += 2;
+            Button autosave = GetButton("AutoSaveOn");
+            if (autosave == null)
+            {
+                autosave = GetButton("AutoSaveOff");
+            }
+            autosave.Region = new Region(X, Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, height);
+            GetLabel("AutoSave").Region = new Region(autosave.Region.X + autosave.Region.Width, autosave.Region.Y, width, height);
+
+            Y += 1;
             Button fullscreen = GetButton("FullscreenOn");
             if (fullscreen == null)
             {
