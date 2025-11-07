@@ -171,6 +171,8 @@ namespace DoS1.Menus
                 Main.Portrait.SaveAsPng(stream, Main.Game.MenuSize.X * 2, Main.Game.MenuSize.Y * 2);
             }
 
+            Main.Portrait.Dispose();
+
             Handler.Selected_Save = Handler.GetHero().Name;
             GameUtil.Alert_Generic("Game saved!", Color.LimeGreen);
 
@@ -193,6 +195,8 @@ namespace DoS1.Menus
             {
                 Main.Portrait.SaveAsPng(stream, Main.Game.MenuSize.X * 2, Main.Game.MenuSize.Y * 2);
             }
+
+            Main.Portrait.Dispose();
 
             Handler.SortSaves();
             GameUtil.ReturnToTitle();

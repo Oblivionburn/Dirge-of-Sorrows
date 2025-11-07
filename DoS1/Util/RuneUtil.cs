@@ -1414,22 +1414,22 @@ namespace DoS1.Util
                            Main.Game.MenuSize_Y), false);
         }
 
-        public static void Increase_XP(Item rune, int amount)
+        public static void Increase_RP(Item rune, int amount)
         {
-            Something xp = rune.GetProperty("XP Value");
+            Something rp = rune.GetProperty("RP Value");
             Something level = rune.GetProperty("Level Value");
 
             if (level != null &&
-                xp != null)
+                rp != null)
             {
                 if (level.Value < level.Max_Value)
                 {
                     for (int i = 1; i <= amount; i++)
                     {
-                        xp.Value++;
+                        rp.Value++;
 
                         //Do we have enough XP to reach the next level?
-                        if (xp.Value >= xp.Max_Value)
+                        if (rp.Value >= rp.Max_Value)
                         {
                             Increase_Level(rune);
 
@@ -1445,10 +1445,10 @@ namespace DoS1.Util
 
         public static void Increase_Level(Item rune)
         {
-            Something xp = rune.GetProperty("XP Value");
-            if (xp != null)
+            Something rp = rune.GetProperty("RP Value");
+            if (rp != null)
             {
-                xp.Value = 0;
+                rp.Value = 0;
             }
 
             Something level = rune.GetProperty("Level Value");
@@ -1458,7 +1458,7 @@ namespace DoS1.Util
 
                 if (level.Value == level.Max_Value)
                 {
-                    xp.Value = xp.Max_Value;
+                    rp.Value = rp.Max_Value;
                 }
 
                 UpdateRune_Description(rune);

@@ -1319,7 +1319,7 @@ namespace DoS1.Menus
                 // Character Stats
                 // ===============
                 X = char_pic.Region.X - (width * 7);
-                Y = char_pic.Region.Y - height;
+                Y = char_pic.Region.Y - (height * 3);
 
                 GetLabel("Stats").Region = new Region(X, Y, (width * 7), height);
                 GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
@@ -1344,31 +1344,35 @@ namespace DoS1.Menus
                 xp.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 xp.Text = "EXP: " + character.XP + "/" + Handler.XP_Needed_ForLevels[character.Level + 1];
 
+                Something STR = character.GetStat("STR");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label strength = GetLabel("STR");
                 strength.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
-                strength.Text = "STR: 10/100";
+                strength.Text = "STR: " + STR.Value + "/" + STR.Max_Value;
 
+                Something INT = character.GetStat("INT");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label intelligence = GetLabel("INT");
                 intelligence.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
-                intelligence.Text = "INT: 10/100";
+                intelligence.Text = "INT: " + INT.Value + "/" + INT.Max_Value;
 
+                Something DEX = character.GetStat("DEX");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label dexterity = GetLabel("DEX");
                 dexterity.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
-                dexterity.Text = "DEX: 10/100";
+                dexterity.Text = "DEX: " + DEX.Value + "/" + DEX.Max_Value;
 
+                Something AGI = character.GetStat("AGI");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label agility = GetLabel("AGI");
                 agility.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
-                agility.Text = "AGI: 10/100";
+                agility.Text = "DEX: " + AGI.Value + "/" + AGI.Max_Value;
 
                 // ===============
                 // Equipment Stats
                 // ===============
                 X = char_pic.Region.X - (width * 7);
-                Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + (height * 3);
+                Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + height;
 
                 GetLabel("Equipment").Region = new Region(X, Y, (width * 7), height);
                 GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
@@ -1456,6 +1460,20 @@ namespace DoS1.Menus
                 {
                     Something property = Properties[i];
 
+                    if (property.Name.Contains("Cost"))
+                    {
+                        equipment.Text += property.Name + ": " + property.Value;
+
+                        equipment.Text += "\n";
+                        equipment.Region.Height += (Main.Game.MenuSize.Y / 2);
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < Properties.Count; i++)
+                {
+                    Something property = Properties[i];
+
                     if (!property.Name.Contains("Cost"))
                     {
                         if (property.Name.Contains("Area") ||
@@ -1491,19 +1509,11 @@ namespace DoS1.Menus
                             equipment.Text += property.Name + ": " + property.Value;
                         }
 
-                        equipment.Text += "\n";
-                        equipment.Region.Height += (Main.Game.MenuSize.Y / 2);
-                    }
-                }
-
-                for (int i = 0; i < Properties.Count; i++)
-                {
-                    Something property = Properties[i];
-
-                    if (property.Name.Contains("Cost"))
-                    {
-                        equipment.Text += property.Name + ": " + property.Value;
-                        break;
+                        if (i < Properties.Count - 1)
+                        {
+                            equipment.Text += "\n";
+                            equipment.Region.Height += (Main.Game.MenuSize.Y / 2);
+                        }
                     }
                 }
             }

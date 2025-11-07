@@ -339,6 +339,7 @@ namespace DoS1.Menus
 
             Handler.Selected_Item = id;
 
+            InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Item");
         }
 
@@ -450,9 +451,9 @@ namespace DoS1.Menus
                             text += property.Name + ": " + property.Value + "%";
                         }
                     }
-                    else if (property.Name.Contains("XP"))
+                    else if (property.Name.Contains("RP"))
                     {
-                        text += "Exp: " + property.Value + "/" + property.Max_Value;
+                        text += "RP: " + property.Value + "/" + property.Max_Value;
                     }
                     else if (property.Name.Contains("Level"))
                     {
@@ -544,9 +545,9 @@ namespace DoS1.Menus
                             text += property.Name + ": " + property.Value + "%";
                         }
                     }
-                    else if (property.Name.Contains("XP"))
+                    else if (property.Name.Contains("RP"))
                     {
-                        text += "Exp: " + property.Value + "/" + property.Max_Value;
+                        text += "RP: " + property.Value + "/" + property.Max_Value;
                     }
                     else if (property.Name.Contains("Level"))
                     {
@@ -852,7 +853,7 @@ namespace DoS1.Menus
         public override void Load()
         {
             LoadGrid();
-            Filter("Helms");
+            Filter(current_filter);
             ResizeInventory();
         }
 

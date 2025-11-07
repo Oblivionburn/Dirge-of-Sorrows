@@ -647,7 +647,6 @@ namespace DoS1.Util
                 }
 
                 random = new CryptoRandom();
-                int runes_tier = random.Next(min_tier, max_tier + 1);
 
                 Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
                 Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
@@ -661,25 +660,25 @@ namespace DoS1.Util
                     //Max of 4 runes at level 15+, min of 1 at level 10+
                     random = new CryptoRandom();
                     int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
-                    InventoryUtil.AddRunes(armor, runes_tier, runes_amount);
+                    InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
                         random = new CryptoRandom();
                         runes_amount = random.Next(0, max_tier + 7) / 4;
-                        InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
+                        InventoryUtil.AddRunes(helm, runes_amount);
                     }
 
                     if (shield != null)
                     {
                         random = new CryptoRandom();
                         runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
-                        InventoryUtil.AddRunes(shield, runes_tier, runes_amount);
+                        InventoryUtil.AddRunes(shield, runes_amount);
                     }
 
                     random = new CryptoRandom();
                     runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
-                    InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
+                    InventoryUtil.AddRunes(weapon, runes_amount);
 
                     #endregion
                 }
@@ -690,18 +689,18 @@ namespace DoS1.Util
                     //Max of 6 runes at level 15+, min of 1 at level 8+
                     random = new CryptoRandom();
                     int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 9) / 3);
-                    InventoryUtil.AddRunes(armor, runes_tier, runes_amount);
+                    InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
                         random = new CryptoRandom();
                         runes_amount = random.Next(0, max_tier + 9) / 3;
-                        InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
+                        InventoryUtil.AddRunes(helm, runes_amount);
                     }
 
                     random = new CryptoRandom();
                     runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 9) / 3);
-                    InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
+                    InventoryUtil.AddRunes(weapon, runes_amount);
 
                     #endregion
                 }
@@ -712,27 +711,27 @@ namespace DoS1.Util
                     //Max of 8 runes at level 15+, min of 1 at level 5+
                     random = new CryptoRandom();
                     int runes_amount = random.Next(min_tier, max_tier + 7) / 2;
-                    InventoryUtil.AddRunes(armor, runes_tier, runes_amount);
+                    InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
                         random = new CryptoRandom();
                         runes_amount = random.Next(0, max_tier + 7) / 2;
-                        InventoryUtil.AddRunes(helm, runes_tier, runes_amount);
+                        InventoryUtil.AddRunes(helm, runes_amount);
                     }
 
                     //Always at least 1 offense on weapon
-                    InventoryUtil.AddRune_Elemental(weapon, runes_tier);
+                    InventoryUtil.AddRune_Elemental(weapon);
 
                     random = new CryptoRandom();
                     runes_amount = (int)Math.Ceiling((double)random.Next(min_tier, max_tier + 7) / 2) - 1;
-                    InventoryUtil.AddRunes(weapon, runes_tier, runes_amount);
+                    InventoryUtil.AddRunes(weapon, runes_amount);
 
                     #endregion
                 }
 
                 random = new CryptoRandom();
-                int level = random.Next(min_tier, max_tier + 1);
+                int level = random.Next(min_tier - 1, max_tier + 1);
                 for (int l = 1; l <= level; l++)
                 {
                     if (l > 1)

@@ -556,9 +556,9 @@ namespace DoS1.Util
                     character.Region.Width.ToString() + "," + character.Region.Height.ToString());
                 Writer.WriteAttributeString("Direction", character.Direction.ToString());
                 Writer.WriteAttributeString("HP_Value", character.HealthBar.Value.ToString());
-                Writer.WriteAttributeString("HP_Max_Value", character.HealthBar.Value.ToString());
+                Writer.WriteAttributeString("HP_Max_Value", character.HealthBar.Max_Value.ToString());
                 Writer.WriteAttributeString("EP_Value", character.ManaBar.Value.ToString());
-                Writer.WriteAttributeString("EP_Max_Value", character.ManaBar.Value.ToString());
+                Writer.WriteAttributeString("EP_Max_Value", character.ManaBar.Max_Value.ToString());
                 ExitNode();
 
                 EnterNode("Stats");
@@ -780,11 +780,11 @@ namespace DoS1.Util
             ExitNode();
         }
 
-        public static RenderTarget2D ExportPortrait()
+        public static void ExportPortrait()
         {
-            RenderTarget2D portrait = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y * 3);
+            Main.Portrait = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y * 3);
 
-            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(portrait);
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(Main.Portrait);
             Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Black);
 
             Character leader = CharacterManager.GetArmy("Ally").Squads[0].Characters[0];
@@ -800,8 +800,6 @@ namespace DoS1.Util
             Main.Game.SpriteBatch.End();
 
             Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(null);
-
-            return portrait;
         }
 
         #endregion

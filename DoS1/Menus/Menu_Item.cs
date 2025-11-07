@@ -615,9 +615,9 @@ namespace DoS1.Menus
             {
                 Something property = item.Properties[i];
 
-                if (property.Name.Contains("XP"))
+                if (property.Name.Contains("RP"))
                 {
-                    text += "Exp: " + property.Value + "/" + property.Max_Value;
+                    text += "RP: " + property.Value + "/" + property.Max_Value;
                 }
                 else if (property.Name.Contains("Level"))
                 {

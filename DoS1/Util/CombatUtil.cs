@@ -1438,41 +1438,35 @@ namespace DoS1.Util
             }
         }
 
-        public static int GainExp(Character character, int amount)
+        public static void Gain_RP(Character character, int amount)
         {
-            int levels_gained = 0;
-
             //Increase rune XP on equipment
             Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
             if (weapon != null)
             {
-                GainExp_Item(weapon, amount);
+                Gain_RP_Item(weapon, amount);
             }
 
             Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
             if (helm != null)
             {
-                GainExp_Item(helm, amount);
+                Gain_RP_Item(helm, amount);
             }
 
             Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
             if (armor != null)
             {
-                GainExp_Item(armor, amount);
+                Gain_RP_Item(armor, amount);
             }
 
             Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
             if (shield != null)
             {
-                GainExp_Item(shield, amount);
+                Gain_RP_Item(shield, amount);
             }
-
-            levels_gained = CharacterUtil.Increase_XP(character, amount);
-
-            return levels_gained;
         }
 
-        public static void GainExp_Item(Item item, int amount)
+        public static void Gain_RP_Item(Item item, int amount)
         {
             if (item != null &&
                 amount > 0)
@@ -1480,7 +1474,7 @@ namespace DoS1.Util
                 for (int i = 0; i < item.Attachments.Count; i++)
                 {
                     Item rune = item.Attachments[i];
-                    RuneUtil.Increase_XP(rune, amount);
+                    RuneUtil.Increase_RP(rune, amount);
                 }
 
                 InventoryUtil.UpdateItem(item);

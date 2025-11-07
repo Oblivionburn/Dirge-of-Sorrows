@@ -479,7 +479,7 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("XP", "Value", 0, 10));
+            properties.Add(NewProperty("RP", "Value", 0, 10));
             properties.Add(NewProperty("Level", "Value", 1, 10));
             Item item = NewItem(type, "Area", "Area", properties);
             item.Buy_Price = 1000;
@@ -1356,7 +1356,7 @@ namespace DoS1.Util
             return spell;
         }
 
-        public static void AddRunes(Item item, int tier, int amount)
+        public static void AddRunes(Item item, int amount)
         {
             CryptoRandom random;
 
@@ -1373,91 +1373,97 @@ namespace DoS1.Util
 
                     for (int i = 0; i < amount; i++)
                     {
-                        string rune_type = "";
-
-                        random = new CryptoRandom();
-                        int rune_choice = random.Next(0, 14);
-                        switch (rune_choice)
+                        bool rune_chance = Utility.RandomPercent(Handler.Level * 5);
+                        if (rune_chance)
                         {
-                            case 0:
-                                rune_type = "Area Rune";
-                                break;
+                            string rune_type = "";
 
-                            case 1:
-                                rune_type = "Death Rune";
-                                break;
+                            random = new CryptoRandom();
+                            int rune_choice = random.Next(0, 14);
+                            switch (rune_choice)
+                            {
+                                case 0:
+                                    rune_type = "Area Rune";
+                                    break;
 
-                            case 2:
-                                rune_type = "Time Rune";
-                                break;
+                                case 1:
+                                    rune_type = "Death Rune";
+                                    break;
 
-                            case 3:
-                                rune_type = "Drain Rune";
-                                break;
+                                case 2:
+                                    rune_type = "Time Rune";
+                                    break;
 
-                            case 4:
-                                rune_type = "Health Rune";
-                                break;
+                                case 3:
+                                    rune_type = "Drain Rune";
+                                    break;
 
-                            case 5:
-                                rune_type = "Earth Rune";
-                                break;
+                                case 4:
+                                    rune_type = "Health Rune";
+                                    break;
 
-                            case 6:
-                                rune_type = "Ice Rune";
-                                break;
+                                case 5:
+                                    rune_type = "Earth Rune";
+                                    break;
 
-                            case 7:
-                                rune_type = "Physical Rune";
-                                break;
+                                case 6:
+                                    rune_type = "Ice Rune";
+                                    break;
 
-                            case 8:
-                                rune_type = "Lightning Rune";
-                                break;
+                                case 7:
+                                    rune_type = "Physical Rune";
+                                    break;
 
-                            case 9:
-                                rune_type = "Fire Rune";
-                                break;
+                                case 8:
+                                    rune_type = "Lightning Rune";
+                                    break;
 
-                            case 10:
-                                rune_type = "Energy Rune";
-                                break;
+                                case 9:
+                                    rune_type = "Fire Rune";
+                                    break;
 
-                            case 11:
-                                rune_type = "Effect Rune";
-                                break;
+                                case 10:
+                                    rune_type = "Energy Rune";
+                                    break;
 
-                            case 12:
-                                rune_type = "Counter Rune";
-                                break;
+                                case 11:
+                                    rune_type = "Effect Rune";
+                                    break;
 
-                            case 13:
-                                rune_type = "Disarm Rune";
-                                break;
+                                case 12:
+                                    rune_type = "Counter Rune";
+                                    break;
+
+                                case 13:
+                                    rune_type = "Disarm Rune";
+                                    break;
+                            }
+
+                            Item rune = CopyItem(assets.GetItem(rune_type), true);
+                            rune.Location = new Location(item.Attachments.Count, 0, 0);
+                            rune.Icon_Visible = true;
+
+                            Something rp = rune.GetProperty("RP Value");
+                            Something level = rune.GetProperty("Level Value");
+
+                            random = new CryptoRandom();
+                            level.Value = random.Next(1, (Handler.Level / 2) + 1);
+                            if (level.Value >= level.Max_Value)
+                            {
+                                rp.Value = rp.Max_Value;
+                            }
+
+                            RuneUtil.UpdateRune_Description(rune);
+
+                            item.Attachments.Add(rune);
+                            UpdateItem(item);
                         }
-
-                        Item rune = CopyItem(assets.GetItem(rune_type), true);
-                        rune.Location = new Location(item.Attachments.Count, 0, 0);
-                        rune.Icon_Visible = true;
-
-                        Something xp = rune.GetProperty("XP Value");
-                        Something level = rune.GetProperty("Level Value");
-
-                        level.Value = tier;
-                        if (level.Value >= level.Max_Value)
-                        {
-                            xp.Value = xp.Max_Value;
-                        }
-                        RuneUtil.UpdateRune_Description(rune);
-
-                        item.Attachments.Add(rune);
-                        UpdateItem(item);
                     }
                 }
             }
         }
 
-        public static void AddRune_Elemental(Item item, int tier)
+        public static void AddRune_Elemental(Item item)
         {
             CryptoRandom random;
 
@@ -1498,14 +1504,16 @@ namespace DoS1.Util
                     rune.Location = new Location(item.Attachments.Count, 0, 0);
                     rune.Icon_Visible = true;
 
-                    Something xp = rune.GetProperty("XP Value");
+                    Something rp = rune.GetProperty("RP Value");
                     Something level = rune.GetProperty("Level Value");
 
-                    level.Value = tier;
+                    random = new CryptoRandom();
+                    level.Value = random.Next(1, (Handler.Level / 2) + 1);
                     if (level.Value >= level.Max_Value)
                     {
-                        xp.Value = xp.Max_Value;
+                        rp.Value = rp.Max_Value;
                     }
+
                     RuneUtil.UpdateRune_Description(rune);
 
                     item.Attachments.Add(rune);

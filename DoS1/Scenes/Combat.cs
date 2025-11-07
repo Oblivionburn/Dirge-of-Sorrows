@@ -59,6 +59,9 @@ namespace DoS1.Scenes
         private bool won_battle;
         private int gold;
         private int xp;
+        private int xp_base = 2;
+        private int rp;
+        private int rp_base = 1;
 
         #endregion
 
@@ -418,8 +421,9 @@ namespace DoS1.Scenes
                 Army ally_army = CharacterManager.GetArmy("Ally");
 
                 if (hero_killed ||
-                    !ally_army.Squads.Any())
+                    ally_army.Squads.Count == 0)
                 {
+                    ResetCombat_Final();
                     Handler.Combat = false;
                     Main.Timer.Start();
 
@@ -1111,7 +1115,7 @@ namespace DoS1.Scenes
                             {
                                 if (target.Type == "Enemy")
                                 {
-                                    Reward();
+                                    Reward_CharacterKilled();
                                 }
                                 else if (target.ID == Handler.MainCharacter_ID)
                                 {
@@ -1122,7 +1126,8 @@ namespace DoS1.Scenes
                                 {
                                     foreach (Character character in enemy_squad.Characters)
                                     {
-                                        CombatUtil.GainExp(character, 2);
+                                        CharacterUtil.Increase_XP(character, xp_base);
+                                        CombatUtil.Gain_RP(character, rp_base);
                                     }
                                 }
                             }
@@ -1158,7 +1163,7 @@ namespace DoS1.Scenes
                                 {
                                     if (target.Type == "Enemy")
                                     {
-                                        Reward();
+                                        Reward_CharacterKilled();
                                     }
                                     else if (target.ID == Handler.MainCharacter_ID)
                                     {
@@ -1169,7 +1174,8 @@ namespace DoS1.Scenes
                                     {
                                         foreach (Character character in enemy_squad.Characters)
                                         {
-                                            CombatUtil.GainExp(character, 2);
+                                            CharacterUtil.Increase_XP(character, xp_base);
+                                            CombatUtil.Gain_RP(character, rp_base);
                                         }
                                     }
                                 }
@@ -1231,7 +1237,7 @@ namespace DoS1.Scenes
                                             {
                                                 if (target.Type == "Enemy")
                                                 {
-                                                    Reward();
+                                                    Reward_CharacterKilled();
                                                 }
                                                 else if (target.ID == Handler.MainCharacter_ID)
                                                 {
@@ -1242,7 +1248,8 @@ namespace DoS1.Scenes
                                                 {
                                                     foreach (Character character in enemy_squad.Characters)
                                                     {
-                                                        CombatUtil.GainExp(character, 2);
+                                                        CharacterUtil.Increase_XP(character, xp_base);
+                                                        CombatUtil.Gain_RP(character, rp_base);
                                                     }
                                                 }
                                             }
@@ -1285,18 +1292,19 @@ namespace DoS1.Scenes
                         {
                             if (target.Type == "Enemy")
                             {
-                                Reward();
+                                Reward_CharacterKilled();
                             }
                             else if (target.ID == Handler.MainCharacter_ID)
                             {
                                 hero_killed = true;
                                 break;
                             }
-                            else
+                            else if (target.Type == "Ally")
                             {
                                 foreach (Character character in enemy_squad.Characters)
                                 {
-                                    CombatUtil.GainExp(character, 2);
+                                    CharacterUtil.Increase_XP(character, xp_base);
+                                    CombatUtil.Gain_RP(character, rp_base);
                                 }
                             }
                         }
@@ -1921,23 +1929,25 @@ namespace DoS1.Scenes
             Label label = Menu.GetLabel("Result");
             label.Visible = true;
 
+            string text;
+
             if (!enemy_squad.Characters.Any())
             {
                 won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
-                label.Text = ally_squad.Name + " was victorious!";
+                text = ally_squad.Name + " was victorious!";
             }
             else if (!ally_squad.Characters.Any())
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                label.Text = ally_squad.Name + " was defeated!";
+                text = ally_squad.Name + " was defeated!";
             }
             else if (enemy_total_damage > ally_total_damage)
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Defeat"];
-                label.Text = ally_squad.Name + " was defeated!\n\n" +
+                text = ally_squad.Name + " was defeated!\n\n" +
                     ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
                     enemy_squad.Name + " Total Damage: " + enemy_total_damage;
             }
@@ -1945,7 +1955,7 @@ namespace DoS1.Scenes
             {
                 won_battle = true;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Victory"];
-                label.Text = ally_squad.Name + " was victorious!\n\n" +
+                text = ally_squad.Name + " was victorious!\n\n" +
                     ally_squad.Name + " Total Damage: " + ally_total_damage + "\n" +
                     enemy_squad.Name + " Total Damage: " + enemy_total_damage;
             }
@@ -1953,7 +1963,7 @@ namespace DoS1.Scenes
             {
                 won_battle = false;
                 Menu.GetPicture("Result").Texture = AssetManager.Textures["Draw"];
-                label.Text = "Both parties are retreating.";
+                text = "Both parties are retreating.";
             }
 
             Menu.GetButton("Retreat").Visible = false;
@@ -1968,19 +1978,10 @@ namespace DoS1.Scenes
                 if (gold > 0 ||
                     xp > 0)
                 {
-                    Handler.Gold += gold;
-                    label.Text += "\n\n" + gold + " Gold was looted!";
-                    label.Text += "\n\n" + xp + " XP was gained!";
-
-                    foreach (Character character in ally_squad.Characters)
-                    {
-                        int levels_gained = CombatUtil.GainExp(character, xp);
-                        if (levels_gained > 0)
-                        {
-                            label.Text += "\n" + character.Name + " is now Level " + character.Level + "!";
-                        }
-                    }
+                    text = Reward_Combat(text);
                 }
+
+                label.Text = GameUtil.WrapText_Dialogue(text);
 
                 Character leader = ally_squad.GetLeader();
                 if (leader == null)
@@ -2015,18 +2016,7 @@ namespace DoS1.Scenes
             if (gold > 0 ||
                 xp > 0)
             {
-                Handler.Gold += gold;
-                text += "\n\n" + gold + " Gold was looted!";
-                text += "\n\n" + xp + " XP was gained!";
-
-                foreach (Character character in ally_squad.Characters)
-                {
-                    int levels_gained = CombatUtil.GainExp(character, xp);
-                    if (levels_gained > 0)
-                    {
-                        text += "\n" + character.Name + " is now Level " + character.Level + "!";
-                    }
-                }
+                text = Reward_Combat(text);
             }
             else
             {
@@ -2034,8 +2024,6 @@ namespace DoS1.Scenes
             }
 
             label.Text = GameUtil.WrapText_Dialogue(text);
-
-            ResetCombat_Final();
         }
 
         private void MainCharacterKilled()
@@ -2055,14 +2043,35 @@ namespace DoS1.Scenes
             Menu.GetButton("Retreat").Visible = false;
             Menu.GetButton("PlayPause").Visible = false;
             Menu.GetButton("Speed").Visible = false;
-
-            ResetCombat_Final();
         }
 
-        private void Reward()
+        private void Reward_CharacterKilled()
         {
             gold += 200;
             xp += 2;
+            rp++;
+        }
+
+        private string Reward_Combat(string text)
+        {
+            text += "\n\n" + gold + " Gold was looted!";
+            text += "\n" + xp + " XP was gained!";
+            text += "\n" + rp + " RP was gained!\n";
+
+            Handler.Gold += gold;
+
+            foreach (Character character in ally_squad.Characters)
+            {
+                int levels_gained = CharacterUtil.Increase_XP(character, xp);
+                if (levels_gained > 0)
+                {
+                    text += "\n" + character.Name + " is now Level " + character.Level + "!";
+                }
+
+                CombatUtil.Gain_RP(character, rp);
+            }
+
+            return text;
         }
 
         private void Leave()

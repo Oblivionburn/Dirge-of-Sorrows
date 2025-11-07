@@ -85,8 +85,9 @@ namespace DoS1.Scenes
         {
             if (Visible)
             {
-                foreach (Map map in World.Maps)
+                for (int i = 0; i < World.Maps.Count; i++)
                 {
+                    Map map = World.Maps[i];
                     if (map.Visible)
                     {
                         foreach (Layer layer in map.Layers)

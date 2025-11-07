@@ -276,6 +276,7 @@ namespace DoS1.Util
             foreach (Squad squad in ally_army.Squads)
             {
                 squad.Active = false;
+                squad.Visible = false;
                 squad.Path.Clear();
                 squad.Moving = false;
 
@@ -1770,12 +1771,7 @@ namespace DoS1.Util
             {
                 menu.GetButton("Back").Visible = true;
                 menu.GetButton("Play").Visible = false;
-
-                if (!Handler.LocalMap)
-                {
-                    menu.GetButton("Save").Visible = true;
-                }
-
+                menu.GetButton("Save").Visible = true;
                 menu.GetButton("SaveExit").Visible = true;
                 menu.GetButton("Exit").Visible = false;
             }
@@ -1783,7 +1779,6 @@ namespace DoS1.Util
             {
                 menu.GetButton("Back").Visible = false;
                 menu.GetButton("Play").Visible = true;
-
                 menu.GetButton("Save").Visible = false;
                 menu.GetButton("SaveExit").Visible = false;
                 menu.GetButton("Exit").Visible = true;

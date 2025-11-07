@@ -741,9 +741,6 @@ namespace DoS1.Menus
                     Handler.StoryStep++;
                 }
 
-                Menu main = MenuManager.GetMenu("Main");
-                main.GetButton("Save").Visible = false;
-
                 //Switch to local map
                 SceneManager.ChangeScene("Localmap");
                 WorldUtil.Resize_OnStart(localmap);

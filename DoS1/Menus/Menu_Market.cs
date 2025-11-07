@@ -555,7 +555,18 @@ namespace DoS1.Menus
                 {
                     Something property = properties[i];
 
-                    text += property.Name + ": " + property.Value;
+                    if (property.Name.Contains("RP"))
+                    {
+                        text += "RP: " + property.Value + "/" + property.Max_Value;
+                    }
+                    else if (property.Name.Contains("Level"))
+                    {
+                        text += "Level: " + property.Value + "/" + property.Max_Value;
+                    }
+                    else
+                    {
+                        text += property.Name + ": " + property.Value;
+                    }
 
                     if (i < properties.Count - 1)
                     {
@@ -594,7 +605,18 @@ namespace DoS1.Menus
                 {
                     Something property = properties[i];
 
-                    text += property.Name + ": " + property.Value;
+                    if (property.Name.Contains("RP"))
+                    {
+                        text += "RP: " + property.Value + "/" + property.Max_Value;
+                    }
+                    else if (property.Name.Contains("Level"))
+                    {
+                        text += "Level: " + property.Value + "/" + property.Max_Value;
+                    }
+                    else
+                    {
+                        text += property.Name + ": " + property.Value;
+                    }
 
                     if (i < properties.Count - 1)
                     {

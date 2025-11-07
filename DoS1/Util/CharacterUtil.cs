@@ -718,6 +718,11 @@ namespace DoS1.Util
 
             character.HealthBar.Update();
 
+            Something STR = character.GetStat("STR");
+            Something INT = character.GetStat("INT");
+            Something DEX = character.GetStat("DEX");
+            Something AGI = character.GetStat("AGI");
+
             //Increase stat
             random = new CryptoRandom();
             int choice = random.Next(0, 3);
@@ -730,16 +735,28 @@ namespace DoS1.Util
                     if (InventoryUtil.Weapon_IsMelee(weapon) ||
                         weapon.Categories[0] == "Bow")
                     {
-                        character.GetStat("STR").IncreaseValue(1);
+                        STR.Value++;
+                        if (STR.Value > STR.Max_Value)
+                        {
+                            STR.Value = STR.Max_Value;
+                        }
                     }
                     else if (weapon.Categories[0] == "Grimoire")
                     {
-                        character.GetStat("INT").IncreaseValue(1);
+                        INT.Value++;
+                        if (INT.Value > INT.Max_Value)
+                        {
+                            INT.Value = INT.Max_Value;
+                        }
                     }
                 }
                 else
                 {
-                    character.GetStat("STR").IncreaseValue(1);
+                    STR.Value++;
+                    if (STR.Value > STR.Max_Value)
+                    {
+                        STR.Value = STR.Max_Value;
+                    }
                 }
             }
             else if (choice == 1)
@@ -751,23 +768,39 @@ namespace DoS1.Util
                     if (InventoryUtil.Weapon_IsMelee(weapon) ||
                         weapon.Categories[0] == "Bow")
                     {
-                        character.GetStat("DEX").IncreaseValue(1);
+                        DEX.Value++;
+                        if (DEX.Value > DEX.Max_Value)
+                        {
+                            DEX.Value = DEX.Max_Value;
+                        }
                     }
                     else if (weapon.Categories[0] == "Grimoire")
                     {
                         //Accuracy doesn't matter for magic, so increase damage
-                        character.GetStat("INT").IncreaseValue(1);
+                        INT.Value++;
+                        if (INT.Value > INT.Max_Value)
+                        {
+                            INT.Value = INT.Max_Value;
+                        }
                     }
                 }
                 else
                 {
-                    character.GetStat("DEX").IncreaseValue(1);
+                    DEX.Value++;
+                    if (DEX.Value > DEX.Max_Value)
+                    {
+                        DEX.Value = DEX.Max_Value;
+                    }
                 }
             }
             else if (choice == 2)
             {
                 //Increase dodge chance
-                character.GetStat("AGI").IncreaseValue(1);
+                AGI.Value++;
+                if (AGI.Value > AGI.Max_Value)
+                {
+                    AGI.Value = AGI.Max_Value;
+                }
             }
         }
     }

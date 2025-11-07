@@ -234,7 +234,7 @@ namespace DoS1
                         {
                             if (SavePortrait)
                             {
-                                Portrait = SaveUtil.ExportPortrait();
+                                SaveUtil.ExportPortrait();
                                 SavePortrait = false;
                             }
 

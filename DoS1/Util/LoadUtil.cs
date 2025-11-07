@@ -208,7 +208,8 @@ namespace DoS1.Util
                     case "Markets":
                         VisitMarkets(reader);
 
-                        if (Handler.LocalMap)
+                        if (Handler.LocalMap &&
+                            Handler.MarketInventories.Count > Handler.Level)
                         {
                             Handler.TradingMarket = Handler.MarketInventories[Handler.Level];
                         }
@@ -217,7 +218,8 @@ namespace DoS1.Util
                     case "Academies":
                         VisitAcademies(reader);
 
-                        if (Handler.LocalMap)
+                        if (Handler.LocalMap &&
+                            Handler.AcademyRecruits.Count > Handler.Level)
                         {
                             Handler.TradingAcademy = Handler.AcademyRecruits[Handler.Level];
                         }
@@ -414,6 +416,15 @@ namespace DoS1.Util
             {
                 switch (reader.Name)
                 {
+                    case "ID":
+                        item.ID = long.Parse(reader.Value);
+
+                        if (Handler.ID < item.ID)
+                        {
+                            Handler.ID = item.ID;
+                        }
+                        break;
+
                     case "Name":
                         item.Name = reader.Value;
                         item.ID = Handler.GetID();
@@ -877,6 +888,30 @@ namespace DoS1.Util
                         {
                             case "Armies":
                                 VisitArmies(reader);
+
+                                Army enemyArmy = CharacterManager.GetArmy("Enemy");
+                                if (enemyArmy == null)
+                                {
+                                    CharacterManager.Armies.Add(new Army
+                                    {
+                                        ID = Handler.GetID(),
+                                        Name = "Enemy"
+                                    });
+                                }
+
+                                Army reservesArmy = CharacterManager.GetArmy("Reserves");
+                                if (reservesArmy == null)
+                                {
+                                    Army reserves = new Army
+                                    {
+                                        ID = Handler.GetID(),
+                                        Name = "Reserves"
+                                    };
+                                    CharacterManager.Armies.Add(reserves);
+
+                                    Squad reserves_squad = ArmyUtil.NewSquad("Reserves");
+                                    reserves.Squads.Add(reserves_squad);
+                                }
                                 break;
                         }
                     }
