@@ -868,16 +868,20 @@ namespace DoS1.Util
                 damage += (int)attacker.GetStat("INT").Value;
             }
 
-            Something status_weak = attacker.GetStatusEffect("Weak");
-            if (status_weak != null)
+            if (InventoryUtil.Weapon_IsMelee(weapon) ||
+                weapon.Categories[0] == "Bow")
             {
-                damage /= 2;
-            }
+                Something status_weak = attacker.GetStatusEffect("Weak");
+                if (status_weak != null)
+                {
+                    damage /= 2;
+                }
 
-            Something status_slow = attacker.GetStatusEffect("Slow");
-            if (status_slow != null)
-            {
-                damage = 0;
+                Something status_slow = attacker.GetStatusEffect("Slow");
+                if (status_slow != null)
+                {
+                    damage = 0;
+                }
             }
 
             if (!RuneUtil.CounterWeapon(menu, attacker, defender))

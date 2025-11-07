@@ -414,12 +414,9 @@ namespace DoS1.Util
             {
                 switch (reader.Name)
                 {
-                    case "ID":
-                        item.ID = int.Parse(reader.Value);
-                        break;
-
                     case "Name":
                         item.Name = reader.Value;
+                        item.ID = Handler.GetID();
                         break;
 
                     case "Description":
@@ -534,12 +531,9 @@ namespace DoS1.Util
             {
                 switch (reader.Name)
                 {
-                    case "ID":
-                        property.ID = int.Parse(reader.Value);
-                        break;
-
                     case "Name":
                         property.Name = reader.Value;
+                        property.ID = Handler.GetID();
                         break;
 
                     case "Type":
@@ -674,6 +668,11 @@ namespace DoS1.Util
                 {
                     case "ID":
                         character.ID = int.Parse(reader.Value);
+
+                        if (Handler.ID < character.ID)
+                        {
+                            Handler.ID = character.ID;
+                        }
                         break;
 
                     case "Name":
@@ -933,12 +932,9 @@ namespace DoS1.Util
             {
                 switch (reader.Name)
                 {
-                    case "ID":
-                        army.ID = int.Parse(reader.Value);
-                        break;
-
                     case "Name":
                         army.Name = reader.Value;
+                        army.ID = Handler.GetID();
                         break;
                 }
             }
@@ -992,16 +988,13 @@ namespace DoS1.Util
             {
                 switch (reader.Name)
                 {
-                    case "ID":
-                        squad.ID = int.Parse(reader.Value);
-                        break;
-
                     case "Leader_ID":
                         squad.Leader_ID = int.Parse(reader.Value);
                         break;
 
                     case "Name":
                         squad.Name = reader.Value;
+                        squad.ID = Handler.GetID();
                         break;
 
                     case "Type":
@@ -1267,6 +1260,11 @@ namespace DoS1.Util
                 {
                     case "ID":
                         world.ID = long.Parse(reader.Value);
+
+                        if (Handler.ID < world.ID)
+                        {
+                            Handler.ID = world.ID;
+                        }
                         break;
 
                     case "Visible":
@@ -1324,6 +1322,11 @@ namespace DoS1.Util
                 {
                     case "ID":
                         map.ID = long.Parse(reader.Value);
+
+                        if (Handler.ID < map.ID)
+                        {
+                            Handler.ID = map.ID;
+                        }
                         break;
 
                     case "Name":
@@ -1391,6 +1394,11 @@ namespace DoS1.Util
                 {
                     case "ID":
                         layer.ID = long.Parse(reader.Value);
+
+                        if (Handler.ID < layer.ID)
+                        {
+                            Handler.ID = layer.ID;
+                        }
                         break;
 
                     case "Name":
@@ -1446,6 +1454,11 @@ namespace DoS1.Util
                 {
                     case "ID":
                         tile.ID = long.Parse(reader.Value);
+
+                        if (Handler.ID < tile.ID)
+                        {
+                            Handler.ID = tile.ID;
+                        }
                         break;
 
                     case "Name":

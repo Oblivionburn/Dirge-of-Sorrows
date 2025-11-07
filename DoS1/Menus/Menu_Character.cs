@@ -450,7 +450,9 @@ namespace DoS1.Menus
         {
             foreach (Label label in Labels)
             {
-                if (label.Name == "Level" ||
+                if (label.Name == "HP" ||
+                    label.Name == "EP" ||
+                    label.Name == "Level" ||
                     label.Name == "XP" ||
                     label.Name == "STR" ||
                     label.Name == "INT" ||
@@ -923,6 +925,14 @@ namespace DoS1.Menus
 
             switch (name)
             {
+                case "HP":
+                    examine.Text = "Health Points (HP):\nHow much health the character has.\nWill die if this reaches 0.";
+                    break;
+
+                case "EP":
+                    examine.Text = "Energy Points (EP):\nHow much energy the character has.\nCannot perform in combat if this reaches 0.";
+                    break;
+
                 case "Level":
                     examine.Text = "Level (LVL):\nThe progress the character has made.";
                     break;
@@ -972,6 +982,11 @@ namespace DoS1.Menus
                 name == "AGI")
             {
                 examine.Region = new Region(X, Y, width * 8, height + (height / 2));
+            }
+            else if (name == "HP" ||
+                     name == "EP")
+            {
+                examine.Region = new Region(X, Y, width * 8, height * 2);
             }
             else
             {
@@ -1079,6 +1094,8 @@ namespace DoS1.Menus
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Stats", "Stats", Color.IndianRed, new Region(0, 0, 0, 0), true);
             AddPicture(Handler.GetID(), "Stats_Underline", AssetManager.Textures["Underline"], new Region(0, 0, 0, 0), Color.IndianRed, true);
 
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "HP", "", Color.White, new Region(0, 0, 0, 0), true);
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "EP", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Level", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "XP", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "STR", "", Color.White, new Region(0, 0, 0, 0), true);
@@ -1308,6 +1325,16 @@ namespace DoS1.Menus
                 GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
 
                 Y += height;
+                Label hp = GetLabel("HP");
+                hp.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                hp.Text = "HP: " + character.HealthBar.Value + "/" + character.HealthBar.Max_Value;
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
+                Label ep = GetLabel("EP");
+                ep.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                ep.Text = "EP: " + character.ManaBar.Value + "/" + character.ManaBar.Max_Value;
+
+                Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label level = GetLabel("Level");
                 level.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
                 level.Text = "LVL: " + character.Level + "/100";
@@ -1341,7 +1368,7 @@ namespace DoS1.Menus
                 // Equipment Stats
                 // ===============
                 X = char_pic.Region.X - (width * 7);
-                Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + (height * 2);
+                Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + (height * 3);
 
                 GetLabel("Equipment").Region = new Region(X, Y, (width * 7), height);
                 GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);

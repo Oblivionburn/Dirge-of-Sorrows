@@ -619,9 +619,9 @@ namespace DoS1.Menus
 
                     if (saveDir != null)
                     {
-                        int day = Util.LoadUtil.Get_Day(save);
-                        int hour = Util.LoadUtil.Get_Hour(save);
-                        int minute = Util.LoadUtil.Get_Minute(save);
+                        int day = LoadUtil.Get_Day(save);
+                        int hour = LoadUtil.Get_Hour(save);
+                        int minute = LoadUtil.Get_Minute(save);
                         string time = GetTime(day, hour, minute);
 
                         AddButton(new ButtonOptions

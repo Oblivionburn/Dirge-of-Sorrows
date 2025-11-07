@@ -327,12 +327,82 @@ namespace DoS1.Util
             examine.Visible = true;
         }
 
-        public static string WrapText(string text)
+        public static string WrapText_Dialogue(string text)
         {
             string result = "";
 
             List<string> text_parts = new List<string>();
             int max_length = 49;
+
+            string full_text = text;
+            if (full_text.Length > max_length)
+            {
+                for (int m = 0; m < full_text.Length; m++)
+                {
+                    int index_break = 0;
+
+                    string current_chunk = full_text.Substring(0, max_length);
+                    if (current_chunk.Contains("\n"))
+                    {
+                        index_break = full_text.IndexOf("\n") + 1;
+
+                        string text_part = full_text.Substring(0, index_break);
+                        text_parts.Add(text_part);
+
+                        full_text = full_text.Remove(0, index_break);
+                        m = 0;
+                    }
+                    else
+                    {
+                        for (int i = max_length; i > 0; i--)
+                        {
+                            if (full_text[i] == ' ')
+                            {
+                                index_break = i;
+                                break;
+                            }
+                        }
+
+                        string text_part = full_text.Substring(0, index_break);
+                        text_parts.Add(text_part);
+
+                        full_text = full_text.Remove(0, index_break + 1);
+                        m = 0;
+                    }
+
+                    if (full_text.Length <= max_length)
+                    {
+                        text_parts.Add(full_text);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                text_parts.Add(full_text);
+            }
+
+            for (int i = 0; i < text_parts.Count; i++)
+            {
+                string text_part = text_parts[i];
+                if (text_part[text_part.Length - 1] == '\n')
+                {
+                    result += text_part;
+                }
+                else
+                {
+                    result += text_part + "\n";
+                }
+            }
+
+            return result;
+        }
+
+        public static string WrapText_Help(string text, int max_length)
+        {
+            string result = "";
+
+            List<string> text_parts = new List<string>();
 
             string full_text = text;
             if (full_text.Length > max_length)
@@ -697,7 +767,7 @@ namespace DoS1.Util
 
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
-            dialogue.Text = WrapText(message);
+            dialogue.Text = WrapText_Dialogue(message);
 
             Picture picture = alerts.GetPicture("Dialogue_Portrait2");
             picture.Visible = true;
@@ -802,7 +872,7 @@ namespace DoS1.Util
 
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
-            dialogue.Text = WrapText(message);
+            dialogue.Text = WrapText_Dialogue(message);
 
             Picture picture = alerts.GetPicture("Dialogue_Portrait2");
             picture.Visible = true;
@@ -840,7 +910,7 @@ namespace DoS1.Util
 
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
-            dialogue.Text = WrapText(message);
+            dialogue.Text = WrapText_Dialogue(message);
 
             Button option1 = alerts.GetButton("Dialogue_Option1");
             option1.Visible = true;
@@ -1110,6 +1180,12 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 14)
             {
+                Scene scene = WorldUtil.GetScene();
+                Map map = scene.World.Maps[Handler.Level];
+                Layer ground = map.GetLayer("Ground");
+                Tile tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+
+                WorldUtil.CameraToTile(map, ground, tile);
                 LocalPause();
 
                 dialogue_name.Text = "System";
@@ -1579,7 +1655,7 @@ namespace DoS1.Util
 
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
-            dialogue.Text = WrapText(message);
+            dialogue.Text = WrapText_Dialogue(message);
         }
 
         public static void Toggle_Pause(bool manual)

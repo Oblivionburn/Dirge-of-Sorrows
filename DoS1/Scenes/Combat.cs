@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
-using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -126,6 +126,8 @@ namespace DoS1.Scenes
                 background.DrawColor = RenderingManager.Lighting.DrawColor;
                 background.Draw(spriteBatch);
 
+                Menu.GetPicture("Highlight").Draw(spriteBatch);
+
                 Color lightColor = Color.Lerp(Color.White, RenderingManager.Lighting.DrawColor, 0.5f);
 
                 if (ally_squad != null)
@@ -207,7 +209,8 @@ namespace DoS1.Scenes
                         picture.Name != "Damage" &&
                         picture.Name != "Cast" &&
                         picture.Name != "Result" &&
-                        picture.Name != "Background")
+                        picture.Name != "Background" &&
+                        picture.Name != "Highlight")
                     {
                         picture.Draw(spriteBatch);
                     }
@@ -273,6 +276,23 @@ namespace DoS1.Scenes
 
         private void UpdateControls()
         {
+            bool found_button = HoveringButton();
+            bool found_grid = HoveringGrid();
+
+            if (!found_button &&
+                !found_grid)
+            {
+                Menu.GetLabel("Examine").Visible = false;
+            }
+
+            if (InputManager.KeyPressed("Space"))
+            {
+                GameUtil.Toggle_Pause_Combat(true);
+            }
+        }
+
+        private bool HoveringButton()
+        {
             bool found = false;
 
             foreach (Button button in Menu.Buttons)
@@ -294,6 +314,7 @@ namespace DoS1.Scenes
 
                         if (InputManager.Mouse_LB_Pressed)
                         {
+                            found = false;
                             CheckClick(button);
 
                             button.Opacity = 0.9f;
@@ -310,15 +331,69 @@ namespace DoS1.Scenes
                 }
             }
 
-            if (!found)
+            return found;
+        }
+
+        private bool HoveringGrid()
+        {
+            Picture highlight = Menu.GetPicture("Highlight");
+            
+            Map map = World.Maps[0];
+            Layer ground = map.GetLayer("Ground");
+
+            int count = ground.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
-                Menu.GetLabel("Examine").Visible = false;
+                Tile tile = ground.Tiles[i];
+
+                if (InputManager.MouseWithin(tile.Region.ToRectangle))
+                {
+                    Character character = null;
+                    if (ally_squad != null &&
+                        ally_squad.Characters.Count > 0)
+                    {
+                        foreach (Character existing in ally_squad.Characters)
+                        {
+                            if (existing.Formation.X + 7 == tile.Location.X &&
+                                existing.Formation.Y + 1 == tile.Location.Y)
+                            {
+                                character = existing;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (character == null)
+                    {
+                        if (enemy_squad != null &&
+                            enemy_squad.Characters.Count > 0)
+                        {
+                            foreach (Character existing in enemy_squad.Characters)
+                            {
+                                if (existing.Formation.X + 1 == tile.Location.X &&
+                                    existing.Formation.Y + 1 == tile.Location.Y)
+                                {
+                                    character = existing;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (character != null)
+                    {
+                        highlight.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
+                        highlight.Visible = true;
+
+                        ExamineCharacter(character);
+
+                        return true;
+                    }
+                }
             }
 
-            if (InputManager.KeyPressed("Space"))
-            {
-                GameUtil.Toggle_Pause_Combat(true);
-            }
+            highlight.Visible = false;
+            return false;
         }
 
         private void CheckClick(Button button)
@@ -1958,7 +2033,7 @@ namespace DoS1.Scenes
                 label.Margin = 20;
             }
 
-            label.Text = GameUtil.WrapText(text);
+            label.Text = GameUtil.WrapText_Dialogue(text);
 
             ResetCombat_Final();
         }
@@ -1973,7 +2048,7 @@ namespace DoS1.Scenes
             battleResult.Visible = true;
 
             Label label = Menu.GetLabel("Result");
-            label.Text = GameUtil.WrapText(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
+            label.Text = GameUtil.WrapText_Dialogue(ally_squad.Name + " has been slain!\n\nThe story cannot continue without its hero...");
             label.Visible = true;
 
             Menu.GetButton("Result").Visible = true;
@@ -2146,7 +2221,8 @@ namespace DoS1.Scenes
             {
                 for (int x = 0; x < 3; x++)
                 {
-                    Menu.GetPicture("Enemy,x:" + x.ToString() + ",y:" + y.ToString()).Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height);
+                    Picture box = Menu.GetPicture("Enemy,x:" + x.ToString() + ",y:" + y.ToString());
+                    box.Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height);
 
                     Character character = enemy_squad.GetCharacter(new Vector2(x, y));
                     if (character != null)
@@ -2154,19 +2230,19 @@ namespace DoS1.Scenes
                         Label name_label = Menu.GetLabel(character.ID + "_Name,x:" + x.ToString() + ",y:" + y.ToString());
                         if (name_label != null)
                         {
-                            name_label.Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height / 4);
+                            name_label.Region = new Region(box.Region.X, box.Region.Y + (height / 8), width, height / 4);
                         }
 
                         Label hp_label = Menu.GetLabel(character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString());
                         if (hp_label != null)
                         {
-                            hp_label.Region = new Region(starting_x + (width * x), starting_y + (height * y) + (height / 4), width, height / 4);
+                            hp_label.Region = new Region(box.Region.X, box.Region.Y + (height / 8) + (height / 4), width, height / 4);
                         }
 
                         Label ep_label = Menu.GetLabel(character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString());
                         if (ep_label != null)
                         {
-                            ep_label.Region = new Region(starting_x + (width * x), starting_y + (height * y) + (height / 2), width, height / 4);
+                            ep_label.Region = new Region(box.Region.X, box.Region.Y + (height / 8) + (height / 2), width, height / 4);
                         }
                     }
                 }
@@ -2177,7 +2253,8 @@ namespace DoS1.Scenes
             {
                 for (int x = 0; x < 3; x++)
                 {
-                    Menu.GetPicture("Ally,x:" + x.ToString() + ",y:" + y.ToString()).Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height);
+                    Picture box = Menu.GetPicture("Ally,x:" + x.ToString() + ",y:" + y.ToString());
+                    box.Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height);
 
                     Character character = ally_squad.GetCharacter(new Vector2(x, y));
                     if (character != null)
@@ -2185,19 +2262,19 @@ namespace DoS1.Scenes
                         Label name_label = Menu.GetLabel(character.ID + "_Name,x:" + x.ToString() + ",y:" + y.ToString());
                         if (name_label != null)
                         {
-                            name_label.Region = new Region(starting_x + (width * x), starting_y + (height * y), width, height / 4);
+                            name_label.Region = new Region(box.Region.X, box.Region.Y + (height / 8), width, height / 4);
                         }
 
                         Label hp_label = Menu.GetLabel(character.ID + "_HP,x:" + x.ToString() + ",y:" + y.ToString());
                         if (hp_label != null)
                         {
-                            hp_label.Region = new Region(starting_x + (width * x), starting_y + (height * y) + (height / 4), width, height / 4);
+                            hp_label.Region = new Region(box.Region.X, box.Region.Y + (height / 8) + (height / 4), width, height / 4);
                         }
 
                         Label ep_label = Menu.GetLabel(character.ID + "_EP,x:" + x.ToString() + ",y:" + y.ToString());
                         if (ep_label != null)
                         {
-                            ep_label.Region = new Region(starting_x + (width * x), starting_y + (height * y) + (height / 2), width, height / 4);
+                            ep_label.Region = new Region(box.Region.X, box.Region.Y + (height / 8) + (height / 2), width, height / 4);
                         }
                     }
                 }
@@ -2248,6 +2325,80 @@ namespace DoS1.Scenes
             SaveUtil.ExportINI();
 
             effect_frame = 0;
+        }
+
+        private void ExamineCharacter(Character character)
+        {
+            int width = Main.Game.MenuSize.X * 4;
+            int height = Main.Game.MenuSize.X;
+
+            Label examine = Menu.GetLabel("Examine");
+            examine.Text = "";
+
+            List<string> lines = new List<string>
+            {
+                character.Name,
+                "",
+                "HP: " + character.HealthBar.Value + "/" + character.HealthBar.Max_Value,
+                "EP: " + character.ManaBar.Value + "/" + character.ManaBar.Max_Value
+            };
+
+            List<Something> statusEffects = new List<Something>();
+            for (int i = 0; i < character.StatusEffects.Count; i++)
+            {
+                Something statusEffect = character.StatusEffects[i];
+                if (statusEffect.Name != "Damage")
+                {
+                    statusEffects.Add(statusEffect);
+                }
+            }
+
+            if (statusEffects.Count > 0)
+            {
+                lines.Add("");
+                lines.Add("Status Effects:");
+
+                for (int i = 0; i < statusEffects.Count; i++)
+                {
+                    lines.Add("- " + statusEffects[i].Name);
+                }
+            }
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+
+                examine.Text += line;
+                
+                if (i < lines.Count - 1)
+                {
+                    examine.Text += "\n";
+                    height += (Main.Game.MenuSize.Y / 2);
+                }
+            }
+
+            int X = InputManager.Mouse.X - (width / 2);
+            if (X < 0)
+            {
+                X = 0;
+            }
+            else if (X > Main.Game.Resolution.X - width)
+            {
+                X = Main.Game.Resolution.X - width;
+            }
+
+            int Y = InputManager.Mouse.Y + 20;
+            if (Y < 0)
+            {
+                Y = 0;
+            }
+            else if (Y > Main.Game.Resolution.Y - height)
+            {
+                Y = Main.Game.Resolution.Y - height;
+            }
+
+            examine.Region = new Region(X, Y, width, height);
+            examine.Visible = true;
         }
 
         public override void Load()
@@ -2396,7 +2547,7 @@ namespace DoS1.Scenes
                 Menu.AddPicture(Handler.GetID(), "Result", AssetManager.Textures["Victory"], new Region(0, 0, 0, 0), Color.White, false);
 
                 Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Debug", "Debugging", Color.White, new Region(0, 0, 0, 0), Main.Game.Debugging);
-
+                Menu.AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
                 Menu.AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["Frame"],
                     new Region(0, 0, 0, 0), false);
 

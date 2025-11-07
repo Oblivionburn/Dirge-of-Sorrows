@@ -205,6 +205,7 @@ namespace DoS1.Util
                         MapID = layer.MapID,
                         LayerID = layer.ID,
                         Visible = false,
+                        Location = new Location(x, y, 0),
                         Region = new Region(x * width, y * height, width, height)
                     });
                 }

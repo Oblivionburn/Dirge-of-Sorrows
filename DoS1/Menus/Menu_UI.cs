@@ -327,7 +327,6 @@ namespace DoS1.Menus
                                 GameUtil.Examine(this, button.HoverText);
                             }
 
-                            button.Opacity = 1;
                             button.Selected = true;
 
                             if (InputManager.Mouse_LB_Pressed)
@@ -336,7 +335,6 @@ namespace DoS1.Menus
 
                                 CheckClick(button);
 
-                                button.Opacity = 0.8f;
                                 button.Selected = false;
 
                                 break;
@@ -344,7 +342,6 @@ namespace DoS1.Menus
                         }
                         else if (InputManager.Mouse.Moved)
                         {
-                            button.Opacity = 0.8f;
                             button.Selected = false;
                         }
                     }
@@ -831,6 +828,8 @@ namespace DoS1.Menus
 
         private void SelectToken(Army army, Squad selected_squad)
         {
+            int height = (Main.Game.MenuSize.Y / 4) * 3;
+
             List<Squad> potential_squads = new List<Squad>
             {
                 selected_squad
@@ -860,13 +859,13 @@ namespace DoS1.Menus
                         font = AssetManager.Fonts["ControlFont"],
                         name = "Squad_" + squad.ID + "_Multiple",
                         text = squad.Name,
-                        texture = AssetManager.Textures["ButtonFrame_Large"],
-                        texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
-                        region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + (Main.Game.MenuSize.Y * i), Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
-                        draw_color = new Color(128, 128, 128, 255),
+                        texture = AssetManager.Textures["ButtonFrame"],
+                        texture_highlight = AssetManager.Textures["ButtonFrame"],
+                        region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + (height * i), Main.Game.MenuSize.X * 3, height),
+                        draw_color = Color.White * 0.9f,
                         draw_color_selected = Color.White,
-                        text_color = Color.White,
-                        text_selected_color = Color.Red,
+                        text_color = Color.Black,
+                        text_selected_color = Color.White,
                         enabled = true,
                         visible = true
                     });
@@ -894,13 +893,13 @@ namespace DoS1.Menus
                                 font = AssetManager.Fonts["ControlFont"],
                                 name = "Squad_" + selected_squad.ID + "_Base",
                                 text = "Retreat",
-                                texture = AssetManager.Textures["ButtonFrame_Large"],
-                                texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
-                                region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
-                                draw_color = new Color(128, 128, 128, 255),
+                                texture = AssetManager.Textures["ButtonFrame"],
+                                texture_highlight = AssetManager.Textures["ButtonFrame"],
+                                region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, height),
+                                draw_color = Color.White * 0.9f,
                                 draw_color_selected = Color.White,
-                                text_color = Color.White,
-                                text_selected_color = Color.Red,
+                                text_color = Color.Black,
+                                text_selected_color = Color.White,
                                 enabled = true,
                                 visible = true
                             });
@@ -911,13 +910,13 @@ namespace DoS1.Menus
                                 font = AssetManager.Fonts["ControlFont"],
                                 name = "Squad_" + selected_squad.ID + "_Move",
                                 text = "Move",
-                                texture = AssetManager.Textures["ButtonFrame_Large"],
-                                texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
-                                region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + Main.Game.MenuSize.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
-                                draw_color = new Color(128, 128, 128, 255),
+                                texture = AssetManager.Textures["ButtonFrame"],
+                                texture_highlight = AssetManager.Textures["ButtonFrame"],
+                                region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + height, Main.Game.MenuSize.X * 3, height),
+                                draw_color = Color.White * 0.9f,
                                 draw_color_selected = Color.White,
-                                text_color = Color.White,
-                                text_selected_color = Color.Red,
+                                text_color = Color.Black,
+                                text_selected_color = Color.White,
                                 enabled = true,
                                 visible = true
                             });
@@ -939,13 +938,13 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Squad_" + selected_squad.ID + "_Town",
                             text = "Enter Town",
-                            texture = AssetManager.Textures["ButtonFrame_Large"],
-                            texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
-                            region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
-                            draw_color = new Color(128, 128, 128, 255),
+                            texture = AssetManager.Textures["ButtonFrame"],
+                            texture_highlight = AssetManager.Textures["ButtonFrame"],
+                            region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, height),
+                            draw_color = Color.White * 0.9f,
                             draw_color_selected = Color.White,
-                            text_color = Color.White,
-                            text_selected_color = Color.Red,
+                            text_color = Color.Black,
+                            text_selected_color = Color.White,
                             enabled = true,
                             visible = true
                         });
@@ -956,13 +955,13 @@ namespace DoS1.Menus
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Squad_" + selected_squad.ID + "_Move",
                             text = "Move",
-                            texture = AssetManager.Textures["ButtonFrame_Large"],
-                            texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
-                            region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + Main.Game.MenuSize.Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y),
-                            draw_color = new Color(128, 128, 128, 255),
+                            texture = AssetManager.Textures["ButtonFrame"],
+                            texture_highlight = AssetManager.Textures["ButtonFrame"],
+                            region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + height, Main.Game.MenuSize.X * 3, height),
+                            draw_color = Color.White * 0.9f,
                             draw_color_selected = Color.White,
-                            text_color = Color.White,
-                            text_selected_color = Color.Red,
+                            text_color = Color.Black,
+                            text_selected_color = Color.White,
                             enabled = true,
                             visible = true
                         });
@@ -1315,6 +1314,20 @@ namespace DoS1.Menus
             AddButton(new ButtonOptions
             {
                 id = Handler.GetID(),
+                name = "Help",
+                hover_text = "Help",
+                texture = AssetManager.Textures["Button_Help"],
+                texture_highlight = AssetManager.Textures["Button_Help_Hover"],
+                texture_disabled = AssetManager.Textures["Button_Help_Disabled"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White * 0.8f,
+                enabled = true,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
                 name = "Army",
                 hover_text = "Army",
                 texture = AssetManager.Textures["Button_Army"],
@@ -1453,6 +1466,7 @@ namespace DoS1.Menus
             GetLabel("Alert").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), height, width * 10, height);
 
             GetButton("Main").Region = new Region(0, 0, width, height);
+            GetButton("Help").Region = new Region(0, height, width, height);
             GetButton("Army").Region = new Region(width, 0, width, height);
             GetButton("Inventory").Region = new Region(width * 2, 0, width, height);
             GetButton("Worldmap").Region = new Region(width * 3, 0, width, height);

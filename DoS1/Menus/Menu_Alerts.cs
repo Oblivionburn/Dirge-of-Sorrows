@@ -377,7 +377,7 @@ namespace DoS1.Menus
                     Squad enemy_squad = ArmyUtil.NewSquad("Enemy");
                     special.Squads.Add(enemy_squad);
 
-                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 2, 2);
+                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 1, 1);
                     foreach (Character character in enemy_squad.Characters)
                     {
                         foreach (Item item in character.Inventory.Items)
@@ -533,8 +533,8 @@ namespace DoS1.Menus
             int name_height = (int)(dialogue.Region.Height / 6);
             GetLabel("Dialogue_Name").Region = new Region(dialogue.Region.X + (width * 3), dialogue.Region.Y - name_height, dialogue.Region.Width - (width * 6), name_height);
 
-            GetPicture("Dialogue_Portrait1").Region = new Region(dialogue.Region.X, dialogue.Region.Y - (height * 3), width * 3, height * 3);
-            GetPicture("Dialogue_Portrait2").Region = new Region(dialogue.Region.X + dialogue.Region.Width - (width * 3), dialogue.Region.Y - (height * 3), width * 3, height * 3);
+            GetPicture("Dialogue_Portrait1").Region = new Region(dialogue.Region.X - width, dialogue.Region.Y - (height * 3), width * 3, height * 3);
+            GetPicture("Dialogue_Portrait2").Region = new Region(dialogue.Region.X + dialogue.Region.Width - (width * 2), dialogue.Region.Y - (height * 3), width * 3, height * 3);
 
             Button option1 = GetButton("Dialogue_Option1");
             option1.Region = new Region(dialogue.Region.X, dialogue.Region.Y + dialogue.Region.Height, dialogue.Region.Width, name_height);

@@ -80,6 +80,7 @@
     <Compile Include="Menus\Menu_CharEdit.cs" />
     <Compile Include="Menus\Menu_CharGen.cs" />
     <Compile Include="Menus\Menu_Alerts.cs" />
+    <Compile Include="Menus\Menu_Help.cs" />
     <Compile Include="Menus\Menu_Inventory.cs" />
     <Compile Include="Menus\Menu_Item.cs" />
     <Compile Include="Menus\Menu_Loading.cs" />
