@@ -1395,15 +1395,17 @@ namespace DoS1.Util
         {
             if (!Handler.MovingSquads)
             {
+                Handler.MovingSquads = true;
+
                 Scene localmap = SceneManager.GetScene("Localmap");
                 if (localmap.World.Maps.Any())
                 {
-                    Handler.MovingSquads = true;
-
                     if (Handler.Level < localmap.World.Maps.Count)
                     {
                         Map map = localmap.World.Maps[Handler.Level];
                         Layer ground = map.GetLayer("Ground");
+
+                        bool interrupt = false;
 
                         foreach (Army army in CharacterManager.Armies)
                         {
@@ -1467,7 +1469,9 @@ namespace DoS1.Util
                                                     Handler.StoryStep++;
                                                 }
 
+                                                interrupt = true;
                                                 CombatUtil.StartCombat(map, ground, destination, squad, other_squad);
+                                                break;
                                             }
                                         }
 
@@ -1512,8 +1516,10 @@ namespace DoS1.Util
                                                         {
                                                             if (Handler.StoryStep == 10)
                                                             {
+                                                                interrupt = true;
                                                                 GameUtil.Toggle_Pause(false);
                                                                 MenuManager.ChangeMenu("Market");
+                                                                break;
                                                             }
                                                             else if (Handler.StoryStep == 21)
                                                             {
@@ -1522,13 +1528,17 @@ namespace DoS1.Util
                                                             }
                                                             else if (Handler.StoryStep > 48)
                                                             {
+                                                                interrupt = true;
                                                                 CameraToTile(map, ground, location);
                                                                 GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                                                break;
                                                             }
                                                         }
                                                         else if (Handler.StoryStep > 48)
                                                         {
+                                                            interrupt = true;
                                                             GameUtil.Alert_MoveFinished(map, ground, squad, location);
+                                                            break;
                                                         }
                                                     }
                                                     else if (squad.Type == "Enemy")
@@ -1538,6 +1548,7 @@ namespace DoS1.Util
 
                                                         if (location_tile != null)
                                                         {
+                                                            interrupt = true;
                                                             GameUtil.Alert_Capture(map, ground, location_tile);
                                                             ChangeLocation(location_tile, squad);
 
@@ -1564,6 +1575,11 @@ namespace DoS1.Util
                                                         {
                                                             AI_Util.Get_NewTarget(map, ground, army, squad);
                                                         }
+
+                                                        if (interrupt)
+                                                        {
+                                                            break;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1574,12 +1590,17 @@ namespace DoS1.Util
                                         AI_Util.Get_NewTarget(map, ground, army, squad);
                                     }
                                 }
+
+                                if (interrupt)
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
-
-                    Handler.MovingSquads = false;
                 }
+
+                Handler.MovingSquads = false;
             }
         }
 

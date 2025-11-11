@@ -95,13 +95,15 @@ namespace DoS1.Util
 
         public static void Get_NewTarget(Map map, Layer ground, Army army, Squad squad)
         {
+            CryptoRandom random;
+
             if (squad.Assignment != "Guard Base" &&
                 squad.Assignment != "Attack Base" &&
                 squad.Assignment != "Sleeper" &&
                 squad.Assignment != "Guard Nearest Town")
             {
-                CryptoRandom random = new CryptoRandom();
-                int chance = random.Next(0, 201);
+                random = new CryptoRandom();
+                int chance = random.Next(0, 601);
                 if (chance == 0)
                 {
                     random = new CryptoRandom();
@@ -136,15 +138,20 @@ namespace DoS1.Util
                             squad.Assignment = "Opportunist";
                             break;
                     }
-                }
 
-                Set_NextTarget(map, ground, army, squad);
+                    Set_NextTarget(map, ground, army, squad);
+                }
             }
             else if (squad.Assignment == "Attack Base" ||
                      squad.Assignment == "Sleeper" ||
                      squad.Assignment == "Guard Nearest Town")
             {
-                Set_NextTarget(map, ground, army, squad);
+                random = new CryptoRandom();
+                int chance = random.Next(0, 601);
+                if (chance == 0)
+                {
+                    Set_NextTarget(map, ground, army, squad);
+                }
             }
         }
     }

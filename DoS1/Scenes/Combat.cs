@@ -1836,6 +1836,7 @@ namespace DoS1.Scenes
             counter_attackers.Clear();
             gold = 0;
             xp = 0;
+            rp = 0;
             won_battle = false;
             counter_attacking = false;
             ally_total_damage = 0;
