@@ -729,10 +729,19 @@ namespace DoS1.Menus
                 Squad ally_squad = allies.Squads[0];
                 WorldUtil.AllyToken_Start(ally_squad, localmap);
 
-                //Set enemies at enemy base
-                foreach (Squad enemy_squad in enemies.Squads)
+                if (tile.Type == "Base_Enemy")
                 {
-                    WorldUtil.EnemyToken_Start(enemy_squad, localmap);
+                    Handler.RevisitMap = false;
+
+                    //Set enemies at enemy base
+                    foreach (Squad enemy_squad in enemies.Squads)
+                    {
+                        WorldUtil.EnemyToken_Start(enemy_squad, localmap);
+                    }
+                }
+                else
+                {
+                    Handler.RevisitMap = true;
                 }
 
                 if (Handler.StoryStep == 0)
@@ -870,7 +879,14 @@ namespace DoS1.Menus
                     Handler.TokenMenu = true;
                 }
 
-                GameUtil.Toggle_Pause(false);
+                if (Handler.Retreating)
+                {
+                    Handler.Retreating = false;
+                }
+                else
+                {
+                    GameUtil.Toggle_Pause(false);
+                }
             }
             else
             {
@@ -976,7 +992,14 @@ namespace DoS1.Menus
                     Handler.Selected_Token = selected_squad.ID;
                 }
 
-                GameUtil.Toggle_Pause(false);
+                if (Handler.Retreating)
+                {
+                    Handler.Retreating = false;
+                }
+                else
+                {
+                    GameUtil.Toggle_Pause(false);
+                }
             }
 
             InputManager.Mouse.Flush();

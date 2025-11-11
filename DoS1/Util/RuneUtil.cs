@@ -71,7 +71,7 @@ namespace DoS1.Util
                             {
                                 if (element == "Death")
                                 {
-                                    if (InventoryUtil.IsWeapon(item))
+                                    if (item.Type == "Weapon")
                                     {
                                         total += (int)level.Value;
                                     }

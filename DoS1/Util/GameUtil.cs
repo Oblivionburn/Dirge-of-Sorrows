@@ -261,16 +261,84 @@ namespace DoS1.Util
             ui.GetButton("Worldmap").Visible = false;
             ui.GetButton("PlayPause").Enabled = false;
 
+            if (!Handler.RevisitMap)
+            {
+                Army enemy_army = CharacterManager.GetArmy("Enemy");
+                foreach (Squad squad in enemy_army.Squads)
+                {
+                    foreach (Character character in squad.Characters)
+                    {
+                        character.Inventory.Items.Clear();
+                    }
+                    squad.Characters.Clear();
+                }
+                enemy_army.Squads.Clear();
+            }
+
+            Army ally_army = CharacterManager.GetArmy("Ally");
+            foreach (Squad squad in ally_army.Squads)
+            {
+                squad.Active = false;
+                squad.Visible = false;
+                squad.Path.Clear();
+                squad.Moving = false;
+
+                foreach (Character character in squad.Characters)
+                {
+                    character.HealthBar.Value = character.HealthBar.Max_Value;
+                    character.ManaBar.Value = character.ManaBar.Max_Value;
+                }
+            }
+
+            Menu main = MenuManager.GetMenu("Main");
+            main.GetButton("Save").Visible = true;
+
+            SceneManager.ChangeScene("Worldmap");
+
+            SoundManager.StopMusic();
+            SoundManager.NeedMusic = true;
+        }
+
+        public static void RetreatToWorldmap()
+        {
+            SoundManager.AmbientFade = 1;
+            SoundManager.StopAmbient();
+
+            foreach (Weather weather in WeatherManager.Weathers)
+            {
+                weather.TransitionTime = 0;
+                weather.ParticleManager.Particles.Clear();
+                weather.Visible = false;
+            }
+
+            WeatherManager.Transitioning = false;
+            WeatherManager.Lightning = false;
+            WeatherManager.TransitionType = WeatherTransition.None;
+            WeatherManager.CurrentWeather = WeatherType.Clear;
+
+            TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
+
+            Handler.LocalMap = false;
+            Handler.LocalPause = false;
+
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.GetButton("Worldmap").Visible = false;
+            ui.GetButton("PlayPause").Enabled = false;
+
             Army enemy_army = CharacterManager.GetArmy("Enemy");
             foreach (Squad squad in enemy_army.Squads)
             {
+                squad.Active = false;
+                squad.Visible = false;
+                squad.Path.Clear();
+                squad.Moving = false;
+
                 foreach (Character character in squad.Characters)
                 {
-                    character.Inventory.Items.Clear();
+                    character.HealthBar.Value = character.HealthBar.Max_Value;
+                    character.ManaBar.Value = character.ManaBar.Max_Value;
                 }
-                squad.Characters.Clear();
             }
-            enemy_army.Squads.Clear();
 
             Army ally_army = CharacterManager.GetArmy("Ally");
             foreach (Squad squad in ally_army.Squads)
@@ -608,6 +676,9 @@ namespace DoS1.Util
 
             Menu ui = MenuManager.GetMenu("UI");
 
+            Label examine = ui.GetLabel("Examine");
+            examine.Visible = false;
+
             Button button = ui.GetButton("PlayPause");
             button.Value = 1;
             button.HoverText = "Play";
@@ -678,6 +749,10 @@ namespace DoS1.Util
 
             Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "Location";
+
+            Menu ui = MenuManager.GetMenu("UI");
+            Label examine = ui.GetLabel("Examine");
+            examine.Visible = false;
 
             bool captured = false;
             bool liberated = false;
@@ -784,8 +859,12 @@ namespace DoS1.Util
                         option1.Visible = true;
 
                         Button option2 = alerts.GetButton("Dialogue_Option2");
-                        option2.Text = "[Continue]";
+                        option2.Text = "[Hold Position]";
                         option2.Visible = true;
+
+                        Button option3 = alerts.GetButton("Dialogue_Option3");
+                        option3.Text = "[Continue Moving]";
+                        option3.Visible = true;
                     }
                     else if (is_market ||
                              is_academy)
@@ -795,14 +874,22 @@ namespace DoS1.Util
                         option1.Visible = true;
 
                         Button option2 = alerts.GetButton("Dialogue_Option2");
-                        option2.Text = "[Continue]";
+                        option2.Text = "[Hold Position]";
                         option2.Visible = true;
+
+                        Button option3 = alerts.GetButton("Dialogue_Option3");
+                        option3.Text = "[Continue Moving]";
+                        option3.Visible = true;
                     }
                     else
                     {
                         Button option1 = alerts.GetButton("Dialogue_Option1");
-                        option1.Text = "[Continue]";
+                        option1.Text = "[Hold Position]";
                         option1.Visible = true;
+
+                        Button option2 = alerts.GetButton("Dialogue_Option2");
+                        option2.Text = "[Continue Moving]";
+                        option2.Visible = true;
                     }
                 }
                 else
@@ -817,39 +904,55 @@ namespace DoS1.Util
                             option1.Visible = true;
 
                             Button option2 = alerts.GetButton("Dialogue_Option2");
-                            option2.Text = "[Continue]";
+                            option2.Text = "[Hold Position]";
                             option2.Visible = true;
+
+                            Button option3 = alerts.GetButton("Dialogue_Option3");
+                            option3.Text = "[Continue Moving]";
+                            option3.Visible = true;
                         }
                         else
                         {
                             Button option1 = alerts.GetButton("Dialogue_Option1");
-                            option1.Text = "[Continue]";
+                            option1.Text = "[Hold Position]";
                             option1.Visible = true;
+
+                            Button option2 = alerts.GetButton("Dialogue_Option2");
+                            option2.Text = "[Continue Moving]";
+                            option2.Visible = true;
                         }
                     }
                     else
                     {
                         Button option1 = alerts.GetButton("Dialogue_Option1");
-                        option1.Text = "[Continue]";
+                        option1.Text = "[Hold Position]";
                         option1.Visible = true;
+
+                        Button option2 = alerts.GetButton("Dialogue_Option2");
+                        option2.Text = "[Continue Moving]";
+                        option2.Visible = true;
                     }
                 }
             }
             else
             {
-                Button option1 = alerts.GetButton("Dialogue_Option1");
-                option1.Visible = true;
-
-                Menu ui = MenuManager.GetMenu("UI");
                 Button worldmap = ui.GetButton("Worldmap");
 
                 if (worldmap.Enabled)
                 {
-                    option1.Text = "[Continue]";
+                    Button option1 = alerts.GetButton("Dialogue_Option1");
+                    option1.Text = "[Hold Position]";
+                    option1.Visible = true;
+
+                    Button option2 = alerts.GetButton("Dialogue_Option2");
+                    option2.Text = "[Continue Moving]";
+                    option2.Visible = true;
                 }
                 else
                 {
+                    Button option1 = alerts.GetButton("Dialogue_Option1");
                     option1.Text = "[Claim Region]";
+                    option1.Visible = true;
                 }
             }
         }
@@ -861,6 +964,10 @@ namespace DoS1.Util
 
             Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "MoveFinished";
+
+            Menu ui = MenuManager.GetMenu("UI");
+            Label examine = ui.GetLabel("Examine");
+            examine.Visible = false;
 
             string message = "\"We have arrived at our destination.\"";
 
@@ -887,43 +994,36 @@ namespace DoS1.Util
             option2.Visible = true;
         }
 
-        public static void Alert_Capture(Map map, Layer ground, Tile location)
+        public static void Alert_BaseCaptured(Map map, Layer ground, Tile location)
         {
             LocalPause();
 
             Handler.AlertType = "Capture";
+            Handler.Selected_Token = -1;
+
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.GetPicture("Select").Visible = false;
+
+            Layer pathing = map.GetLayer("Pathing");
+            pathing.Visible = false;
 
             WorldUtil.CameraToTile(map, ground, location);
 
-            string message = "";
-
-            if (location.Type == "Base_Ally")
-            {
-                message = "The enemy has captured our base!";
-            }
-            else
-            {
-                message = "The enemy has captured " + location.Name + "!";
-            }
+            string message = "The enemy has captured our base!";
 
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
+
+            Label dialogue_name = alerts.GetLabel("Dialogue_Name");
+            dialogue_name.Visible = false;
 
             Label dialogue = alerts.GetLabel("Dialogue");
             dialogue.Visible = true;
             dialogue.Text = WrapText_Dialogue(message);
 
             Button option1 = alerts.GetButton("Dialogue_Option1");
+            option1.Text = "[Retreat to Worldmap]";
             option1.Visible = true;
-
-            if (location.Type == "Base_Ally")
-            {
-                option1.Text = "[Retreat to Worldmap]";
-            }
-            else
-            {
-                option1.Text = "[Continue]";
-            }
         }
 
         public static void Alert_Tutorial()
@@ -966,6 +1066,9 @@ namespace DoS1.Util
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
 
+            Label dialogue = alerts.GetLabel("Dialogue");
+            dialogue.Visible = true;
+
             Label dialogue_name = alerts.GetLabel("Dialogue_Name");
             dialogue_name.Visible = true;
 
@@ -979,6 +1082,12 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 1)
             {
+                Scene scene = WorldUtil.GetScene();
+                Map map = scene.World.Maps[Handler.Level];
+                Layer ground = map.GetLayer("Ground");
+                Tile tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+
+                WorldUtil.CameraToTile(map, ground, tile);
                 LocalPause();
 
                 dialogue_name.Text = "Narrator";
@@ -1087,7 +1196,7 @@ namespace DoS1.Util
 
                 dialogue_name.Text = "System";
                 message = "Your starting squad, represented by a blue token on the map, will always be deployed at your Base when entering a Local Map. You can right-click" +
-                    " any squad positioned at a Town or your Base to edit them. Right-click your starting squad now to edit it.";
+                    " any squad positioned at a Town or your Base to edit them.\n\nRight-click your starting squad now to edit it.";
             }
             else if (Handler.StoryStep == 6)
             {
@@ -1102,7 +1211,7 @@ namespace DoS1.Util
                 }
 
                 dialogue_name.Text = "System";
-                message = "Left-click and drag " + friend.Name + " from your Reserves to a position in your squad's Formation.";
+                message = "Left-click and drag " + friend.Name + " from your Reserves (on the right) to a position in your squad's Formation (on the left).";
             }
             else if (Handler.StoryStep == 7)
             {
@@ -1172,7 +1281,7 @@ namespace DoS1.Util
             {
                 dialogue_name.Text = "System";
                 message = "Items in the market (on the right) can be right-clicked to purchase them. Items in your inventory (on the left) can be right-clicked" +
-                    " to sell them. Purchase a Cloth Helm from the market.";
+                    " to sell them.\n\nPurchase a Cloth Helm from the market.";
             }
             else if (Handler.StoryStep == 13)
             {
@@ -1323,6 +1432,15 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 30)
             {
+                int width = Main.Game.MenuSize.X;
+                int height = Main.Game.MenuSize.X;
+                int Y = Main.Game.ScreenHeight - (height * 6);
+
+                dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Y, width * 10, height * 4);
+
+                int name_height = (int)(dialogue.Region.Height / 6);
+                dialogue_name.Region = new Region(dialogue.Region.X + (width * 3), dialogue.Region.Y - name_height, dialogue.Region.Width - (width * 6), name_height);
+
                 dialogue_name.Text = "System";
                 message = "Above your inventory on the right are buttons to filter which items are visible in the grid. Click the Weapons filter button to view" +
                     " your weapons.";
@@ -1344,6 +1462,15 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 34)
             {
+                int width = Main.Game.MenuSize.X;
+                int height = Main.Game.MenuSize.X;
+                int Y = Main.Game.ScreenHeight - (height * 7);
+
+                dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Y, width * 10, height * 4);
+
+                int name_height = (int)(dialogue.Region.Height / 6);
+                dialogue_name.Region = new Region(dialogue.Region.X + (width * 3), dialogue.Region.Y - name_height, dialogue.Region.Width - (width * 6), name_height);
+
                 dialogue_name.Text = "System";
                 message = "Now left-click the Back button in the upper-left corner to leave the Item Menu.";
             }
@@ -1447,7 +1574,7 @@ namespace DoS1.Util
                 picture.Visible = true;
 
                 dialogue_name.Text = enemy.Name;
-                message = "\"Go cry about it to your local lord, " + local_lord.Name + ", I'm just following orders.\"";
+                message = "\"Go cry about it to your local lord, " + local_lord.Name + ", I'm just following " + HisHer(local_lord.Gender) + " orders.\"";
 
                 Button option1 = alerts.GetButton("Dialogue_Option1");
                 option1.Text = "[Click here to continue]";
@@ -1654,8 +1781,6 @@ namespace DoS1.Util
                 option1.Visible = true;
             }
 
-            Label dialogue = alerts.GetLabel("Dialogue");
-            dialogue.Visible = true;
             dialogue.Text = WrapText_Dialogue(message);
         }
 
@@ -1699,6 +1824,7 @@ namespace DoS1.Util
 
         public static void LocalUnpause()
         {
+            Handler.Retreating = false;
             Handler.LocalPause = false;
             SoundManager.AmbientPaused = false;
 

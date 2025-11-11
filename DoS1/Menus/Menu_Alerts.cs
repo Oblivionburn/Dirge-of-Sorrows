@@ -122,120 +122,97 @@ namespace DoS1.Menus
             AssetManager.PlaySound_Random("Click");
             InputManager.Mouse.Flush();
 
-            if (button.Name == "Alert")
+            if (button.Text == "[Enter Town]")
             {
-                if (Handler.AlertType == "Combat")
-                {
-                    button.Visible = false;
-                    
-                }
+                EnterTown();
             }
-            if (button.Name == "Dialogue_Option1")
+            else if (button.Text == "[Retreat]")
             {
-                if (button.Text == "[Enter Town]")
+                ArmyUtil.Undeploy();
+                Close();
+                GameUtil.Toggle_Pause(false);
+            }
+            else if (button.Text == "[Claim Region]")
+            {
+                UnlockNextLocation();
+                Close();
+                GameUtil.Toggle_Pause(false);
+            }
+            else if (button.Text == "[Yes - Start Tutorial]")
+            {
+                Handler.StoryStep = 0;
+                Close();
+                GameUtil.Toggle_Pause(false);
+            }
+            else if (button.Text == "[No - Skip Tutorial]")
+            {
+                Handler.StoryStep = 56;
+                InventoryUtil.BeginningInventory();
+                Close();
+                GameUtil.Toggle_Pause(false);
+            }
+            else if (button.Text == "[Continue]" ||
+                     button.Text == "[Click here to continue]")
+            {
+                if (Handler.AlertType == "Story")
                 {
-                    EnterTown();
-                }
-                else if (button.Text == "[Retreat]")
-                {
-                    ArmyUtil.Undeploy();
-                    Close();
-                    GameUtil.Toggle_Pause(false);
-                }
-                else if (button.Text == "[Claim Region]")
-                {
-                    UnlockNextLocation();
-                    Close();
-                    GameUtil.Toggle_Pause(false);
-                }
-                else if (button.Text == "[Yes - Start Tutorial]")
-                {
-                    Handler.StoryStep = 0;
-                    Close();
-                    GameUtil.Toggle_Pause(false);
-                }
-                else if (button.Text == "[Continue]" ||
-                         button.Text == "[Click here to continue]")
-                {
-                    if (Handler.AlertType == "Story")
-                    {
-                        ContinueStory();
+                    ContinueStory();
 
-                        if (Handler.StoryStep != 38)
-                        {
-                            Close();
-                        }
-                    }
-                    else
+                    if (Handler.StoryStep != 38)
                     {
-                        GameUtil.Toggle_Pause(false);
                         Close();
                     }
                 }
-                else if (button.Text == "[Retreat to Worldmap]")
-                {
-                    Close();
-                    GameUtil.ReturnToWorldmap();
-                }
-                else if (button.Text == "[Hold Position]")
+                else
                 {
                     GameUtil.Toggle_Pause(false);
-                    Close();
-                }
-                else if (button.Text == "Fight!")
-                {
-                    SoundManager.StopMusic();
-                    SoundManager.NeedMusic = true;
-
-                    Scene combat = SceneManager.GetScene("Combat");
-                    combat.Load();
-
-                    if (Handler.StoryStep == 38 ||
-                        Handler.StoryStep == 50)
-                    {
-                        combat.Menu.GetButton("Retreat").Visible = false;
-                        GameUtil.Toggle_Pause_Combat(false);
-                    }
-
-                    SceneManager.ChangeScene(combat);
-
-                    Handler.Combat = true;
-                    SoundManager.AmbientPaused = false;
                     Close();
                 }
             }
-            else if (button.Name == "Dialogue_Option2")
+            else if (button.Text == "[Retreat to Worldmap]")
             {
-                if (button.Text == "[Continue]")
-                {
-                    Close();
-                    GameUtil.Toggle_Pause(false);
-                }
-                else if (button.Text == "[No - Skip Tutorial]")
-                {
-                    Handler.StoryStep = 56;
-                    InventoryUtil.BeginningInventory();
-                    Close();
-                    GameUtil.Toggle_Pause(false);
-                }
-                else if (button.Text == "[Continue Moving]")
-                {
-                    Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
-                    Handler.Selected_Token = squad.ID;
-
-                    Menu ui = MenuManager.GetMenu("UI");
-                    Picture highlight = ui.GetPicture("Highlight");
-                    highlight.Region = squad.Region;
-                    highlight.Visible = true;
-                    highlight.DrawColor = new Color(0, 0, 255, 255);
-                    highlight.Texture = AssetManager.Textures["Highlight_Circle"];
-
-                    Close();
-                }
+                Close();
+                GameUtil.RetreatToWorldmap();
             }
-            else if (button.Name == "Dialogue_Option3")
+            else if (button.Text == "[Hold Position]")
             {
+                GameUtil.Toggle_Pause(false);
+                Close();
+            }
+            else if (button.Text == "[Continue Moving]")
+            {
+                Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
+                Handler.Selected_Token = squad.ID;
 
+                Menu ui = MenuManager.GetMenu("UI");
+                Picture highlight = ui.GetPicture("Highlight");
+                highlight.Region = squad.Region;
+                highlight.Visible = true;
+                highlight.DrawColor = new Color(0, 0, 255, 255);
+                highlight.Texture = AssetManager.Textures["Highlight_Circle"];
+
+                Close();
+            }
+            else if (button.Text == "Fight!")
+            {
+                SoundManager.StopMusic();
+                SoundManager.NeedMusic = true;
+
+                Scene combat = SceneManager.GetScene("Combat");
+                combat.Load();
+
+                if (Handler.StoryStep == 38 ||
+                    Handler.StoryStep == 50)
+                {
+                    combat.Menu.GetButton("Retreat").Visible = false;
+                    GameUtil.Toggle_Pause_Combat(false);
+                }
+
+                SceneManager.ChangeScene(combat);
+
+                Handler.Combat = true;
+                SoundManager.AmbientPaused = false;
+                Close();
             }
         }
 
@@ -525,7 +502,7 @@ namespace DoS1.Menus
             int width = Main.Game.MenuSize.X;
             int height = Main.Game.MenuSize.X;
 
-            int Y = Main.Game.ScreenHeight - (height * 6);
+            int Y = Main.Game.ScreenHeight - (height * 7);
 
             Label dialogue = GetLabel("Dialogue");
             dialogue.Region = new Region((Main.Game.ScreenWidth / 2) - (width * 5), Y, width * 10, height * 4);

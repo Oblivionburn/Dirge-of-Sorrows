@@ -340,8 +340,9 @@ namespace DoS1.Menus
                         if (InputManager.MouseWithin(item.Icon_Region.ToRectangle))
                         {
                             found = true;
+                            HighlightSlot(item);
 
-                            ExamineItem(item);
+                            InventoryUtil.ExamineItem(this, item);
 
                             if (InputManager.Mouse_LB_Held &&
                                 InputManager.Mouse.Moved)
@@ -349,7 +350,7 @@ namespace DoS1.Menus
                                 found = false;
 
                                 if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
-                                    (Handler.StoryStep == 31 && InventoryUtil.IsWeapon(item)) ||
+                                    (Handler.StoryStep == 31 && item.Type == "Weapon") ||
                                     Handler.StoryStep == 35 ||
                                     Handler.StoryStep > 32)
                                 {
@@ -368,6 +369,7 @@ namespace DoS1.Menus
                                     if (slots.Value > 0)
                                     {
                                         found = false;
+                                        GetPicture("SlotMatch").Visible = false;
 
                                         if (Handler.StoryStep > 32)
                                         {
@@ -383,61 +385,69 @@ namespace DoS1.Menus
                 }
             }
 
-            if (character != null)
+            if (!found)
             {
-                foreach (Item item in character.Inventory.Items)
+                if (!moving)
                 {
-                    if (item.Icon_Visible &&
-                        item.Equipped)
+                    GetPicture("SlotMatch").Visible = false;
+                }
+
+                if (character != null)
+                {
+                    foreach (Item item in character.Inventory.Items)
                     {
-                        if (InputManager.MouseWithin(item.Icon_Region.ToRectangle))
+                        if (item.Icon_Visible &&
+                            item.Equipped)
                         {
-                            found = true;
-
-                            ExamineItem(item);
-
-                            if (InputManager.Mouse_LB_Held &&
-                                InputManager.Mouse.Moved &&
-                                !Handler.ViewOnly_Character)
+                            if (InputManager.MouseWithin(item.Icon_Region.ToRectangle))
                             {
-                                found = false;
+                                found = true;
 
-                                if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
-                                    (Handler.StoryStep == 31 && InventoryUtil.IsWeapon(item)) ||
-                                    Handler.StoryStep == 35 ||
-                                    Handler.StoryStep > 32)
+                                InventoryUtil.ExamineItem(this, item);
+
+                                if (InputManager.Mouse_LB_Held &&
+                                    InputManager.Mouse.Moved &&
+                                    !Handler.ViewOnly_Character)
                                 {
-                                    moving = true;
-                                    starting_pos = item.Icon_Region.ToRectangle;
-                                    movingItem = item;
+                                    found = false;
+
+                                    if ((Handler.StoryStep == 16 && item.Name == "Cloth Helm") ||
+                                        (Handler.StoryStep == 31 && item.Type == "Weapon") ||
+                                        Handler.StoryStep == 35 ||
+                                        Handler.StoryStep > 32)
+                                    {
+                                        moving = true;
+                                        starting_pos = item.Icon_Region.ToRectangle;
+                                        movingItem = item;
+                                    }
+
+                                    break;
+                                }
+                                else if (InputManager.Mouse_RB_Pressed)
+                                {
+                                    Something slots = item.GetProperty("Rune Slots");
+                                    if (slots != null)
+                                    {
+                                        if (slots.Value > 0)
+                                        {
+                                            found = false;
+
+                                            if (Handler.StoryStep >= 32)
+                                            {
+                                                if (Handler.StoryStep == 32)
+                                                {
+                                                    MenuManager.GetMenu("Alerts").Visible = false;
+                                                    Handler.StoryStep++;
+                                                }
+
+                                                SelectItem(item.ID);
+                                            }
+                                        }
+                                    }
                                 }
 
                                 break;
                             }
-                            else if (InputManager.Mouse_RB_Pressed)
-                            {
-                                Something slots = item.GetProperty("Rune Slots");
-                                if (slots != null)
-                                {
-                                    if (slots.Value > 0)
-                                    {
-                                        found = false;
-
-                                        if (Handler.StoryStep >= 32)
-                                        {
-                                            if (Handler.StoryStep == 32)
-                                            {
-                                                MenuManager.GetMenu("Alerts").Visible = false;
-                                                Handler.StoryStep++;
-                                            }
-
-                                            SelectItem(item.ID);
-                                        }
-                                    }
-                                }
-                            }
-
-                            break;
                         }
                     }
                 }
@@ -689,6 +699,36 @@ namespace DoS1.Menus
             MenuManager.ChangeMenu("Item");
         }
 
+        private void HighlightSlot(Item item)
+        {
+            Picture slotMatch = GetPicture("SlotMatch");
+
+            Picture slot = null;
+
+            if (item.Type == "Weapon")
+            {
+                slot = GetPicture("Weapon");
+            }
+            else if (item.Type == "Helm")
+            {
+                slot = GetPicture("Helm");
+            }
+            else if (item.Type == "Armor")
+            {
+                slot = GetPicture("Armor");
+            }
+            else if (item.Type == "Shield")
+            {
+                slot = GetPicture("Shield");
+            }
+
+            if (slot != null)
+            {
+                slotMatch.Region = new Region(slot.Region.X, slot.Region.Y, slot.Region.Width, slot.Region.Height);
+                slotMatch.Visible = true;
+            }
+        }
+
         private void ResetPos()
         {
             width = Main.Game.MenuSize.X;
@@ -703,220 +743,6 @@ namespace DoS1.Menus
             {
                 starting_X = (Main.Game.ScreenWidth / 2) + (width * 5);
             }
-        }
-
-        private void ExamineItem(Item item)
-        {
-            int width = (Main.Game.MenuSize.X * 4) + (Main.Game.MenuSize.X / 2);
-            if (item.Type == "Rune")
-            {
-                width = item.Description.Length * (Main.Game.MenuSize.X / 10);
-            }
-            else if (item.Type == "Weapon" &&
-                     item.Categories.Contains("Grimoire"))
-            {
-                width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
-            }
-
-            int height = Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-
-            string text = item.Name + "\n\n";
-
-            if (!string.IsNullOrEmpty(item.Description))
-            {
-                text += item.Description + "\n";
-                height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-            }
-
-            if (item.Type == "Weapon")
-            {
-                if (InventoryUtil.Weapon_Is2H(item))
-                {
-                    text = item.Name + " (2H)\n\n";
-                }
-
-                List<Something> properties = new List<Something>();
-
-                //List damage properties first
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Damage"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                //List non-damage properties
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (!property.Name.Contains("Damage") &&
-                        !property.Name.Contains("Slots") &&
-                        !property.Name.Contains("Cost"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                //List slots
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Slots"))
-                    {
-                        properties.Add(property);
-                        break;
-                    }
-                }
-
-                //List cost last
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Cost"))
-                    {
-                        properties.Add(property);
-                        break;
-                    }
-                }
-
-                for (int i = 0; i < properties.Count; i++)
-                {
-                    Something property = properties[i];
-
-                    if (property.Name.Contains("Area") ||
-                        property.Name.Contains("Chance") ||
-                        property.Name.Contains("Status") ||
-                        property.Name.Contains("Drain") ||
-                        property.Name.Contains("Resist") ||
-                        property.Name.Contains("Haste") ||
-                        property.Name.Contains("Dodge") ||
-                        property.Name.Contains("Pierce") ||
-                        property.Name.Contains("Counter") ||
-                        property.Name.Contains("Disarm"))
-                    {
-                        text += property.Name + ": " + property.Value + "%";
-                    }
-                    else
-                    {
-                        text += property.Name + ": " + property.Value;
-                    }
-
-                    if (i < properties.Count - 1)
-                    {
-                        text += "\n";
-                        height += (Main.Game.MenuSize.Y / 2);
-                    }
-                }
-
-                properties.Clear();
-            }
-            else
-            {
-                List<Something> properties = new List<Something>();
-
-                //List defense properties first
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Defense"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                //List non-defense properties
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (!property.Name.Contains("Defense") &&
-                        !property.Name.Contains("Slots") &&
-                        !property.Name.Contains("Cost"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                //List slots
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Slots"))
-                    {
-                        properties.Add(property);
-                        break;
-                    }
-                }
-
-                //List cost last
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Cost"))
-                    {
-                        properties.Add(property);
-                        break;
-                    }
-                }
-
-                for (int i = 0; i < properties.Count; i++)
-                {
-                    Something property = properties[i];
-
-                    if (property.Name.Contains("Area") ||
-                        property.Name.Contains("Chance") ||
-                        property.Name.Contains("Status") ||
-                        property.Name.Contains("Drain") ||
-                        property.Name.Contains("Resist") ||
-                        property.Name.Contains("Haste") ||
-                        property.Name.Contains("Dodge") ||
-                        property.Name.Contains("Pierce") ||
-                        property.Name.Contains("Counter") ||
-                        property.Name.Contains("Disarm"))
-                    {
-                        text += property.Name + ": " + property.Value + "%";
-                    }
-                    else
-                    {
-                        text += property.Name + ": " + property.Value;
-                    }
-
-                    if (i < properties.Count - 1)
-                    {
-                        text += "\n";
-                        height += (Main.Game.MenuSize.Y / 2);
-                    }
-                }
-
-                properties.Clear();
-            }
-
-            Label examine = GetLabel("Examine");
-            examine.Text = text;
-
-            int X = InputManager.Mouse.X - (width / 2);
-            if (X < 0)
-            {
-                X = 0;
-            }
-            else if (X > Main.Game.Resolution.X - width)
-            {
-                X = Main.Game.Resolution.X - width;
-            }
-
-            int Y = InputManager.Mouse.Y + 20;
-            if (Y < 0)
-            {
-                Y = 0;
-            }
-            else if (Y > Main.Game.Resolution.Y - height)
-            {
-                Y = Main.Game.Resolution.Y - height;
-            }
-
-            examine.Region = new Region(X, Y, width, height);
-            examine.Visible = true;
         }
 
         private void ExamineStat(string name)
@@ -1143,6 +969,7 @@ namespace DoS1.Menus
                 visible = true
             });
 
+            AddPicture(Handler.GetID(), "SlotMatch", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.LimeGreen, false);
             AddPicture(Handler.GetID(), "Highlight", AssetManager.Textures["Grid_Hover"], new Region(0, 0, 0, 0), Color.White, false);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Examine", "", Color.White, AssetManager.Textures["ButtonFrame_Large"],
                 new Region(0, 0, 0, 0), false);

@@ -337,7 +337,7 @@ namespace DoS1.Menus
                         {
                             found = true;
 
-                            ExamineItem(item);
+                            InventoryUtil.ExamineItem(this, item);
 
                             if (InputManager.Mouse_RB_Pressed)
                             {
@@ -361,7 +361,7 @@ namespace DoS1.Menus
                         {
                             found = true;
 
-                            ExamineItem(item);
+                            InventoryUtil.ExamineItem(this, item);
 
                             if (InputManager.Mouse_RB_Pressed)
                             {
@@ -491,171 +491,6 @@ namespace DoS1.Menus
             starting_Y = (Main.Game.ScreenHeight / 2) - (height * 5);
             starting_X = (Main.Game.ScreenWidth / 2) - (width / 2) - (width * 10);
             other_starting_x = (Main.Game.ScreenWidth / 2) + (width / 2);
-        }
-
-        private void ExamineItem(Item item)
-        {
-            int width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
-            if (item.Type == "Rune")
-            {
-                width = item.Description.Length * (Main.Game.MenuSize.X / 10);
-            }
-            else if (item.Type == "Weapon" &&
-                     item.Categories.Contains("Grimoire"))
-            {
-                width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
-            }
-
-            int height = Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-
-            string text = item.Name + "\n\n";
-
-            if (!string.IsNullOrEmpty(item.Description))
-            {
-                text += item.Description + "\n";
-                height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-            }
-
-            if (item.Type == "Weapon")
-            {
-                if (InventoryUtil.Weapon_Is2H(item))
-                {
-                    text = item.Name + " (2H)\n\n";
-
-                    if (!string.IsNullOrEmpty(item.Description))
-                    {
-                        text += item.Description + "\n";
-                        height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-                    }
-                }
-
-                List<Something> properties = new List<Something>();
-
-                //List damage properties first
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Damage"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                //List non-damage properties last
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (!property.Name.Contains("Damage"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                for (int i = 0; i < properties.Count; i++)
-                {
-                    Something property = properties[i];
-
-                    if (property.Name.Contains("RP"))
-                    {
-                        text += "RP: " + property.Value + "/" + property.Max_Value;
-                    }
-                    else if (property.Name.Contains("Level"))
-                    {
-                        text += "Level: " + property.Value + "/" + property.Max_Value;
-                    }
-                    else
-                    {
-                        text += property.Name + ": " + property.Value;
-                    }
-
-                    if (i < properties.Count - 1)
-                    {
-                        text += "\n";
-                        height += (Main.Game.MenuSize.Y / 2);
-                    }
-                }
-
-                properties.Clear();
-            }
-            else
-            {
-                List<Something> properties = new List<Something>();
-
-                //List defense properties first
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (property.Name.Contains("Defense"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                //List non-defense properties last
-                for (int i = 0; i < item.Properties.Count; i++)
-                {
-                    Something property = item.Properties[i];
-                    if (!property.Name.Contains("Defense"))
-                    {
-                        properties.Add(property);
-                    }
-                }
-
-                for (int i = 0; i < properties.Count; i++)
-                {
-                    Something property = properties[i];
-
-                    if (property.Name.Contains("RP"))
-                    {
-                        text += "RP: " + property.Value + "/" + property.Max_Value;
-                    }
-                    else if (property.Name.Contains("Level"))
-                    {
-                        text += "Level: " + property.Value + "/" + property.Max_Value;
-                    }
-                    else
-                    {
-                        text += property.Name + ": " + property.Value;
-                    }
-
-                    if (i < properties.Count - 1)
-                    {
-                        text += "\n";
-                        height += (Main.Game.MenuSize.Y / 2);
-                    }
-                }
-
-                properties.Clear();
-            }
-
-            text += "\n\nPrice: " + item.Buy_Price;
-            height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-
-            Label examine = GetLabel("Examine");
-            examine.Text = text;
-
-            int X = InputManager.Mouse.X - (width / 2);
-            if (X < 0)
-            {
-                X = 0;
-            }
-            else if (X > Main.Game.Resolution.X - width)
-            {
-                X = Main.Game.Resolution.X - width;
-            }
-
-            int Y = InputManager.Mouse.Y + 20;
-            if (Y < 0)
-            {
-                Y = 0;
-            }
-            else if (Y > Main.Game.Resolution.Y - height)
-            {
-                Y = Main.Game.Resolution.Y - height;
-            }
-
-            examine.Region = new Region(X, Y, width, height);
-            examine.Visible = true;
         }
 
         private void Filter()

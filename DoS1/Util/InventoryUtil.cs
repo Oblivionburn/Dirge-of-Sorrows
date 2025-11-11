@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 using OP_Engine.Characters;
+using OP_Engine.Controls;
+using OP_Engine.Inputs;
 using OP_Engine.Inventories;
+using OP_Engine.Menus;
 using OP_Engine.Spells;
 using OP_Engine.Utility;
 
@@ -216,70 +219,66 @@ namespace DoS1.Util
             List<Something> properties = new List<Something>();
 
             string category = "Round";
-            properties.Add(NewProperty("Physical", "Defense", 5, 0));
+            properties.Add(NewProperty("Physical", "Defense", 3, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Wood", properties);
             item.Buy_Price = 20;
             items.Add(item);
 
-            properties[0].Value = 10;
+            properties[0].Value = 6;
             properties[1].Value = 1;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 40;
             items.Add(item);
 
-            properties[0].Value = 15;
+            properties[0].Value = 9;
             properties[1].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 60;
             items.Add(item);
 
-            properties[0].Value = 20;
+            properties[0].Value = 12;
             properties[1].Value = 2;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 80;
             items.Add(item);
 
-            properties[0].Value = 25;
+            properties[0].Value = 15;
             properties[1].Value = 3;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 100;
             items.Add(item);
 
             category = "Kite";
-            List<Something> special_properties = new List<Something>()
-            {
-                NewProperty("Physical", "Defense", 30, 0),
-                NewProperty("Rune", "Slots", 4, 0),
-                NewProperty("EP", "Cost", 3, 0)
-            };
+            properties[0].Value = 18;
+            properties[1].Value = 3;
             item = NewItem(type, category, "Wood", properties);
             item.Buy_Price = 120;
             item.Sell_Price = 120;
             items.Add(item);
 
-            properties[0].Value = 35;
+            properties[0].Value = 21;
             properties[1].Value = 4;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 140;
             item.Sell_Price = 140;
             items.Add(item);
 
-            properties[0].Value = 40;
+            properties[0].Value = 24;
             properties[1].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 160;
             item.Sell_Price = 160;
             items.Add(item);
 
-            properties[0].Value = 45;
+            properties[0].Value = 27;
             properties[1].Value = 5;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 180;
             item.Sell_Price = 180;
             items.Add(item);
 
-            properties[0].Value = 50;
+            properties[0].Value = 30;
             properties[1].Value = 5;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 200;
@@ -303,20 +302,20 @@ namespace DoS1.Util
             item.Buy_Price = 100;
             items.Add(item);
 
-            properties[0].Value = 40;
-            properties[1].Value = 6;
+            properties[0].Value = 60;
+            properties[1].Value = 5;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 200;
             items.Add(item);
 
-            properties[0].Value = 50;
-            properties[1].Value = 8;
+            properties[0].Value = 90;
+            properties[1].Value = 6;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 300;
             items.Add(item);
 
-            properties[0].Value = 60;
-            properties[1].Value = 10;
+            properties[0].Value = 120;
+            properties[1].Value = 7;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 400;
             items.Add(item);
@@ -332,28 +331,28 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 35, 0));
+            properties.Add(NewProperty("Physical", "Damage", 20, 0));
             properties.Add(NewProperty("Rune", "Slots", 3, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 125;
             items.Add(item);
 
-            properties[0].Value = 45;
+            properties[0].Value = 40;
             properties[1].Value = 3;
             properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 250;
             items.Add(item);
 
-            properties[0].Value = 55;
+            properties[0].Value = 60;
             properties[1].Value = 3;
             properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 375;
             items.Add(item);
 
-            properties[0].Value = 65;
+            properties[0].Value = 80;
             properties[1].Value = 3;
             properties[2].Value = 4;
             item = NewItem(type, category, "Steel", properties);
@@ -371,21 +370,21 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 40, 0));
+            properties.Add(NewProperty("Physical", "Damage", 25, 0));
             properties.Add(NewProperty("Rune", "Slots", 2, 0));
             properties.Add(NewProperty("EP", "Cost", 2, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 150;
             items.Add(item);
 
-            properties[0].Value = 60;
+            properties[0].Value = 50;
             properties[1].Value = 2;
             properties[2].Value = 3;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 300;
             items.Add(item);
 
-            properties[0].Value = 80;
+            properties[0].Value = 75;
             properties[1].Value = 2;
             properties[2].Value = 4;
             item = NewItem(type, category, "Bronze", properties);
@@ -410,30 +409,30 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 45, 0));
+            properties.Add(NewProperty("Physical", "Damage", 35, 0));
             properties.Add(NewProperty("Rune", "Slots", 1, 0));
             properties.Add(NewProperty("EP", "Cost", 3, 0));
             Item item = NewItem(type, category, "Elm", properties);
             item.Buy_Price = 175;
             items.Add(item);
 
-            properties[0].Value = 70;
+            properties[0].Value = 60;
             properties[1].Value = 1;
-            properties[2].Value = 6;
+            properties[2].Value = 4;
             item = NewItem(type, category, "Cedar", properties);
             item.Buy_Price = 350;
             items.Add(item);
 
-            properties[0].Value = 95;
+            properties[0].Value = 85;
             properties[1].Value = 1;
-            properties[2].Value = 8;
+            properties[2].Value = 5;
             item = NewItem(type, category, "Oak", properties);
             item.Buy_Price = 525;
             items.Add(item);
 
-            properties[0].Value = 120;
+            properties[0].Value = 110;
             properties[1].Value = 1;
-            properties[2].Value = 10;
+            properties[2].Value = 6;
             item = NewItem(type, category, "Ebony", properties);
             item.Buy_Price = 700;
             items.Add(item);
@@ -709,7 +708,7 @@ namespace DoS1.Util
 
                 if (Element_IsDamage(element))
                 {
-                    if (IsWeapon(item))
+                    if (item.Type == "Weapon")
                     {
                         effect = "Damage";
                     }
@@ -721,7 +720,7 @@ namespace DoS1.Util
                 else if (element == "Health" ||
                          element == "Energy")
                 {
-                    if (IsWeapon(item))
+                    if (item.Type == "Weapon")
                     {
                         effect = "Restore";
                     }
@@ -739,7 +738,7 @@ namespace DoS1.Util
                     {
                         if (Element_IsDamage(paired_rune.Categories[0]))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = paired_rune.Categories[0] + " Damage";
                             }
@@ -750,7 +749,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Counter"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Pierce Chance";
                             }
@@ -761,7 +760,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Death"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Death";
                             }
@@ -772,7 +771,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Disarm"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Disarm Weapon";
                             }
@@ -791,7 +790,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Time"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Haste";
                             }
@@ -806,7 +805,7 @@ namespace DoS1.Util
                 }
                 else if (element == "Death")
                 {
-                    if (IsWeapon(item))
+                    if (item.Type == "Weapon")
                     {
                         effect = "Chance";
                     }
@@ -817,7 +816,7 @@ namespace DoS1.Util
                 }
                 else if (element == "Time")
                 {
-                    if (IsWeapon(item))
+                    if (item.Type == "Weapon")
                     {
                         effect = "Haste";
                     }
@@ -833,7 +832,7 @@ namespace DoS1.Util
                     {
                         if (Element_IsDamage(paired_rune.Categories[0]))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "HP With " + paired_rune.Categories[0];
                             }
@@ -846,7 +845,7 @@ namespace DoS1.Util
                 }
                 else if (element == "Counter")
                 {
-                    if (IsWeapon(item))
+                    if (item.Type == "Weapon")
                     {
                         effect = "Pierce Chance";
                     }
@@ -857,7 +856,7 @@ namespace DoS1.Util
                 }
                 else if (element == "Disarm")
                 {
-                    if (IsWeapon(item))
+                    if (item.Type == "Weapon")
                     {
                         effect = "Weapon";
                     }
@@ -875,7 +874,7 @@ namespace DoS1.Util
                     {
                         if (paired_rune.Name.Contains("Counter"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Weak Status";
                             }
@@ -886,7 +885,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Death"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Cursed Status";
                             }
@@ -897,7 +896,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Disarm"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Melting Status";
                             }
@@ -908,7 +907,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Drain"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Poisoned Status";
                             }
@@ -919,7 +918,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Earth"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Petrified Status";
                             }
@@ -930,7 +929,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Fire"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Burning Status";
                             }
@@ -941,7 +940,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Health"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Regenerating Status";
                             }
@@ -952,7 +951,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Energy"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Charging Status";
                             }
@@ -963,7 +962,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Physical"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Stunned Status";
                             }
@@ -974,7 +973,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Time"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Slow Status";
                             }
@@ -985,7 +984,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Ice"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Frozen Status";
                             }
@@ -996,7 +995,7 @@ namespace DoS1.Util
                         }
                         else if (paired_rune.Name.Contains("Lightning"))
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 effect = "Apply Shocked Status";
                             }
@@ -1034,7 +1033,7 @@ namespace DoS1.Util
                         }
                         else if (element == "Death")
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 property.Value += level.Value;
                             }
@@ -1078,7 +1077,7 @@ namespace DoS1.Util
                         }
                         else if (element == "Death")
                         {
-                            if (IsWeapon(item))
+                            if (item.Type == "Weapon")
                             {
                                 item.Properties.Add(new Something
                                 {
@@ -1177,6 +1176,193 @@ namespace DoS1.Util
 
                 #endregion
             }
+        }
+
+        public static void ExamineItem(Menu menu, Item item)
+        {
+            int width = (Main.Game.MenuSize.X * 4) + (Main.Game.MenuSize.X / 2);
+            if (item.Type == "Rune")
+            {
+                width = item.Description.Length * (Main.Game.MenuSize.X / 10);
+            }
+            else if (item.Type == "Weapon" &&
+                     item.Categories.Contains("Grimoire"))
+            {
+                width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
+            }
+
+            int height = Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
+
+            string text = item.Name + "\n\n";
+
+            if (!string.IsNullOrEmpty(item.Description))
+            {
+                text += item.Description + "\n";
+                height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
+            }
+
+            List<Something> properties = new List<Something>();
+
+            if (item.Type == "Weapon")
+            {
+                if (Weapon_Is2H(item))
+                {
+                    text = item.Name + " (2H)\n\n";
+                }
+
+                //List damage properties first
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (property.Name.Contains("Damage"))
+                    {
+                        properties.Add(property);
+                    }
+                }
+
+                //List non-damage properties
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (!property.Name.Contains("Damage") &&
+                        !property.Name.Contains("Slots") &&
+                        !property.Name.Contains("Cost"))
+                    {
+                        properties.Add(property);
+                    }
+                }
+            }
+            else
+            {
+                //List defense properties first
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (property.Name.Contains("Defense"))
+                    {
+                        properties.Add(property);
+                    }
+                }
+
+                //List non-defense properties
+                for (int i = 0; i < item.Properties.Count; i++)
+                {
+                    Something property = item.Properties[i];
+                    if (!property.Name.Contains("Defense") &&
+                        !property.Name.Contains("Slots") &&
+                        !property.Name.Contains("Cost"))
+                    {
+                        properties.Add(property);
+                    }
+                }
+            }
+
+            //List slots
+            for (int i = 0; i < item.Properties.Count; i++)
+            {
+                Something property = item.Properties[i];
+                if (property.Name.Contains("Slots"))
+                {
+                    properties.Add(property);
+                    break;
+                }
+            }
+
+            //List cost last
+            for (int i = 0; i < item.Properties.Count; i++)
+            {
+                Something property = item.Properties[i];
+                if (property.Name.Contains("Cost"))
+                {
+                    properties.Add(property);
+                    break;
+                }
+            }
+
+            for (int i = 0; i < properties.Count; i++)
+            {
+                Something property = properties[i];
+                if (property.Name.Contains("Area"))
+                {
+                    width += (Main.Game.MenuSize.X / 2);
+                    break;
+                }
+            }
+
+            for (int i = 0; i < properties.Count; i++)
+            {
+                Something property = properties[i];
+
+                if (property.Name.Contains("Area") ||
+                    property.Name.Contains("Status") ||
+                    property.Name.Contains("Drain") ||
+                    property.Name.Contains("Resist") ||
+                    property.Name.Contains("Haste") ||
+                    property.Name.Contains("Dodge") ||
+                    property.Name.Contains("Pierce") ||
+                    property.Name.Contains("Counter") ||
+                    property.Name.Contains("Disarm"))
+                {
+                    if (!property.Name.Contains("Chance"))
+                    {
+                        text += property.Name + " Chance: " + property.Value + "%";
+                    }
+                    else
+                    {
+                        text += property.Name + ": " + property.Value + "%";
+                    }
+                }
+                else if (property.Name.Contains("RP"))
+                {
+                    text += "RP: " + property.Value + "/" + property.Max_Value;
+                }
+                else if (property.Name.Contains("Level"))
+                {
+                    text += "Level: " + property.Value + "/" + property.Max_Value;
+                }
+                else if (property.Name.Contains("Slots"))
+                {
+                    text += "Rune Slots: " + (property.Value - item.Attachments.Count) + "/" + property.Value;
+                }
+                else
+                {
+                    text += property.Name + ": " + property.Value;
+                }
+
+                if (i < properties.Count - 1)
+                {
+                    text += "\n";
+                    height += (Main.Game.MenuSize.Y / 2);
+                }
+            }
+
+            properties.Clear();
+
+            Label examine = menu.GetLabel("Examine");
+            examine.Text = text;
+
+            int X = InputManager.Mouse.X - (width / 2);
+            if (X < 0)
+            {
+                X = 0;
+            }
+            else if (X > Main.Game.Resolution.X - width)
+            {
+                X = Main.Game.Resolution.X - width;
+            }
+
+            int Y = InputManager.Mouse.Y + 20;
+            if (Y < 0)
+            {
+                Y = 0;
+            }
+            else if (Y > Main.Game.Resolution.Y - height)
+            {
+                Y = Main.Game.Resolution.Y - height;
+            }
+
+            examine.Region = new Region(X, Y, width, height);
+            examine.Visible = true;
         }
 
         public static void AddItem(Inventory inventory, string material, string category, string type)
@@ -1886,16 +2072,7 @@ namespace DoS1.Util
 
         public static bool IsWeapon(Item item)
         {
-            if (item.Categories.Contains("Sword") ||
-                item.Categories.Contains("Axe") ||
-                item.Categories.Contains("Mace") ||
-                item.Categories.Contains("Bow") ||
-                item.Categories.Contains("Grimoire"))
-            {
-                return true;
-            }
-
-            return false;
+            return item.Type == "Weapon";
         }
 
         public static bool IsArmor(Item item)

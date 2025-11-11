@@ -166,11 +166,19 @@ namespace DoS1
                             {
                                 LostFocus = false;
                                 TimeManager.Paused = false;
-                                SoundManager.AmbientPaused = false;
 
                                 if (Handler.Combat)
                                 {
-                                    GameUtil.Toggle_Pause_Combat(false);
+                                    if (!Handler.CombatFinishing)
+                                    {
+                                        SoundManager.AmbientPaused = false;
+                                        GameUtil.Toggle_Pause_Combat(false);
+                                    }
+                                }
+                                else if (!Handler.LocalMap ||
+                                         (Handler.LocalMap && !Handler.LocalPause))
+                                {
+                                    SoundManager.AmbientPaused = false;
                                 }
                             }
 

@@ -315,7 +315,7 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Deploy")
             {
-                DeploySquad();
+                ArmyUtil.DeploySquad(SelectedSquad);
             }
         }
 
@@ -424,19 +424,6 @@ namespace DoS1.Menus
 
             InputManager.Mouse.Flush();
             MenuManager.ChangeMenu("Squad");
-        }
-
-        private void DeploySquad()
-        {
-            Army army = CharacterManager.GetArmy("Ally");
-            Squad squad = army.GetSquad(SelectedSquad);
-
-            World world = SceneManager.GetScene("Localmap").World;
-            Map map = world.Maps[Handler.Level];
-
-            WorldUtil.AllyToken_Start(squad, map);
-
-            GetButton("Deploy").Enabled = false;
         }
 
         public override void Load(ContentManager content)

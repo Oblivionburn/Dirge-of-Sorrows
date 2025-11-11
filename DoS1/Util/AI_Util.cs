@@ -56,15 +56,15 @@ namespace DoS1.Util
             }
             else if (squad.Assignment == "Opportunist")
             {
-                target_tile = WorldUtil.Get_Base(map, "Ally");
+                Tile ally_base = WorldUtil.Get_Base(map, "Ally");
 
                 bool guarded = false;
 
                 Army ally_army = CharacterManager.GetArmy("Ally");
                 foreach (Squad ally_squad in ally_army.Squads)
                 {
-                    if (ally_squad.Location.X == target_tile.Location.X &&
-                        ally_squad.Location.Y == target_tile.Location.Y)
+                    if (ally_squad.Location.X == ally_base.Location.X &&
+                        ally_squad.Location.Y == ally_base.Location.Y)
                     {
                         guarded = true;
                         break;
@@ -74,7 +74,20 @@ namespace DoS1.Util
                 if (!guarded)
                 {
                     squad.Assignment = "Attack Base";
+                    target_tile = ally_base;
                 }
+            }
+            else if (squad.Assignment == "Rest")
+            {
+                target_tile = WorldUtil.GetNearest_Location_ToRest(map, ground, army, squad, false);
+            }
+
+            if (target_tile == null &&
+                squad.Assignment != "Sleeper" &&
+                squad.Assignment != "Opportunist")
+            {
+                squad.Assignment = "Attack Base";
+                target_tile = WorldUtil.Get_Base(map, "Ally");
             }
 
             if (target_tile != null)
@@ -95,62 +108,82 @@ namespace DoS1.Util
 
         public static void Get_NewTarget(Map map, Layer ground, Army army, Squad squad)
         {
-            CryptoRandom random;
+            bool rest_needed = false;
 
-            if (squad.Assignment != "Guard Base" &&
-                squad.Assignment != "Attack Base" &&
-                squad.Assignment != "Sleeper" &&
-                squad.Assignment != "Guard Nearest Town")
+            foreach (Character character in squad.Characters)
             {
-                random = new CryptoRandom();
-                int chance = random.Next(0, 601);
-                if (chance == 0)
+                int epCost = InventoryUtil.Get_EP_Cost(character);
+                if (character.ManaBar.Value < epCost ||
+                    character.HealthBar.Value < character.HealthBar.Max_Value)
                 {
-                    random = new CryptoRandom();
-                    int choice = random.Next(0, 7);
-                    switch (choice)
-                    {
-                        case 0:
-                            squad.Assignment = "Attack Base";
-                            break;
-
-                        case 1:
-                            squad.Assignment = "Capture Nearest Town";
-                            break;
-
-                        case 2:
-                            squad.Assignment = "Guard Nearest Town";
-                            break;
-
-                        case 3:
-                            squad.Assignment = "Attack Nearest Squad";
-                            break;
-
-                        case 4:
-                            squad.Assignment = "Attack Hero Squad";
-                            break;
-
-                        case 5:
-                            squad.Assignment = "Sleeper";
-                            break;
-
-                        case 6:
-                            squad.Assignment = "Opportunist";
-                            break;
-                    }
-
-                    Set_NextTarget(map, ground, army, squad);
+                    rest_needed = true;
                 }
             }
-            else if (squad.Assignment == "Attack Base" ||
-                     squad.Assignment == "Sleeper" ||
-                     squad.Assignment == "Guard Nearest Town")
+
+            if (rest_needed)
             {
-                random = new CryptoRandom();
-                int chance = random.Next(0, 601);
-                if (chance == 0)
+                squad.Assignment = "Rest";
+                Set_NextTarget(map, ground, army, squad);
+            }
+            else
+            {
+                CryptoRandom random;
+
+                if (squad.Assignment != "Guard Base" &&
+                    squad.Assignment != "Attack Base" &&
+                    squad.Assignment != "Sleeper" &&
+                    squad.Assignment != "Guard Nearest Town")
                 {
-                    Set_NextTarget(map, ground, army, squad);
+                    random = new CryptoRandom();
+                    int chance = random.Next(0, 401);
+                    if (chance == 0)
+                    {
+                        random = new CryptoRandom();
+                        int choice = random.Next(0, 7);
+                        switch (choice)
+                        {
+                            case 0:
+                                squad.Assignment = "Attack Base";
+                                break;
+
+                            case 1:
+                                squad.Assignment = "Capture Nearest Town";
+                                break;
+
+                            case 2:
+                                squad.Assignment = "Guard Nearest Town";
+                                break;
+
+                            case 3:
+                                squad.Assignment = "Attack Nearest Squad";
+                                break;
+
+                            case 4:
+                                squad.Assignment = "Attack Hero Squad";
+                                break;
+
+                            case 5:
+                                squad.Assignment = "Sleeper";
+                                break;
+
+                            case 6:
+                                squad.Assignment = "Opportunist";
+                                break;
+                        }
+
+                        Set_NextTarget(map, ground, army, squad);
+                    }
+                }
+                else if (squad.Assignment == "Attack Base" ||
+                         squad.Assignment == "Sleeper" ||
+                         squad.Assignment == "Guard Nearest Town")
+                {
+                    random = new CryptoRandom();
+                    int chance = random.Next(0, 401);
+                    if (chance == 0)
+                    {
+                        Set_NextTarget(map, ground, army, squad);
+                    }
                 }
             }
         }

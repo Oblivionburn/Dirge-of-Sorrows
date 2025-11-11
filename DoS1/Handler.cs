@@ -41,6 +41,7 @@ namespace DoS1
         public static CancellationTokenSource Loading_TokenSource;
         public static Task Loading_Task;
 
+        public static bool RevisitMap;
         public static bool LocalMap;
         public static int Level;
         public static bool MovingGrid;
@@ -76,7 +77,9 @@ namespace DoS1
 
         public static System.Timers.Timer CombatTimer = new System.Timers.Timer(1);
         public static bool Combat;
-        public static int Element_Multiplier = 8;
+        public static bool CombatFinishing;
+        public static bool Retreating;
+        public static int Element_Multiplier = 4;
         public static string Combat_Terrain;
         public static bool Combat_Ally_Base;
         public static bool Combat_Enemy_Base;

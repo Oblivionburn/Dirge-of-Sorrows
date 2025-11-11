@@ -1035,7 +1035,7 @@ namespace DoS1.Util
                         Item item = character.Inventory.Items[acid_choice];
 
                         if (InventoryUtil.IsArmor(item) ||
-                            InventoryUtil.IsWeapon(item))
+                            item.Type == "Weapon")
                         {
                             character.Inventory.Items.Remove(item);
                             break;

@@ -588,12 +588,10 @@ namespace DoS1.Scenes
                                     }
 
                                     ep_cost = InventoryUtil.Get_EP_Cost(current_character);
-                                    if (ep_cost > 0)
+                                    if (ep_cost > 0 &&
+                                        current_character.ManaBar.Value < ep_cost)
                                     {
-                                        if (current_character.ManaBar.Value < ep_cost)
-                                        {
-                                            can_attack = false;
-                                        }
+                                        can_attack = false;
                                     }
 
                                     if (can_attack)
@@ -852,13 +850,17 @@ namespace DoS1.Scenes
                         for (int y = 0; y < 3; y++)
                         {
                             Character character = ally_squad.GetCharacter(new Vector2(x, y));
-                            if (character != null &&
-                                character.CombatStep == 0 &&
-                                character.ManaBar.Value > 0 &&
-                                !character.Dead)
+                            if (character != null)
                             {
-                                current_character = character;
-                                break;
+                                int epCost = InventoryUtil.Get_EP_Cost(character);
+
+                                if (character.CombatStep == 0 &&
+                                    character.ManaBar.Value >= epCost &&
+                                    !character.Dead)
+                                {
+                                    current_character = character;
+                                    break;
+                                }
                             }
                         }
 
@@ -879,13 +881,17 @@ namespace DoS1.Scenes
                         for (int y = 0; y < 3; y++)
                         {
                             Character character = enemy_squad.GetCharacter(new Vector2(x, y));
-                            if (character != null &&
-                                character.CombatStep == 0 &&
-                                character.ManaBar.Value > 0 &&
-                                !character.Dead)
+                            if (character != null)
                             {
-                                current_character = character;
-                                break;
+                                int epCost = InventoryUtil.Get_EP_Cost(character);
+
+                                if (character.CombatStep == 0 &&
+                                    character.ManaBar.Value >= epCost &&
+                                    !character.Dead)
+                                {
+                                    current_character = character;
+                                    break;
+                                }
                             }
                         }
 
@@ -1862,10 +1868,16 @@ namespace DoS1.Scenes
             }
 
             GetCurrentCharacter();
+
+            if (current_character == null)
+            {
+                FinishCombat();
+            }
         }
 
         private void FinishCombat()
         {
+            Handler.CombatFinishing = true;
             SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
 
@@ -1904,8 +1916,16 @@ namespace DoS1.Scenes
             }
             else
             {
+                bool rest_needed = false;
+
                 foreach (Character character in enemy_squad.Characters)
                 {
+                    int epCost = InventoryUtil.Get_EP_Cost(character);
+                    if (character.ManaBar.Value < epCost)
+                    {
+                        rest_needed = true;
+                    }
+
                     for (int i = 0; i < character.StatusEffects.Count; i++)
                     {
                         Something statusEffect = character.StatusEffects[i];
@@ -1924,6 +1944,18 @@ namespace DoS1.Scenes
                             i--;
                         }
                     }
+                }
+
+                if (rest_needed)
+                {
+                    enemy_squad.Assignment = "Rest";
+
+                    Army army = CharacterManager.GetArmy("Enemy");
+                    Scene localmap = SceneManager.GetScene("Localmap");
+                    Map map = localmap.World.Maps[Handler.Level];
+                    Layer ground = map.GetLayer("Ground");
+
+                    AI_Util.Set_NextTarget(map, ground, army, enemy_squad);
                 }
             }
 
@@ -1974,32 +2006,33 @@ namespace DoS1.Scenes
             Menu.GetPicture("Result").Visible = true;
             Menu.GetButton("Result").Visible = true;
 
-            if (won_battle)
+            if (gold > 0 ||
+                xp > 0)
             {
-                if (gold > 0 ||
-                    xp > 0)
-                {
-                    text = Reward_Combat(text);
-                }
+                text = Reward_Combat(text);
+            }
 
-                label.Text = GameUtil.WrapText_Dialogue(text);
+            label.Text = GameUtil.WrapText_Dialogue(text);
 
-                Character leader = ally_squad.GetLeader();
-                if (leader == null)
-                {
-                    //If leader was killed, assign new leader
-                    ally_squad.Leader_ID = ally_squad.Characters[0].ID;
-                }
-                else
-                {
-                    //If leader was not killed, remove enemy as target
-                    leader.Target_ID = 0;
-                }
+            Character leader = ally_squad.GetLeader();
+            if (leader == null)
+            {
+                //If leader was killed, assign new leader
+                ally_squad.Leader_ID = ally_squad.Characters[0].ID;
+            }
+            else if (won_battle &&
+                     !enemy_squad.Characters.Any())
+            {
+                //If leader not killed and no enemies left, remove enemy as target
+                leader.Target_ID = 0;
             }
         }
 
         private void Retreat()
         {
+            Handler.Retreating = true;
+            Handler.CombatFinishing = true;
+            SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
 
             Picture battleResult = Menu.GetPicture("Result");
@@ -2009,7 +2042,7 @@ namespace DoS1.Scenes
             Label label = Menu.GetLabel("Result");
             label.Visible = true;
 
-            string text = ally_squad.Name + " is retreating...";
+            string text = "    " + ally_squad.Name + " is retreating...    ";
             
             Menu.GetButton("Result").Visible = true;
             Menu.GetButton("Retreat").Visible = false;
@@ -2055,9 +2088,8 @@ namespace DoS1.Scenes
 
         private string Reward_Combat(string text)
         {
-            text += "\n\n" + gold + " Gold was looted!";
-            text += "\n" + xp + " XP was gained!";
-            text += "\n" + rp + " RP was gained!\n";
+            text += "\n\n" + gold + " Gold looted!";
+            text += "\n" + xp + " XP and " + rp + " RP gained!";
 
             Handler.Gold += gold;
 
@@ -2101,13 +2133,76 @@ namespace DoS1.Scenes
                 {
                     ally_squad.Location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
                 }
+                else
+                {
+                    if (enemy_squad.Direction == Direction.North)
+                    {
+                        ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
+                    }
+                    else if (enemy_squad.Direction == Direction.East)
+                    {
+                        ally_squad.Location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
+                    }
+                    else if (enemy_squad.Direction == Direction.South)
+                    {
+                        ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
+                    }
+                    else if (enemy_squad.Direction == Direction.West)
+                    {
+                        ally_squad.Location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
+                    }
+                }
 
                 Tile tile = ground.GetTile(new Vector2(ally_squad.Location.X, ally_squad.Location.Y));
                 ally_squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
             }
+            else if (won_battle &&
+                     enemy_squad.Characters.Any())
+            {
+                //Bump enemy away from squad
+                if (enemy_squad.Direction == Direction.North)
+                {
+                    enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
+                }
+                else if (enemy_squad.Direction == Direction.East)
+                {
+                    enemy_squad.Location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
+                }
+                else if (enemy_squad.Direction == Direction.South)
+                {
+                    enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
+                }
+                else if (enemy_squad.Direction == Direction.West)
+                {
+                    enemy_squad.Location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
+                }
+                else
+                {
+                    if (ally_squad.Direction == Direction.North)
+                    {
+                        enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
+                    }
+                    else if (ally_squad.Direction == Direction.East)
+                    {
+                        enemy_squad.Location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
+                    }
+                    else if (ally_squad.Direction == Direction.South)
+                    {
+                        enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
+                    }
+                    else if (ally_squad.Direction == Direction.West)
+                    {
+                        enemy_squad.Location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
+                    }
+                }
+
+                Tile tile = ground.GetTile(new Vector2(enemy_squad.Location.X, enemy_squad.Location.Y));
+                enemy_squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
+            }
 
             Handler.CombatTimer.Stop();
             Handler.Combat = false;
+            Handler.CombatFinishing = false;
 
             ResetCombat_Final();
 
@@ -2120,10 +2215,14 @@ namespace DoS1.Scenes
 
             SoundManager.StopMusic();
             SoundManager.NeedMusic = true;
-            SoundManager.AmbientPaused = false;
 
             Main.Timer.Start();
-            GameUtil.Toggle_Pause(false);
+
+            if (!Handler.Retreating)
+            {
+                SoundManager.AmbientPaused = false;
+                GameUtil.Toggle_Pause(false);
+            }
         }
 
         public void UpdateGrids()
@@ -2543,13 +2642,13 @@ namespace DoS1.Scenes
                     font = AssetManager.Fonts["ControlFont"],
                     name = "Retreat",
                     text = "Retreat",
-                    texture = AssetManager.Textures["ButtonFrame_Large"],
-                    texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
+                    texture = AssetManager.Textures["ButtonFrame"],
+                    texture_highlight = AssetManager.Textures["ButtonFrame"],
                     region = new Region(0, 0, 0, 0),
                     draw_color = Color.White,
                     draw_color_selected = Color.White,
-                    text_color = Color.White,
-                    text_selected_color = Color.Red,
+                    text_color = Color.Black,
+                    text_selected_color = Color.White,
                     enabled = true,
                     visible = true
                 });
@@ -2632,7 +2731,7 @@ namespace DoS1.Scenes
 
                 Menu.GetButton("PlayPause").Region = new Region((Main.Game.ScreenWidth / 2) - Main.Game.MenuSize.X, Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
                 Menu.GetButton("Speed").Region = new Region(Main.Game.ScreenWidth / 2, Main.Game.MenuSize.Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
-                Menu.GetButton("Retreat").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2), result_label.Region.Y + result_label.Region.Height - height, Main.Game.MenuSize.X * 4, height);
+                Menu.GetButton("Retreat").Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 2), (Main.Game.MenuSize.Y * 3), Main.Game.MenuSize.X * 4, height);
 
                 Menu.GetLabel("Debug").Region = new Region((Main.Game.Resolution.X / 2) - (Main.Game.MenuSize.X * 5), 0, Main.Game.MenuSize.X * 10, height);
                 Menu.GetLabel("Examine").Region = new Region(0, 0, 0, 0);

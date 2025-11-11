@@ -140,6 +140,14 @@ namespace DoS1.Menus
             {
                 Back();
             }
+            else if (button.Name == "Movement")
+            {
+                GetInfo_Movement();
+            }
+            else if (button.Name == "Combat")
+            {
+                GetInfo_Combat();
+            }
             else if (button.Name == "Formation")
             {
                 GetInfo_Formation();
@@ -150,19 +158,86 @@ namespace DoS1.Menus
             }
         }
 
+        private void GetInfo_Movement()
+        {
+            Label text = GetLabel("Text");
+            text.Text = "";
+
+            string newText = "";
+            newText += "If you left-click one of your squads, the game will automatically pause and allow you to select a destination for that squad with a preview of " +
+                "the path it will take to get there. A destination can be a location on the map which will be highlighted with a green box, or an enemy squad which " +
+                "will be highlighted with a red circle. Once a destination is selected, the game will unpause and your squad will move along its designated path until " +
+                "it reaches its destination. If the destination is an enemy squad, then the path of your squad will continuously update to follow the enemy.\n\n";
+            newText += "When a squad is selected for movement you can right-click anywhere, or left-click the same squad again, to cancel moving it. Cancelling movement " +
+                "will not remove a squad's current path/destination. When no squad is selected for movement, you can hover the mouse over any squad to preview their " +
+                "current path and destination, including enemy squads.\n\n";
+            newText += "When one of your squads collides with an enemy squad, or vice-versa, both squads will be repositioned to their current tile location and then " +
+                "combat will begin.\n\n";
+
+            text.Text = GameUtil.WrapText_Help(newText, 80);
+
+            int width = Main.Game.MenuSize_X * 20;
+            int height = Main.Game.MenuSize_Y * 12;
+
+            int X = (Main.Game.Resolution.X / 2) - (width / 2);
+            int Y = (Main.Game.Resolution.Y / 2) - (height / 2);
+
+            int buttonWidth = Main.Game.MenuSize_X * 3;
+
+            text.Region = new Region(X + buttonWidth, Y, width - (Main.Game.MenuSize_X * 2), height);
+        }
+
+        private void GetInfo_Combat()
+        {
+            Label text = GetLabel("Text");
+            text.Text = "";
+
+            string newText = "";
+            newText += "When combat begins, you will be taken to a separate Combat screen with your squad on the right-side of the field and the enemy on the left. " +
+                "Combat plays out automatically until one side has been completely eliminated, or until both sides have run out of Energy Points (EP). Every action in " +
+                "combat costs a certain number of EP, based on the equipment a character is wearing. Higher tier armor/weapons/runes will cost more EP to wield. In the " +
+                "event that both sides have run out EP, the winner will be determined by whichever side caused the most damage.\n\n";
+            newText += "The order of combat is your whole squad goes first, then the entire enemy squad takes their turn, etc. Character order within a squad is " +
+                "determined based on their formation position, with the upper-left corner starting first and then proceeding left-to-right/top-to-bottom\n\n";
+            newText += "Target selection is based on the weapon a character is wielding:\n";
+            newText += "- Characters wielding a melee weapon will always target whoever is directly in front of them on the same row. If no target can be found in the " +
+                "same row, then they will search for a target in other rows, starting from the Front and working their way to the Back. If the character is in the top " +
+                "row, then the next row searched will be the middle and last will be the bottom row. If the character is in the middle row, then the next row searched " +
+                "will be the top and last will be the bottom row. If the character is in the bottom row, then the next row searched will be the middle and last will be " +
+                "the top row.\n";
+            newText += "- Characters wielding a ranged weapon (bow or grimoire with offensive runes) will always target whoever is furthest back on the same row. If no " +
+                "target can be found in the same row, then they will search the other rows in the same order as a character wielding a melee weapon, starting from the " +
+                "Back and working their way to the Front.\n";
+            newText += "- Characters wielding any weapon with restorative runes (e.g. Health or Energy), can simultaneously target their own squad members for " +
+                "restoration of HP/EP. Restoration targeting will always be whoever has the least amount of the value being restored. If the restorative rune is paired " +
+                "with an Area Rune, then the target will be the entire squad when the Area effect is applied.";
+
+            text.Text = GameUtil.WrapText_Help(newText, 100);
+
+            int width = Main.Game.MenuSize_X * 20;
+            int height = Main.Game.MenuSize_Y * 12;
+
+            int X = (Main.Game.Resolution.X / 2) - (width / 2);
+            int Y = (Main.Game.Resolution.Y / 2) - (height / 2);
+
+            int buttonWidth = Main.Game.MenuSize_X * 3;
+
+            text.Region = new Region(X + buttonWidth, Y, width, height + Main.Game.MenuSize_Y);
+        }
+
         private void GetInfo_Formation()
         {
             Label text = GetLabel("Text");
             text.Text = "";
 
             string newText = "";
-            newText += "- The first/left column of your squad is the 'front' of its formation, and the last/right column is the 'back'. For enemy squads the 'front' of " +
-                "their formation is on the right, since they face the opposite direction.\n\n";
-            newText += "- Characters in the front do normal damage with melee weapons, as well as receive normal damage from melee attacks. Characters in the middle will " +
-                "do and receive 3/4 of melee damage. The back will do and receive 1/2 of melee damage.\n\n";
-            newText += "- Characters in the back will do normal damage with bow weapons, as well as receive normal damage from bow attacks. Characters in the middle will " +
-                "do and receive 3/4 of bow damage. The front will do and receive 1/2 of bow damage.\n\n";
-            newText += "- Characters wielding magic grimoires do no extra damage from formation position.\n\n";
+            newText += "The left column of your squad's formation is the Front, the middle column is the Middle, and the right column is the Back. For enemy squads, the " +
+                "Front of their formation is on the right since they face the opposite direction.\n\n";
+            newText += "Characters in the Front do normal damage with melee weapons, as well as receive normal damage from melee attacks. Characters in the Middle will " +
+                "do and receive 3/4 of melee damage. The Back will do and receive 1/2 of melee damage.\n\n";
+            newText += "Characters in the Back will do normal damage with bow weapons, as well as receive normal damage from bow attacks. Characters in the Middle will " +
+                "do and receive 3/4 of bow damage. The Front will do and receive 1/2 of bow damage.\n\n";
+            newText += "Characters wielding grimoires do no extra damage from formation position.\n\n";
 
             text.Text = GameUtil.WrapText_Help(newText, 80);
 
@@ -223,19 +298,39 @@ namespace DoS1.Menus
         {
             Clear();
 
-            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Frame_Full"], new Region(0, 0, 0, 0), Color.White, true);
-            AddPicture(Handler.GetID(), "ButtonsColumn", AssetManager.Textures["Frame_Large"], new Region(0, 0, 0, 0), Color.White, true);
+            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Frame_Text_Full"], new Region(0, 0, 0, 0), Color.White, true);
+            AddPicture(Handler.GetID(), "ButtonsColumn", AssetManager.Textures["Frame_Large"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddButton(new ButtonOptions
             {
                 id = Handler.GetID(),
-                name = "Back",
-                hover_text = "Close",
-                texture = AssetManager.Textures["Button_Back"],
-                texture_highlight = AssetManager.Textures["Button_Back_Hover"],
-                texture_disabled = AssetManager.Textures["Button_Back_Disabled"],
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Movement",
+                text = "Movement",
+                texture = AssetManager.Textures["ButtonFrame"],
+                texture_highlight = AssetManager.Textures["ButtonFrame"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White,
+                draw_color_selected = Color.White,
+                text_color = Color.Black,
+                text_selected_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Combat",
+                text = "Combat",
+                texture = AssetManager.Textures["ButtonFrame"],
+                texture_highlight = AssetManager.Textures["ButtonFrame"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                draw_color_selected = Color.White,
+                text_color = Color.Black,
+                text_selected_color = Color.White,
                 enabled = true,
                 visible = true
             });
@@ -246,12 +341,12 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Formation",
                 text = "Formation",
-                texture = AssetManager.Textures["ButtonFrame_Large"],
-                texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
+                texture = AssetManager.Textures["ButtonFrame"],
+                texture_highlight = AssetManager.Textures["ButtonFrame"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = Color.White * 0.8f,
+                draw_color = Color.White,
                 draw_color_selected = Color.White,
-                text_color = Color.White * 0.8f,
+                text_color = Color.Black,
                 text_selected_color = Color.White,
                 enabled = true,
                 visible = true
@@ -263,12 +358,29 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "StatusEffects",
                 text = "Status Effects",
-                texture = AssetManager.Textures["ButtonFrame_Large"],
-                texture_highlight = AssetManager.Textures["ButtonFrame_Large"],
+                texture = AssetManager.Textures["ButtonFrame"],
+                texture_highlight = AssetManager.Textures["ButtonFrame"],
                 region = new Region(0, 0, 0, 0),
-                draw_color = Color.White * 0.8f,
+                draw_color = Color.White,
                 draw_color_selected = Color.White,
-                text_color = Color.White * 0.8f,
+                text_color = Color.Black,
+                text_selected_color = Color.White,
+                enabled = true,
+                visible = true
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                font = AssetManager.Fonts["ControlFont"],
+                name = "Back",
+                text = "Close",
+                texture = AssetManager.Textures["ButtonFrame"],
+                texture_highlight = AssetManager.Textures["ButtonFrame"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                draw_color_selected = Color.White,
+                text_color = Color.Black,
                 text_selected_color = Color.White,
                 enabled = true,
                 visible = true
@@ -280,7 +392,7 @@ namespace DoS1.Menus
                 font = AssetManager.Fonts["ControlFont"],
                 name = "Text",
                 text = "",
-                text_color = Color.White,
+                text_color = new Color(99, 82, 71),
                 alignment_verticle = Alignment.Top,
                 alignment_horizontal = Alignment.Left,
                 region = new Region(0, 0, 0, 0),
@@ -303,18 +415,20 @@ namespace DoS1.Menus
             int Y = (Main.Game.Resolution.Y / 2) - (height / 2);
 
             int buttonWidth = Main.Game.MenuSize_X * 3;
-            int buttonHeight = Main.Game.MenuSize_Y;
+            int buttonHeight = Main.Game.MenuSize_Y / 2;
 
             Picture background = GetPicture("Background");
-            background.Region = new Region(X, Y, width, height);
+            background.Region = new Region(X + buttonWidth, Y, width - buttonWidth, height);
 
             GetPicture("ButtonsColumn").Region = new Region(X, Y, buttonWidth, height);
 
-            GetButton("Formation").Region = new Region(X, Y, buttonWidth, buttonHeight);
-            GetButton("StatusEffects").Region = new Region(X, Y + buttonHeight, buttonWidth, buttonHeight);
+            GetButton("Movement").Region = new Region(X, Y, buttonWidth, buttonHeight);
+            GetButton("Combat").Region = new Region(X, Y + buttonHeight, buttonWidth, buttonHeight);
+            GetButton("Formation").Region = new Region(X, Y + (buttonHeight * 2), buttonWidth, buttonHeight);
+            GetButton("StatusEffects").Region = new Region(X, Y + (buttonHeight * 3), buttonWidth, buttonHeight);
 
+            GetButton("Back").Region = new Region(X, background.Region.Y + background.Region.Height - (buttonHeight * 2), buttonWidth, buttonHeight * 2);
             GetLabel("Text").Region = new Region(X + buttonWidth, Y, width - buttonWidth, height);
-            GetButton("Back").Region = new Region(X, Y + background.Region.Height, Main.Game.MenuSize_X, Main.Game.MenuSize_Y);
         }
 
         #endregion

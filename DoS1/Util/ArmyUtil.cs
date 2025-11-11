@@ -4,10 +4,11 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 
 using OP_Engine.Characters;
+using OP_Engine.Inventories;
+using OP_Engine.Menus;
+using OP_Engine.Scenes;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
-using OP_Engine.Menus;
-using OP_Engine.Inventories;
 
 namespace DoS1.Util
 {
@@ -1032,7 +1033,8 @@ namespace DoS1.Util
                     {
                         if ((destination.Location.X == enemy_squad.Location.X &&
                              destination.Location.Y == enemy_squad.Location.Y) ||
-                            (destination.Location.X == enemy_squad.Destination.X &&
+                            (enemy_squad.Moving &&
+                             destination.Location.X == enemy_squad.Destination.X &&
                              destination.Location.Y == enemy_squad.Destination.Y))
                         {
                             enemy_targeted = true;
@@ -1065,6 +1067,20 @@ namespace DoS1.Util
 
                 pathing.Visible = false;
             }
+        }
+
+        public static void DeploySquad(long squadID)
+        {
+            Army army = CharacterManager.GetArmy("Ally");
+            Squad squad = army.GetSquad(squadID);
+
+            World world = SceneManager.GetScene("Localmap").World;
+            Map map = world.Maps[Handler.Level];
+
+            WorldUtil.AllyToken_Start(squad, map);
+
+            Menu armyMenu = MenuManager.GetMenu("Army");
+            armyMenu.GetButton("Deploy").Enabled = false;
         }
 
         public static void Undeploy()
