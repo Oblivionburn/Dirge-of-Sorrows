@@ -12,6 +12,7 @@ using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
+using OP_Engine.Weathers;
 
 namespace DoS1.Util
 {
@@ -326,6 +327,44 @@ namespace DoS1.Util
 
                     case "Time_Milliseconds":
                         TimeManager.Now.Milliseconds = long.Parse(reader.Value);
+                        break;
+
+                    case "CurrentWeather":
+                        if (Enum.TryParse(reader.Value, out WeatherType weather))
+                        {
+                            WeatherManager.CurrentWeather = weather;
+                        }
+                        break;
+
+                    case "Transitioning":
+                        WeatherManager.Transitioning = reader.Value == "True";
+                        break;
+
+                    case "TransitionType":
+                        if (Enum.TryParse(reader.Value, out WeatherTransition transition))
+                        {
+                            WeatherManager.TransitionType = transition;
+                        }
+                        break;
+
+                    case "AmbientFade":
+                        SoundManager.AmbientFade = float.Parse(reader.Value);
+                        break;
+
+                    case "Lightning":
+                        WeatherManager.Lightning = reader.Value == "True";
+                        break;
+
+                    case "TransitionTime":
+                        if (WeatherManager.Transitioning)
+                        {
+                            Weather transitionWeather = WeatherManager.GetWeather_TransitioningTo();
+                            if (transitionWeather != null)
+                            {
+                                transitionWeather.TransitionTime = int.Parse(reader.Value);
+                                transitionWeather.Visible = true;
+                            }
+                        }
                         break;
                 }
             }

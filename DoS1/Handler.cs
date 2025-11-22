@@ -279,19 +279,38 @@ namespace DoS1
 
         public static void SortSaves()
         {
+            DirectoryInfo saveDirs = new DirectoryInfo(AssetManager.Directories["Saves"]);
+
             for (int i = 0; i < Saves.Count; i++)
             {
                 for (int j = 0; j < Saves.Count - 1; j++)
                 {
-                    int day_a = LoadUtil.Get_Day(Saves[j]);
-                    int hour_a = LoadUtil.Get_Hour(Saves[j]);
-                    int minute_a = LoadUtil.Get_Minute(Saves[j]);
-                    int total_a = ((day_a * 24) * 60) + (hour_a * 60) + minute_a;
+                    DirectoryInfo saveDir_a = null;
+                    DirectoryInfo saveDir_b = null;
 
-                    int day_b = LoadUtil.Get_Day(Saves[j + 1]);
-                    int hour_b = LoadUtil.Get_Hour(Saves[j + 1]);
-                    int minute_b = LoadUtil.Get_Minute(Saves[j + 1]);
-                    int total_b = ((day_b * 24) * 60) + (hour_b * 60) + minute_b;
+                    foreach (DirectoryInfo existing in saveDirs.GetDirectories())
+                    {
+                        if (existing.Name == Saves[j])
+                        {
+                            saveDir_a = existing;
+                        }
+                        else if (existing.Name == Saves[j + 1])
+                        {
+                            saveDir_b = existing;
+                        }
+                    }
+
+                    int day_a = saveDir_a.LastWriteTime.Day;
+                    int hour_a = saveDir_a.LastWriteTime.Hour;
+                    int minute_a = saveDir_a.LastWriteTime.Minute;
+                    int second_a = saveDir_a.LastWriteTime.Second;
+                    int total_a = (((day_a * 24) * 60) * 60) + ((hour_a * 60) * 60) + (minute_a * 60) + second_a;
+
+                    int day_b = saveDir_b.LastWriteTime.Day;
+                    int hour_b = saveDir_b.LastWriteTime.Hour;
+                    int minute_b = saveDir_b.LastWriteTime.Minute;
+                    int second_b = saveDir_b.LastWriteTime.Second;
+                    int total_b = (((day_b * 24) * 60) * 60) + ((hour_b * 60) * 60) + (minute_b * 60) + second_b;
 
                     if (total_a < total_b)
                     {

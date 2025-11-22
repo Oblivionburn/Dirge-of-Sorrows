@@ -331,7 +331,7 @@ namespace DoS1.Menus
                     {
                         found = true;
 
-                        ExamineItem(item);
+                        InventoryUtil.ExamineItem(this, item);
 
                         if (InputManager.Mouse_LB_Held &&
                             InputManager.Mouse.Moved &&
@@ -363,7 +363,7 @@ namespace DoS1.Menus
                         {
                             found = true;
 
-                            ExamineItem(item);
+                            InventoryUtil.ExamineItem(this, item);
 
                             if (InputManager.Mouse_LB_Held &&
                                 InputManager.Mouse.Moved &&

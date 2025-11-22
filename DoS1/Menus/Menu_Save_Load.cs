@@ -4,11 +4,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-using OP_Engine.Scenes;
-using OP_Engine.Menus;
-using OP_Engine.Inputs;
 using OP_Engine.Controls;
+using OP_Engine.Inputs;
+using OP_Engine.Menus;
+using OP_Engine.Scenes;
 using OP_Engine.Utility;
+using OP_Engine.Weathers;
 
 using DoS1.Util;
 
@@ -389,7 +390,19 @@ namespace DoS1.Menus
                 string save = Handler.Saves[num - 1];
                 Handler.Selected_Save = save;
 
-                Util.LoadUtil.LoadGame();
+                foreach (Weather weather in WeatherManager.Weathers)
+                {
+                    weather.TransitionTime = 0;
+                    weather.ParticleManager.Particles.Clear();
+                    weather.Visible = false;
+                }
+
+                WeatherManager.Transitioning = false;
+                WeatherManager.Lightning = false;
+                WeatherManager.TransitionType = WeatherTransition.None;
+                WeatherManager.CurrentWeather = WeatherType.Clear;
+
+                LoadUtil.LoadGame();
                 GameUtil.LoadGame();
             }
         }
@@ -676,7 +689,7 @@ namespace DoS1.Menus
                             id = Handler.GetID(),
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Time",
-                            text = "Save Time:   " + time,
+                            text = "Game Time:   " + time,
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true
@@ -687,7 +700,7 @@ namespace DoS1.Menus
                             id = Handler.GetID(),
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Save" + i.ToString() + "_Date",
-                            text = "File Date:   " + saveDir.LastWriteTime.ToString("MM-dd-yyyy hh:mm tt"),
+                            text = "Save Date:   " + saveDir.LastWriteTime.ToString("MM-dd-yyyy hh:mm:ss tt"),
                             text_color = Color.White * 0.8f,
                             region = new Region(0, 0, 0, 0),
                             visible = true

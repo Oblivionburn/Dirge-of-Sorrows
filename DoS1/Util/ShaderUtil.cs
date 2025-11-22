@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OP_Engine.Controls;
+
 using OP_Engine.Utility;
-using System;
 
 namespace DoS1.Util
 {

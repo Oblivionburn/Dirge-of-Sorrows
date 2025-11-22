@@ -1,11 +1,14 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using OP_Engine.Characters;
 using OP_Engine.Controls;
+using OP_Engine.Inputs;
 using OP_Engine.Inventories;
+using OP_Engine.Menus;
 using OP_Engine.Utility;
 
 namespace DoS1.Util
@@ -596,7 +599,7 @@ namespace DoS1.Util
                     eyes.Visible = false;
                 }
             }
-            else if (Utility.RandomPercent(5))
+            else if (Utility.RandomPercent(10))
             {
                 eyes.Visible = true;
             }
@@ -670,6 +673,80 @@ namespace DoS1.Util
             }
 
             return "Attack";
+        }
+
+        public static void ExamineCharacter(Menu menu, Character character)
+        {
+            int width = Main.Game.MenuSize.X * 4;
+            int height = Main.Game.MenuSize.X;
+
+            Label examine = menu.GetLabel("Examine");
+            examine.Text = "";
+
+            List<string> lines = new List<string>
+            {
+                character.Name,
+                "",
+                "HP: " + character.HealthBar.Value + "/" + character.HealthBar.Max_Value,
+                "EP: " + character.ManaBar.Value + "/" + character.ManaBar.Max_Value
+            };
+
+            List<Something> statusEffects = new List<Something>();
+            for (int i = 0; i < character.StatusEffects.Count; i++)
+            {
+                Something statusEffect = character.StatusEffects[i];
+                if (statusEffect.Name != "Damage")
+                {
+                    statusEffects.Add(statusEffect);
+                }
+            }
+
+            if (statusEffects.Count > 0)
+            {
+                lines.Add("");
+                lines.Add("Status Effects:");
+
+                for (int i = 0; i < statusEffects.Count; i++)
+                {
+                    lines.Add("- " + statusEffects[i].Name);
+                }
+            }
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+
+                examine.Text += line;
+
+                if (i < lines.Count - 1)
+                {
+                    examine.Text += "\n";
+                    height += (Main.Game.MenuSize.Y / 2);
+                }
+            }
+
+            int X = InputManager.Mouse.X - (width / 2);
+            if (X < 0)
+            {
+                X = 0;
+            }
+            else if (X > Main.Game.Resolution.X - width)
+            {
+                X = Main.Game.Resolution.X - width;
+            }
+
+            int Y = InputManager.Mouse.Y + 20;
+            if (Y < 0)
+            {
+                Y = 0;
+            }
+            else if (Y > Main.Game.Resolution.Y - height)
+            {
+                Y = Main.Game.Resolution.Y - height;
+            }
+
+            examine.Region = new Region(X, Y, width, height);
+            examine.Visible = true;
         }
 
         public static int Increase_XP(Character character, int xp)

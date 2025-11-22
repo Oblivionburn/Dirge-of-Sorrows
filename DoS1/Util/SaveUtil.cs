@@ -15,6 +15,7 @@ using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
+using OP_Engine.Weathers;
 
 namespace DoS1.Util
 {
@@ -206,6 +207,22 @@ namespace DoS1.Util
             Writer.WriteAttributeString("Time_Seconds", TimeManager.Now.Seconds.ToString());
             Writer.WriteAttributeString("Time_TotalMilliseconds", TimeManager.Now.TotalMilliseconds.ToString());
             Writer.WriteAttributeString("Time_Milliseconds", TimeManager.Now.Milliseconds.ToString());
+
+            Writer.WriteAttributeString("CurrentWeather", WeatherManager.CurrentWeather.ToString());
+            Writer.WriteAttributeString("Transitioning", WeatherManager.Transitioning.ToString());
+            Writer.WriteAttributeString("TransitionType", WeatherManager.TransitionType.ToString());
+            Writer.WriteAttributeString("AmbientFade", SoundManager.AmbientFade.ToString());
+            Writer.WriteAttributeString("Lightning", WeatherManager.Lightning.ToString());
+
+            if (WeatherManager.Transitioning)
+            {
+                Weather transitionWeather = WeatherManager.GetWeather_TransitioningTo();
+                if (transitionWeather != null)
+                {
+                    Writer.WriteAttributeString("TransitionTime", transitionWeather.TransitionTime.ToString());
+                }
+            }
+
             ExitNode();
 
             if (Handler.MarketInventories.Any())

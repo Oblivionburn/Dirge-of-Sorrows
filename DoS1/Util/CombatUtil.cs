@@ -78,7 +78,8 @@ namespace DoS1.Util
 
                 for (int i = 0; i < character.Tags.Count; i++)
                 {
-                    if (character.Tags[i].Contains("Animation"))
+                    if (character.Tags[i].Contains("Animation") ||
+                        character.Tags[i].Contains("Shake"))
                     {
                         character.Tags.Remove(character.Tags[i]);
                         i--;
@@ -763,6 +764,20 @@ namespace DoS1.Util
 
                 CharacterUtil.UpdateGear(character);
             }
+        }
+
+        public static bool SquadReady(World world, Squad squad, float move_speed)
+        {
+            foreach (Character character in squad.Characters)
+            {
+                Tile origin = OriginTile(world, character);
+                if (!AtTile(character, origin, move_speed))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static bool FrontRow(Character character)

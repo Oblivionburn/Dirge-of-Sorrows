@@ -1336,6 +1336,9 @@ namespace DoS1.Util
                 }
             }
 
+            text += "\n\nPrice: " + item.Buy_Price;
+            height += (Main.Game.MenuSize.Y / 2);
+
             properties.Clear();
 
             Label examine = menu.GetLabel("Examine");

@@ -88,18 +88,6 @@ namespace DoS1.Util
             SoundManager.AmbientFade = 1;
             SoundManager.StopAmbient();
 
-            foreach (Weather weather in WeatherManager.Weathers)
-            {
-                weather.TransitionTime = 0;
-                weather.ParticleManager.Particles.Clear();
-                weather.Visible = false;
-            }
-
-            WeatherManager.Transitioning = false;
-            WeatherManager.Lightning = false;
-            WeatherManager.TransitionType = WeatherTransition.None;
-            WeatherManager.CurrentWeather = WeatherType.Clear;
-
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
 
             TimeManager.Now.OnSecondsChange -= SecondChanged;

@@ -379,7 +379,7 @@ namespace DoS1.Menus
                                 {
                                     examining = true;
 
-                                    GameUtil.Examine(this, character.Name);
+                                    CharacterUtil.ExamineCharacter(this, character);
 
                                     if (InputManager.Mouse_LB_Held &&
                                         InputManager.Mouse.Moved &&

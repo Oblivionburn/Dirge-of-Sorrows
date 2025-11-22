@@ -36,7 +36,6 @@ namespace DoS1.Scenes
         private Character current_character = null;
         private string attack_type = "";
         private bool hero_killed = false;
-        private int ep_cost = 0;
 
         private List<Character> counter_attackers = new List<Character>();
         private Character initial_attacker = null;
@@ -388,7 +387,7 @@ namespace DoS1.Scenes
                         highlight.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
                         highlight.Visible = true;
 
-                        ExamineCharacter(character);
+                        CharacterUtil.ExamineCharacter(Menu, character);
 
                         return true;
                     }
@@ -587,9 +586,9 @@ namespace DoS1.Scenes
                                         can_attack = false;
                                     }
 
-                                    ep_cost = InventoryUtil.Get_EP_Cost(current_character);
-                                    if (ep_cost > 0 &&
-                                        current_character.ManaBar.Value < ep_cost)
+                                    int epCost = InventoryUtil.Get_EP_Cost(current_character);
+                                    if (epCost > 0 &&
+                                        current_character.ManaBar.Value < epCost)
                                     {
                                         can_attack = false;
                                     }
@@ -615,6 +614,7 @@ namespace DoS1.Scenes
                                     {
                                         attack_type = CharacterUtil.AttackType(current_character);
                                         CombatUtil.SwitchAnimation(current_character, attack_type);
+                                        InventoryUtil.Get_EquippedItem(current_character, "Eyes").Visible = true;
 
                                         switch (attack_type)
                                         {
@@ -710,9 +710,25 @@ namespace DoS1.Scenes
 
                                             if (effect_frame >= animation_speed * 4)
                                             {
-                                                ClearDamageEffects();
-                                                effect_frame = 0;
-                                                combat_state = "AnimateDamageLabels";
+                                                bool enemies_ready = CombatUtil.SquadReady(World, enemy_squad, move_speed);
+                                                bool allies_ready = CombatUtil.SquadReady(World, ally_squad, move_speed);
+
+                                                if (enemies_ready &&
+                                                    allies_ready)
+                                                {
+                                                    foreach (Character character in enemy_squad.Characters)
+                                                    {
+                                                        CombatUtil.SwitchAnimation(character, "Idle");
+                                                    }
+                                                    foreach (Character character in ally_squad.Characters)
+                                                    {
+                                                        CombatUtil.SwitchAnimation(character, "Idle");
+                                                    }
+
+                                                    ClearDamageEffects();
+                                                    effect_frame = 0;
+                                                    combat_state = "AnimateDamageLabels";
+                                                }
                                             }
                                             else if (effect_frame % animation_speed == 0)
                                             {
@@ -929,17 +945,18 @@ namespace DoS1.Scenes
         {
             if (current_character != null)
             {
-                current_character.ManaBar.Value -= ep_cost;
+                Item weapon = InventoryUtil.Get_EquippedItem(current_character, "Weapon");
+
+                Offense(weapon);
+                Defense(weapon);
+
+                int epCost = InventoryUtil.Get_EP_Cost(current_character);
+                current_character.ManaBar.Value -= epCost;
                 if (current_character.ManaBar.Value < 0)
                 {
                     current_character.ManaBar.Value = 0;
                 }
                 current_character.ManaBar.Update();
-
-                Item weapon = InventoryUtil.Get_EquippedItem(current_character, "Weapon");
-
-                Defense(weapon);
-                Offense(weapon);
             }
         }
 
@@ -974,22 +991,14 @@ namespace DoS1.Scenes
                 //Single target heal HP
                 Character target;
 
-                if (weapon.Categories.Contains("Grimoire"))
+                //Heal least HP
+                if (current_character.Type == "Enemy")
                 {
-                    //Heal least HP
-                    if (current_character.Type == "Enemy")
-                    {
-                        target = CombatUtil.GetTarget_LeastHP(enemy_squad);
-                    }
-                    else
-                    {
-                        target = CombatUtil.GetTarget_LeastHP(ally_squad);
-                    }
+                    target = CombatUtil.GetTarget_LeastHP(enemy_squad);
                 }
                 else
                 {
-                    //Heal self HP
-                    target = current_character;
+                    target = CombatUtil.GetTarget_LeastHP(ally_squad);
                 }
 
                 if (target != null)
@@ -1028,22 +1037,14 @@ namespace DoS1.Scenes
                 //Single target heal EP
                 Character target;
 
-                if (weapon.Categories.Contains("Grimoire"))
+                //Heal least EP
+                if (current_character.Type == "Enemy")
                 {
-                    //Heal least EP
-                    if (current_character.Type == "Enemy")
-                    {
-                        target = CombatUtil.GetTarget_LeastEP(enemy_squad);
-                    }
-                    else
-                    {
-                        target = CombatUtil.GetTarget_LeastEP(ally_squad);
-                    }
+                    target = CombatUtil.GetTarget_LeastEP(enemy_squad);
                 }
                 else
                 {
-                    //Heal self EP
-                    target = current_character;
+                    target = CombatUtil.GetTarget_LeastEP(ally_squad);
                 }
 
                 if (target != null)
@@ -1576,6 +1577,8 @@ namespace DoS1.Scenes
                     if (!character.Dead)
                     {
                         Tile origin_tile = CombatUtil.OriginTile(World, character);
+                        Tile target_tile = CombatUtil.TargetTile(World, character);
+
                         float speed = 1;
 
                         CryptoRandom random = new CryptoRandom();
@@ -1604,6 +1607,17 @@ namespace DoS1.Scenes
                             float x = origin_tile.Region.X;
                             float distance = origin_tile.Region.Width / 4;
 
+                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
+                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
+                            {
+                                x = origin_tile.Region.X;
+                            }
+                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            {
+                                x = target_tile.Region.X;
+                            }
+
                             if (character.Type == "Ally")
                             {
                                 x += distance;
@@ -1625,6 +1639,17 @@ namespace DoS1.Scenes
                         {
                             float x = origin_tile.Region.X;
                             float distance = origin_tile.Region.Width / 4;
+
+                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
+                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
+                            {
+                                x = origin_tile.Region.X;
+                            }
+                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            {
+                                x = target_tile.Region.X;
+                            }
 
                             if (character.Type == "Ally")
                             {
@@ -1648,6 +1673,17 @@ namespace DoS1.Scenes
                             float x = origin_tile.Region.X;
                             float distance = origin_tile.Region.Width / 8;
 
+                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
+                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
+                            {
+                                x = origin_tile.Region.X;
+                            }
+                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            {
+                                x = target_tile.Region.X;
+                            }
+
                             if (character.Type == "Ally")
                             {
                                 x += distance;
@@ -1669,18 +1705,39 @@ namespace DoS1.Scenes
                         {
                             float distance = 0;
 
-                            if (character.Type == "Ally")
+                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
+                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
                             {
-                                distance = character.Region.X - origin_tile.Region.X;
-                            }
-                            else if (character.Type == "Enemy")
-                            {
-                                distance = origin_tile.Region.X - character.Region.X;
-                            }
+                                if (character.Type == "Ally")
+                                {
+                                    distance = character.Region.X - origin_tile.Region.X;
+                                }
+                                else if (character.Type == "Enemy")
+                                {
+                                    distance = origin_tile.Region.X - character.Region.X;
+                                }
 
-                            if (character.Region.X != origin_tile.Region.X)
+                                if (character.Region.X != origin_tile.Region.X)
+                                {
+                                    CombatUtil.MoveForward(character, distance / (speed / 2));
+                                }
+                            }
+                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
                             {
-                                CombatUtil.MoveForward(character, distance / (speed / 2));
+                                if (character.Type == "Ally")
+                                {
+                                    distance = character.Region.X - target_tile.Region.X;
+                                }
+                                else if (character.Type == "Enemy")
+                                {
+                                    distance = target_tile.Region.X - character.Region.X;
+                                }
+
+                                if (character.Region.X != target_tile.Region.X)
+                                {
+                                    CombatUtil.MoveForward(character, distance / (speed / 2));
+                                }
                             }
                         }
                     }
@@ -1813,27 +1870,8 @@ namespace DoS1.Scenes
             character_frame = 0;
             effect_frame = 0;
             attack_type = "";
-            ep_cost = 0;
             targets.Clear();
             current_character = null;
-
-            if (ally_squad != null)
-            {
-                foreach (Character character in ally_squad.Characters)
-                {
-                    CharacterUtil.SwitchAnimation(character, "Idle");
-                    character.Tags.Clear();
-                }
-            }
-
-            if (enemy_squad != null)
-            {
-                foreach (Character character in enemy_squad.Characters)
-                {
-                    CharacterUtil.SwitchAnimation(character, "Idle");
-                    character.Tags.Clear();
-                }
-            }
         }
 
         private void ResetCombat_Final()
@@ -1847,6 +1885,22 @@ namespace DoS1.Scenes
             counter_attacking = false;
             ally_total_damage = 0;
             enemy_total_damage = 0;
+
+            if (ally_squad != null)
+            {
+                foreach (Character character in ally_squad.Characters)
+                {
+                    character.Tags.Clear();
+                }
+            }
+
+            if (enemy_squad != null)
+            {
+                foreach (Character character in enemy_squad.Characters)
+                {
+                    character.Tags.Clear();
+                }
+            }
         }
 
         private void FinishRound()
@@ -2436,80 +2490,6 @@ namespace DoS1.Scenes
             effect_frame = 0;
         }
 
-        private void ExamineCharacter(Character character)
-        {
-            int width = Main.Game.MenuSize.X * 4;
-            int height = Main.Game.MenuSize.X;
-
-            Label examine = Menu.GetLabel("Examine");
-            examine.Text = "";
-
-            List<string> lines = new List<string>
-            {
-                character.Name,
-                "",
-                "HP: " + character.HealthBar.Value + "/" + character.HealthBar.Max_Value,
-                "EP: " + character.ManaBar.Value + "/" + character.ManaBar.Max_Value
-            };
-
-            List<Something> statusEffects = new List<Something>();
-            for (int i = 0; i < character.StatusEffects.Count; i++)
-            {
-                Something statusEffect = character.StatusEffects[i];
-                if (statusEffect.Name != "Damage")
-                {
-                    statusEffects.Add(statusEffect);
-                }
-            }
-
-            if (statusEffects.Count > 0)
-            {
-                lines.Add("");
-                lines.Add("Status Effects:");
-
-                for (int i = 0; i < statusEffects.Count; i++)
-                {
-                    lines.Add("- " + statusEffects[i].Name);
-                }
-            }
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = lines[i];
-
-                examine.Text += line;
-                
-                if (i < lines.Count - 1)
-                {
-                    examine.Text += "\n";
-                    height += (Main.Game.MenuSize.Y / 2);
-                }
-            }
-
-            int X = InputManager.Mouse.X - (width / 2);
-            if (X < 0)
-            {
-                X = 0;
-            }
-            else if (X > Main.Game.Resolution.X - width)
-            {
-                X = Main.Game.Resolution.X - width;
-            }
-
-            int Y = InputManager.Mouse.Y + 20;
-            if (Y < 0)
-            {
-                Y = 0;
-            }
-            else if (Y > Main.Game.Resolution.Y - height)
-            {
-                Y = Main.Game.Resolution.Y - height;
-            }
-
-            examine.Region = new Region(X, Y, width, height);
-            examine.Visible = true;
-        }
-
         public override void Load()
         {
             Menu.Clear();
@@ -2524,6 +2504,16 @@ namespace DoS1.Scenes
                 if (enemy_squad == null)
                 {
                     enemy_squad = CharacterManager.GetArmy("Special").GetSquad(Handler.Combat_Enemy_Squad);
+                }
+
+                foreach (Character character in ally_squad.Characters)
+                {
+                    CombatUtil.SwitchAnimation(character, "Idle");
+                }
+
+                foreach (Character character in enemy_squad.Characters)
+                {
+                    CombatUtil.SwitchAnimation(character, "Idle");
                 }
 
                 Color backdropColor = Color.White;
