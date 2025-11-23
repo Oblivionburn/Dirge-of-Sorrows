@@ -49,32 +49,6 @@ namespace DoS1.Menus
 
                 if (Handler.Loading_Step == 0)
                 {
-                    #region Load Textures
-
-                    if (Handler.Loading_Percent == 0 &&
-                        Handler.Loading_Task == null)
-                    {
-                        Handler.Loading_TokenSource = new CancellationTokenSource();
-                        Handler.Loading_Task = Task.Factory.StartNew(() => Handler.LoadTextures(), Handler.Loading_TokenSource.Token);
-                    }
-
-                    if (Handler.Loading_Task != null)
-                    {
-                        if (Handler.Loading_Task.Status == TaskStatus.RanToCompletion)
-                        {
-                            Handler.Loading_Task = null;
-                            Handler.Loading_TokenSource.Dispose();
-                            Handler.Loading_Percent = 0;
-                            Handler.Loading_Step++;
-                        }
-                    }
-
-                    #endregion
-                }
-                else if (Handler.Loading_Step == 1)
-                {
-                    #region Load Assets
-
                     if (Handler.Loading_Percent == 0 &&
                         Handler.Loading_Task == null)
                     {
@@ -92,10 +66,8 @@ namespace DoS1.Menus
                             Handler.Loading_Step++;
                         }
                     }
-
-                    #endregion
                 }
-                else if (Handler.Loading_Step == 2)
+                else if (Handler.Loading_Step == 1)
                 {
                     Handler.Loaded = true;
                     Handler.Loading_Step++;

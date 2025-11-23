@@ -27,7 +27,7 @@ namespace DoS1.Util
                 Type = type,
                 Direction = direction,
                 Region = new Region(),
-                Texture = AssetManager.Textures[direction.ToString() + "_Body_" + skinColor + "_Idle"]
+                Texture = Handler.GetTexture(direction.ToString() + "_Body_" + skinColor + "_Idle")
             };
             character.Animator.Frames = 4;
             character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
@@ -45,13 +45,13 @@ namespace DoS1.Util
                 Type = "Head",
                 Location = new Location(),
                 Equipped = true,
-                Texture = AssetManager.Textures[character.Direction.ToString() + "_" + skinColor + "_" + gender + "_" + headStyle],
+                Texture = Handler.GetTexture(character.Direction.ToString() + "_" + skinColor + "_" + gender + "_" + headStyle),
                 Image = character.Image,
                 DrawColor = Color.White,
                 Visible = true
             });
 
-            Texture2D eyeTexture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
+            Texture2D eyeTexture = Handler.GetTexture(character.Direction.ToString() + "_Eye");
             Texture2D newEyeTexture = GameUtil.CopyTexture_NewColor(eyeTexture, Handler.EyeColors[eyeColor]);
 
             character.Inventory.Items.Add(new Item
@@ -69,7 +69,7 @@ namespace DoS1.Util
 
             if (hairStyle != "Bald")
             {
-                Texture2D hairTexture = AssetManager.Textures[character.Direction.ToString() + "_" + gender + "_" + hairStyle];
+                Texture2D hairTexture = Handler.GetTexture(character.Direction.ToString() + "_" + gender + "_" + hairStyle);
                 Texture2D newHairTexture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[hairColor]);
 
                 character.Inventory.Items.Add(new Item
@@ -187,7 +187,7 @@ namespace DoS1.Util
                         string skin_tone = parts[2];
                         string closed_eye = direction + "_Eye_Closed_" + skin_tone;
 
-                        spriteBatch.Draw(AssetManager.Textures[closed_eye], eyes.Region.ToRectangle, eyes.Image, color);
+                        spriteBatch.Draw(Handler.GetTexture(closed_eye), eyes.Region.ToRectangle, eyes.Image, color);
                     }
                 }
 
@@ -279,7 +279,7 @@ namespace DoS1.Util
                         string skin_tone = parts[2];
                         string closed_eye = direction + "_Eye_Closed_" + skin_tone;
 
-                        spriteBatch.Draw(AssetManager.Textures[closed_eye], eyes.Region.ToRectangle, eyes.Image, color);
+                        spriteBatch.Draw(Handler.GetTexture(closed_eye), eyes.Region.ToRectangle, eyes.Image, color);
                     }
                 }
 
@@ -617,21 +617,21 @@ namespace DoS1.Util
 
                 string body_texture = direction + "_" + category + "_" + skin_tone + "_" + type;
 
-                character.Texture = AssetManager.Textures[body_texture];
+                character.Texture = Handler.GetTexture(body_texture);
                 if (character.Texture != null)
                 {
                     Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
                     if (armor != null)
                     {
                         string armor_texture = direction + "_Armor_" + armor.Categories[0] + "_" + armor.Materials[0] + "_" + type;
-                        armor.Texture = AssetManager.Textures[armor_texture];
+                        armor.Texture = Handler.GetTexture(armor_texture);
                     }
 
                     Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
                     if (weapon != null)
                     {
                         string weapon_texture = direction + "_Weapon_" + weapon.Categories[0] + "_" + weapon.Materials[0] + "_" + type;
-                        weapon.Texture = AssetManager.Textures[weapon_texture];
+                        weapon.Texture = Handler.GetTexture(weapon_texture);
                     }
 
                     ResetAnimation(character);

@@ -826,88 +826,88 @@ namespace DoS1.Util
                         case Direction.North:
                             if (previous_direction == Direction.Nowhere)
                             {
-                                texture = AssetManager.Textures["Path_N"];
+                                texture = Handler.GetTexture("Path_N");
                             }
                             else
                             {
-                                texture = AssetManager.Textures["Path_NS"];
+                                texture = Handler.GetTexture("Path_NS");
                             }
                             break;
 
                         case Direction.East:
                             if (previous_direction == Direction.Nowhere)
                             {
-                                texture = AssetManager.Textures["Path_E"];
+                                texture = Handler.GetTexture("Path_E");
                             }
                             else
                             {
-                                texture = AssetManager.Textures["Path_WE"];
+                                texture = Handler.GetTexture("Path_WE");
                             }
                             break;
 
                         case Direction.South:
                             if (previous_direction == Direction.Nowhere)
                             {
-                                texture = AssetManager.Textures["Path_S"];
+                                texture = Handler.GetTexture("Path_S");
                             }
                             else
                             {
-                                texture = AssetManager.Textures["Path_NS"];
+                                texture = Handler.GetTexture("Path_NS");
                             }
                             break;
 
                         case Direction.West:
                             if (previous_direction == Direction.Nowhere)
                             {
-                                texture = AssetManager.Textures["Path_W"];
+                                texture = Handler.GetTexture("Path_W");
                             }
                             else
                             {
-                                texture = AssetManager.Textures["Path_WE"];
+                                texture = Handler.GetTexture("Path_WE");
                             }
                             break;
 
                         case Direction.NorthEast:
                             if (previous_direction == Direction.North)
                             {
-                                texture = AssetManager.Textures["Path_SE"];
+                                texture = Handler.GetTexture("Path_SE");
                             }
                             else if (previous_direction == Direction.East)
                             {
-                                texture = AssetManager.Textures["Path_NW"];
+                                texture = Handler.GetTexture("Path_NW");
                             }
                             break;
 
                         case Direction.NorthWest:
                             if (previous_direction == Direction.North)
                             {
-                                texture = AssetManager.Textures["Path_SW"];
+                                texture = Handler.GetTexture("Path_SW");
                             }
                             else if (previous_direction == Direction.West)
                             {
-                                texture = AssetManager.Textures["Path_NE"];
+                                texture = Handler.GetTexture("Path_NE");
                             }
                             break;
 
                         case Direction.SouthEast:
                             if (previous_direction == Direction.South)
                             {
-                                texture = AssetManager.Textures["Path_NE"];
+                                texture = Handler.GetTexture("Path_NE");
                             }
                             else if (previous_direction == Direction.East)
                             {
-                                texture = AssetManager.Textures["Path_SW"];
+                                texture = Handler.GetTexture("Path_SW");
                             }
                             break;
 
                         case Direction.SouthWest:
                             if (previous_direction == Direction.South)
                             {
-                                texture = AssetManager.Textures["Path_NW"];
+                                texture = Handler.GetTexture("Path_NW");
                             }
                             else if (previous_direction == Direction.West)
                             {
-                                texture = AssetManager.Textures["Path_SE"];
+                                texture = Handler.GetTexture("Path_SE");
                             }
                             break;
                     }
@@ -920,19 +920,19 @@ namespace DoS1.Util
                     switch (direction)
                     {
                         case Direction.North:
-                            texture = AssetManager.Textures["Path_N"];
+                            texture = Handler.GetTexture("Path_N");
                             break;
 
                         case Direction.East:
-                            texture = AssetManager.Textures["Path_E"];
+                            texture = Handler.GetTexture("Path_E");
                             break;
 
                         case Direction.South:
-                            texture = AssetManager.Textures["Path_S"];
+                            texture = Handler.GetTexture("Path_S");
                             break;
 
                         case Direction.West:
-                            texture = AssetManager.Textures["Path_W"];
+                            texture = Handler.GetTexture("Path_W");
                             break;
                     }
                 }
@@ -944,19 +944,19 @@ namespace DoS1.Util
                     switch (direction)
                     {
                         case Direction.North:
-                            texture = AssetManager.Textures["Path_S"];
+                            texture = Handler.GetTexture("Path_S");
                             break;
 
                         case Direction.East:
-                            texture = AssetManager.Textures["Path_W"];
+                            texture = Handler.GetTexture("Path_W");
                             break;
 
                         case Direction.South:
-                            texture = AssetManager.Textures["Path_N"];
+                            texture = Handler.GetTexture("Path_N");
                             break;
 
                         case Direction.West:
-                            texture = AssetManager.Textures["Path_E"];
+                            texture = Handler.GetTexture("Path_E");
                             break;
                     }
                 }
@@ -1409,7 +1409,7 @@ namespace DoS1.Util
                 location.Type = "Town_" + squad.Type;
             }
 
-            location.Texture = AssetManager.Textures["Tile_" + location.Type];
+            location.Texture = Handler.GetTexture("Tile_" + location.Type);
         }
 
         public static int MaxLevelUnlocked()

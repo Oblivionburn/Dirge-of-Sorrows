@@ -198,6 +198,7 @@ namespace DoS1
             string[] textures =
             {
                 "Controls",
+                "Effects",
                 "Particles",
                 "Screens",
                 "Shaders",
@@ -349,64 +350,6 @@ namespace DoS1
             }
         }
 
-        public static void LoadTextures()
-        {
-            if (Main.Game.GraphicsManager.GraphicsDevice != null)
-            {
-                Loading_Current = 0;
-                Loading_IconCount = 0;
-                Loading_Message = "Loading Textures";
-
-                string[] dirs = { "Armors", "Bodies", "Effects", "Eyes", "Hairs", "Heads", "Helms", "Icons", "Shields", "Tiles", "Weapons" };
-
-                int total = 0;
-
-                DirectoryInfo dir = new DirectoryInfo(AssetManager.Directories["Textures"]);
-
-                foreach (var sub_dir in dir.GetDirectories())
-                {
-                    if (dirs.Contains(sub_dir.Name))
-                    {
-                        foreach (var file in sub_dir.GetFiles("*.png"))
-                        {
-                            total++;
-                        }
-                    }
-                }
-
-                foreach (var sub_dir in dir.GetDirectories())
-                {
-                    if (dirs.Contains(sub_dir.Name))
-                    {
-                        FileInfo[] files = sub_dir.GetFiles("*.png");
-
-                        int fileCount = files.Length;
-                        for (int i = 0; i < fileCount; i++)
-                        {
-                            FileInfo file = files[i];
-
-                            var name = Path.GetFileNameWithoutExtension(file.Name);
-                            if (!AssetManager.Textures.ContainsKey(name))
-                            {
-                                using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open))
-                                {
-                                    if (Main.Game.GraphicsManager.GraphicsDevice != null)
-                                    {
-                                        Texture2D texture = Texture2D.FromStream(Main.Game.GraphicsManager.GraphicsDevice, fileStream);
-                                        texture.Name = name;
-                                        AssetManager.Textures.Add(name, texture);
-
-                                        Loading_Current++;
-                                        Loading_Percent = (Loading_Current * 100) / total;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         #endregion
 
         #region Get Stuff
@@ -420,6 +363,11 @@ namespace DoS1
         public static Character GetHero()
         {
             return CharacterManager.GetArmy("Ally").Squads[0].GetLeader();
+        }
+
+        public static Texture2D GetTexture(string name)
+        {
+            return AssetManager.GetTexture_LazyLoad(Main.Game.GraphicsManager.GraphicsDevice, name);
         }
 
         #endregion

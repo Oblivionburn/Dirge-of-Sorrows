@@ -15,8 +15,12 @@ namespace DoS1.Util
 {
     public static class InventoryUtil
     {
+        public static int TotalAssets = 64;
+
         public static void GenAssets()
         {
+            Handler.Loading_Current = 0;
+
             InventoryManager.Inventories.Clear();
 
             Inventory assets = new Inventory
@@ -24,15 +28,6 @@ namespace DoS1.Util
                 ID = Handler.GetID(),
                 Name = "Assets"
             };
-            assets.Items.AddRange(GenArmors());
-            assets.Items.AddRange(GenHelms());
-            assets.Items.AddRange(GenShields());
-            assets.Items.AddRange(GenAxes());
-            assets.Items.AddRange(GenMaces());
-            assets.Items.AddRange(GenSwords());
-            assets.Items.AddRange(GenBows());
-            assets.Items.AddRange(GenGrimoires());
-            assets.Items.AddRange(GenRunes());
             InventoryManager.Inventories.Add(assets);
 
             Inventory inventory = new Inventory
@@ -41,10 +36,21 @@ namespace DoS1.Util
                 Name = "Ally"
             };
             InventoryManager.Inventories.Add(inventory);
+
+            GenArmors(assets);
+            GenHelms(assets);
+            GenShields(assets);
+            GenAxes(assets);
+            GenMaces(assets);
+            GenSwords(assets);
+            GenBows(assets);
+            GenGrimoires(assets);
+            GenRunes(assets);
         }
 
-        public static List<Item> GenArmors()
+        public static void GenArmors(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Armors";
             string type = "Armor";
 
             List<Item> items = new List<Item>();
@@ -56,7 +62,10 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Cloth", properties);
             item.Buy_Price = 50;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Leather";
             properties[0].Value = 10;
@@ -64,7 +73,10 @@ namespace DoS1.Util
             properties[2].Value = 2;
             item = NewItem(type, category, "Leather", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Chainmail";
             properties[0].Value = 15;
@@ -72,28 +84,40 @@ namespace DoS1.Util
             properties[2].Value = 3;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 150;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 20;
             properties[1].Value = 2;
             properties[2].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 200;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 25;
             properties[1].Value = 2;
             properties[2].Value = 5;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 250;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 30;
             properties[1].Value = 2;
             properties[2].Value = 6;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 300;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Platemail";
             properties[0].Value = 35;
@@ -101,34 +125,45 @@ namespace DoS1.Util
             properties[2].Value = 7;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 350;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 40;
             properties[1].Value = 0;
             properties[2].Value = 8;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 400;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 45;
             properties[1].Value = 0;
             properties[2].Value = 9;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 450;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 50;
             properties[1].Value = 0;
             properties[2].Value = 10;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 500;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenHelms()
+        public static void GenHelms(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Helms";
             string type = "Helm";
 
             List<Item> items = new List<Item>();
@@ -140,7 +175,10 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Cloth", properties);
             item.Buy_Price = 10;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Leather";
             properties[0].Value = 2;
@@ -148,7 +186,10 @@ namespace DoS1.Util
             properties[2].Value = 1;
             item = NewItem(type, category, "Leather", properties);
             item.Buy_Price = 20;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Chainmail";
             properties[0].Value = 3;
@@ -156,28 +197,40 @@ namespace DoS1.Util
             properties[2].Value = 2;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 30;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 4;
             properties[1].Value = 2;
             properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 40;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 5;
             properties[1].Value = 2;
             properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 50;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 6;
             properties[1].Value = 2;
             properties[2].Value = 3;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 60;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Platemail";
             properties[0].Value = 7;
@@ -185,34 +238,45 @@ namespace DoS1.Util
             properties[2].Value = 4;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 70;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 8;
             properties[1].Value = 0;
             properties[2].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 80;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 9;
             properties[1].Value = 0;
             properties[2].Value = 5;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 90;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 10;
             properties[1].Value = 0;
             properties[2].Value = 5;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenShields()
+        public static void GenShields(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Shields";
             string type = "Shield";
 
             List<Item> items = new List<Item>();
@@ -223,31 +287,46 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Wood", properties);
             item.Buy_Price = 20;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 6;
             properties[1].Value = 1;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 40;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 9;
             properties[1].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 60;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 12;
             properties[1].Value = 2;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 80;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 15;
             properties[1].Value = 3;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             category = "Kite";
             properties[0].Value = 18;
@@ -255,41 +334,55 @@ namespace DoS1.Util
             item = NewItem(type, category, "Wood", properties);
             item.Buy_Price = 120;
             item.Sell_Price = 120;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 21;
             properties[1].Value = 4;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 140;
             item.Sell_Price = 140;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 24;
             properties[1].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 160;
             item.Sell_Price = 160;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 27;
             properties[1].Value = 5;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 180;
             item.Sell_Price = 180;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 30;
             properties[1].Value = 5;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 200;
             item.Sell_Price = 200;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenAxes()
+        public static void GenAxes(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Axes";
             string type = "Weapon";
             string category = "Axe";
 
@@ -300,31 +393,42 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 4, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 60;
             properties[1].Value = 5;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 200;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 90;
             properties[1].Value = 6;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 300;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 120;
             properties[1].Value = 7;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 400;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenMaces()
+        public static void GenMaces(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Maces";
             string type = "Weapon";
             string category = "Mace";
 
@@ -336,34 +440,45 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 125;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 40;
             properties[1].Value = 3;
             properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 250;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 60;
             properties[1].Value = 3;
             properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 375;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 80;
             properties[1].Value = 3;
             properties[2].Value = 4;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 500;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenSwords()
+        public static void GenSwords(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Swords";
             string type = "Weapon";
             string category = "Sword";
 
@@ -375,34 +490,45 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 2, 0));
             Item item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 150;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 50;
             properties[1].Value = 2;
             properties[2].Value = 3;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 300;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 75;
             properties[1].Value = 2;
             properties[2].Value = 4;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 450;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 100;
             properties[1].Value = 2;
             properties[2].Value = 5;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 600;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenBows()
+        public static void GenBows(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Bows";
             string type = "Weapon";
             string category = "Bow";
 
@@ -414,34 +540,45 @@ namespace DoS1.Util
             properties.Add(NewProperty("EP", "Cost", 3, 0));
             Item item = NewItem(type, category, "Elm", properties);
             item.Buy_Price = 175;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 60;
             properties[1].Value = 1;
             properties[2].Value = 4;
             item = NewItem(type, category, "Cedar", properties);
             item.Buy_Price = 350;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 85;
             properties[1].Value = 1;
             properties[2].Value = 5;
             item = NewItem(type, category, "Oak", properties);
             item.Buy_Price = 525;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 110;
             properties[1].Value = 1;
             properties[2].Value = 6;
             item = NewItem(type, category, "Ebony", properties);
             item.Buy_Price = 700;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenGrimoires()
+        public static void GenGrimoires(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Grimoires";
             string type = "Weapon";
             string category = "Grimoire";
 
@@ -451,28 +588,39 @@ namespace DoS1.Util
             properties.Add(NewProperty("Rune", "Slots", 4, 0));
             Item item = NewItem(type, category, "Apprentice", properties);
             item.Buy_Price = 400;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 6;
             item = NewItem(type, category, "Novice", properties);
             item.Buy_Price = 600;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 8;
             item = NewItem(type, category, "Expert", properties);
             item.Buy_Price = 800;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 10;
             item = NewItem(type, category, "Master", properties);
             item.Buy_Price = 1000;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
-        public static List<Item> GenRunes()
+        public static void GenRunes(Inventory assets)
         {
+            Handler.Loading_Message = "Loading Runes";
             string type = "Rune";
 
             List<Item> items = new List<Item>();
@@ -482,61 +630,101 @@ namespace DoS1.Util
             properties.Add(NewProperty("Level", "Value", 1, 10));
             Item item = NewItem(type, "Area", "Area", properties);
             item.Buy_Price = 1000;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Counter", "Counter", properties);
             item.Buy_Price = 600;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Death", "Death", properties);
             item.Buy_Price = 800;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Disarm", "Disarm", properties);
             item.Buy_Price = 1000;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Drain", "Drain", properties);
             item.Buy_Price = 200;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Earth", "Earth", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Effect", "Effect", properties);
             item.Buy_Price = 400;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Fire", "Fire", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Health", "Health", properties);
             item.Buy_Price = 200;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Energy", "Energy", properties);
             item.Buy_Price = 200;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Physical", "Physical", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Time", "Time", properties);
             item.Buy_Price = 600;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Ice", "Ice", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             item = NewItem(type, "Lightning", "Lightning", properties);
             item.Buy_Price = 100;
-            items.Add(item);
+            assets.Items.Add(item);
 
-            return items;
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
         public static Item NewItem(string type, string category, string material, List<Something> properties)
@@ -553,7 +741,7 @@ namespace DoS1.Util
             if (material == category)
             {
                 item.Name = category + " " + type;
-                item.Icon = AssetManager.Textures[type + "_" + category];
+                item.Icon = Handler.GetTexture(type + "_" + category);
             }
             else
             {
@@ -566,7 +754,7 @@ namespace DoS1.Util
                     item.Name = material + " " + category + " " + type;
                 }
                     
-                item.Icon = AssetManager.Textures[type + "_" + category + "_" + material];
+                item.Icon = Handler.GetTexture(type + "_" + category + "_" + material);
             }
 
             item.Icon_Image = new Rectangle(0, 0, item.Icon.Width, item.Icon.Height);
@@ -641,11 +829,11 @@ namespace DoS1.Util
             if (item.Type == "Helm" ||
                 item.Type == "Shield")
             {
-                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + item.Type + "_" + item.Categories[0] + "_" + item.Materials[0]];
+                item.Texture = Handler.GetTexture(character.Direction.ToString() + "_" + item.Type + "_" + item.Categories[0] + "_" + item.Materials[0]);
             }
             else
             {
-                item.Texture = AssetManager.Textures[character.Direction.ToString() + "_" + item.Type + "_" + item.Categories[0] + "_" + item.Materials[0] + "_Idle"];
+                item.Texture = Handler.GetTexture(character.Direction.ToString() + "_" + item.Type + "_" + item.Categories[0] + "_" + item.Materials[0] + "_Idle");
             }
 
             item.Image = new Rectangle(0, 0, item.Texture.Width / 4, item.Texture.Height);

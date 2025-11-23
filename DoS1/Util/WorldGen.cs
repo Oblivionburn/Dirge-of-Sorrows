@@ -254,7 +254,7 @@ namespace DoS1.Util
 
         public static Tile NewTile(Layer layer, string type, Vector2 location, Region region)
         {
-            Texture2D texture = AssetManager.Textures["Tile_" + type];
+            Texture2D texture = Handler.GetTexture("Tile_" + type);
 
             Tile tile = new Tile
             {
@@ -622,7 +622,7 @@ namespace DoS1.Util
                 if (okay)
                 {
                     tile.Type = type;
-                    tile.Texture = AssetManager.Textures["Tile_" + type];
+                    tile.Texture = Handler.GetTexture("Tile_" + type);
 
                     if (type == "Water")
                     {
@@ -759,14 +759,14 @@ namespace DoS1.Util
                     if (type == "Oasis")
                     {
                         tile.Type = "Water";
-                        tile.Texture = AssetManager.Textures["Tile_Water"];
+                        tile.Texture = Handler.GetTexture("Tile_Water");
                         tile.Image = new Rectangle(0, 0, tile.Texture.Width / 4, tile.Texture.Height);
                         type = "Grass";
                     }
                     else
                     {
                         tile.Type = type;
-                        tile.Texture = AssetManager.Textures["Tile_" + type];
+                        tile.Texture = Handler.GetTexture("Tile_" + type);
 
                         if (type == "Water")
                         {

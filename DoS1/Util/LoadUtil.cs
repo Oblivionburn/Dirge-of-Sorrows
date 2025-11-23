@@ -490,7 +490,7 @@ namespace DoS1.Util
                         break;
 
                     case "Texture":
-                        item.Texture = AssetManager.Textures[reader.Value];
+                        item.Texture = Handler.GetTexture(reader.Value);
                         item.Image = new Rectangle(0, 0, item.Texture.Width / 4, item.Texture.Height);
                         break;
 
@@ -526,7 +526,7 @@ namespace DoS1.Util
                         break;
 
                     case "Icon":
-                        item.Icon = AssetManager.Textures[reader.Value];
+                        item.Icon = Handler.GetTexture(reader.Value);
                         item.Icon_Image = new Rectangle(0, 0, item.Icon.Width, item.Icon.Height);
                         item.Icon_DrawColor = Color.White;
                         break;
@@ -746,7 +746,7 @@ namespace DoS1.Util
                         break;
 
                     case "Texture":
-                        character.Texture = AssetManager.Textures[reader.Value];
+                        character.Texture = Handler.GetTexture(reader.Value);
                         character.Image = new Rectangle(0, 0, character.Texture.Width / 4, character.Texture.Height);
                         character.DrawColor = Color.White;
                         break;
@@ -1076,7 +1076,7 @@ namespace DoS1.Util
                         break;
 
                     case "Texture":
-                        squad.Texture = AssetManager.Textures[reader.Value];
+                        squad.Texture = Handler.GetTexture(reader.Value);
                         squad.Image = new Rectangle(0, 0, squad.Texture.Width, squad.Texture.Height);
                         break;
 
@@ -1561,7 +1561,7 @@ namespace DoS1.Util
                         break;
 
                     case "Texture":
-                        tile.Texture = AssetManager.Textures[reader.Value];
+                        tile.Texture = Handler.GetTexture(reader.Value);
 
                         if (tile.Type == "Water")
                         {

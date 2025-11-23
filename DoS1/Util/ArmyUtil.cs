@@ -85,11 +85,11 @@ namespace DoS1.Util
 
             if (type == "Ally")
             {
-                squad.Texture = AssetManager.Textures["Token_Ally"];
+                squad.Texture = Handler.GetTexture("Token_Ally");
             }
             else if (type == "Enemy")
             {
-                squad.Texture = AssetManager.Textures["Token_Enemy"];
+                squad.Texture = Handler.GetTexture("Token_Enemy");
             }
 
             if (squad.Texture != null)
@@ -164,9 +164,38 @@ namespace DoS1.Util
 
         public static void Gen_EnemySquad(Squad squad, int map_level, int chars_override, int class_type_override, int min_tier_override, int max_tier_override)
         {
-            int min_chars = (int)Math.Ceiling((double)map_level / 5);
-            int max_chars = (int)Math.Ceiling((double)map_level / 2);
-            if (max_chars > 5)
+            int min_chars = 1;
+            if (map_level >= 2 && map_level < 10)
+            {
+                min_chars = 2;
+            }
+            else if (map_level >= 10 && map_level < 15)
+            {
+                min_chars = 3;
+            }
+            else if (map_level >= 15 && map_level < 20)
+            {
+                min_chars = 4;
+            }
+            else if (map_level >= 20)
+            {
+                min_chars = 5;
+            }
+
+            int max_chars = 1;
+            if (map_level >= 2 && map_level < 4)
+            {
+                max_chars = 2;
+            }
+            else if (map_level >= 4 && map_level < 7)
+            {
+                max_chars = 3;
+            }
+            else if (map_level >= 7 && map_level < 13)
+            {
+                max_chars = 4;
+            }
+            else if (map_level >= 13)
             {
                 max_chars = 5;
             }
