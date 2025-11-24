@@ -71,7 +71,7 @@ namespace DoS1.Menus
                     Handler.StoryStep == 17 ||
                     (Handler.StoryStep >= 30 && Handler.StoryStep <= 32))
                 {
-                    GameUtil.Alert_Story();
+                    GameUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);

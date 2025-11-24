@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -11,8 +7,11 @@ using OP_Engine.Menus;
 using OP_Engine.Particles;
 using OP_Engine.Scenes;
 using OP_Engine.Tiles;
+using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DoS1.Util
 {
@@ -62,7 +61,7 @@ namespace DoS1.Util
             return map;
         }
 
-        public static void Resize_OnZoom(Map map, bool world_map)
+        public static void Resize_OnZoom(Menu menu, Map map, bool world_map)
         {
             if (map != null)
             {
@@ -97,13 +96,13 @@ namespace DoS1.Util
 
                     if (current != null)
                     {
-                        ResizeMap(map, ground, current, world_map);
+                        ResizeMap(menu, map, ground, current, world_map);
                     }
                 }
             }
         }
 
-        public static void Resize_OnStart(Map map)
+        public static void Resize_OnStart(Menu menu, Map map)
         {
             if (map != null)
             {
@@ -122,7 +121,7 @@ namespace DoS1.Util
                         }
                     }
 
-                    CameraToTile(map, ground, target);
+                    CameraToTile(menu, map, ground, target);
                 }
             }
         }
@@ -214,18 +213,18 @@ namespace DoS1.Util
             CharacterUtil.UpdateGear(character);
         }
 
-        public static void CameraToTile(Map map, Layer ground, Tile target)
+        public static void CameraToTile(Menu menu, Map map, Layer ground, Tile target)
         {
             if (target != null)
             {
                 target.Region.X = Main.Game.Resolution.X / 2 - (Main.Game.TileSize.X / 2);
                 target.Region.Y = Main.Game.Resolution.Y / 2 - (Main.Game.TileSize.Y / 2);
 
-                ResizeMap(map, ground, target, false);
+                ResizeMap(menu, map, ground, target, false);
             }
         }
 
-        public static void ResizeMap(Map map, Layer ground, Tile current, bool world_map)
+        public static void ResizeMap(Menu menu, Map map, Layer ground, Tile current, bool world_map)
         {
             current.Region.Width = Main.Game.TileSize.X;
             current.Region.Height = Main.Game.TileSize.Y;
@@ -361,9 +360,17 @@ namespace DoS1.Util
                     }
                 }
 
-                Menu ui = MenuManager.GetMenu("UI");
-                ui.GetPicture("Highlight").Visible = false;
-                ui.GetPicture("Select").Visible = false;
+                Picture highlight = menu.GetPicture("Highlight");
+                if (highlight != null)
+                {
+                    highlight.Visible = false;
+                }
+
+                Picture select = menu.GetPicture("Select");
+                if (select != null)
+                {
+                    select.Visible = false;
+                }
             }
         }
 
@@ -519,9 +526,8 @@ namespace DoS1.Util
                     }
                 }
 
-                Menu ui = MenuManager.GetMenu("UI");
-                ui.GetPicture("Highlight").Visible = false;
-                ui.GetPicture("Select").Visible = false;
+                scene.Menu.GetPicture("Highlight").Visible = false;
+                scene.Menu.GetPicture("Select").Visible = false;
             }
         }
 
@@ -617,6 +623,30 @@ namespace DoS1.Util
             Main.Game.ResolutionChange();
         }
 
+        public static void DeselectToken()
+        {
+            AssetManager.PlaySound_Random("Click");
+
+            Handler.Selected_Token = -1;
+
+            Scene localmap = SceneManager.GetScene("Localmap");
+
+            Menu menu = localmap.Menu;
+            menu.GetPicture("Select").Visible = false;
+            menu.GetPicture("Highlight").Visible = true;
+            menu.GetPicture("Highlight").DrawColor = new Color(255, 255, 255, 255);
+
+            Map map = GetMap(localmap.World);
+            if (map != null)
+            {
+                Layer pathing = map.GetLayer("Pathing");
+                pathing.Visible = false;
+            }
+
+            GameUtil.Toggle_Pause(false);
+            InputManager.Mouse.Flush();
+        }
+
         public static void AnimateTiles()
         {
             Scene scene = SceneManager.GetScene("Worldmap");
@@ -641,6 +671,62 @@ namespace DoS1.Util
                     }
                 }
             }
+        }
+
+        public static void UpdateTime()
+        {
+            long NewHours = TimeManager.Now.Hours;
+            string hours;
+            string minutes;
+
+            bool pm = false;
+
+            if (NewHours > 12)
+            {
+                NewHours = NewHours - 12;
+                pm = true;
+            }
+            else if (NewHours == 0)
+            {
+                NewHours = 12;
+            }
+            else if (NewHours == 12)
+            {
+                pm = true;
+            }
+
+            if (NewHours < 10)
+            {
+                hours = "0" + NewHours.ToString();
+            }
+            else
+            {
+                hours = NewHours.ToString();
+            }
+
+            if (TimeManager.Now.Minutes < 10)
+            {
+                minutes = "0" + TimeManager.Now.Minutes.ToString();
+            }
+            else
+            {
+                minutes = TimeManager.Now.Minutes.ToString();
+            }
+
+            Menu ui = MenuManager.GetMenu("UI");
+            Label time = ui.GetLabel("Time");
+            Label date = ui.GetLabel("Date");
+
+            if (pm == false)
+            {
+                time.Text = hours + ":" + minutes + " AM";
+            }
+            else
+            {
+                time.Text = hours + ":" + minutes + " PM";
+            }
+
+            date.Text = "Day " + TimeManager.Now.Days.ToString();
         }
 
         public static Tile Get_Tile(Layer layer, Vector2 location)
@@ -1592,8 +1678,7 @@ namespace DoS1.Util
                                                     Handler.Hovering_Squad.ID == squad.ID)
                                                 {
                                                     //Fix highlight region reference breaking after setting new Region on squad
-                                                    Menu menu = MenuManager.GetMenu("UI");
-                                                    Picture highlight = menu.GetPicture("Highlight");
+                                                    Picture highlight = localmap.Menu.GetPicture("Highlight");
                                                     highlight.Region = squad.Region;
                                                 }
 
@@ -1626,18 +1711,20 @@ namespace DoS1.Util
                                                                 {
                                                                     interrupt = true;
                                                                     GameUtil.Toggle_Pause(false);
+                                                                    localmap.Active = false;
+
                                                                     MenuManager.ChangeMenu("Market");
                                                                     break;
                                                                 }
                                                                 else if (Handler.StoryStep == 21)
                                                                 {
-                                                                    CameraToTile(map, ground, location);
+                                                                    CameraToTile(localmap.Menu, map, ground, location);
                                                                     Handler.StoryStep++;
                                                                 }
                                                                 else if (Handler.StoryStep > 48)
                                                                 {
                                                                     interrupt = true;
-                                                                    CameraToTile(map, ground, location);
+                                                                    CameraToTile(localmap.Menu, map, ground, location);
                                                                     GameUtil.Alert_Location(map, ground, squad, location_tile);
                                                                     break;
                                                                 }
@@ -1645,7 +1732,7 @@ namespace DoS1.Util
                                                             else if (Handler.StoryStep > 48)
                                                             {
                                                                 interrupt = true;
-                                                                GameUtil.Alert_MoveFinished(map, ground, squad, location);
+                                                                GameUtil.Alert_MoveFinished(localmap.Menu, map, ground, squad, location);
                                                                 break;
                                                             }
                                                         }
@@ -1659,7 +1746,7 @@ namespace DoS1.Util
                                                                 if (location_tile.Type == "Base_Ally")
                                                                 {
                                                                     interrupt = true;
-                                                                    GameUtil.Alert_BaseCaptured(map, ground, location_tile);
+                                                                    GameUtil.Alert_BaseCaptured(localmap.Menu, map, ground, location_tile);
                                                                 }
 
                                                                 ChangeLocation(location_tile, squad);
@@ -1783,17 +1870,17 @@ namespace DoS1.Util
 
         public static void EnterTown(string type)
         {
+            Scene localmap = SceneManager.GetScene("Localmap");
+
             if (type.Contains("Market"))
             {
+                localmap.Active = false;
                 MenuManager.ChangeMenu("Market");
             }
             else if (type.Contains("Academy"))
             {
+                localmap.Active = false;
                 MenuManager.ChangeMenu("Academy");
-            }
-            else
-            {
-                //Lore
             }
         }
 

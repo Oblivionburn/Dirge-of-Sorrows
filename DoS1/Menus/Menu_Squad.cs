@@ -10,6 +10,7 @@ using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Utility;
 using OP_Engine.Inventories;
+using OP_Engine.Scenes;
 
 using DoS1.Util;
 
@@ -134,7 +135,7 @@ namespace DoS1.Menus
                     Handler.StoryStep == 15 ||
                     Handler.StoryStep == 29)
                 {
-                    GameUtil.Alert_Story();
+                    GameUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);
@@ -817,7 +818,7 @@ namespace DoS1.Menus
 
                 if (missing_weapon)
                 {
-                    GameUtil.Alert_Story();
+                    GameUtil.Alert_Story(this);
                 }
                 else
                 {
@@ -837,6 +838,9 @@ namespace DoS1.Menus
                 if (MenuManager.PreviousMenu.Name != "Army")
                 {
                     GameUtil.Toggle_Pause(false);
+
+                    Scene localmap = SceneManager.GetScene("Localmap");
+                    localmap.Active = true;
                 }
 
                 MenuManager.ChangeMenu_Previous();

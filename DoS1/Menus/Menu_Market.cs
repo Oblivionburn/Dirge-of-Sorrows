@@ -10,6 +10,7 @@ using OP_Engine.Utility;
 using OP_Engine.Inventories;
 using OP_Engine.Inputs;
 using OP_Engine.Time;
+using OP_Engine.Scenes;
 
 using DoS1.Util;
 
@@ -63,7 +64,7 @@ namespace DoS1.Menus
                 if (Handler.StoryStep >= 10 &&
                     Handler.StoryStep <= 13)
                 {
-                    GameUtil.Alert_Story();
+                    GameUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);
@@ -425,6 +426,7 @@ namespace DoS1.Menus
 
             MenuManager.ChangeMenu_Previous();
             GameUtil.Toggle_Pause(false);
+            SceneManager.GetScene("Localmap").Active = true;
         }
 
         private void BuyItem(Item item)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
 
+using OP_Engine.Scenes;
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inventories;
@@ -54,8 +55,10 @@ namespace DoS1.Util
                 }
             }
 
-            Menu ui = MenuManager.GetMenu("UI");
-            Label examine = ui.GetLabel("Examine");
+            Scene localmap = SceneManager.GetScene("Localmap");
+            Menu menu = localmap.Menu;
+
+            Label examine = menu.GetLabel("Examine");
             examine.Visible = false;
 
             Layer pathing = map.GetLayer("Pathing");
@@ -66,7 +69,7 @@ namespace DoS1.Util
             other_squad.Path.Clear();
 
             Main.Timer.Stop();
-            WorldUtil.CameraToTile(map, ground, destination);
+            WorldUtil.CameraToTile(menu, map, ground, destination);
             GameUtil.Alert_Combat(squad, other_squad);
         }
 
@@ -771,7 +774,10 @@ namespace DoS1.Util
             foreach (Character character in squad.Characters)
             {
                 Tile origin = OriginTile(world, character);
-                if (!AtTile(character, origin, move_speed))
+                Tile target = TargetTile(world, character);
+
+                if (!AtTile(character, origin, move_speed) &&
+                    !AtTile(character, target, move_speed))
                 {
                     return false;
                 }

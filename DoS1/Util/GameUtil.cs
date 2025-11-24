@@ -64,6 +64,7 @@ namespace DoS1.Util
 
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
+            scene.Active = true;
 
             MenuManager.GetMenu("UI").Visible = true;
             MenuManager.CurrentMenu_ID = MenuManager.GetMenu("UI").ID;
@@ -80,7 +81,7 @@ namespace DoS1.Util
             Main.Game.ResolutionChange();
 
             Map map = WorldUtil.GetMap(scene.World);
-            WorldUtil.Resize_OnStart(map);
+            WorldUtil.Resize_OnStart(scene.Menu, map);
         }
 
         public static void LoadGame()
@@ -111,13 +112,14 @@ namespace DoS1.Util
 
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
+            scene.Active = true;
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.Visible = true;
             MenuManager.CurrentMenu_ID = ui.ID;
 
             Map map = WorldUtil.GetMap(scene.World);
-            WorldUtil.Resize_OnStart(map);
+            WorldUtil.Resize_OnStart(scene.Menu, map);
 
             if (Handler.LocalMap)
             {
@@ -281,7 +283,12 @@ namespace DoS1.Util
             Menu main = MenuManager.GetMenu("Main");
             main.GetButton("Save").Visible = true;
 
-            SceneManager.ChangeScene("Worldmap");
+            Scene localmap = SceneManager.GetScene("Localmap");
+            localmap.Active = false;
+
+            Scene worldmap = SceneManager.GetScene("Worldmap");
+            SceneManager.ChangeScene(worldmap);
+            worldmap.Active = true;
 
             SoundManager.StopMusic();
             SoundManager.NeedMusic = true;
@@ -945,10 +952,10 @@ namespace DoS1.Util
             }
         }
 
-        public static void Alert_MoveFinished(Map map, Layer ground, Squad squad, Tile location)
+        public static void Alert_MoveFinished(Menu menu, Map map, Layer ground, Squad squad, Tile location)
         {
             Toggle_Pause(false);
-            WorldUtil.CameraToTile(map, ground, location);
+            WorldUtil.CameraToTile(menu, map, ground, location);
 
             Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "MoveFinished";
@@ -982,7 +989,7 @@ namespace DoS1.Util
             option2.Visible = true;
         }
 
-        public static void Alert_BaseCaptured(Map map, Layer ground, Tile location)
+        public static void Alert_BaseCaptured(Menu menu, Map map, Layer ground, Tile location)
         {
             LocalPause();
 
@@ -995,7 +1002,7 @@ namespace DoS1.Util
             Layer pathing = map.GetLayer("Pathing");
             pathing.Visible = false;
 
-            WorldUtil.CameraToTile(map, ground, location);
+            WorldUtil.CameraToTile(menu, map, ground, location);
 
             string message = "The enemy has captured our base!";
 
@@ -1040,7 +1047,7 @@ namespace DoS1.Util
             option2.Visible = true;
         }
 
-        public static void Alert_Story()
+        public static void Alert_Story(Menu menu)
         {
             Handler.AlertType = "Story";
             string message = "";
@@ -1075,7 +1082,7 @@ namespace DoS1.Util
                 Layer ground = map.GetLayer("Ground");
                 Tile tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
 
-                WorldUtil.CameraToTile(map, ground, tile);
+                WorldUtil.CameraToTile(menu, map, ground, tile);
                 LocalPause();
 
                 dialogue_name.Text = "Narrator";
@@ -1283,7 +1290,7 @@ namespace DoS1.Util
                 Layer ground = map.GetLayer("Ground");
                 Tile tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
 
-                WorldUtil.CameraToTile(map, ground, tile);
+                WorldUtil.CameraToTile(menu, map, ground, tile);
                 LocalPause();
 
                 dialogue_name.Text = "System";

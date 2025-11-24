@@ -115,7 +115,7 @@ namespace DoS1.Scenes
                 if ((Handler.StoryStep >= 38 && Handler.StoryStep <= 44) ||
                     (Handler.StoryStep >= 50 && Handler.StoryStep <= 54))
                 {
-                    GameUtil.Alert_Story();
+                    GameUtil.Alert_Story(Menu);
                 }
             }
         }
@@ -716,15 +716,7 @@ namespace DoS1.Scenes
                                                 if (enemies_ready &&
                                                     allies_ready)
                                                 {
-                                                    foreach (Character character in enemy_squad.Characters)
-                                                    {
-                                                        CombatUtil.SwitchAnimation(character, "Idle");
-                                                    }
-                                                    foreach (Character character in ally_squad.Characters)
-                                                    {
-                                                        CombatUtil.SwitchAnimation(character, "Idle");
-                                                    }
-
+                                                    ClearDamageShake();
                                                     ClearDamageEffects();
                                                     effect_frame = 0;
                                                     combat_state = "AnimateDamageLabels";
@@ -742,7 +734,16 @@ namespace DoS1.Scenes
                                         }
                                         else
                                         {
-                                            combat_state = "AnimateDamageLabels";
+                                            bool enemies_ready = CombatUtil.SquadReady(World, enemy_squad, move_speed);
+                                            bool allies_ready = CombatUtil.SquadReady(World, ally_squad, move_speed);
+
+                                            if (enemies_ready &&
+                                                allies_ready)
+                                            {
+                                                ClearDamageShake();
+                                                effect_frame = 0;
+                                                combat_state = "AnimateDamageLabels";
+                                            }
                                         }
                                     }
 
@@ -1538,6 +1539,33 @@ namespace DoS1.Scenes
                             character.Tags.Remove("Shake3");
                             character.Tags.Add("Shake4");
                         }
+                    }
+                }
+            }
+        }
+
+        private void ClearDamageShake()
+        {
+            foreach (Character character in enemy_squad.Characters)
+            {
+                for (int i = 0; i < character.Tags.Count; i++)
+                {
+                    if (character.Tags[i].Contains("Shake"))
+                    {
+                        character.Tags.Remove(character.Tags[i]);
+                        i--;
+                    }
+                }
+            }
+
+            foreach (Character character in ally_squad.Characters)
+            {
+                for (int i = 0; i < character.Tags.Count; i++)
+                {
+                    if (character.Tags[i].Contains("Shake"))
+                    {
+                        character.Tags.Remove(character.Tags[i]);
+                        i--;
                     }
                 }
             }

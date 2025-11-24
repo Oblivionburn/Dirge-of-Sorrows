@@ -1,18 +1,16 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-
+﻿using DoS1.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
-using OP_Engine.Controls;
-using OP_Engine.Menus;
-using OP_Engine.Utility;
 using OP_Engine.Characters;
+using OP_Engine.Controls;
 using OP_Engine.Inputs;
+using OP_Engine.Menus;
+using OP_Engine.Scenes;
 using OP_Engine.Time;
-
-using DoS1.Util;
+using OP_Engine.Utility;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DoS1.Menus
 {
@@ -414,6 +412,7 @@ namespace DoS1.Menus
             InputManager.Keyboard.Flush();
             MenuManager.ChangeMenu_Previous();
             GameUtil.Toggle_Pause(false);
+            SceneManager.GetScene("Localmap").Active = true;
         }
 
         private void BuyRecruits(Character character)
