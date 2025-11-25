@@ -43,8 +43,6 @@ namespace DoS1.Util
 
             MenuManager.PreviousMenus.Clear();
 
-            CharacterManager.Armies.Clear();
-
             Inventory inventory = InventoryManager.GetInventory("Ally");
             inventory.Items.Clear();
 
@@ -88,6 +86,7 @@ namespace DoS1.Util
         public static void NewGame()
         {
             ResetGame();
+
             Task.Factory.StartNew(() => WorldGen.GenWorldmap());
 
             Main.Game.GameStarted = true;
@@ -122,6 +121,8 @@ namespace DoS1.Util
         public static void LoadGame()
         {
             ResetGame();
+            CharacterManager.Armies.Clear();
+
             LoadUtil.LoadGame();
 
             Main.Game.GameStarted = true;
@@ -175,6 +176,7 @@ namespace DoS1.Util
         public static void ReturnToTitle()
         {
             ResetGame();
+            CharacterManager.Armies.Clear();
 
             Toggle_MainMenu();
 
@@ -1037,7 +1039,9 @@ namespace DoS1.Util
             Squad squad = ally.Squads[0];
             Character hero = squad.GetLeader();
 
-            Character spouse = CharacterManager.GetArmy("Special").Squads[0].Characters[0];
+            Army special = CharacterManager.GetArmy("Special");
+
+            Character spouse = special.Squads[0].Characters[0];
 
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
