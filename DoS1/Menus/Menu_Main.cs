@@ -138,6 +138,11 @@ namespace DoS1.Menus
                 SaveUtil.SaveGame();
                 Task.Factory.StartNew(() => Portrait_SaveClose());
             }
+            else if (button.Name == "Load")
+            {
+                InputManager.Mouse.Flush();
+                MenuManager.ChangeMenu("Save_Load");
+            }
             else if (button.Name == "SaveExit")
             {
                 SaveUtil.SaveGame();
@@ -215,7 +220,16 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
-            MenuManager.ChangeMenu_Previous();
+            Active = false;
+            Visible = false;
+            MenuManager.PreviousMenus.Clear();
+
+            if (Main.Game.GameStarted)
+            {
+                Menu ui = MenuManager.GetMenu("UI");
+                ui.Visible = true;
+                MenuManager.CurrentMenu_ID = ui.ID;
+            }
         }
 
         public override void Load(ContentManager content)
@@ -257,6 +271,19 @@ namespace DoS1.Menus
                 hover_text = "Save",
                 texture = AssetManager.Textures["Button_Save"],
                 texture_highlight = AssetManager.Textures["Button_Save_Hover"],
+                region = new Region(0, 0, 0, 0),
+                draw_color = Color.White,
+                enabled = true,
+                visible = false
+            });
+
+            AddButton(new ButtonOptions
+            {
+                id = Handler.GetID(),
+                name = "Load",
+                hover_text = "Load",
+                texture = AssetManager.Textures["Button_Load"],
+                texture_highlight = AssetManager.Textures["Button_Load_Hover"],
                 region = new Region(0, 0, 0, 0),
                 draw_color = Color.White,
                 enabled = true,
@@ -314,7 +341,6 @@ namespace DoS1.Menus
         {
             int Y = Main.Game.ScreenHeight / (Main.Game.MenuSize.Y * 2);
 
-            Y++;
             Button back = GetButton("Back");
             back.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
 
@@ -324,6 +350,10 @@ namespace DoS1.Menus
             Y++;
             Button save = GetButton("Save");
             save.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
+
+            Y++;
+            Button load = GetButton("Load");
+            load.Region = new Region((Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X / 2), Main.Game.MenuSize.Y * Y, Main.Game.MenuSize.X, Main.Game.MenuSize.Y);
 
             Y++;
             Button options = GetButton("Options");

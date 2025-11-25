@@ -390,19 +390,6 @@ namespace DoS1.Menus
                 string save = Handler.Saves[num - 1];
                 Handler.Selected_Save = save;
 
-                foreach (Weather weather in WeatherManager.Weathers)
-                {
-                    weather.TransitionTime = 0;
-                    weather.ParticleManager.Particles.Clear();
-                    weather.Visible = false;
-                }
-
-                WeatherManager.Transitioning = false;
-                WeatherManager.Lightning = false;
-                WeatherManager.TransitionType = WeatherTransition.None;
-                WeatherManager.CurrentWeather = WeatherType.Clear;
-
-                LoadUtil.LoadGame();
                 GameUtil.LoadGame();
             }
         }
@@ -539,8 +526,17 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
-            SceneManager.GetScene("Title").Menu.Visible = true;
-            MenuManager.ChangeMenu("Main");
+            if (Main.Game.GameStarted)
+            {
+                InputManager.Mouse.Flush();
+                MenuManager.ChangeMenu("Main");
+                MenuManager.PreviousMenus.Clear();
+            }
+            else
+            {
+                SceneManager.GetScene("Title").Menu.Visible = true;
+                MenuManager.ChangeMenu("Main");
+            }
         }
 
         public void ClearSaves()

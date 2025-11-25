@@ -143,7 +143,7 @@ namespace DoS1.Scenes
                     {
                         found = true;
 
-                        GameUtil.Examine(Menu, location.Name);
+                        ExamineLocation(location, i + 1);
 
                         Picture highlight = Menu.GetPicture("Highlight");
                         highlight.Region = location.Region;
@@ -300,6 +300,38 @@ namespace DoS1.Scenes
                 SoundManager.StopMusic();
                 SoundManager.NeedMusic = true;
             }
+        }
+
+        private void ExamineLocation(Tile location, int location_num)
+        {
+            Label examine = Menu.GetLabel("Examine");
+            examine.Text = location.Name + "\n(Level " + location_num + ")";
+
+            int width = Main.Game.MenuSize.X * 4;
+            int height = Main.Game.MenuSize.X + (Main.Game.MenuSize.X / 2);
+
+            int X = InputManager.Mouse.X - (width / 2);
+            if (X < 0)
+            {
+                X = 0;
+            }
+            else if (X > Main.Game.Resolution.X - width)
+            {
+                X = Main.Game.Resolution.X - width;
+            }
+
+            int Y = InputManager.Mouse.Y + 20;
+            if (Y < 0)
+            {
+                Y = 0;
+            }
+            else if (Y > Main.Game.Resolution.Y - height)
+            {
+                Y = Main.Game.Resolution.Y - height;
+            }
+
+            examine.Region = new Region(X, Y, width, height);
+            examine.Visible = true;
         }
 
         public override void Load(ContentManager content)

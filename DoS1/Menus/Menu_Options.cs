@@ -160,7 +160,8 @@ namespace DoS1.Menus
             {
                 SaveUtil.ExportINI();
                 InputManager.Mouse.Flush();
-                MenuManager.ChangeMenu_Previous();
+                MenuManager.ChangeMenu("Main");
+                MenuManager.PreviousMenus.Clear();
             }
             else if (button.Name == "AutoSaveOn")
             {

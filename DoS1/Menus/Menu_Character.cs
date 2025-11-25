@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-
+﻿using DoS1.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Utility;
-
-using DoS1.Util;
+using System.Collections.Generic;
 
 namespace DoS1.Menus
 {
@@ -1133,13 +1130,13 @@ namespace DoS1.Menus
                     equip.Icon_Visible = true;
                 }
 
-                equip = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                if (equip != null)
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
                 {
-                    Picture weapon = GetPicture("Weapon");
-                    equip.Icon_Region = new Region(weapon.Region.X, weapon.Region.Y, weapon.Region.Width, weapon.Region.Height);
-                    equip.Icon_Image = new Rectangle(0, 0, equip.Icon.Width, equip.Icon.Height);
-                    equip.Icon_Visible = true;
+                    Picture weaponSlot = GetPicture("Weapon");
+                    weapon.Icon_Region = new Region(weaponSlot.Region.X, weaponSlot.Region.Y, weaponSlot.Region.Width, weaponSlot.Region.Height);
+                    weapon.Icon_Image = new Rectangle(0, 0, weapon.Icon.Width, weapon.Icon.Height);
+                    weapon.Icon_Visible = true;
                 }
 
                 // ===============
@@ -1193,7 +1190,7 @@ namespace DoS1.Menus
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label agility = GetLabel("AGI");
                 agility.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
-                agility.Text = "DEX: " + AGI.Value + "/" + AGI.Max_Value;
+                agility.Text = "AGI: " + AGI.Value + "/" + AGI.Max_Value;
 
                 // ===============
                 // Equipment Stats
@@ -1247,39 +1244,35 @@ namespace DoS1.Menus
                 }
 
                 //List damage properties
-                foreach (Item item in character.Inventory.Items)
+                if (weapon != null)
                 {
-                    if (item.Type == "Weapon")
+                    foreach (Something property in weapon.Properties)
                     {
-                        foreach (Something property in item.Properties)
+                        if (!property.Name.Contains("Slots"))
                         {
-                            if (!property.Name.Contains("Slots"))
+                            Something existing_property = null;
+                            foreach (Something existing in Properties)
                             {
-                                Something existing_property = null;
-                                foreach (Something existing in Properties)
+                                if (existing.Name == property.Name)
                                 {
-                                    if (existing.Name == property.Name)
-                                    {
-                                        existing_property = existing;
-                                        break;
-                                    }
-                                }
-
-                                if (existing_property == null)
-                                {
-                                    Properties.Add(new Something
-                                    {
-                                        Name = property.Name,
-                                        Value = property.Value
-                                    });
-                                }
-                                else
-                                {
-                                    existing_property.Value += property.Value;
+                                    existing_property = existing;
+                                    break;
                                 }
                             }
+
+                            if (existing_property == null)
+                            {
+                                Properties.Add(new Something
+                                {
+                                    Name = property.Name,
+                                    Value = property.Value
+                                });
+                            }
+                            else
+                            {
+                                existing_property.Value += property.Value;
+                            }
                         }
-                        break;
                     }
                 }
 
@@ -1323,13 +1316,25 @@ namespace DoS1.Menus
                                 equipment.Text += property.Name + ": " + property.Value + "%";
                             }
                         }
-                        else if (property.Name.Contains("XP"))
+                        else if (property.Name.Contains("Damage"))
                         {
-                            equipment.Text += "XP: " + property.Value + "/" + property.Max_Value;
-                        }
-                        else if (property.Name.Contains("Level"))
-                        {
-                            equipment.Text += "Level: " + property.Value + "/" + property.Max_Value;
+                            string[] nameParts = property.Name.Split(' ');
+                            string element = nameParts[0];
+
+                            if ((InventoryUtil.Weapon_IsMelee(weapon) ||
+                                weapon.Categories[0] == "Bow") &&
+                                element == "Physical")
+                            {
+                                equipment.Text += property.Name + " (+STR): " + (property.Value + (int)character.GetStat("STR").Value);
+                            }
+                            else if (weapon.Categories[0] == "Grimoire")
+                            {
+                                equipment.Text += property.Name + " (+INT): " + (property.Value + (int)character.GetStat("INT").Value);
+                            }
+                            else
+                            {
+                                equipment.Text += property.Name + ": " + property.Value;
+                            }
                         }
                         else
                         {

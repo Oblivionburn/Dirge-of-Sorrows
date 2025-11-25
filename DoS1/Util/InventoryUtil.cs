@@ -1470,9 +1470,10 @@ namespace DoS1.Util
             for (int i = 0; i < properties.Count; i++)
             {
                 Something property = properties[i];
-                if (property.Name.Contains("Area"))
+                if (property.Name.Contains("Area") ||
+                    property.Name.Contains("Drain"))
                 {
-                    width += (Main.Game.MenuSize.X / 2);
+                    width += Main.Game.MenuSize.X;
                     break;
                 }
             }
@@ -1827,8 +1828,11 @@ namespace DoS1.Util
                             Something rp = rune.GetProperty("RP Value");
                             Something level = rune.GetProperty("Level Value");
 
+                            int minLevel = 1;
+                            int maxLevel = (Handler.Level / 2) + 1;
+
                             random = new CryptoRandom();
-                            level.Value = random.Next(1, (Handler.Level / 2) + 1);
+                            level.Value = random.Next(minLevel, maxLevel + 1);
                             if (level.Value >= level.Max_Value)
                             {
                                 rp.Value = rp.Max_Value;

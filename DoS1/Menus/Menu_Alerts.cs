@@ -184,8 +184,8 @@ namespace DoS1.Menus
                 Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
                 Handler.Selected_Token = squad.ID;
 
-                Menu ui = MenuManager.GetMenu("UI");
-                Picture highlight = ui.GetPicture("Highlight");
+                Scene localmap = SceneManager.GetScene("Localmap");
+                Picture highlight = localmap.Menu.GetPicture("Highlight");
                 highlight.Region = squad.Region;
                 highlight.Visible = true;
                 highlight.DrawColor = new Color(0, 0, 255, 255);

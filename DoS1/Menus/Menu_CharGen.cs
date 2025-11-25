@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 
@@ -606,15 +604,14 @@ namespace DoS1.Menus
             InventoryUtil.AddItem(leader.Inventory, "Cloth", "Cloth", "Armor");
             InventoryUtil.EquipItem(leader, leader.Inventory.Items[leader.Inventory.Items.Count - 1]);
 
-            //Finish setup
-            Task.Factory.StartNew(() => WorldGen.GenWorldmap());
-
             GameUtil.NewGame();
         }
 
         public override void Load()
         {
             Clear();
+
+            AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Name", "Name:", Color.White, new Region(0, 0, 0, 0), true);
             AddInput(AssetManager.Fonts["ControlFont"], Handler.GetID(), 100, "Name", string.IsNullOrEmpty(LeaderName) ? "Type name here" : LeaderName, Color.DarkGray, AssetManager.Textures["ButtonFrame_Large"],
@@ -818,7 +815,7 @@ namespace DoS1.Menus
             {
                 id = Handler.GetID(),
                 name = "Back",
-                hover_text = "Cancel",
+                hover_text = "Back",
                 texture = AssetManager.Textures["Button_Back"],
                 texture_highlight = AssetManager.Textures["Button_Back_Hover"],
                 region = new Region(0, 0, 0, 0),
@@ -858,6 +855,8 @@ namespace DoS1.Menus
 
             if (ControlsLoaded)
             {
+                GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+
                 GetLabel("Name").Region = new Region(center_x - (width * 6), Y, width * 2, height);
                 GetInput("Name").Region = new Region(center_x - (width * 4), Y, width * 8, height);
                 GetLabel("Warning").Region = new Region(center_x + (width * 4), Y, width * 4, height);

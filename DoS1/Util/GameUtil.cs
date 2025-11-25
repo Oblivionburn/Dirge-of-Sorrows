@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,10 +24,37 @@ namespace DoS1.Util
 {
     public static class GameUtil
     {
-        public static void NewGame()
+        private static void ResetGame()
         {
-            SoundManager.AmbientFade = 1;
-            SoundManager.StopAmbient();
+            Main.Game.GameStarted = false;
+
+            Handler.MarketInventories.Clear();
+            Handler.TradingMarket = null;
+            Handler.AcademyRecruits.Clear();
+            Handler.TradingAcademy = null;
+            Handler.LocalMap = false;
+            Handler.LocalPause = false;
+            Handler.Level = 0;
+            Handler.StoryStep = -1;
+            Handler.Gold = 1000;
+
+            TimeManager.Paused = false;
+            TimeManager.Interval = 0;
+
+            MenuManager.PreviousMenus.Clear();
+
+            CharacterManager.Armies.Clear();
+
+            Inventory inventory = InventoryManager.GetInventory("Ally");
+            inventory.Items.Clear();
+
+            SceneManager.GetScene("Worldmap").World.Maps.Clear();
+            SceneManager.GetScene("Localmap").World.Maps.Clear();
+
+            WeatherManager.Transitioning = false;
+            WeatherManager.Lightning = false;
+            WeatherManager.TransitionType = WeatherTransition.None;
+            WeatherManager.CurrentWeather = WeatherType.Clear;
 
             foreach (Weather weather in WeatherManager.Weathers)
             {
@@ -34,11 +62,6 @@ namespace DoS1.Util
                 weather.ParticleManager.Particles.Clear();
                 weather.Visible = false;
             }
-
-            WeatherManager.Transitioning = false;
-            WeatherManager.Lightning = false;
-            WeatherManager.TransitionType = WeatherTransition.None;
-            WeatherManager.CurrentWeather = WeatherType.Clear;
 
             TimeManager.Reset(TimeRate.Second, 1, 1, 1, 12);
             TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
@@ -55,19 +78,30 @@ namespace DoS1.Util
             TimeManager.Now.OnDaysChange -= DayChanged;
             TimeManager.Now.OnDaysChange += DayChanged;
 
+            SoundManager.StopAll();
+            SoundManager.NeedMusic = true;
+            SoundManager.StopAmbient();
+            SoundManager.AmbientFade = 1;
+            SoundManager.AmbientPaused = false;
+        }
+
+        public static void NewGame()
+        {
+            ResetGame();
+            Task.Factory.StartNew(() => WorldGen.GenWorldmap());
+
             Main.Game.GameStarted = true;
             Toggle_MainMenu();
 
-            SoundManager.StopMusic();
             SoundManager.MusicLooping = false;
-            SoundManager.NeedMusic = true;
 
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
             scene.Active = true;
 
-            MenuManager.GetMenu("UI").Visible = true;
-            MenuManager.CurrentMenu_ID = MenuManager.GetMenu("UI").ID;
+            Menu ui = MenuManager.GetMenu("UI");
+            ui.Visible = true;
+            MenuManager.CurrentMenu_ID = ui.ID;
 
             if (scene.Name == "Worldmap")
             {
@@ -78,37 +112,22 @@ namespace DoS1.Util
             }
 
             Main.Game.Zoom = 1.5f;
-            Main.Game.ResolutionChange();
 
             Map map = WorldUtil.GetMap(scene.World);
             WorldUtil.Resize_OnStart(scene.Menu, map);
+
+            Main.Game.ResolutionChange();
         }
 
         public static void LoadGame()
         {
-            SoundManager.AmbientFade = 1;
-            SoundManager.StopAmbient();
-
-            TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear };
-
-            TimeManager.Now.OnSecondsChange -= SecondChanged;
-            TimeManager.Now.OnSecondsChange += SecondChanged;
-
-            TimeManager.Now.OnMinutesChange -= MinuteChanged;
-            TimeManager.Now.OnMinutesChange += MinuteChanged;
-
-            TimeManager.Now.OnHoursChange -= HourChanged;
-            TimeManager.Now.OnHoursChange += HourChanged;
-
-            TimeManager.Now.OnDaysChange -= DayChanged;
-            TimeManager.Now.OnDaysChange += DayChanged;
+            ResetGame();
+            LoadUtil.LoadGame();
 
             Main.Game.GameStarted = true;
             Toggle_MainMenu();
 
-            SoundManager.StopMusic();
             SoundManager.MusicLooping = false;
-            SoundManager.NeedMusic = true;
 
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
@@ -155,21 +174,7 @@ namespace DoS1.Util
 
         public static void ReturnToTitle()
         {
-            Main.Game.GameStarted = false;
-
-            Handler.MarketInventories.Clear();
-            Handler.TradingMarket = null;
-            Handler.AcademyRecruits.Clear();
-            Handler.TradingAcademy = null;
-            Handler.LocalMap = false;
-            Handler.LocalPause = false;
-            Handler.StoryStep = -1;
-            Handler.Gold = 1000;
-
-            TimeManager.Paused = false;
-            TimeManager.Interval = 0;
-
-            MenuManager.PreviousMenus.Clear();
+            ResetGame();
 
             Toggle_MainMenu();
 
@@ -183,31 +188,7 @@ namespace DoS1.Util
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");
 
-            CharacterManager.Armies.Clear();
-
-            Inventory inventory = InventoryManager.GetInventory("Ally");
-            inventory.Items.Clear();
-
-            SceneManager.GetScene("Worldmap").World.Maps.Clear();
-            SceneManager.GetScene("Localmap").World.Maps.Clear();
-
-            SoundManager.StopAll();
             SoundManager.MusicLooping = true;
-            SoundManager.NeedMusic = true;
-            SoundManager.AmbientFade = 1;
-            SoundManager.AmbientPaused = false;
-
-            WeatherManager.Transitioning = false;
-            WeatherManager.Lightning = false;
-            WeatherManager.TransitionType = WeatherTransition.None;
-            WeatherManager.CurrentWeather = WeatherType.Clear;
-
-            foreach (Weather weather in WeatherManager.Weathers)
-            {
-                weather.TransitionTime = 0;
-                weather.ParticleManager.Particles.Clear();
-                weather.Visible = false;
-            }
 
             CryptoRandom random = new CryptoRandom();
             int weather_choice = random.Next(0, 3);
@@ -1893,6 +1874,7 @@ namespace DoS1.Util
                 menu.GetButton("Back").Visible = true;
                 menu.GetButton("Play").Visible = false;
                 menu.GetButton("Save").Visible = true;
+                menu.GetButton("Load").Visible = true;
                 menu.GetButton("SaveExit").Visible = true;
                 menu.GetButton("Exit").Visible = false;
             }
@@ -1901,6 +1883,7 @@ namespace DoS1.Util
                 menu.GetButton("Back").Visible = false;
                 menu.GetButton("Play").Visible = true;
                 menu.GetButton("Save").Visible = false;
+                menu.GetButton("Load").Visible = false;
                 menu.GetButton("SaveExit").Visible = false;
                 menu.GetButton("Exit").Visible = true;
             }

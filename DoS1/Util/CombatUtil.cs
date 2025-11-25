@@ -879,8 +879,9 @@ namespace DoS1.Util
         {
             int damage = InventoryUtil.Get_TotalDamage(weapon, element);
 
-            if (InventoryUtil.Weapon_IsMelee(weapon) ||
-                weapon.Categories[0] == "Bow")
+            if ((InventoryUtil.Weapon_IsMelee(weapon) ||
+                weapon.Categories[0] == "Bow") &&
+                element == "Physical")
             {
                 damage += (int)attacker.GetStat("STR").Value;
             }
