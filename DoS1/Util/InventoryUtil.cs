@@ -1471,7 +1471,8 @@ namespace DoS1.Util
             {
                 Something property = properties[i];
                 if (property.Name.Contains("Area") ||
-                    property.Name.Contains("Drain"))
+                    property.Name.Contains("Drain") ||
+                    property.Name.Contains("Regenerating"))
                 {
                     width += Main.Game.MenuSize.X;
                     break;

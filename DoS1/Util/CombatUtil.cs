@@ -10,6 +10,7 @@ using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace DoS1.Util
 {
@@ -1236,13 +1237,13 @@ namespace DoS1.Util
 
                             if (character.Type == "Ally")
                             {
-                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Right"],
-                                    new Region(x, y, width, height), Color.White, true);
+                                AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Slash_Right"],
+                                    new Region(x, y, width, height), Color.White);
                             }
                             else if (character.Type == "Enemy")
                             {
-                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Slash_Left"],
-                                    new Region(x, y, width, height), Color.White, true);
+                                AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Slash_Left"],
+                                    new Region(x, y, width, height), Color.White);
                             }
                         }
                         else if (weapon.Categories.Contains("Bow"))
@@ -1251,15 +1252,13 @@ namespace DoS1.Util
 
                             if (character.Type == "Ally")
                             {
-                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Right"],
-                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        Color.White, true);
+                                AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Arrow_Right"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                             }
                             else if (character.Type == "Enemy")
                             {
-                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Arrow_Left"],
-                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        Color.White, true);
+                                AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Arrow_Left"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                             }
                         }
                         else
@@ -1268,15 +1267,13 @@ namespace DoS1.Util
 
                             if (character.Type == "Ally")
                             {
-                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Right"],
-                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        Color.White, true);
+                                AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Thump_Right"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                             }
                             else if (character.Type == "Enemy")
                             {
-                                menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Left"],
-                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                        Color.White, true);
+                                AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Thump_Left"],
+                                    new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                             }
                         }
                     }
@@ -1286,95 +1283,73 @@ namespace DoS1.Util
 
                         if (character.Type == "Ally")
                         {
-                            menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Right"],
-                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    Color.White, true);
+                            AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Thump_Right"],
+                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                         }
                         else if (character.Type == "Enemy")
                         {
-                            menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Thump_Left"],
-                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                                    Color.White, true);
+                            AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Thump_Left"],
+                                new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                         }
                     }
                     break;
 
                 case "Fire":
                     AssetManager.PlaySound_Random("Fire");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Fire"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.8f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Fire"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.8f);
                     break;
 
                 case "Lightning":
                     AssetManager.PlaySound_Random("Shock");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Lightning"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Earth":
                     AssetManager.PlaySound_Random("Earth");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Earth"],
-                        new Region(character.Region.X, character.Region.Y - (character.Region.Height / 3), character.Region.Width, 
-                            character.Region.Height), Color.White, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Earth"],
+                        new Region(character.Region.X, character.Region.Y - (character.Region.Height / 3), character.Region.Width,
+                            character.Region.Height), Color.White);
                     break;
 
                 case "Ice":
                     AssetManager.PlaySound_Random("Ice");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Ice"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Ice"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Health":
                 case "Energy":
                     AssetManager.PlaySound_Random("Heal");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Heal"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Heal"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                     break;
 
                 case "Death":
                     AssetManager.PlaySound_Random("Death");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Death"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Death"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Poison":
                     AssetManager.PlaySound_Random("Poison");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Poison"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Poison"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "HP Drain":
                     AssetManager.PlaySound_Random("Leech");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["HP Drain"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["HP Drain"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "EP Drain":
                     AssetManager.PlaySound_Random("Siphon");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["EP Drain"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["EP Drain"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
             }
-
-            Picture effect = Get_LastDamagePicture(menu);
-            effect.Image = new Rectangle(0, 0, effect.Texture.Height, effect.Texture.Height);
         }
 
         public static void AddEffect_Status(Menu menu, Character character, string status)
@@ -1383,67 +1358,62 @@ namespace DoS1.Util
             {
                 case "Cursed":
                     AssetManager.PlaySound_Random("Death");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Death"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Death"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Melting":
                     AssetManager.PlaySound_Random("Acid");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Acid"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Acid"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Poisoned":
                     AssetManager.PlaySound_Random("Poison");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Poison"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Poison"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Burning":
                     AssetManager.PlaySound_Random("Fire");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Fire"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Fire"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Regenerating":
                 case "Charging":
                     AssetManager.PlaySound_Random("Heal");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Heal"],
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Heal"],
                         new Region(character.Region.X, character.Region.Y - (character.Region.Height / 3), character.Region.Width,
-                            character.Region.Height), Color.White, true);
+                            character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Frozen":
                     AssetManager.PlaySound_Random("Ice");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Ice"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Ice"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Shocked":
                     AssetManager.PlaySound_Random("Shock");
-
-                    menu.AddPicture(Handler.GetID(), "Damage", AssetManager.Textures["Lightning"],
-                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height),
-                            Color.White * 0.9f, true);
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Lightning"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
             }
+        }
 
-            Picture effect = Get_LastDamagePicture(menu);
-            if (effect != null)
+        public static void AddCombatEffect(Menu menu, Character character, string name, Texture2D texture, Region region, Color color)
+        {
+            menu.Pictures.Add(new Picture
             {
-                effect.Image = new Rectangle(0, 0, effect.Texture.Width / 4, effect.Texture.Height);
-            }
+                ID = character.ID,
+                Name = name,
+                Texture = texture,
+                DrawColor = color,
+                Region = new Region(region.X, region.Y, region.Width, region.Height),
+                Image = new Rectangle(0, 0, texture.Width / 4, texture.Height),
+                Visible = true
+            });
         }
 
         public static void Kill(Character character)

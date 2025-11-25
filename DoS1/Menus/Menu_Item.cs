@@ -588,80 +588,6 @@ namespace DoS1.Menus
             }
         }
 
-        private void ExamineItem(Item item)
-        {
-            int width = (Main.Game.MenuSize.X * 4) + (Main.Game.MenuSize.X / 2);
-            if (item.Type == "Rune")
-            {
-                width = item.Description.Length * (Main.Game.MenuSize.X / 10);
-            }
-            else if (item.Type == "Weapon" &&
-                     item.Categories.Contains("Grimoire"))
-            {
-                width = (Main.Game.MenuSize.X * 5) + (Main.Game.MenuSize.X / 2);
-            }
-
-            int height = Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-
-            string text = item.Name + "\n\n";
-
-            if (!string.IsNullOrEmpty(item.Description))
-            {
-                text += item.Description + "\n";
-                height += Main.Game.MenuSize.Y + (Main.Game.MenuSize.Y / 2);
-            }
-
-            for (int i = 0; i < item.Properties.Count; i++)
-            {
-                Something property = item.Properties[i];
-
-                if (property.Name.Contains("RP"))
-                {
-                    text += "RP: " + property.Value + "/" + property.Max_Value;
-                }
-                else if (property.Name.Contains("Level"))
-                {
-                    text += "Level: " + property.Value + "/" + property.Max_Value;
-                }
-                else
-                {
-                    text += property.Name + ": " + property.Value;
-                }
-
-                if (i < item.Properties.Count - 1)
-                {
-                    text += "\n";
-                    height += (Main.Game.MenuSize.Y / 2);
-                }
-            }
-
-            Label examine = GetLabel("Examine");
-            examine.Text = text;
-
-            int X = InputManager.Mouse.X - (width / 2);
-            if (X < 0)
-            {
-                X = 0;
-            }
-            else if (X > Main.Game.Resolution.X - width)
-            {
-                X = Main.Game.Resolution.X - width;
-            }
-
-            int Y = InputManager.Mouse.Y + 20;
-            if (Y < 0)
-            {
-                Y = 0;
-            }
-            else if (Y > Main.Game.Resolution.Y - height)
-            {
-                Y = Main.Game.Resolution.Y - height;
-            }
-
-            examine.Region = new Region(X, Y, width, height);
-            examine.Visible = true;
-        }
-
         private void Filter(string filter)
         {
             Top = 0;
@@ -824,12 +750,15 @@ namespace DoS1.Menus
                     item_name.Text = selectedItem.Name + " (2H)";
                 }
 
+                int X = starting_X - (width * 14);
                 int Y = starting_Y + (height * 6) + (height / 2);
-                GetLabel("Properties").Region = new Region(starting_X - (width * 12), Y, width * 7, height);
-                GetPicture("Properties_Underline").Region = new Region(starting_X - (width * 12), Y + (height / 2), width * 7, height);
+                int statWidth = width * 9;
+
+                GetLabel("Properties").Region = new Region(X, Y, statWidth, height);
+                GetPicture("Properties_Underline").Region = new Region(X, Y + (height / 2), statWidth, height);
 
                 Label item_properties = GetLabel("Item_Properties");
-                item_properties.Region = new Region(starting_X - (width * 12), Y + height, width * 7, height);
+                item_properties.Region = new Region(X, Y + height, statWidth, height);
                 item_properties.Text = "";
 
                 if (selectedItem.Type == "Weapon")

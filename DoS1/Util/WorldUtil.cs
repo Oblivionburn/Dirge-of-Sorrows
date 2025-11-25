@@ -1547,8 +1547,9 @@ namespace DoS1.Util
             if (squad.Type == "Ally")
             {
                 Army enemy_army = CharacterManager.GetArmy("Enemy");
-                foreach (Squad enemy_squad in enemy_army.Squads)
+                for (int i = enemy_army.Squads.Count - 1; i >= 0; i--)
                 {
+                    Squad enemy_squad = enemy_army.Squads[i];
                     if (enemy_squad.Region != null)
                     {
                         if (Utility.RegionsOverlapping(squad.Region, enemy_squad.Region))
@@ -1561,8 +1562,9 @@ namespace DoS1.Util
             else if (squad.Type == "Enemy")
             {
                 Army ally_army = CharacterManager.GetArmy("Ally");
-                foreach (Squad ally_squad in ally_army.Squads)
+                for (int i = ally_army.Squads.Count - 1; i >= 0; i--)
                 {
+                    Squad ally_squad = ally_army.Squads[i];
                     if (ally_squad.Region != null)
                     {
                         if (Utility.RegionsOverlapping(squad.Region, ally_squad.Region))

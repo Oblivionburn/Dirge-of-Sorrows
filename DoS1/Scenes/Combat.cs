@@ -141,24 +141,20 @@ namespace DoS1.Scenes
                             Character character = ally_squad.GetCharacter(new Vector2(x, y));
                             if (character != null)
                             {
-                                bool received_damage = false;
-
                                 Something damage = character.GetStatusEffect("Damage");
-                                if (damage != null)
+                                Label damage_label = Menu.GetLabel(character.ID);
+                                if (damage != null &&
+                                    damage_label != null)
                                 {
-                                    Label damage_label = Menu.GetLabel(damage.ID);
-                                    if (damage_label != null)
-                                    {
-                                        received_damage = true;
-                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
-                                        damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
-                                    }
+                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                    damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
                                 }
-
-                                if (!received_damage)
+                                else
                                 {
                                     CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
                                 }
+
+                                DrawDamageEffects(spriteBatch, character);
                             }
                         }
                     }
@@ -173,24 +169,20 @@ namespace DoS1.Scenes
                             Character character = enemy_squad.GetCharacter(new Vector2(x, y));
                             if (character != null)
                             {
-                                bool received_damage = false;
-
                                 Something damage = character.GetStatusEffect("Damage");
-                                if (damage != null)
+                                Label damage_label = Menu.GetLabel(character.ID);
+                                if (damage != null &&
+                                    damage_label != null)
                                 {
-                                    Label damage_label = Menu.GetLabel(damage.ID);
-                                    if (damage_label != null)
-                                    {
-                                        received_damage = true;
-                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
-                                        damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
-                                    }
+                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                    damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
                                 }
-
-                                if (!received_damage)
+                                else
                                 {
                                     CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
                                 }
+
+                                DrawDamageEffects(spriteBatch, character);
                             }
                         }
                     }
@@ -218,37 +210,11 @@ namespace DoS1.Scenes
                     }
                 }
 
-                for (int i = 0; i < Menu.Pictures.Count; i++)
-                {
-                    Picture picture = Menu.Pictures[i];
-                    if (picture.Name == "Damage" ||
-                        picture.Name == "Cast")
-                    {
-                        if (picture.Texture.Name == "Lightning" ||
-                            picture.Texture.Name == "Fire" ||
-                            picture.Texture.Name == "Ice" ||
-                            picture.Texture.Name == "Heal" ||
-                            picture.Texture.Name == "Thump")
-                        {
-                            int radius = 1;
-                            if (picture.Texture.Name == "Fire")
-                            {
-                                radius = 5;
-                            }
-
-                            ShaderUtil.Apply_GaussianBlur(spriteBatch, radius, picture.Texture, picture.Region, picture.Image, picture.DrawColor, picture.Opacity);
-                        }
-                        else
-                        {
-                            spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
-                        }
-                    }
-                }
-
                 for (int i = 0; i < Menu.Labels.Count; i++)
                 {
                     Label label = Menu.Labels[i];
-                    if (label.Name != "Examine")
+                    if (label.Name == "Result" ||
+                        label.Name == "Debug")
                     {
                         label.Draw(spriteBatch);
                     }
@@ -272,6 +238,49 @@ namespace DoS1.Scenes
                         label.Draw(spriteBatch);
                         break;
                     }
+                }
+            }
+        }
+
+        private void DrawDamageEffects(SpriteBatch spriteBatch, Character character)
+        {
+            for (int i = 0; i < Menu.Pictures.Count; i++)
+            {
+                Picture picture = Menu.Pictures[i];
+                if (picture.ID == character.ID)
+                {
+                    if (picture.Name == "Damage" ||
+                        picture.Name == "Cast")
+                    {
+                        if (picture.Texture.Name == "Lightning" ||
+                            picture.Texture.Name == "Fire" ||
+                            picture.Texture.Name == "Ice" ||
+                            picture.Texture.Name == "Heal" ||
+                            picture.Texture.Name == "Thump")
+                        {
+                            int radius = 1;
+                            if (picture.Texture.Name == "Fire")
+                            {
+                                radius = 5;
+                            }
+
+                            ShaderUtil.Apply_GaussianBlur(spriteBatch, radius, picture.Texture, picture.Region, picture.Image, picture.DrawColor, picture.Opacity);
+                        }
+                        else
+                        {
+                            spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < Menu.Labels.Count; i++)
+            {
+                Label label = Menu.Labels[i];
+                if (label.ID == character.ID &&
+                    label.Name == "Damage")
+                {
+                    label.Draw(spriteBatch);
                 }
             }
         }
@@ -1577,8 +1586,9 @@ namespace DoS1.Scenes
             {
                 if (ally_squad != null)
                 {
-                    foreach (Character character in ally_squad.Characters)
+                    for (int i = 0; i < ally_squad.Characters.Count; i++)
                     {
+                        Character character = ally_squad.Characters[i];
                         if (!character.Dead &&
                             character.Tags.Contains("Animation_Idle"))
                         {
@@ -1589,8 +1599,9 @@ namespace DoS1.Scenes
 
                 if (enemy_squad != null)
                 {
-                    foreach (Character character in enemy_squad.Characters)
+                    for (int i = 0; i < enemy_squad.Characters.Count; i++)
                     {
+                        Character character = enemy_squad.Characters[i];
                         if (!character.Dead &&
                             character.Tags.Contains("Animation_Idle"))
                         {

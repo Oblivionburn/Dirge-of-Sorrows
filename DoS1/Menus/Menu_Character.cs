@@ -1142,67 +1142,67 @@ namespace DoS1.Menus
                 // ===============
                 // Character Stats
                 // ===============
-                X = char_pic.Region.X - (width * 7);
+                int statWidth = width * 8;
+                X = char_pic.Region.X - statWidth;
                 Y = char_pic.Region.Y - (height * 3);
 
-                GetLabel("Stats").Region = new Region(X, Y, (width * 7), height);
-                GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
+                GetLabel("Stats").Region = new Region(X, Y, statWidth, height);
+                GetPicture("Stats_Underline").Region = new Region(X, Y + (height / 2), statWidth, height);
 
                 Y += height;
                 Label hp = GetLabel("HP");
-                hp.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                hp.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 hp.Text = "HP: " + character.HealthBar.Value + "/" + character.HealthBar.Max_Value;
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label ep = GetLabel("EP");
-                ep.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                ep.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 ep.Text = "EP: " + character.ManaBar.Value + "/" + character.ManaBar.Max_Value;
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label level = GetLabel("Level");
-                level.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                level.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 level.Text = "LVL: " + character.Level + "/100";
 
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label xp = GetLabel("XP");
-                xp.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                xp.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 xp.Text = "EXP: " + character.XP + "/" + Handler.XP_Needed_ForLevels[character.Level + 1];
 
                 Something STR = character.GetStat("STR");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label strength = GetLabel("STR");
-                strength.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                strength.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 strength.Text = "STR: " + STR.Value + "/" + STR.Max_Value;
 
                 Something INT = character.GetStat("INT");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label intelligence = GetLabel("INT");
-                intelligence.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                intelligence.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 intelligence.Text = "INT: " + INT.Value + "/" + INT.Max_Value;
 
                 Something DEX = character.GetStat("DEX");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label dexterity = GetLabel("DEX");
-                dexterity.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                dexterity.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 dexterity.Text = "DEX: " + DEX.Value + "/" + DEX.Max_Value;
 
                 Something AGI = character.GetStat("AGI");
                 Y += (Main.Game.MenuSize.Y / 4) * 3;
                 Label agility = GetLabel("AGI");
-                agility.Region = new Region(X, Y, (width * 7), (Main.Game.MenuSize.Y / 4) * 3);
+                agility.Region = new Region(X, Y, statWidth, (Main.Game.MenuSize.Y / 4) * 3);
                 agility.Text = "AGI: " + AGI.Value + "/" + AGI.Max_Value;
 
                 // ===============
                 // Equipment Stats
                 // ===============
-                X = char_pic.Region.X - (width * 7);
                 Y = char_pic.Region.Y + char_pic.Region.Height - (char_pic.Region.Height / 2) + height;
 
-                GetLabel("Equipment").Region = new Region(X, Y, (width * 7), height);
-                GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), (width * 7), height);
+                GetLabel("Equipment").Region = new Region(X, Y, statWidth, height);
+                GetPicture("Equipment_Underline").Region = new Region(X, Y + (height / 2), statWidth, height);
 
                 Label equipment = GetLabel("Equipment_Properties");
-                equipment.Region = new Region(X, Y + height, (width * 7), height);
+                equipment.Region = new Region(X, Y + height, statWidth, height);
                 equipment.Text = "";
 
                 List<Something> Properties = new List<Something>();

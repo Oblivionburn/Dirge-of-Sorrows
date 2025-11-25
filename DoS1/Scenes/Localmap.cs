@@ -315,7 +315,8 @@ namespace DoS1.Scenes
 
                     if (Handler.MoveGridDelay >= 4)
                     {
-                        WorldUtil.MoveGrid(world);
+                        Menu.GetLabel("Examine").Visible = false;
+                        Handler.MovingGrid = true;
                     }
                 }
 
