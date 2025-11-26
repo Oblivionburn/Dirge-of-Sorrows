@@ -1336,6 +1336,17 @@ namespace DoS1.Menus
                                 equipment.Text += property.Name + ": " + property.Value;
                             }
                         }
+                        else if (property.Name.Contains("Restore"))
+                        {
+                            if (weapon.Categories[0] == "Grimoire")
+                            {
+                                equipment.Text += property.Name + " (+INT): " + (property.Value + (int)character.GetStat("INT").Value);
+                            }
+                            else
+                            {
+                                equipment.Text += property.Name + ": " + property.Value;
+                            }
+                        }
                         else
                         {
                             equipment.Text += property.Name + ": " + property.Value;

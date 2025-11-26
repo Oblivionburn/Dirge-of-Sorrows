@@ -69,8 +69,11 @@ namespace DoS1.Util
                 if (ground != null)
                 {
                     Tile current = null;
-                    foreach (Tile tile in ground.Tiles)
+
+                    int count = ground.Tiles.Count;
+                    for (int i = 0; i < count; i++)
                     {
+                        Tile tile = ground.Tiles[i];
                         if (InputManager.MouseWithin(tile.Region.ToRectangle))
                         {
                             current = tile;
@@ -83,8 +86,9 @@ namespace DoS1.Util
                         int x = Main.Game.ScreenWidth / 2;
                         int y = Main.Game.ScreenHeight / 2;
 
-                        foreach (Tile tile in ground.Tiles)
+                        for (int i = 0; i < count; i++)
                         {
+                            Tile tile = ground.Tiles[i];
                             if (x >= tile.Region.X && x < tile.Region.X + tile.Region.Width &&
                                 y >= tile.Region.Y && y < tile.Region.Y + tile.Region.Height)
                             {
@@ -229,8 +233,10 @@ namespace DoS1.Util
             current.Region.Width = Main.Game.TileSize.X;
             current.Region.Height = Main.Game.TileSize.Y;
 
-            foreach (Tile tile in ground.Tiles)
+            int count = ground.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
+                Tile tile = ground.Tiles[i];
                 if (tile.ID != current.ID)
                 {
                     int x_diff = (int)tile.Location.X - (int)current.Location.X;
@@ -278,10 +284,15 @@ namespace DoS1.Util
 
             if (!world_map)
             {
-                foreach (Army army in CharacterManager.Armies)
+                int armyCount = CharacterManager.Armies.Count;
+                for (int a = 0; a < armyCount; a++)
                 {
-                    foreach (Squad squad in army.Squads)
+                    Army army = CharacterManager.Armies[a];
+
+                    int squadCount = army.Squads.Count;
+                    for (int s = 0; s < squadCount; s++)
                     {
+                        Squad squad = army.Squads[s];
                         if (squad.Region != null)
                         {
                             int x_diff = (int)squad.Location.X - (int)current.Location.X;
@@ -386,8 +397,10 @@ namespace DoS1.Util
                 current.Region.Width = Main.Game.TileSize.X;
                 current.Region.Height = Main.Game.TileSize.Y;
 
-                foreach (Tile tile in ground.Tiles)
+                int count = ground.Tiles.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    Tile tile = ground.Tiles[i];
                     if (tile.ID != current.ID)
                     {
                         int x_diff = (int)tile.Location.X - (int)current.Location.X;
@@ -433,12 +446,16 @@ namespace DoS1.Util
                     }
                 }
 
-                foreach (Army army in CharacterManager.Armies)
+                int armyCount = CharacterManager.Armies.Count;
+                for (int a = 0; a < armyCount; a++)
                 {
+                    Army army = CharacterManager.Armies[a];
                     if (army.Name != "Special")
                     {
-                        foreach (Squad squad in army.Squads)
+                        int squadCount = army.Squads.Count;
+                        for (int s = 0; s < squadCount; s++)
                         {
+                            Squad squad = army.Squads[s];
                             if (squad.Region != null)
                             {
                                 if (squad.Moving)
@@ -542,16 +559,24 @@ namespace DoS1.Util
                 if (map != null)
                 {
                     Layer ground = map.GetLayer("Ground");
-                    foreach (Tile tile in ground.Tiles)
+
+                    int count = ground.Tiles.Count;
+                    for (int i = 0; i < count; i++)
                     {
+                        Tile tile = ground.Tiles[i];
                         tile.Region.X += x_diff;
                         tile.Region.Y += y_diff;
                     }
 
-                    foreach (Army army in CharacterManager.Armies)
+                    int armyCount = CharacterManager.Armies.Count;
+                    for (int a = 0; a < armyCount; a++)
                     {
-                        foreach (Squad squad in army.Squads)
+                        Army army = CharacterManager.Armies[a];
+
+                        int squadCount = army.Squads.Count;
+                        for (int s = 0; s < squadCount; s++)
                         {
+                            Squad squad = army.Squads[s];
                             if (squad.Visible)
                             {
                                 squad.Region.X += x_diff;
@@ -570,8 +595,9 @@ namespace DoS1.Util
                     {
                         if (weather.ParticleManager.Particles.Any())
                         {
-                            foreach (Particle particle in weather.ParticleManager.Particles)
+                            for (int p  = 0; p < weather.ParticleManager.Particles.Count; p++)
                             {
+                                Particle particle = weather.ParticleManager.Particles[p];
                                 particle.Location.X += x_diff;
                                 particle.Location.Y += y_diff;
                             }
@@ -663,11 +689,13 @@ namespace DoS1.Util
             {
                 Layer ground = map.GetLayer("Ground");
 
-                foreach (Tile existing in ground.Tiles)
+                int count = ground.Tiles.Count;
+                for (int i = 0; i < count; i++)
                 {
-                    if (existing.Type == "Water")
+                    Tile tile = ground.Tiles[i];
+                    if (tile.Type == "Water")
                     {
-                        existing.Animate();
+                        tile.Animate();
                     }
                 }
             }
@@ -731,8 +759,10 @@ namespace DoS1.Util
 
         public static Tile Get_Tile(Layer layer, Vector2 location)
         {
-            foreach (Tile tile in layer.Tiles)
+            int count = layer.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
+                Tile tile = layer.Tiles[i];
                 if (tile.Location.X == location.X &&
                     tile.Location.Y == location.Y)
                 {
@@ -1146,8 +1176,10 @@ namespace DoS1.Util
             Layer roads = map.GetLayer("Roads");
             if (roads != null)
             {
-                foreach (Tile tile in roads.Tiles)
+                int roadCount = roads.Tiles.Count;
+                for (int i = 0; i < roadCount; i++)
                 {
+                    Tile tile = roads.Tiles[i];
                     if (screen_location.X >= tile.Region.X && screen_location.X < tile.Region.X + tile.Region.Width &&
                         screen_location.Y >= tile.Region.Y && screen_location.Y < tile.Region.Y + tile.Region.Height)
                     {
@@ -1157,8 +1189,11 @@ namespace DoS1.Util
             }
 
             Layer ground = map.GetLayer("Ground");
-            foreach (Tile tile in ground.Tiles)
+
+            int count = ground.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
+                Tile tile = ground.Tiles[i];
                 if (screen_location.X >= tile.Region.X && screen_location.X < tile.Region.X + tile.Region.Width &&
                     screen_location.Y >= tile.Region.Y && screen_location.Y < tile.Region.Y + tile.Region.Height)
                 {
@@ -1209,12 +1244,14 @@ namespace DoS1.Util
         public static Tile Get_Base(Map map, string type)
         {
             Layer locations = map.GetLayer("Locations");
-            
-            foreach (Tile location in locations.Tiles)
+
+            int count = locations.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
-                if (location.Type == "Base_" + type)
+                Tile tile = locations.Tiles[i];
+                if (tile.Type == "Base_" + type)
                 {
-                    return location;
+                    return tile;
                 }
             }
 
@@ -1234,12 +1271,14 @@ namespace DoS1.Util
                         Layer locations = map.GetLayer("Locations");
                         if (locations != null)
                         {
-                            foreach (Tile location in locations.Tiles)
+                            int count = locations.Tiles.Count;
+                            for (int i = 0; i < count; i++)
                             {
-                                if (squad.Location.X == location.Location.X &&
-                                    squad.Location.Y == location.Location.Y)
+                                Tile tile = locations.Tiles[i];
+                                if (squad.Location.X == tile.Location.X &&
+                                    squad.Location.Y == tile.Location.Y)
                                 {
-                                    return location;
+                                    return tile;
                                 }
                             }
                         }
@@ -1257,11 +1296,13 @@ namespace DoS1.Util
             Layer locations = map.GetLayer("Locations");
             if (locations != null)
             {
-                foreach (Tile location in locations.Tiles)
+                int count = locations.Tiles.Count;
+                for (int i = 0; i < count; i++)
                 {
-                    if (!location.Type.Contains("Base"))
+                    Tile tile = locations.Tiles[i];
+                    if (!tile.Type.Contains("Base"))
                     {
-                        towns.Add(location);
+                        towns.Add(tile);
                     }
                 }
             }
@@ -1275,13 +1316,13 @@ namespace DoS1.Util
                 map != null)
             {
                 List<Tile> Towns = GetTowns(map);
-
                 Tile nearest = null;
 
                 if (to_guard)
                 {
                     //Are we already on a captured town?
-                    for (int i = 0; i < Towns.Count; i++)
+                    int townCount = Towns.Count;
+                    for (int i = 0; i < townCount; i++)
                     {
                         Tile town = Towns[i];
 
@@ -1311,8 +1352,10 @@ namespace DoS1.Util
                 {
                     Tile town = Towns[i];
 
-                    foreach (Squad existing in army.Squads)
+                    int squadCount = army.Squads.Count;
+                    for (int s = 0; s < squadCount; s++)
                     {
+                        Squad existing = army.Squads[s];
                         if (existing.ID != squad.ID &&
                             existing.Path.Any())
                         {
@@ -1329,8 +1372,10 @@ namespace DoS1.Util
                 }
 
                 //Get first town
-                foreach (Tile town in Towns)
+                int count = Towns.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    Tile town = Towns[i];
                     if (!town.Type.Contains("Enemy"))
                     {
                         Squad existing = ArmyUtil.Get_Squad(map, army, town.Location);
@@ -1348,8 +1393,9 @@ namespace DoS1.Util
                     int distance = GetDistance(squad.Location, nearest.Location);
 
                     //Check for closer town
-                    foreach (Tile town in Towns)
+                    for (int i = 0; i < count; i++)
                     {
+                        Tile town = Towns[i];
                         if (!town.Type.Contains("Enemy"))
                         {
                             Squad existing = ArmyUtil.Get_Squad(map, army, town.Location);
@@ -1382,8 +1428,10 @@ namespace DoS1.Util
                 Layer layer = map.GetLayer("Locations");
                 if (layer != null)
                 {
-                    foreach (Tile tile in layer.Tiles)
+                    int layerCount = layer.Tiles.Count;
+                    for (int i = 0; i < layerCount; i++)
                     {
+                        Tile tile = layer.Tiles[i];
                         if (tile.Type != "Base_Ally")
                         {
                             locations.Add(tile);
@@ -1391,10 +1439,9 @@ namespace DoS1.Util
                     }
                 }
 
-                Tile nearest = null;
-
                 //Are we already on something?
-                for (int i = 0; i < locations.Count; i++)
+                int count = locations.Count;
+                for (int i = 0; i < count; i++)
                 {
                     Tile tile = locations[i];
 
@@ -1406,19 +1453,17 @@ namespace DoS1.Util
                 }
 
                 //Get first location
-                foreach (Tile tile in locations)
-                {
-                    nearest = tile;
-                    break;
-                }
+                Tile nearest = locations[0];
 
                 if (nearest != null)
                 {
                     int distance = GetDistance(squad.Location, nearest.Location);
 
                     //Check for closer location
-                    foreach (Tile tile in locations)
+                    for (int i = 0; i < count; i++)
                     {
+                        Tile tile = locations[i];
+
                         int new_distance = GetDistance(squad.Location, tile.Location);
 
                         if (new_distance < distance)
@@ -1442,8 +1487,10 @@ namespace DoS1.Util
             Map map = GetMap(world);
             Layer locations = map.GetLayer("Locations");
 
-            foreach (Tile tile in locations.Tiles)
+            int count = locations.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
+                Tile tile = locations.Tiles[i];
                 if (tile.Type.Contains("Market"))
                 {
                     return tile;
@@ -1460,8 +1507,11 @@ namespace DoS1.Util
             Squad nearest = ally_army.Squads[0];
             int distance = GetDistance(squad.Location, nearest.Location);
 
-            foreach (Squad ally_squad in ally_army.Squads)
+            int count = ally_army.Squads.Count;
+            for (int i = 0; i < count; i++)
             {
+                Squad ally_squad = ally_army.Squads[i];
+
                 int new_distance = GetDistance(squad.Location, ally_squad.Location);
                 if (new_distance < distance)
                 {
@@ -1506,10 +1556,12 @@ namespace DoS1.Util
             Map map = scene.World.Maps[0];
 
             Layer locations = map.GetLayer("Locations");
-            for (int i = 0; i < locations.Tiles.Count; i++)
+
+            int count = locations.Tiles.Count;
+            for (int i = 0; i < count; i++)
             {
-                Tile location = locations.Tiles[i];
-                if (location.Visible)
+                Tile tile = locations.Tiles[i];
+                if (tile.Visible)
                 {
                     maxLevel = i;
                 }
@@ -1547,7 +1599,9 @@ namespace DoS1.Util
             if (squad.Type == "Ally")
             {
                 Army enemy_army = CharacterManager.GetArmy("Enemy");
-                for (int i = enemy_army.Squads.Count - 1; i >= 0; i--)
+
+                int enemyCount = enemy_army.Squads.Count - 1;
+                for (int i = enemyCount; i >= 0; i--)
                 {
                     Squad enemy_squad = enemy_army.Squads[i];
                     if (enemy_squad.Region != null)
@@ -1562,7 +1616,9 @@ namespace DoS1.Util
             else if (squad.Type == "Enemy")
             {
                 Army ally_army = CharacterManager.GetArmy("Ally");
-                for (int i = ally_army.Squads.Count - 1; i >= 0; i--)
+
+                int allyCount = ally_army.Squads.Count - 1;
+                for (int i = allyCount; i >= 0; i--)
                 {
                     Squad ally_squad = ally_army.Squads[i];
                     if (ally_squad.Region != null)
@@ -1594,13 +1650,16 @@ namespace DoS1.Util
 
                         bool interrupt = false;
 
-                        foreach (Army army in CharacterManager.Armies)
+                        int armyCount = CharacterManager.Armies.Count;
+                        for (int a = 0; a < armyCount; a++)
                         {
+                            Army army = CharacterManager.Armies[a];
                             if (army.Name != "Reserves" &&
                                 army.Name != "Special")
                             {
-                                foreach (Squad squad in army.Squads)
+                                for (int s = 0; s < army.Squads.Count; s++)
                                 {
+                                    Squad squad = army.Squads[s];
                                     if (squad.Visible &&
                                         squad.Active)
                                     {
@@ -1818,20 +1877,28 @@ namespace DoS1.Util
                     Map map = localmap.World.Maps[Handler.Level];
                     Layer locations = map.GetLayer("Locations");
 
-                    foreach (Tile location in locations.Tiles)
+                    int count = locations.Tiles.Count;
+                    for (int i = 0; i < count; i++)
                     {
-                        foreach (Army army in CharacterManager.Armies)
+                        Tile tile = locations.Tiles[i];
+
+                        int armyCount = CharacterManager.Armies.Count;
+                        for (int a = 0; a < armyCount; a++)
                         {
-                            foreach (Squad squad in army.Squads)
+                            Army army = CharacterManager.Armies[a];
+
+                            for (int s = 0; s < army.Squads.Count; s++)
                             {
+                                Squad squad = army.Squads[s];
                                 if (squad.Location != null)
                                 {
-                                    if (squad.Location.X == location.Location.X &&
-                                        squad.Location.Y == location.Location.Y &&
+                                    if (squad.Location.X == tile.Location.X &&
+                                        squad.Location.Y == tile.Location.Y &&
                                         !squad.Moving)
                                     {
-                                        foreach (Character character in squad.Characters)
+                                        for (int c = 0; c < squad.Characters.Count; c++)
                                         {
+                                            Character character = squad.Characters[c];
                                             character.HealthBar.IncreaseValue(1);
                                             character.ManaBar.IncreaseValue(1);
                                         }
@@ -1851,12 +1918,19 @@ namespace DoS1.Util
             int gold = 0;
 
             Scene localmap = SceneManager.GetScene("Localmap");
-            foreach (Map map in localmap.World.Maps)
+
+            int mapCount = localmap.World.Maps.Count;
+            for (int i = 0; i < mapCount; i++)
             {
+                Map map = localmap.World.Maps[i];
+
                 Layer locations = map.GetLayer("Locations");
-                foreach (Tile location in locations.Tiles)
+
+                int count = locations.Tiles.Count;
+                for (int j = 0; j < count; j++)
                 {
-                    if (location.Type.Contains("Ally"))
+                    Tile tile = locations.Tiles[j];
+                    if (tile.Type.Contains("Ally"))
                     {
                         gold++;
                     }

@@ -213,8 +213,7 @@ namespace DoS1.Scenes
                 for (int i = 0; i < Menu.Labels.Count; i++)
                 {
                     Label label = Menu.Labels[i];
-                    if (label.Name == "Result" ||
-                        label.Name == "Debug")
+                    if (label.Name != "Examine")
                     {
                         label.Draw(spriteBatch);
                     }
@@ -508,6 +507,7 @@ namespace DoS1.Scenes
                                                     if (statusEffect.Amount <= 0)
                                                     {
                                                         current_character.StatusEffects.Remove(statusEffect);
+                                                        RuneUtil.AddCombatLabel(Menu, current_character, "-" + statusEffect.Name, Color.White);
                                                         i--;
                                                     }
                                                 }

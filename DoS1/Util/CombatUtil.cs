@@ -847,11 +847,7 @@ namespace DoS1.Util
                     statusEffect.Name == "Shocked")
                 {
                     character.StatusEffects.Remove(statusEffect);
-
-                    menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", "-" + statusEffect.Name, Color.White,
-                        new Region(character.Region.X + (character.Region.Width / 4), character.Region.Y - ((character.Region.Width / 8) * 3),
-                            character.Region.Width / 2, character.Region.Width / 2), false);
-
+                    RuneUtil.AddCombatLabel(menu, character, "-" + statusEffect.Name, Color.White);
                     i--;
                 }
             }

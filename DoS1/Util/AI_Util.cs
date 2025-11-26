@@ -112,11 +112,14 @@ namespace DoS1.Util
 
             foreach (Character character in squad.Characters)
             {
-                int epCost = InventoryUtil.Get_EP_Cost(character);
-                if (character.ManaBar.Value < epCost ||
-                    character.HealthBar.Value < character.HealthBar.Max_Value)
+                if (!character.Dead)
                 {
-                    rest_needed = true;
+                    int epCost = InventoryUtil.Get_EP_Cost(character);
+                    if (character.ManaBar.Value < epCost ||
+                        character.HealthBar.Value < character.HealthBar.Max_Value)
+                    {
+                        rest_needed = true;
+                    }
                 }
             }
 

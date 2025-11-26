@@ -1245,7 +1245,10 @@ namespace DoS1.Util
             heal += Area_AllArmor_PairedLevel(squad, character, element);
 
             //Check for stat extra healing
-            heal += (int)character.GetStat("INT").Value;
+            if (weapon.Categories[0] == "Grimoire")
+            {
+                heal += (int)character.GetStat("INT").Value;
+            }
 
             if (heal > 0)
             {
@@ -1319,7 +1322,10 @@ namespace DoS1.Util
             }
 
             //Check for stat extra energy
-            energy += (int)character.GetStat("INT").Value;
+            if (weapon.Categories[0] == "Grimoire")
+            {
+                energy += (int)character.GetStat("INT").Value;
+            }
 
             if (energy > 0)
             {

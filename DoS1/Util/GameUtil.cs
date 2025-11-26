@@ -138,8 +138,12 @@ namespace DoS1.Util
             ui.Visible = true;
             MenuManager.CurrentMenu_ID = ui.ID;
 
+            Main.Game.Zoom = 1.5f;
+
             Map map = WorldUtil.GetMap(scene.World);
             WorldUtil.Resize_OnStart(scene.Menu, map);
+
+            Main.Game.ResolutionChange();
 
             if (Handler.LocalMap)
             {
