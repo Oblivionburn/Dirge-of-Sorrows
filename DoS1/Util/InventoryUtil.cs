@@ -535,7 +535,7 @@ namespace DoS1.Util
             List<Item> items = new List<Item>();
             List<Something> properties = new List<Something>();
 
-            properties.Add(NewProperty("Physical", "Damage", 35, 0));
+            properties.Add(NewProperty("Physical", "Damage", 20, 0));
             properties.Add(NewProperty("Rune", "Slots", 1, 0));
             properties.Add(NewProperty("EP", "Cost", 3, 0));
             Item item = NewItem(type, category, "Elm", properties);
@@ -545,7 +545,7 @@ namespace DoS1.Util
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
-            properties[0].Value = 60;
+            properties[0].Value = 45;
             properties[1].Value = 1;
             properties[2].Value = 4;
             item = NewItem(type, category, "Cedar", properties);
@@ -555,7 +555,7 @@ namespace DoS1.Util
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
-            properties[0].Value = 85;
+            properties[0].Value = 70;
             properties[1].Value = 1;
             properties[2].Value = 5;
             item = NewItem(type, category, "Oak", properties);
@@ -565,7 +565,7 @@ namespace DoS1.Util
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
-            properties[0].Value = 110;
+            properties[0].Value = 95;
             properties[1].Value = 1;
             properties[2].Value = 6;
             item = NewItem(type, category, "Ebony", properties);

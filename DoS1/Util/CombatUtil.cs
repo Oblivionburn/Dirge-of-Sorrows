@@ -1422,6 +1422,22 @@ namespace DoS1.Util
             Squad squad = ArmyUtil.Get_Squad(character.ID);
             if (squad != null)
             {
+                //Replace leader if got killed
+                if (character.ID == squad.Leader_ID &&
+                    character.ID != Handler.GetHero().ID)
+                {
+                    int count = squad.Characters.Count;
+                    for (int i = 0; i < count; i++)
+                    {
+                        Character existing = squad.Characters[i];
+                        if (existing.ID != character.ID)
+                        {
+                            squad.Leader_ID = existing.ID;
+                            break;
+                        }
+                    }
+                }
+
                 squad.Characters.Remove(character);
             }
         }

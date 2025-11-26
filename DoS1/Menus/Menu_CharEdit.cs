@@ -526,7 +526,7 @@ namespace DoS1.Menus
 
             Item eyes = character.Inventory.GetItem("Eyes");
             Texture2D eyeTexture = AssetManager.Textures[character.Direction.ToString() + "_Eye"];
-            eyes.Texture = GameUtil.CopyTexture_NewColor(eyeTexture, Handler.EyeColors[EyeColors[EyeColor]]);
+            eyes.Texture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, eyeTexture, Handler.EyeColors[EyeColors[EyeColor]]);
             eyes.Image = character.Image;
 
             Texture2D hairTexture = null;
@@ -551,7 +551,7 @@ namespace DoS1.Menus
             {
                 if (hairTexture != null)
                 {
-                    hair.Texture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[HairColors[HairColor]]);
+                    hair.Texture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, hairTexture, Handler.HairColors[HairColors[HairColor]]);
                     hair.Image = character.Image;
                 }
                 else
@@ -569,7 +569,7 @@ namespace DoS1.Menus
                     Location = new Location(),
                     Equipped = true,
                     DrawColor = Color.White,
-                    Texture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[HairColors[HairColor]]),
+                    Texture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, hairTexture, Handler.HairColors[HairColors[HairColor]]),
                     Image = character.Image,
                     Visible = true
                 });

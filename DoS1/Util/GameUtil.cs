@@ -75,12 +75,6 @@ namespace DoS1.Util
 
             TimeManager.Now.OnDaysChange -= DayChanged;
             TimeManager.Now.OnDaysChange += DayChanged;
-
-            SoundManager.StopAll();
-            SoundManager.NeedMusic = true;
-            SoundManager.StopAmbient();
-            SoundManager.AmbientFade = 1;
-            SoundManager.AmbientPaused = false;
         }
 
         public static void NewGame()
@@ -92,11 +86,16 @@ namespace DoS1.Util
             Main.Game.GameStarted = true;
             Toggle_MainMenu();
 
-            SoundManager.MusicLooping = false;
-
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
             scene.Active = true;
+
+            SoundManager.StopAll();
+            SoundManager.NeedMusic = true;
+            SoundManager.MusicLooping = false;
+            SoundManager.StopAmbient();
+            SoundManager.AmbientFade = 1;
+            SoundManager.AmbientPaused = false;
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.Visible = true;
@@ -125,14 +124,16 @@ namespace DoS1.Util
 
             LoadUtil.LoadGame();
 
-            Main.Game.GameStarted = true;
-            Toggle_MainMenu();
-
-            SoundManager.MusicLooping = false;
-
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
             scene.Active = true;
+
+            SoundManager.StopAll();
+            SoundManager.NeedMusic = true;
+            SoundManager.MusicLooping = false;
+            SoundManager.StopAmbient();
+            SoundManager.AmbientFade = 1;
+            SoundManager.AmbientPaused = false;
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.Visible = true;
@@ -175,6 +176,13 @@ namespace DoS1.Util
                     worldMap.Enabled = false;
                 }
             }
+
+            Menu saveLoad = MenuManager.GetMenu("Save_Load");
+            saveLoad.GetPicture("Loading").Visible = false;
+            saveLoad.Visible = false;
+
+            Main.Game.GameStarted = true;
+            Toggle_MainMenu();
         }
 
         public static void ReturnToTitle()
@@ -194,7 +202,12 @@ namespace DoS1.Util
             SceneManager.GetScene("Title").Menu.Visible = true;
             SceneManager.ChangeScene("Title");
 
+            SoundManager.StopAll();
+            SoundManager.NeedMusic = true;
             SoundManager.MusicLooping = true;
+            SoundManager.StopAmbient();
+            SoundManager.AmbientFade = 1;
+            SoundManager.AmbientPaused = false;
 
             CryptoRandom random = new CryptoRandom();
             int weather_choice = random.Next(0, 3);
@@ -603,12 +616,42 @@ namespace DoS1.Util
             return new Color(0, 0, 0, 0);
         }
 
-        public static Texture2D CopyTexture_NewColor(Texture2D texture, Color new_color)
+        public static Texture2D CopyTexture_NewColor(Texture2D original, Color new_color)
+        {
+            Texture2D texture = new Texture2D(Main.Game.GraphicsManager.GraphicsDevice, original.Width, original.Height);
+
+            Color[] colors = new Color[original.Width * original.Height];
+            original.GetData(colors);
+
+            int count = colors.Length;
+            for (int i = 0; i < count; i++)
+            {
+                Color color = colors[i];
+                if (color.R == 0 &&
+                    color.G == 0 &&
+                    color.B == 0 &&
+                    color.A == 0)
+                {
+                    //Ignore transparent pixels
+                }
+                else
+                {
+                    colors[i] = new_color;
+                }
+            }
+
+            texture.SetData(colors);
+            texture.Name = texture.Name;
+
+            return texture;
+        }
+
+        public static Texture2D CopyTexture_NewColor(GraphicsDevice graphicsDevice, Texture2D texture, Color new_color)
         {
             int width = texture.Width;
             int height = texture.Height;
 
-            RenderTarget2D renderTarget = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, width, height)
+            RenderTarget2D renderTarget = new RenderTarget2D(graphicsDevice, width, height)
             {
                 Name = texture.Name
             };
@@ -622,14 +665,14 @@ namespace DoS1.Util
             {
                 Handler.PauseDrawing = true;
 
-                Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(renderTarget);
-                Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
+                graphicsDevice.SetRenderTarget(renderTarget);
+                graphicsDevice.Clear(Color.Transparent);
 
                 Main.Game.SpriteBatch.Begin();
                 Main.Game.SpriteBatch.Draw(texture, Vector2.Zero, new_color);
                 Main.Game.SpriteBatch.End();
 
-                Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(null);
+                graphicsDevice.SetRenderTarget(null);
 
                 Handler.PauseDrawing = false;
             }

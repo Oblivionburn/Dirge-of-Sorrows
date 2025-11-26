@@ -52,7 +52,7 @@ namespace DoS1.Util
             });
 
             Texture2D eyeTexture = Handler.GetTexture(character.Direction.ToString() + "_Eye");
-            Texture2D newEyeTexture = GameUtil.CopyTexture_NewColor(eyeTexture, Handler.EyeColors[eyeColor]);
+            Texture2D newEyeTexture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, eyeTexture, Handler.EyeColors[eyeColor]);
 
             character.Inventory.Items.Add(new Item
             {
@@ -70,7 +70,7 @@ namespace DoS1.Util
             if (hairStyle != "Bald")
             {
                 Texture2D hairTexture = Handler.GetTexture(character.Direction.ToString() + "_" + gender + "_" + hairStyle);
-                Texture2D newHairTexture = GameUtil.CopyTexture_NewColor(hairTexture, Handler.HairColors[hairColor]);
+                Texture2D newHairTexture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, hairTexture, Handler.HairColors[hairColor]);
 
                 character.Inventory.Items.Add(new Item
                 {

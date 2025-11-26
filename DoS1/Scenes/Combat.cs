@@ -2107,17 +2107,15 @@ namespace DoS1.Scenes
 
             label.Text = GameUtil.WrapText_Dialogue(text);
 
-            Character leader = ally_squad.GetLeader();
-            if (leader == null)
+            if (ally_squad.Characters.Any())
             {
-                //If leader was killed, assign new leader
-                ally_squad.Leader_ID = ally_squad.Characters[0].ID;
-            }
-            else if (won_battle &&
-                     !enemy_squad.Characters.Any())
-            {
-                //If leader not killed and no enemies left, remove enemy as target
-                leader.Target_ID = 0;
+                Character leader = ally_squad.GetLeader();
+                if (won_battle &&
+                    !enemy_squad.Characters.Any())
+                {
+                    //If leader not killed and no enemies left, remove enemy as target
+                    leader.Target_ID = 0;
+                }
             }
         }
 

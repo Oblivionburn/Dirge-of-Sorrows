@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -9,7 +10,6 @@ using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Scenes;
 using OP_Engine.Utility;
-using OP_Engine.Weathers;
 
 using DoS1.Util;
 
@@ -84,7 +84,8 @@ namespace DoS1.Menus
                 foreach (Picture existing in Pictures)
                 {
                     if (existing.Name != "Background" &&
-                        existing.Name != "SaveList")
+                        existing.Name != "SaveList" &&
+                        existing.Name != "Loading")
                     {
                         existing.Draw(spriteBatch);
                     }
@@ -93,6 +94,16 @@ namespace DoS1.Menus
                 foreach (Label existing in Labels)
                 {
                     if (existing.Name == "Examine")
+                    {
+                        existing.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                foreach (Picture existing in Pictures)
+                {
+                    if (existing.Name == "Loading" &&
+                        existing.Visible)
                     {
                         existing.Draw(spriteBatch);
                         break;
@@ -383,14 +394,15 @@ namespace DoS1.Menus
             }
             else
             {
+                GetPicture("Loading").Visible = true;
+
                 Active = false;
-                Visible = false;
 
                 int num = int.Parse(button.Name);
                 string save = Handler.Saves[num - 1];
                 Handler.Selected_Save = save;
 
-                GameUtil.LoadGame();
+                Task.Factory.StartNew(() => GameUtil.LoadGame());
             }
         }
 
@@ -726,6 +738,7 @@ namespace DoS1.Menus
             Clear();
 
             AddPicture(Handler.GetID(), "Background", AssetManager.Textures["Black"], new Region(0, 0, 0, 0), Color.White * 0.6f, true);
+            AddPicture(Handler.GetID(), "Loading", AssetManager.Textures["Loading"], new Region(0, 0, 0, 0), Color.White, false);
 
             AddPicture(Handler.GetID(), "SaveList", AssetManager.Textures["Frame_Full"], new Region(0, 0, 0, 0), Color.White * 0.8f, true);
             AddPicture(Handler.GetID(), "Arrow_Up", AssetManager.Textures["ArrowIcon_Up"], new Region(0, 0, 0, 0), Color.White * 0f, true);
@@ -766,6 +779,7 @@ namespace DoS1.Menus
         public override void Resize(Point point)
         {
             GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+            GetPicture("Loading").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
             int X = (Main.Game.ScreenWidth / 2) - (Main.Game.MenuSize.X * 8);
             int Y = Main.Game.MenuSize.Y * 2;
