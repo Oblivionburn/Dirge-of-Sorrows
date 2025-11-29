@@ -130,6 +130,24 @@ namespace DoS1.Util
             }
             else
             {
+                for (int i = 0; i < army.Squads.Count; i++)
+                {
+                    Squad existing = army.Squads[i];
+                    if (squad.ID == existing.ID)
+                    {
+                        if (i == 0)
+                        {
+                            squad.Assignment = "Guard Base";
+                            break;
+                        }
+                        else if (i == 1)
+                        {
+                            squad.Assignment = "Attack Base";
+                            break;
+                        }
+                    }
+                }
+
                 CryptoRandom random;
 
                 if (squad.Assignment != "Guard Base" &&

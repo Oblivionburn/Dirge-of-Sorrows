@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-
+﻿using DoS1.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -14,8 +11,8 @@ using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
-
-using DoS1.Util;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DoS1.Scenes
 {
@@ -377,62 +374,13 @@ namespace DoS1.Scenes
                         if (squad.Visible)
                         {
                             Picture highlight = Menu.GetPicture("Highlight");
-                            Picture select = Menu.GetPicture("Select");
-
+                            
                             if (InputManager.MouseWithin(squad.Region.ToRectangle))
                             {
                                 hovered_squad = squad;
-
-                                Label examine = Menu.GetLabel("Examine");
-                                if (squad.Type == "Enemy")
-                                {
-                                    examine.TextColor = Color.Red;
-                                }
-                                else
-                                {
-                                    examine.TextColor = Color.Blue;
-                                }
+                                ExamineSquad(squad);
 
                                 Map map = WorldUtil.GetMap(world);
-
-                                if (Handler.Selected_Token == -1)
-                                {
-                                    highlight.Region = squad.Region;
-                                    highlight.Visible = true;
-
-                                    if (squad.Type == "Ally")
-                                    {
-                                        highlight.DrawColor = Color.Blue;
-                                        highlight.Texture = AssetManager.Textures["Highlight_Circle"];
-                                    }
-                                    else if (squad.Type == "Enemy")
-                                    {
-                                        highlight.DrawColor = Color.Red;
-                                        highlight.Texture = AssetManager.Textures["Highlight_Circle"];
-                                    }
-
-                                    GameUtil.Examine(Menu, squad.Name);
-                                }
-                                else if (Handler.Selected_Token == squad.ID)
-                                {
-                                    select.Texture = AssetManager.Textures["Highlight_Circle"];
-                                    select.Region = squad.Region;
-                                    select.Visible = true;
-                                    select.DrawColor = new Color(0, 255, 255, 255);
-
-                                    map.GetLayer("Pathing").Visible = false;
-
-                                    GameUtil.Examine(Menu, squad.Name);
-                                }
-                                else if (squad.Type == "Enemy")
-                                {
-                                    select.Texture = AssetManager.Textures["Highlight_Circle"];
-                                    select.Region = squad.Region;
-                                    select.Visible = true;
-                                    select.DrawColor = Color.Red;
-
-                                    GameUtil.Examine(Menu, squad.Name);
-                                }
 
                                 if (InputManager.Mouse_LB_Pressed)
                                 {
@@ -1030,6 +978,124 @@ namespace DoS1.Scenes
             {
                 examine.Text += "\n(Base)";
                 height += Main.Game.MenuSize.X / 2;
+            }
+
+            int X = InputManager.Mouse.X - (width / 2);
+            if (X < 0)
+            {
+                X = 0;
+            }
+            else if (X > Main.Game.Resolution.X - width)
+            {
+                X = Main.Game.Resolution.X - width;
+            }
+
+            int Y = InputManager.Mouse.Y + 20;
+            if (Y < 0)
+            {
+                Y = 0;
+            }
+            else if (Y > Main.Game.Resolution.Y - height)
+            {
+                Y = Main.Game.Resolution.Y - height;
+            }
+
+            examine.Region = new Region(X, Y, width, height);
+            examine.Visible = true;
+        }
+
+        private void ExamineSquad(Squad squad)
+        {
+            Picture highlight = Menu.GetPicture("Highlight");
+            Picture select = Menu.GetPicture("Select");
+
+            Label examine = Menu.GetLabel("Examine");
+            examine.Text = squad.Name;
+
+            if (squad.Type == "Enemy")
+            {
+                examine.TextColor = Color.Red;
+            }
+            else
+            {
+                examine.TextColor = Color.Blue;
+            }
+
+            if (Handler.Selected_Token == -1)
+            {
+                highlight.Region = squad.Region;
+                highlight.Visible = true;
+
+                if (squad.Type == "Ally")
+                {
+                    highlight.DrawColor = Color.Blue;
+                    highlight.Texture = AssetManager.Textures["Highlight_Circle"];
+                }
+                else if (squad.Type == "Enemy")
+                {
+                    highlight.DrawColor = Color.Red;
+                    highlight.Texture = AssetManager.Textures["Highlight_Circle"];
+                }
+
+                GameUtil.Examine(Menu, squad.Name);
+            }
+            else if (Handler.Selected_Token == squad.ID)
+            {
+                select.Texture = AssetManager.Textures["Highlight_Circle"];
+                select.Region = squad.Region;
+                select.Visible = true;
+                select.DrawColor = new Color(0, 255, 255, 255);
+
+                Map map = WorldUtil.GetMap(World);
+                map.GetLayer("Pathing").Visible = false;
+
+                GameUtil.Examine(Menu, squad.Name);
+            }
+            else if (squad.Type == "Enemy")
+            {
+                select.Texture = AssetManager.Textures["Highlight_Circle"];
+                select.Region = squad.Region;
+                select.Visible = true;
+                select.DrawColor = Color.Red;
+
+                GameUtil.Examine(Menu, squad.Name);
+            }
+
+            int width = Main.Game.MenuSize.X * 4;
+            int height = Main.Game.MenuSize.X;
+
+            bool wounded = false;
+            for (int i = 0; i < squad.Characters.Count; i++)
+            {
+                Character character = squad.Characters[i];
+                if (character.HealthBar.Value < character.HealthBar.Max_Value)
+                {
+                    wounded = true;
+                    break;
+                }
+            }
+
+            if (wounded)
+            {
+                examine.Text += "\n(Wounded)";
+                height += (Main.Game.MenuSize.X / 2);
+            }
+
+            bool tired = false;
+            for (int i = 0; i < squad.Characters.Count; i++)
+            {
+                Character character = squad.Characters[i];
+                if (character.ManaBar.Value < character.ManaBar.Max_Value)
+                {
+                    tired = true;
+                    break;
+                }
+            }
+
+            if (tired)
+            {
+                examine.Text += "\n(Tired)";
+                height += (Main.Game.MenuSize.X / 2);
             }
 
             int X = InputManager.Mouse.X - (width / 2);

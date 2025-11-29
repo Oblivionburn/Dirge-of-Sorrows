@@ -2200,95 +2200,15 @@ namespace DoS1.Scenes
 
         private void Leave()
         {
-            Scene localmap = SceneManager.GetScene("Localmap");
-            Map map = localmap.World.Maps[Handler.Level];
-            Layer ground = map.GetLayer("Ground");
-
             if (!won_battle &&
                 ally_squad.Characters.Any())
             {
-                //Bump squad away from enemy
-                if (ally_squad.Direction == Direction.North)
-                {
-                    ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                }
-                else if (ally_squad.Direction == Direction.East)
-                {
-                    ally_squad.Location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                }
-                else if (ally_squad.Direction == Direction.South)
-                {
-                    ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                }
-                else if (ally_squad.Direction == Direction.West)
-                {
-                    ally_squad.Location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                }
-                else
-                {
-                    if (enemy_squad.Direction == Direction.North)
-                    {
-                        ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                    }
-                    else if (enemy_squad.Direction == Direction.East)
-                    {
-                        ally_squad.Location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                    }
-                    else if (enemy_squad.Direction == Direction.South)
-                    {
-                        ally_squad.Location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                    }
-                    else if (enemy_squad.Direction == Direction.West)
-                    {
-                        ally_squad.Location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                    }
-                }
-
-                Tile tile = ground.GetTile(new Vector2(ally_squad.Location.X, ally_squad.Location.Y));
-                ally_squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
+                CombatUtil.BumpAllyAway(ally_squad, enemy_squad);
             }
             else if (won_battle &&
                      enemy_squad.Characters.Any())
             {
-                //Bump enemy away from squad
-                if (enemy_squad.Direction == Direction.North)
-                {
-                    enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                }
-                else if (enemy_squad.Direction == Direction.East)
-                {
-                    enemy_squad.Location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                }
-                else if (enemy_squad.Direction == Direction.South)
-                {
-                    enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                }
-                else if (enemy_squad.Direction == Direction.West)
-                {
-                    enemy_squad.Location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                }
-                else
-                {
-                    if (ally_squad.Direction == Direction.North)
-                    {
-                        enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                    }
-                    else if (ally_squad.Direction == Direction.East)
-                    {
-                        enemy_squad.Location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                    }
-                    else if (ally_squad.Direction == Direction.South)
-                    {
-                        enemy_squad.Location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                    }
-                    else if (ally_squad.Direction == Direction.West)
-                    {
-                        enemy_squad.Location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                    }
-                }
-
-                Tile tile = ground.GetTile(new Vector2(enemy_squad.Location.X, enemy_squad.Location.Y));
-                enemy_squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
+                CombatUtil.BumpEnemyAway(ally_squad, enemy_squad);
             }
 
             Handler.CombatTimer.Stop();
