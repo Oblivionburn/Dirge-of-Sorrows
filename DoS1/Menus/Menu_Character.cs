@@ -558,10 +558,68 @@ namespace DoS1.Menus
             }
         }
 
-        private void SwapItems(Inventory main_inventory, Item moving_item, Item existing_item)
+        private void SwapItems(Inventory main_inventory, Item new_item, Item old_item)
         {
-            UnequipItem(main_inventory, existing_item);
-            EquipItem(main_inventory, moving_item);
+            int newSlotsCount = 0;
+
+            Something runeSlots = new_item.GetProperty("Rune Slots");
+            if (runeSlots != null)
+            {
+                newSlotsCount = (int)runeSlots.Value;
+            }
+
+            for (int i = 0; i < newSlotsCount && i < old_item.Attachments.Count; i++)
+            {
+                Item oldRune = old_item.Attachments[i];
+                if (oldRune != null)
+                {
+                    //Remove rune from existing item slot
+                    old_item.Attachments.Remove(oldRune);
+                    InventoryUtil.UpdateItem(old_item);
+                    i--;
+
+                    //Remove any runes in the same location of the new_item slots
+                    for (int n = 0; n < new_item.Attachments.Count; n++)
+                    {
+                        Item newRune = new_item.Attachments[n];
+                        if (newRune.Location.X == oldRune.Location.X)
+                        {
+                            new_item.Attachments.Remove(newRune);
+                            InventoryUtil.UpdateItem(new_item);
+
+                            main_inventory.Items.Add(newRune);
+                            break;
+                        }
+                    }
+
+                    //Check if rune location fits within new_item slots
+                    if (oldRune.Location.X < newSlotsCount)
+                    {
+                        new_item.Attachments.Add(oldRune);
+                        InventoryUtil.UpdateItem(new_item);
+                    }
+                    else
+                    {
+                        //If doesn't fit, move to inventory
+                        main_inventory.Items.Add(oldRune);
+                    }
+                }
+            }
+
+            //Remove leftover runes that didn't fit into new_item slots
+            for (int i = 0; i < old_item.Attachments.Count; i++)
+            {
+                Item oldRune = old_item.Attachments[i];
+
+                old_item.Attachments.Remove(oldRune);
+                InventoryUtil.UpdateItem(old_item);
+
+                main_inventory.Items.Add(oldRune);
+                i--;
+            }
+
+            UnequipItem(main_inventory, old_item);
+            EquipItem(main_inventory, new_item);
         }
 
         private void EquipItem(Inventory main_inventory, Item item)
@@ -1338,7 +1396,8 @@ namespace DoS1.Menus
                         }
                         else if (property.Name.Contains("Restore"))
                         {
-                            if (weapon.Categories[0] == "Grimoire")
+                            if (weapon != null &&
+                                weapon.Categories[0] == "Grimoire")
                             {
                                 equipment.Text += property.Name + " (+INT): " + (property.Value + (int)character.GetStat("INT").Value);
                             }
