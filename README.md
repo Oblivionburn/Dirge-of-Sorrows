@@ -44,4 +44,3 @@ For discussion/suggestions/bug-reporting:<br>
 <br><br>
 ## <ins>Planned features not yet implemented</ins>:
 - More of the story
-- More music for variety
