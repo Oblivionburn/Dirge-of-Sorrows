@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
-
+﻿using DoS1.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
+using OP_Engine.Characters;
 using OP_Engine.Controls;
-using OP_Engine.Menus;
-using OP_Engine.Utility;
-using OP_Engine.Inventories;
 using OP_Engine.Inputs;
-using OP_Engine.Time;
+using OP_Engine.Inventories;
+using OP_Engine.Menus;
 using OP_Engine.Scenes;
-
-using DoS1.Util;
+using OP_Engine.Tiles;
+using OP_Engine.Time;
+using OP_Engine.Utility;
+using System.Collections.Generic;
 
 namespace DoS1.Menus
 {
@@ -64,7 +63,7 @@ namespace DoS1.Menus
                 if (Handler.StoryStep >= 10 &&
                     Handler.StoryStep <= 13)
                 {
-                    GameUtil.Alert_Story(this);
+                    StoryUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);
@@ -420,6 +419,16 @@ namespace DoS1.Menus
 
             if (Handler.StoryStep == 13)
             {
+                Army ally = CharacterManager.GetArmy("Ally");
+                Squad squad = ally.Squads[0];
+
+                Scene localmap = SceneManager.GetScene("Localmap");
+                Map map = localmap.World.Maps[Handler.Level];
+                Layer ground = map.GetLayer("Ground");
+                Tile tile = ground.GetTile(new Vector2(squad.Location.X, squad.Location.Y));
+
+                WorldUtil.CameraToTile(localmap.Menu, map, ground, tile);
+
                 MenuManager.GetMenu("Alerts").Visible = false;
                 Handler.StoryStep++;
             }

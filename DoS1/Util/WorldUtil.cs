@@ -585,17 +585,13 @@ namespace DoS1.Util
                         }
                     }
 
-                    Weather weather = WeatherManager.GetWeather(WeatherManager.CurrentWeather);
-                    if (weather == null)
+                    int weatherCount = WeatherManager.Weathers.Count;
+                    for (int i = 0; i <  weatherCount; i++)
                     {
-                        weather = WeatherManager.GetWeather_TransitioningTo();
-                    }
-
-                    if (weather != null)
-                    {
-                        if (weather.ParticleManager.Particles.Any())
+                        Weather weather = WeatherManager.Weathers[i];
+                        if (weather.Visible)
                         {
-                            for (int p  = 0; p < weather.ParticleManager.Particles.Count; p++)
+                            for (int p = 0; p < weather.ParticleManager.Particles.Count; p++)
                             {
                                 Particle particle = weather.ParticleManager.Particles[p];
                                 particle.Location.X += x_diff;

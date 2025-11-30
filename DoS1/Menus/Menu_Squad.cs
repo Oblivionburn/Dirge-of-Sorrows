@@ -135,7 +135,7 @@ namespace DoS1.Menus
                     Handler.StoryStep == 15 ||
                     Handler.StoryStep == 29)
                 {
-                    GameUtil.Alert_Story(this);
+                    StoryUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);
@@ -291,66 +291,72 @@ namespace DoS1.Menus
                 }
             }
 
-            if (!found_button &&
-                !found_squad &&
-                !found_grid &&
-                Handler.StoryStep != 6 &&
+            if (Handler.StoryStep != 6 &&
                 Handler.StoryStep != 7 &&
                 Handler.StoryStep != 15 &&
-                InputManager.Mouse_RB_Pressed)
+                Handler.StoryStep != 29)
             {
-                Back();
-            }
-            
-            if (InputManager.KeyPressed("Esc"))
-            {
-                Back();
+                if (!found_button &&
+                    !found_squad &&
+                    !found_grid &&
+                    InputManager.Mouse_RB_Pressed)
+                {
+                    Back();
+                }
+
+                if (InputManager.KeyPressed("Esc"))
+                {
+                    Back();
+                }
             }
         }
 
         private bool HoveringButton()
         {
+            if (Handler.StoryStep == 6 ||
+                Handler.StoryStep == 15 ||
+                Handler.StoryStep == 29)
+            {
+                return false;
+            }
+
             bool found = false;
 
-            if (Handler.StoryStep != 6 &&
-                Handler.StoryStep != 29)
+            foreach (Button button in Buttons)
             {
-                foreach (Button button in Buttons)
+                if (button.Visible &&
+                    button.Enabled)
                 {
-                    if (button.Visible &&
-                        button.Enabled)
+                    if (InputManager.MouseWithin(button.Region.ToRectangle))
                     {
-                        if (InputManager.MouseWithin(button.Region.ToRectangle))
+                        found = true;
+                        examining = true;
+
+                        if (button.HoverText != null)
                         {
-                            found = true;
-                            examining = true;
-
-                            if (button.HoverText != null)
-                            {
-                                GameUtil.Examine(this, button.HoverText);
-                            }
-
-                            button.Opacity = 1;
-                            button.Selected = true;
-
-                            if (InputManager.Mouse_LB_Pressed)
-                            {
-                                found = false;
-                                examining = false;
-
-                                CheckClick(button);
-
-                                button.Opacity = 0.8f;
-                                button.Selected = false;
-
-                                break;
-                            }
+                            GameUtil.Examine(this, button.HoverText);
                         }
-                        else if (InputManager.Mouse.Moved)
+
+                        button.Opacity = 1;
+                        button.Selected = true;
+
+                        if (InputManager.Mouse_LB_Pressed)
                         {
+                            found = false;
+                            examining = false;
+
+                            CheckClick(button);
+
                             button.Opacity = 0.8f;
                             button.Selected = false;
+
+                            break;
                         }
+                    }
+                    else if (InputManager.Mouse.Moved)
+                    {
+                        button.Opacity = 0.8f;
+                        button.Selected = false;
                     }
                 }
             }
@@ -818,7 +824,7 @@ namespace DoS1.Menus
 
                 if (missing_weapon)
                 {
-                    GameUtil.Alert_Story(this);
+                    StoryUtil.Alert_Story(this);
                 }
                 else
                 {

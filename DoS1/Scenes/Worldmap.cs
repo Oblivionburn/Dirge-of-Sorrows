@@ -56,7 +56,7 @@ namespace DoS1.Scenes
                 }
                 else if (Handler.StoryStep == 0)
                 {
-                    GameUtil.Alert_Story(Menu);
+                    StoryUtil.Alert_Story(Menu);
                 }
 
                 if (Handler.MovingGrid)

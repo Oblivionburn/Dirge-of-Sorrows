@@ -109,6 +109,7 @@
     <Compile Include="Util\RuneUtil.cs" />
     <Compile Include="Util\SaveUtil.cs" />
     <Compile Include="Util\ShaderUtil.cs" />
+    <Compile Include="Util\StoryUtil.cs" />
     <Compile Include="Util\WorldGen.cs" />
     <Compile Include="Util\WorldUtil.cs" />
   </ItemGroup>

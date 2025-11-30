@@ -28,7 +28,6 @@ namespace DoS1.Menus
         bool moving;
         bool attachment;
         int slot;
-        Rectangle starting_pos;
 
         int width;
         int height;
@@ -67,7 +66,7 @@ namespace DoS1.Menus
                 if (Handler.StoryStep == 33 ||
                     Handler.StoryStep == 34)
                 {
-                    GameUtil.Alert_Story(this);
+                    StoryUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);
@@ -238,23 +237,31 @@ namespace DoS1.Menus
                 ResizeInventory();
             }
 
-            if (!found_button &&
-                !found_grid &&
-                !found_item &&
-                !found_slot &&
-                InputManager.Mouse_RB_Pressed)
+            if (Handler.StoryStep != 33)
             {
-                Back();
-            }
+                if (!found_button &&
+                    !found_grid &&
+                    !found_item &&
+                    !found_slot &&
+                    InputManager.Mouse_RB_Pressed)
+                {
+                    Back();
+                }
 
-            if (InputManager.KeyPressed("Esc"))
-            {
-                Back();
+                if (InputManager.KeyPressed("Esc"))
+                {
+                    Back();
+                }
             }
         }
 
         private bool HoveringButton()
         {
+            if (Handler.StoryStep == 33)
+            {
+                return false;
+            }
+
             bool found = false;
 
             foreach (Button button in Buttons)
@@ -340,8 +347,6 @@ namespace DoS1.Menus
                             found = false;
                             attachment = false;
 
-                            starting_pos = item.Icon_Region.ToRectangle;
-
                             moving = true;
                             movingItem = item;
 
@@ -371,8 +376,6 @@ namespace DoS1.Menus
                             {
                                 found = false;
                                 attachment = true;
-
-                                starting_pos = item.Icon_Region.ToRectangle;
 
                                 moving = true;
                                 movingItem = item;

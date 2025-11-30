@@ -78,34 +78,34 @@ namespace DoS1.Scenes
                     (Handler.StoryStep >= 45 && Handler.StoryStep <= 48) ||
                     Handler.StoryStep == 55)
                 {
-                    GameUtil.Alert_Story(Menu);
+                    StoryUtil.Alert_Story(Menu);
                 }
 
-                if (Handler.MovingGrid)
+                if (Handler.StoryStep <= 0 ||
+                    Handler.StoryStep == 5 ||
+                    Handler.StoryStep == 9 ||
+                    Handler.StoryStep == 10 ||
+                    Handler.StoryStep == 14 ||
+                    Handler.StoryStep == 20 ||
+                    Handler.StoryStep == 21 ||
+                    Handler.StoryStep == 28 ||
+                    Handler.StoryStep > 48)
                 {
-                    WorldUtil.MoveGrid(World);
+                    if (Handler.AlertType == "Story" ||
+                        Handler.AlertType == "Generic" ||
+                        string.IsNullOrEmpty(Handler.AlertType))
+                    {
+                        if (Handler.MovingGrid)
+                        {
+                            WorldUtil.MoveGrid(World);
 
-                    if (InputManager.Mouse_LB_Pressed)
-                    {
-                        Handler.MoveGridDelay = 0;
-                        Handler.MovingGrid = false;
-                    }
-                }
-                else
-                {
-                    if (Handler.StoryStep <= 0 ||
-                        Handler.StoryStep == 5 ||
-                        Handler.StoryStep == 9 ||
-                        Handler.StoryStep == 10 ||
-                        Handler.StoryStep == 14 ||
-                        Handler.StoryStep == 20 ||
-                        Handler.StoryStep == 21 ||
-                        Handler.StoryStep == 28 ||
-                        Handler.StoryStep > 48)
-                    {
-                        if (Handler.AlertType == "Story" ||
-                            Handler.AlertType == "Generic" ||
-                            string.IsNullOrEmpty(Handler.AlertType))
+                            if (InputManager.Mouse_LB_Pressed)
+                            {
+                                Handler.MoveGridDelay = 0;
+                                Handler.MovingGrid = false;
+                            }
+                        }
+                        else
                         {
                             UpdateControls(World);
                         }
@@ -330,6 +330,11 @@ namespace DoS1.Scenes
 
         private bool HoveringButton()
         {
+            if (Handler.StoryStep == 28)
+            {
+                return false;
+            }
+
             bool found = false;
 
             foreach (Button button in Menu.Buttons)

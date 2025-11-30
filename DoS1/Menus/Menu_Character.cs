@@ -68,7 +68,7 @@ namespace DoS1.Menus
                     Handler.StoryStep == 17 ||
                     (Handler.StoryStep >= 30 && Handler.StoryStep <= 32))
                 {
-                    GameUtil.Alert_Story(this);
+                    StoryUtil.Alert_Story(this);
                 }
 
                 base.Update(gameRef, content);
@@ -237,64 +237,70 @@ namespace DoS1.Menus
                 ResizeInventory();
             }
 
-            if (!found_helm &&
-                !found_armor &&
-                !found_shield &&
-                !found_weapon &&
-                !found_button &&
-                !found_stat &&
-                !found_grid &&
-                !found_item &&
-                InputManager.Mouse_RB_Pressed)
+            if (Handler.StoryStep != 16 &&
+                (Handler.StoryStep < 30 || Handler.StoryStep > 32))
             {
-                Back();
-            }
+                if (!found_helm &&
+                    !found_armor &&
+                    !found_shield &&
+                    !found_weapon &&
+                    !found_button &&
+                    !found_stat &&
+                    !found_grid &&
+                    !found_item &&
+                    InputManager.Mouse_RB_Pressed)
+                {
+                    Back();
+                }
 
-            if (InputManager.KeyPressed("Esc"))
-            {
-                Back();
+                if (InputManager.KeyPressed("Esc"))
+                {
+                    Back();
+                }
             }
         }
 
         private bool HoveringButton()
         {
+            if (Handler.StoryStep == 16)
+            {
+                return false;
+            }
+
             bool found = false;
 
-            if (Handler.StoryStep != 16)
+            foreach (Button button in Buttons)
             {
-                foreach (Button button in Buttons)
+                if (button.Visible &&
+                    button.Enabled)
                 {
-                    if (button.Visible &&
-                        button.Enabled)
+                    if (InputManager.MouseWithin(button.Region.ToRectangle))
                     {
-                        if (InputManager.MouseWithin(button.Region.ToRectangle))
+                        found = true;
+
+                        if (button.HoverText != null)
                         {
-                            found = true;
-
-                            if (button.HoverText != null)
-                            {
-                                GameUtil.Examine(this, button.HoverText);
-                            }
-
-                            button.Opacity = 1;
-                            button.Selected = true;
-
-                            if (InputManager.Mouse_LB_Pressed)
-                            {
-                                found = false;
-                                CheckClick(button);
-
-                                button.Opacity = 0.8f;
-                                button.Selected = false;
-
-                                break;
-                            }
+                            GameUtil.Examine(this, button.HoverText);
                         }
-                        else if (InputManager.Mouse.Moved)
+
+                        button.Opacity = 1;
+                        button.Selected = true;
+
+                        if (InputManager.Mouse_LB_Pressed)
                         {
+                            found = false;
+                            CheckClick(button);
+
                             button.Opacity = 0.8f;
                             button.Selected = false;
+
+                            break;
                         }
+                    }
+                    else if (InputManager.Mouse.Moved)
+                    {
+                        button.Opacity = 0.8f;
+                        button.Selected = false;
                     }
                 }
             }

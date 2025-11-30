@@ -115,7 +115,7 @@ namespace DoS1.Scenes
                 if ((Handler.StoryStep >= 38 && Handler.StoryStep <= 44) ||
                     (Handler.StoryStep >= 50 && Handler.StoryStep <= 54))
                 {
-                    GameUtil.Alert_Story(Menu);
+                    StoryUtil.Alert_Story(Menu);
                 }
             }
         }
