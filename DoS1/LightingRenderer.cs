@@ -43,7 +43,10 @@ namespace DoS1
             {
                 sceneType = "Localmap";
                 scene = SceneManager.GetScene(sceneType);
-                map = scene.World.Maps[Handler.Level];
+                if (scene.World.Maps.Count > 0)
+                {
+                    map = scene.World.Maps[Handler.Level];
+                }
             }
             else if (scene.World.Maps.Count > 0)
             {

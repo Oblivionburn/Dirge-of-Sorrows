@@ -75,8 +75,7 @@ namespace DoS1.Scenes
 
                         SoundManager.MusicLooping = true;
                         SoundManager.NeedMusic = true;
-                        SoundManager.AmbientFade = 1;
-
+                        
                         CryptoRandom random = new CryptoRandom();
                         int weather = random.Next(0, 3);
                         if (weather == 0)

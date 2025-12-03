@@ -239,15 +239,6 @@ namespace DoS1.Menus
 
             if (Handler.StoryStep != 33)
             {
-                if (!found_button &&
-                    !found_grid &&
-                    !found_item &&
-                    !found_slot &&
-                    InputManager.Mouse_RB_Pressed)
-                {
-                    Back();
-                }
-
                 if (InputManager.KeyPressed("Esc"))
                 {
                     Back();

@@ -98,8 +98,13 @@ namespace DoS1.Scenes
 
         private void UpdateControls(World world)
         {
+            bool hovering_location = false;
+
             Map map = WorldUtil.GetMap(world);
-            bool hovering_location = HoveringLocation(map);
+            if (map != null)
+            {
+                hovering_location = HoveringLocation(map);
+            }
 
             if (!hovering_location)
             {
@@ -170,6 +175,7 @@ namespace DoS1.Scenes
             Handler.Level = location_num;
 
             Army enemies = CharacterManager.GetArmy("Enemy");
+            Army allies = CharacterManager.GetArmy("Ally");
 
             Layer ground = map.GetLayer("Ground");
             Tile ground_tile = ground.GetTile(new Vector2(tile.Location.X, tile.Location.Y));
@@ -235,11 +241,11 @@ namespace DoS1.Scenes
                 if (ground_tile.Type.Contains("Snow") ||
                     ground_tile.Type.Contains("Ice"))
                 {
-                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Snow };
+                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Snow, WeatherType.Fog };
                 }
                 else if (!ground_tile.Type.Contains("Desert"))
                 {
-                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm };
+                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm, WeatherType.Fog };
                 }
 
                 Handler.LocalMap = true;
@@ -247,6 +253,7 @@ namespace DoS1.Scenes
                 Menu ui = MenuManager.GetMenu("UI");
                 ui.GetButton("PlayPause").Enabled = true;
                 ui.GetButton("Speed").Enabled = true;
+                ui.GetLabel("Level").Text = "Level " + (Handler.Level + 1);
 
                 //Set "Return to Worldmap" button
                 Button worldMap = ui.GetButton("Worldmap");
@@ -262,24 +269,20 @@ namespace DoS1.Scenes
                     worldMap.Enabled = false;
                 }
 
-                //Set starting squad at ally base
-                Army allies = CharacterManager.GetArmy("Ally");
-                Squad ally_squad = allies.Squads[0];
-                WorldUtil.AllyToken_Start(ally_squad, localmap);
-
                 if (tile.Type == "Base_Enemy")
                 {
                     Handler.RevisitMap = false;
 
-                    //Set enemies at enemy base
-                    foreach (Squad enemy_squad in enemies.Squads)
-                    {
-                        WorldUtil.EnemyToken_Start(enemy_squad, localmap);
-                    }
+                    //Deploy all squads at bases
+                    ArmyUtil.DeployArmy(enemies, localmap, "Enemy");
+                    ArmyUtil.DeployArmy(allies, localmap, "Ally");
                 }
                 else
                 {
                     Handler.RevisitMap = true;
+
+                    //Deploy just hero squad at ally base
+                    ArmyUtil.DeploySquad(allies.Squads[0].ID);
                 }
 
                 if (Handler.StoryStep == 0)
@@ -288,12 +291,8 @@ namespace DoS1.Scenes
                     Handler.StoryStep++;
                 }
 
-                Active = false;
-
                 //Switch to local map
-                Scene localmapScene = SceneManager.GetScene("Localmap");
-                SceneManager.ChangeScene(localmapScene);
-                localmapScene.Active = true;
+                SceneManager.ChangeScene("Localmap");
 
                 WorldUtil.Resize_OnStart(Menu, localmap);
 

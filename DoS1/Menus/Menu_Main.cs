@@ -210,7 +210,6 @@ namespace DoS1.Menus
         public override void Close()
         {
             TimeManager.Paused = false;
-            SoundManager.AmbientPaused = false;
 
             if (Handler.Combat)
             {

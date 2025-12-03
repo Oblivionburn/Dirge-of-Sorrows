@@ -11,8 +11,6 @@ using OP_Engine.Controls;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
 using OP_Engine.Time;
-using OP_Engine.Scenes;
-using OP_Engine.Tiles;
 using OP_Engine.Sounds;
 
 using DoS1.Util;
@@ -323,7 +321,6 @@ namespace DoS1.Menus
         {
             SelectedSquad = 0;
             TimeManager.Paused = false;
-            SoundManager.AmbientPaused = false;
 
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();

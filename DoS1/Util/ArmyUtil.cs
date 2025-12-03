@@ -157,12 +157,12 @@ namespace DoS1.Util
                     }
                 }
 
-                Gen_EnemySquad(enemy_squad, map_level + 1, -1, -1, -1, -1);
+                Gen_EnemySquad(army, enemy_squad, map_level + 1, -1, -1, -1, -1);
                 army.Squads.Add(enemy_squad);
             }
         }
 
-        public static void Gen_EnemySquad(Squad squad, int map_level, int chars_override, int class_type_override, int min_tier_override, int max_tier_override)
+        public static void Gen_EnemySquad(Army army, Squad squad, int map_level, int chars_override, int class_type_override, int min_tier_override, int max_tier_override)
         {
             int min_chars = 1;
             if (map_level >= 2 && map_level < 10)
@@ -245,6 +245,17 @@ namespace DoS1.Util
 
                 Character character = CharacterUtil.NewCharacter_Random(formation, true, random.Next(0, 2));
 
+                //Max is always 10 once we reach level 15+
+                int max_tier = (int)Math.Ceiling(map_level / 1.5);
+                if (max_tier_override != -1)
+                {
+                    max_tier = max_tier_override;
+                }
+                if (max_tier > 10)
+                {
+                    max_tier = 10;
+                }
+
                 //Highest min value is 8 at level 20
                 int min_tier = (int)Math.Ceiling(map_level / 2.5);
                 if (min_tier_override != -1)
@@ -252,16 +263,10 @@ namespace DoS1.Util
                     min_tier = min_tier_override;
                 }
 
-                //Max is always 10 once we reach level 15+
-                int max_tier = (int)Math.Ceiling(map_level / 1.5);
-                if (max_tier_override != -1)
+                //Set min to max tier if first/boss squad 
+                if (army.Squads.Count == 0)
                 {
-                    max_tier = max_tier_override;
-                }
-
-                if (max_tier > 10)
-                {
-                    max_tier = 10;
+                    min_tier = max_tier;
                 }
 
                 random = new CryptoRandom();
@@ -676,8 +681,6 @@ namespace DoS1.Util
                     #endregion
                 }
 
-                random = new CryptoRandom();
-
                 Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
                 Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
                 Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
@@ -687,9 +690,9 @@ namespace DoS1.Util
                 {
                     #region Warrior Runes
 
-                    //Max of 4 runes at level 15+, min of 1 at level 10+
+                    //Max of 2 runes at level 15+, min of 1 at level 10+
                     random = new CryptoRandom();
-                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
+                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 4);
                     InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
@@ -702,12 +705,12 @@ namespace DoS1.Util
                     if (shield != null)
                     {
                         random = new CryptoRandom();
-                        runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
+                        runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 4);
                         InventoryUtil.AddRunes(shield, runes_amount);
                     }
 
                     random = new CryptoRandom();
-                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 7) / 4);
+                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 4);
                     InventoryUtil.AddRunes(weapon, runes_amount);
 
                     #endregion
@@ -716,9 +719,9 @@ namespace DoS1.Util
                 {
                     #region Ranger Runes
 
-                    //Max of 6 runes at level 15+, min of 1 at level 8+
+                    //Max of 3 runes at level 15+, min of 1 at level 8+
                     random = new CryptoRandom();
-                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 9) / 3);
+                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 3);
                     InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
@@ -729,7 +732,7 @@ namespace DoS1.Util
                     }
 
                     random = new CryptoRandom();
-                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 9) / 3);
+                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 3);
                     InventoryUtil.AddRunes(weapon, runes_amount);
 
                     #endregion
@@ -738,15 +741,15 @@ namespace DoS1.Util
                 {
                     #region Mage Runes
 
-                    //Max of 8 runes at level 15+, min of 1 at level 5+
+                    //Max of 4 runes at level 15+, min of 1 at level 5+
                     random = new CryptoRandom();
-                    int runes_amount = random.Next(min_tier, max_tier + 7) / 2;
+                    int runes_amount = random.Next(min_tier, max_tier) / 2;
                     InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
                         random = new CryptoRandom();
-                        runes_amount = random.Next(0, max_tier + 7) / 2;
+                        runes_amount = random.Next(0, max_tier) / 2;
                         InventoryUtil.AddRunes(helm, runes_amount);
                     }
 
@@ -1024,68 +1027,71 @@ namespace DoS1.Util
                 }
 
                 squad.Path = Handler.Pathing.Get_Path(ground, roads, squad, destination, ground.Columns * ground.Rows, false);
-                if (squad.Path.Any())
+                if (squad.Path != null)
                 {
-                    squad.Path.Reverse();
-
-                    if (remaining != null)
+                    if (squad.Path.Any())
                     {
-                        if (remaining.X == squad.Path[1].X &&
-                            remaining.Y == squad.Path[1].Y &&
-                            squad.Moved > 0)
+                        squad.Path.Reverse();
+
+                        if (remaining != null)
                         {
-                            //Exclude starting location if already moving to next location
+                            if (remaining.X == squad.Path[1].X &&
+                                remaining.Y == squad.Path[1].Y &&
+                                squad.Moved > 0)
+                            {
+                                //Exclude starting location if already moving to next location
+                                squad.Path.RemoveAt(0);
+                            }
+                            else
+                            {
+                                //Reverse direction towards new starting location
+                                squad.Location = new Location(remaining.X, remaining.Y, 0);
+                                squad.Moved = squad.Move_TotalDistance - squad.Moved;
+                            }
+                        }
+
+                        ALocation start = squad.Path[0];
+                        Tile start_tile = ground.GetTile(new Vector2(start.X, start.Y));
+
+                        if (squad.Region.X == start_tile.Region.X &&
+                            squad.Region.Y == start_tile.Region.Y)
+                        {
+                            //Exclude starting location if already there
                             squad.Path.RemoveAt(0);
+                            squad.Moved = 0;
                         }
-                        else
+
+                        bool enemy_targeted = false;
+                        Army enemy_army = CharacterManager.GetArmy("Enemy");
+                        foreach (Squad enemy_squad in enemy_army.Squads)
                         {
-                            //Reverse direction towards new starting location
-                            squad.Location = new Location(remaining.X, remaining.Y, 0);
-                            squad.Moved = squad.Move_TotalDistance - squad.Moved;
+                            if ((destination.Location.X == enemy_squad.Location.X &&
+                                 destination.Location.Y == enemy_squad.Location.Y) ||
+                                (enemy_squad.Moving &&
+                                 destination.Location.X == enemy_squad.Destination.X &&
+                                 destination.Location.Y == enemy_squad.Destination.Y))
+                            {
+                                enemy_targeted = true;
+                                squad.GetLeader().Target_ID = enemy_squad.ID;
+                                squad.Coordinates = enemy_squad.Location;
+                                break;
+                            }
                         }
-                    }
 
-                    ALocation start = squad.Path[0];
-                    Tile start_tile = ground.GetTile(new Vector2(start.X, start.Y));
-
-                    if (squad.Region.X == start_tile.Region.X &&
-                        squad.Region.Y == start_tile.Region.Y)
-                    {
-                        //Exclude starting location if already there
-                        squad.Path.RemoveAt(0);
-                        squad.Moved = 0;
-                    }
-
-                    bool enemy_targeted = false;
-                    Army enemy_army = CharacterManager.GetArmy("Enemy");
-                    foreach (Squad enemy_squad in enemy_army.Squads)
-                    {
-                        if ((destination.Location.X == enemy_squad.Location.X &&
-                             destination.Location.Y == enemy_squad.Location.Y) ||
-                            (enemy_squad.Moving &&
-                             destination.Location.X == enemy_squad.Destination.X &&
-                             destination.Location.Y == enemy_squad.Destination.Y))
+                        if (!enemy_targeted)
                         {
-                            enemy_targeted = true;
-                            squad.GetLeader().Target_ID = enemy_squad.ID;
-                            squad.Coordinates = enemy_squad.Location;
-                            break;
+                            squad.GetLeader().Target_ID = 0;
+                            squad.Coordinates = destination.Location;
                         }
                     }
-
-                    if (!enemy_targeted)
+                    else if (remaining != null &&
+                             squad.Moved > 0)
                     {
-                        squad.GetLeader().Target_ID = 0;
-                        squad.Coordinates = destination.Location;
+                        //Reverse direction back towards current location if already moved away from it
+                        squad.Path.Insert(0, new ALocation((int)squad.Location.X, (int)squad.Location.Y));
+                        squad.Location = new Location(remaining.X, remaining.Y, 0);
+                        squad.Moved = squad.Move_TotalDistance - squad.Moved;
                     }
-                }
-                else if (remaining != null &&
-                         squad.Moved > 0)
-                {
-                    //Reverse direction back towards current location if already moved away from it
-                    squad.Path.Insert(0, new ALocation((int)squad.Location.X, (int)squad.Location.Y));
-                    squad.Location = new Location(remaining.X, remaining.Y, 0);
-                    squad.Moved = squad.Move_TotalDistance - squad.Moved;
                 }
 
                 Handler.Selected_Token = -1;
@@ -1093,8 +1099,21 @@ namespace DoS1.Util
                 menu.GetPicture("Select").Visible = false;
                 menu.GetPicture("Highlight").Visible = false;
                 menu.GetPicture("Highlight").DrawColor = new Color(255, 255, 255, 255);
+            }
+        }
 
-                pathing.Visible = false;
+        public static void DeployArmy(Army army, Map map, string type)
+        {
+            Tile armyBase = WorldUtil.Get_Base(map, type);
+            if (armyBase != null)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    squad.Location = new Location(armyBase.Location.X, armyBase.Location.Y, armyBase.Location.Z);
+                    squad.Region = new Region(armyBase.Region.X, armyBase.Region.Y, armyBase.Region.Width, armyBase.Region.Height);
+                    squad.Visible = true;
+                    squad.Active = true;
+                }
             }
         }
 
@@ -1106,7 +1125,14 @@ namespace DoS1.Util
             World world = SceneManager.GetScene("Localmap").World;
             Map map = world.Maps[Handler.Level];
 
-            WorldUtil.AllyToken_Start(squad, map);
+            Tile ally_base = WorldUtil.Get_Base(map, "Ally");
+            if (ally_base != null)
+            {
+                squad.Location = new Location(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
+                squad.Region = new Region(ally_base.Region.X, ally_base.Region.Y, ally_base.Region.Width, ally_base.Region.Height);
+                squad.Visible = true;
+                squad.Active = true;
+            }
 
             Menu armyMenu = MenuManager.GetMenu("Army");
             armyMenu.GetButton("Deploy").Enabled = false;

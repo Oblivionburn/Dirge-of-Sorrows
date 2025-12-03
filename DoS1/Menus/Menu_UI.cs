@@ -218,7 +218,6 @@ namespace DoS1.Menus
             else
             {
                 TimeManager.Paused = true;
-                SoundManager.AmbientPaused = true;
 
                 Active = false;
                 Visible = false;
@@ -412,6 +411,7 @@ namespace DoS1.Menus
                     break;
             }
 
+            AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Level", "", Color.White, new Region(0, 0, 0, 0), true);
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Debug", "Debugging", Color.White, new Region(0, 0, 0, 0), false);
 
             AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), "Date", "", Color.White, AssetManager.Textures["Frame_Small"],
@@ -443,7 +443,8 @@ namespace DoS1.Menus
 
             GetLabel("Date").Region = new Region(Main.Game.ScreenWidth - (width * 2), 0, width * 2, height / 2);
             GetLabel("Time").Region = new Region(Main.Game.ScreenWidth - (width * 2), height / 2, width * 2, height / 2);
-            GetLabel("Debug").Region = new Region(Main.Game.ScreenWidth - (width * 2), height, width * 2, height / 2);
+            GetLabel("Level").Region = new Region(Main.Game.ScreenWidth - (width * 2), height, width * 2, height / 2);
+            GetLabel("Debug").Region = new Region(Main.Game.ScreenWidth - (width * 2), height + (height / 2), width * 2, height / 2);
             GetLabel("Gold").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), 0, width * 10, height);
             GetLabel("Alert").Region = new Region((Main.Game.Resolution.X / 2) - (width * 5), height, width * 10, height);
 

@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -19,6 +11,12 @@ using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DoS1.Util
 {
@@ -88,14 +86,10 @@ namespace DoS1.Util
 
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
-            scene.Active = true;
 
             SoundManager.StopAll();
             SoundManager.NeedMusic = true;
             SoundManager.MusicLooping = false;
-            SoundManager.StopAmbient();
-            SoundManager.AmbientFade = 1;
-            SoundManager.AmbientPaused = false;
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.Visible = true;
@@ -126,14 +120,10 @@ namespace DoS1.Util
 
             Scene scene = WorldUtil.GetScene();
             SceneManager.ChangeScene(scene);
-            scene.Active = true;
 
             SoundManager.StopAll();
             SoundManager.NeedMusic = true;
             SoundManager.MusicLooping = false;
-            SoundManager.StopAmbient();
-            SoundManager.AmbientFade = 1;
-            SoundManager.AmbientPaused = false;
 
             Menu ui = MenuManager.GetMenu("UI");
             ui.Visible = true;
@@ -155,11 +145,11 @@ namespace DoS1.Util
                 if (map.Type.Contains("Snow") ||
                     map.Type.Contains("Ice"))
                 {
-                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Snow };
+                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Snow, WeatherType.Fog };
                 }
                 else if (!map.Type.Contains("Desert"))
                 {
-                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm };
+                    TimeManager.WeatherOptions = new WeatherType[] { WeatherType.Clear, WeatherType.Rain, WeatherType.Storm, WeatherType.Fog };
                 }
 
                 //Set "Return to Worldmap" button
@@ -205,9 +195,6 @@ namespace DoS1.Util
             SoundManager.StopAll();
             SoundManager.NeedMusic = true;
             SoundManager.MusicLooping = true;
-            SoundManager.StopAmbient();
-            SoundManager.AmbientFade = 1;
-            SoundManager.AmbientPaused = false;
 
             CryptoRandom random = new CryptoRandom();
             int weather_choice = random.Next(0, 3);
@@ -227,7 +214,6 @@ namespace DoS1.Util
 
         public static void ReturnToWorldmap()
         {
-            SoundManager.AmbientFade = 1;
             SoundManager.StopAmbient();
 
             foreach (Weather weather in WeatherManager.Weathers)
@@ -250,6 +236,7 @@ namespace DoS1.Util
             Menu ui = MenuManager.GetMenu("UI");
             ui.GetButton("Worldmap").Visible = false;
             ui.GetButton("PlayPause").Enabled = false;
+            ui.GetLabel("Level").Text = "";
 
             if (!Handler.RevisitMap)
             {
@@ -283,12 +270,7 @@ namespace DoS1.Util
             Menu main = MenuManager.GetMenu("Main");
             main.GetButton("Save").Visible = true;
 
-            Scene localmap = SceneManager.GetScene("Localmap");
-            localmap.Active = false;
-
-            Scene worldmap = SceneManager.GetScene("Worldmap");
-            SceneManager.ChangeScene(worldmap);
-            worldmap.Active = true;
+            SceneManager.ChangeScene("Worldmap");
 
             SoundManager.StopMusic();
             SoundManager.NeedMusic = true;
@@ -296,7 +278,6 @@ namespace DoS1.Util
 
         public static void RetreatToWorldmap()
         {
-            SoundManager.AmbientFade = 1;
             SoundManager.StopAmbient();
 
             foreach (Weather weather in WeatherManager.Weathers)
@@ -319,6 +300,7 @@ namespace DoS1.Util
             Menu ui = MenuManager.GetMenu("UI");
             ui.GetButton("Worldmap").Visible = false;
             ui.GetButton("PlayPause").Enabled = false;
+            ui.GetLabel("Level").Text = "";
 
             Army enemy_army = CharacterManager.GetArmy("Enemy");
             foreach (Squad squad in enemy_army.Squads)
@@ -611,7 +593,7 @@ namespace DoS1.Util
             }
 
             texture.SetData(colors);
-            texture.Name = texture.Name;
+            texture.Name = original.Name;
 
             return texture;
         }
@@ -667,7 +649,6 @@ namespace DoS1.Util
         public static void Alert_Combat(Squad attacker, Squad defender)
         {
             Handler.LocalPause = true;
-            SoundManager.AmbientPaused = true;
 
             Menu ui = MenuManager.GetMenu("UI");
 
@@ -1076,7 +1057,6 @@ namespace DoS1.Util
         public static void LocalPause()
         {
             Handler.LocalPause = true;
-            SoundManager.AmbientPaused = true;
 
             Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
             button.HoverText = "Play";
@@ -1089,7 +1069,6 @@ namespace DoS1.Util
         {
             Handler.Retreating = false;
             Handler.LocalPause = false;
-            SoundManager.AmbientPaused = false;
 
             Button button = MenuManager.GetMenu("UI").GetButton("PlayPause");
             button.HoverText = "Pause";
@@ -1127,9 +1106,7 @@ namespace DoS1.Util
         public static void CombatPause()
         {
             Handler.CombatTimer.Stop();
-
             Handler.CombatPause = true;
-            SoundManager.AmbientPaused = true;
 
             Button button = SceneManager.GetScene("Combat").Menu.GetButton("PlayPause");
             button.HoverText = "Play";
@@ -1141,9 +1118,7 @@ namespace DoS1.Util
         public static void CombatUnpause()
         {
             Handler.CombatTimer.Start();
-
             Handler.CombatPause = false;
-            SoundManager.AmbientPaused = false;
 
             Button button = SceneManager.GetScene("Combat").Menu.GetButton("PlayPause");
             button.HoverText = "Pause";

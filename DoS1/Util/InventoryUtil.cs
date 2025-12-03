@@ -58,7 +58,7 @@ namespace DoS1.Util
 
             string category = "Cloth";
             properties.Add(NewProperty("Physical", "Defense", 5, 0));
-            properties.Add(NewProperty("Rune", "Slots", 8, 0));
+            properties.Add(NewProperty("Rune", "Slots", 4, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Cloth", properties);
             item.Buy_Price = 50;
@@ -69,7 +69,7 @@ namespace DoS1.Util
 
             category = "Leather";
             properties[0].Value = 10;
-            properties[1].Value = 4;
+            properties[1].Value = 3;
             properties[2].Value = 2;
             item = NewItem(type, category, "Leather", properties);
             item.Buy_Price = 100;
@@ -91,7 +91,7 @@ namespace DoS1.Util
 
             properties[0].Value = 20;
             properties[1].Value = 2;
-            properties[2].Value = 4;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 200;
             assets.Items.Add(item);
@@ -101,7 +101,7 @@ namespace DoS1.Util
 
             properties[0].Value = 25;
             properties[1].Value = 2;
-            properties[2].Value = 5;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 250;
             assets.Items.Add(item);
@@ -111,7 +111,7 @@ namespace DoS1.Util
 
             properties[0].Value = 30;
             properties[1].Value = 2;
-            properties[2].Value = 6;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 300;
             assets.Items.Add(item);
@@ -121,8 +121,8 @@ namespace DoS1.Util
 
             category = "Platemail";
             properties[0].Value = 35;
-            properties[1].Value = 0;
-            properties[2].Value = 7;
+            properties[1].Value = 1;
+            properties[2].Value = 4;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 350;
             assets.Items.Add(item);
@@ -131,8 +131,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 40;
-            properties[1].Value = 0;
-            properties[2].Value = 8;
+            properties[1].Value = 1;
+            properties[2].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 400;
             assets.Items.Add(item);
@@ -141,8 +141,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 45;
-            properties[1].Value = 0;
-            properties[2].Value = 9;
+            properties[1].Value = 1;
+            properties[2].Value = 4;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 450;
             assets.Items.Add(item);
@@ -151,8 +151,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 50;
-            properties[1].Value = 0;
-            properties[2].Value = 10;
+            properties[1].Value = 1;
+            properties[2].Value = 4;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 500;
             assets.Items.Add(item);
@@ -171,7 +171,7 @@ namespace DoS1.Util
 
             string category = "Cloth";
             properties.Add(NewProperty("Physical", "Defense", 1, 0));
-            properties.Add(NewProperty("Rune", "Slots", 8, 0));
+            properties.Add(NewProperty("Rune", "Slots", 2, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Cloth", properties);
             item.Buy_Price = 10;
@@ -182,7 +182,7 @@ namespace DoS1.Util
 
             category = "Leather";
             properties[0].Value = 2;
-            properties[1].Value = 4;
+            properties[1].Value = 2;
             properties[2].Value = 1;
             item = NewItem(type, category, "Leather", properties);
             item.Buy_Price = 20;
@@ -193,7 +193,7 @@ namespace DoS1.Util
 
             category = "Chainmail";
             properties[0].Value = 3;
-            properties[1].Value = 2;
+            properties[1].Value = 1;
             properties[2].Value = 2;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 30;
@@ -203,7 +203,7 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 4;
-            properties[1].Value = 2;
+            properties[1].Value = 1;
             properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 40;
@@ -213,8 +213,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 5;
-            properties[1].Value = 2;
-            properties[2].Value = 3;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 50;
             assets.Items.Add(item);
@@ -223,8 +223,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 6;
-            properties[1].Value = 2;
-            properties[2].Value = 3;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 60;
             assets.Items.Add(item);
@@ -235,7 +235,7 @@ namespace DoS1.Util
             category = "Platemail";
             properties[0].Value = 7;
             properties[1].Value = 0;
-            properties[2].Value = 4;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 70;
             assets.Items.Add(item);
@@ -245,7 +245,7 @@ namespace DoS1.Util
 
             properties[0].Value = 8;
             properties[1].Value = 0;
-            properties[2].Value = 4;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 80;
             assets.Items.Add(item);
@@ -255,7 +255,7 @@ namespace DoS1.Util
 
             properties[0].Value = 9;
             properties[1].Value = 0;
-            properties[2].Value = 5;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 90;
             assets.Items.Add(item);
@@ -265,7 +265,7 @@ namespace DoS1.Util
 
             properties[0].Value = 10;
             properties[1].Value = 0;
-            properties[2].Value = 5;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 100;
             assets.Items.Add(item);
@@ -284,6 +284,7 @@ namespace DoS1.Util
 
             string category = "Round";
             properties.Add(NewProperty("Physical", "Defense", 3, 0));
+            properties.Add(NewProperty("Rune", "Slots", 2, 0));
             properties.Add(NewProperty("EP", "Cost", 1, 0));
             Item item = NewItem(type, category, "Wood", properties);
             item.Buy_Price = 20;
@@ -293,7 +294,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 6;
-            properties[1].Value = 1;
+            properties[1].Value = 2;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 40;
             assets.Items.Add(item);
@@ -303,6 +305,7 @@ namespace DoS1.Util
 
             properties[0].Value = 9;
             properties[1].Value = 2;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 60;
             assets.Items.Add(item);
@@ -312,6 +315,7 @@ namespace DoS1.Util
 
             properties[0].Value = 12;
             properties[1].Value = 2;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 80;
             assets.Items.Add(item);
@@ -320,7 +324,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 15;
-            properties[1].Value = 3;
+            properties[1].Value = 2;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 100;
             assets.Items.Add(item);
@@ -330,7 +335,8 @@ namespace DoS1.Util
 
             category = "Kite";
             properties[0].Value = 18;
-            properties[1].Value = 3;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Wood", properties);
             item.Buy_Price = 120;
             item.Sell_Price = 120;
@@ -340,7 +346,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 21;
-            properties[1].Value = 4;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Iron", properties);
             item.Buy_Price = 140;
             item.Sell_Price = 140;
@@ -350,7 +357,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 24;
-            properties[1].Value = 4;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 160;
             item.Sell_Price = 160;
@@ -360,7 +368,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 27;
-            properties[1].Value = 5;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 180;
             item.Sell_Price = 180;
@@ -370,7 +379,8 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 30;
-            properties[1].Value = 5;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 200;
             item.Sell_Price = 200;
@@ -399,7 +409,7 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 60;
-            properties[1].Value = 5;
+            properties[1].Value = 4;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 200;
             assets.Items.Add(item);
@@ -408,7 +418,7 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 90;
-            properties[1].Value = 6;
+            properties[1].Value = 4;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 300;
             assets.Items.Add(item);
@@ -417,7 +427,7 @@ namespace DoS1.Util
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
             properties[0].Value = 120;
-            properties[1].Value = 7;
+            properties[1].Value = 4;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 400;
             assets.Items.Add(item);
@@ -447,7 +457,7 @@ namespace DoS1.Util
 
             properties[0].Value = 40;
             properties[1].Value = 3;
-            properties[2].Value = 2;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 250;
             assets.Items.Add(item);
@@ -457,7 +467,7 @@ namespace DoS1.Util
 
             properties[0].Value = 60;
             properties[1].Value = 3;
-            properties[2].Value = 3;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 375;
             assets.Items.Add(item);
@@ -467,7 +477,7 @@ namespace DoS1.Util
 
             properties[0].Value = 80;
             properties[1].Value = 3;
-            properties[2].Value = 4;
+            properties[2].Value = 1;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 500;
             assets.Items.Add(item);
@@ -497,7 +507,7 @@ namespace DoS1.Util
 
             properties[0].Value = 50;
             properties[1].Value = 2;
-            properties[2].Value = 3;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Copper", properties);
             item.Buy_Price = 300;
             assets.Items.Add(item);
@@ -507,7 +517,7 @@ namespace DoS1.Util
 
             properties[0].Value = 75;
             properties[1].Value = 2;
-            properties[2].Value = 4;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Bronze", properties);
             item.Buy_Price = 450;
             assets.Items.Add(item);
@@ -517,7 +527,7 @@ namespace DoS1.Util
 
             properties[0].Value = 100;
             properties[1].Value = 2;
-            properties[2].Value = 5;
+            properties[2].Value = 2;
             item = NewItem(type, category, "Steel", properties);
             item.Buy_Price = 600;
             assets.Items.Add(item);
@@ -547,7 +557,7 @@ namespace DoS1.Util
 
             properties[0].Value = 45;
             properties[1].Value = 1;
-            properties[2].Value = 4;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Cedar", properties);
             item.Buy_Price = 350;
             assets.Items.Add(item);
@@ -557,7 +567,7 @@ namespace DoS1.Util
 
             properties[0].Value = 70;
             properties[1].Value = 1;
-            properties[2].Value = 5;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Oak", properties);
             item.Buy_Price = 525;
             assets.Items.Add(item);
@@ -567,7 +577,7 @@ namespace DoS1.Util
 
             properties[0].Value = 95;
             properties[1].Value = 1;
-            properties[2].Value = 6;
+            properties[2].Value = 3;
             item = NewItem(type, category, "Ebony", properties);
             item.Buy_Price = 700;
             assets.Items.Add(item);
@@ -729,14 +739,16 @@ namespace DoS1.Util
 
         public static Item NewItem(string type, string category, string material, List<Something> properties)
         {
-            Item item = new Item();
-            item.ID = Handler.GetID();
-            item.Type = type;
+            Item item = new Item
+            {
+                ID = Handler.GetID(),
+                Type = type,
+                Location = new Location(),
+                Icon_Region = new Region(),
+                Attachments = new List<Item>()
+            };
             item.Materials.Add(material);
             item.Categories.Add(category);
-            item.Location = new Location();
-            item.Icon_Region = new Region();
-            item.Attachments = new List<Item>();
 
             if (material == category)
             {
@@ -762,14 +774,18 @@ namespace DoS1.Util
 
             foreach (Something existing in properties)
             {
-                Something something = new Something();
-                something.ID = existing.ID;
-                something.Name = existing.Name;
-                something.Type = existing.Type;
-                something.Value = existing.Value;
-                something.Max_Value = existing.Max_Value;
-                something.Rate = existing.Rate;
-                item.Properties.Add(something);
+                if (existing.Value > 0)
+                {
+                    item.Properties.Add(new Something
+                    {
+                        ID = existing.ID,
+                        Name = existing.Name,
+                        Type = existing.Type,
+                        Value = existing.Value,
+                        Max_Value = existing.Max_Value,
+                        Rate = existing.Rate
+                    });
+                }
             }
 
             RuneUtil.UpdateRune_Description(item);
@@ -1739,111 +1755,114 @@ namespace DoS1.Util
             return spell;
         }
 
-        public static void AddRunes(Item item, int amount)
+        public static void AddRune(Item item, string type)
         {
-            CryptoRandom random;
-
             Inventory assets = InventoryManager.GetInventory("Assets");
             if (assets != null)
             {
-                Something slots = item.GetProperty("Rune Slots");
-                if (slots != null)
+                Item rune = CopyItem(assets.GetItem(type), true);
+                rune.Location = new Location(item.Attachments.Count, 0, 0);
+                rune.Icon_Visible = true;
+
+                Something rp = rune.GetProperty("RP Value");
+                Something level = rune.GetProperty("Level Value");
+
+                int minLevel = (int)(((float)Handler.Level / 2) / 2);
+                int maxLevel = (Handler.Level / 2) + 1;
+
+                CryptoRandom random = new CryptoRandom();
+                level.Value = random.Next(minLevel, maxLevel + 1);
+                if (level.Value >= level.Max_Value)
                 {
-                    if (amount > slots.Value)
-                    {
-                        amount = (int)slots.Value;
-                    }
+                    rp.Value = rp.Max_Value;
+                }
 
-                    for (int i = 0; i < amount; i++)
+                RuneUtil.UpdateRune_Description(rune);
+
+                item.Attachments.Add(rune);
+                UpdateItem(item);
+            }
+        }
+
+        public static void AddRunes(Item item, int amount)
+        {
+            Something slots = item.GetProperty("Rune Slots");
+            if (slots != null)
+            {
+                if (amount > slots.Value)
+                {
+                    amount = (int)slots.Value;
+                }
+
+                for (int i = 0; i < amount; i++)
+                {
+                    bool rune_chance = Utility.RandomPercent(Handler.Level * 5);
+                    if (rune_chance)
                     {
-                        bool rune_chance = Utility.RandomPercent(Handler.Level * 5);
-                        if (rune_chance)
+                        string rune_type = "";
+
+                        CryptoRandom random = new CryptoRandom();
+                        int rune_choice = random.Next(0, 14);
+                        switch (rune_choice)
                         {
-                            string rune_type = "";
+                            case 0:
+                                rune_type = "Area Rune";
+                                break;
 
-                            random = new CryptoRandom();
-                            int rune_choice = random.Next(0, 14);
-                            switch (rune_choice)
-                            {
-                                case 0:
-                                    rune_type = "Area Rune";
-                                    break;
+                            case 1:
+                                rune_type = "Death Rune";
+                                break;
 
-                                case 1:
-                                    rune_type = "Death Rune";
-                                    break;
+                            case 2:
+                                rune_type = "Time Rune";
+                                break;
 
-                                case 2:
-                                    rune_type = "Time Rune";
-                                    break;
+                            case 3:
+                                rune_type = "Drain Rune";
+                                break;
 
-                                case 3:
-                                    rune_type = "Drain Rune";
-                                    break;
+                            case 4:
+                                rune_type = "Health Rune";
+                                break;
 
-                                case 4:
-                                    rune_type = "Health Rune";
-                                    break;
+                            case 5:
+                                rune_type = "Earth Rune";
+                                break;
 
-                                case 5:
-                                    rune_type = "Earth Rune";
-                                    break;
+                            case 6:
+                                rune_type = "Ice Rune";
+                                break;
 
-                                case 6:
-                                    rune_type = "Ice Rune";
-                                    break;
+                            case 7:
+                                rune_type = "Physical Rune";
+                                break;
 
-                                case 7:
-                                    rune_type = "Physical Rune";
-                                    break;
+                            case 8:
+                                rune_type = "Lightning Rune";
+                                break;
 
-                                case 8:
-                                    rune_type = "Lightning Rune";
-                                    break;
+                            case 9:
+                                rune_type = "Fire Rune";
+                                break;
 
-                                case 9:
-                                    rune_type = "Fire Rune";
-                                    break;
+                            case 10:
+                                rune_type = "Energy Rune";
+                                break;
 
-                                case 10:
-                                    rune_type = "Energy Rune";
-                                    break;
+                            case 11:
+                                rune_type = "Effect Rune";
+                                break;
 
-                                case 11:
-                                    rune_type = "Effect Rune";
-                                    break;
+                            case 12:
+                                rune_type = "Counter Rune";
+                                break;
 
-                                case 12:
-                                    rune_type = "Counter Rune";
-                                    break;
-
-                                case 13:
-                                    rune_type = "Disarm Rune";
-                                    break;
-                            }
-
-                            Item rune = CopyItem(assets.GetItem(rune_type), true);
-                            rune.Location = new Location(item.Attachments.Count, 0, 0);
-                            rune.Icon_Visible = true;
-
-                            Something rp = rune.GetProperty("RP Value");
-                            Something level = rune.GetProperty("Level Value");
-
-                            int minLevel = 1;
-                            int maxLevel = (Handler.Level / 2) + 1;
-
-                            random = new CryptoRandom();
-                            level.Value = random.Next(minLevel, maxLevel + 1);
-                            if (level.Value >= level.Max_Value)
-                            {
-                                rp.Value = rp.Max_Value;
-                            }
-
-                            RuneUtil.UpdateRune_Description(rune);
-
-                            item.Attachments.Add(rune);
-                            UpdateItem(item);
+                            case 13:
+                                rune_type = "Disarm Rune";
+                                break;
                         }
+
+                        AddRune(item, rune_type);
                     }
                 }
             }
@@ -2759,6 +2778,11 @@ namespace DoS1.Util
                         if (ep_cost != null)
                         {
                             total += (int)ep_cost.Value;
+                        }
+
+                        foreach (Item attachment in item.Attachments)
+                        {
+                            total++;
                         }
                     }
                 }

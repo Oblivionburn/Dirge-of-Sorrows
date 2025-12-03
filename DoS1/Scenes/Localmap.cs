@@ -156,14 +156,19 @@ namespace DoS1.Scenes
                     }
                 }
 
-                foreach (Army army in CharacterManager.Armies)
+                if (CharacterManager.Armies.Count > 0)
                 {
-                    foreach (Squad squad in army.Squads)
+                    for (int a = 0; a < CharacterManager.Armies.Count; a++)
                     {
-                        if (squad.Characters.Any() &&
-                            squad.Visible)
+                        Army army = CharacterManager.Armies[a];
+                        for (int s = 0; s < army.Squads.Count; s++)
                         {
-                            squad.Draw(spriteBatch, resolution, Color.White);
+                            Squad squad = army.Squads[s];
+                            if (squad.Characters.Any() &&
+                                squad.Visible)
+                            {
+                                squad.Draw(spriteBatch, resolution, Color.White);
+                            }
                         }
                     }
                 }
@@ -227,40 +232,43 @@ namespace DoS1.Scenes
                 if (!hovering_button)
                 {
                     Map map = WorldUtil.GetMap(world);
-                    Layer pathing = map.GetLayer("Pathing");
-
-                    Handler.Hovering_Squad = HoveringSquad(world);
-                    if (Handler.Hovering_Squad == null)
+                    if (map != null)
                     {
-                        if (Handler.Selected_Token == -1 &&
-                            pathing != null)
+                        Layer pathing = map.GetLayer("Pathing");
+
+                        Handler.Hovering_Squad = HoveringSquad(world);
+                        if (Handler.Hovering_Squad == null)
                         {
-                            pathing.Visible = false;
+                            if (Handler.Selected_Token == -1 &&
+                                pathing != null)
+                            {
+                                pathing.Visible = false;
+                            }
+
+                            hovering_location = HoveringLocation(map);
+                        }
+                        else if (Handler.Hovering_Squad.Type != "Enemy" &&
+                                 (Handler.Selected_Token != -1 &&
+                                 Handler.Hovering_Squad.ID != Handler.Selected_Token))
+                        {
+                            hovering_location = HoveringLocation(map);
                         }
 
-                        hovering_location = HoveringLocation(map);
-                    }
-                    else if (Handler.Hovering_Squad.Type != "Enemy" &&
-                             (Handler.Selected_Token != -1 &&
-                             Handler.Hovering_Squad.ID != Handler.Selected_Token))
-                    {
-                        hovering_location = HoveringLocation(map);
-                    }
-
-                    if (Handler.Selected_Token != -1)
-                    {
-                        hovering_selection = HoveringSelection(world, map);
-                        if (hovering_selection)
+                        if (Handler.Selected_Token != -1)
                         {
-                            Menu.GetPicture("Select").Visible = true;
+                            hovering_selection = HoveringSelection(world, map);
+                            if (hovering_selection)
+                            {
+                                Menu.GetPicture("Select").Visible = true;
+                            }
                         }
-                    }
 
-                    if (!hovering_selection &&
-                        !hovering_location &&
-                        Handler.Hovering_Squad == null)
-                    {
-                        Menu.GetPicture("Select").Visible = false;
+                        if (!hovering_selection &&
+                            !hovering_location &&
+                            Handler.Hovering_Squad == null)
+                        {
+                            Menu.GetPicture("Select").Visible = false;
+                        }
                     }
                 }
 

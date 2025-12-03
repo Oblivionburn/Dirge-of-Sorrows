@@ -347,10 +347,6 @@ namespace DoS1.Util
                         }
                         break;
 
-                    case "AmbientFade":
-                        SoundManager.AmbientFade = float.Parse(reader.Value);
-                        break;
-
                     case "Lightning":
                         WeatherManager.Lightning = reader.Value == "True";
                         break;
@@ -443,7 +439,7 @@ namespace DoS1.Util
                         break;
 
                     case "Attachments":
-                        VisitItemAttachments(reader, item);
+                        VisitItemAttachments(reader, inventory, item);
                         break;
                 }
             }
@@ -491,7 +487,10 @@ namespace DoS1.Util
 
                     case "Texture":
                         item.Texture = Handler.GetTexture(reader.Value);
-                        item.Image = new Rectangle(0, 0, item.Texture.Width / 4, item.Texture.Height);
+                        if (item.Texture != null)
+                        {
+                            item.Image = new Rectangle(0, 0, item.Texture.Width / 4, item.Texture.Height);
+                        }
                         break;
 
                     case "DrawColor":
@@ -605,7 +604,7 @@ namespace DoS1.Util
             }
         }
 
-        private static void VisitItemAttachments(XmlTextReader reader, Item item)
+        private static void VisitItemAttachments(XmlTextReader reader, Inventory inventory, Item item)
         {
             while (reader.Read())
             {
@@ -615,13 +614,13 @@ namespace DoS1.Util
                 switch (reader.Name)
                 {
                     case "Attachment":
-                        VisitItemAttachment(reader, item);
+                        VisitItemAttachment(reader, inventory, item);
                         break;
                 }
             }
         }
 
-        private static void VisitItemAttachment(XmlTextReader reader, Item item)
+        private static void VisitItemAttachment(XmlTextReader reader, Inventory inventory, Item item)
         {
             Item attachment = null;
 
@@ -635,7 +634,27 @@ namespace DoS1.Util
                     case "AttachmentProperties":
                         attachment = new Item();
                         VisitItemProperties(reader, attachment);
-                        item.Attachments.Add(attachment);
+
+                        bool canAttach = true;
+
+                        Something runeSlots = item.GetProperty("Rune Slots");
+                        if (runeSlots != null)
+                        {
+                            if (item.Attachments.Count >= runeSlots.Value)
+                            {
+                                canAttach = false;
+                            }
+                        }
+
+                        if (canAttach)
+                        {
+                            item.Attachments.Add(attachment);
+                        }
+                        else
+                        {
+                            inventory.Items.Add(attachment);
+                        }
+
                         break;
 
                     case "Properties":

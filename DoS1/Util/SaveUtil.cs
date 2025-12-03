@@ -211,7 +211,6 @@ namespace DoS1.Util
             Writer.WriteAttributeString("CurrentWeather", WeatherManager.CurrentWeather.ToString());
             Writer.WriteAttributeString("Transitioning", WeatherManager.Transitioning.ToString());
             Writer.WriteAttributeString("TransitionType", WeatherManager.TransitionType.ToString());
-            Writer.WriteAttributeString("AmbientFade", SoundManager.AmbientFade.ToString());
             Writer.WriteAttributeString("Lightning", WeatherManager.Lightning.ToString());
 
             if (WeatherManager.Transitioning)
@@ -263,8 +262,11 @@ namespace DoS1.Util
         private static void SaveItems(Inventory inventory)
         {
             EnterNode("Items");
-            foreach (Item item in inventory.Items)
+
+            int itemCount = inventory.Items.Count;
+            for (int i = 0; i < itemCount; i++)
             {
+                Item item = inventory.Items[i];
                 EnterNode("Item");
 
                 EnterNode("ItemProperties");
@@ -353,8 +355,12 @@ namespace DoS1.Util
             if (item.Properties.Any())
             {
                 EnterNode("Properties");
-                foreach (Something property in item.Properties)
+
+                int count = item.Properties.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    Something property = item.Properties[i];
+
                     EnterNode("Property");
                     Writer.WriteAttributeString("ID", property.ID.ToString());
                     Writer.WriteAttributeString("Name", property.Name);
@@ -374,8 +380,11 @@ namespace DoS1.Util
                 item.Attachments.Any())
             {
                 EnterNode("Attachments");
-                foreach (Item attachment in item.Attachments)
+
+                int count = item.Attachments.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    Item attachment = item.Attachments[i];
                     EnterNode("Attachment");
 
                     EnterNode("AttachmentProperties");
@@ -462,8 +471,10 @@ namespace DoS1.Util
         {
             EnterNode("Armies");
 
-            foreach (Army army in CharacterManager.Armies)
+            int count = CharacterManager.Armies.Count;
+            for (int i = 0; i < count; i++)
             {
+                Army army = CharacterManager.Armies[i];
                 EnterNode("Army");
 
                 EnterNode("ArmyProperties");
@@ -486,8 +497,11 @@ namespace DoS1.Util
         private static void SaveSquads(Army army)
         {
             EnterNode("Squads");
-            foreach (Squad squad in army.Squads)
+
+            int squadCount = army.Squads.Count;
+            for (int s = 0; s < squadCount; s++)
             {
+                Squad squad = army.Squads[s];
                 EnterNode("Squad");
 
                 EnterNode("SquadProperties");
@@ -532,8 +546,12 @@ namespace DoS1.Util
                 if (squad.Path.Any())
                 {
                     EnterNode("Path");
-                    foreach (ALocation location in squad.Path)
+
+                    int pathCount = squad.Path.Count;
+                    for (int p = 0; p < pathCount; p++)
                     {
+                        ALocation location = squad.Path[p];
+
                         EnterNode("ALocation");
                         Writer.WriteAttributeString("X", location.X.ToString());
                         Writer.WriteAttributeString("Y", location.Y.ToString());
@@ -556,8 +574,12 @@ namespace DoS1.Util
         private static void SaveCharacters(Squad squad)
         {
             EnterNode("Characters");
-            foreach (Character character in squad.Characters)
+
+            int characterCount = squad.Characters.Count;
+            for (int c = 0; c < characterCount; c++)
             {
+                Character character = squad.Characters[c];
+
                 EnterNode("Character");
 
                 EnterNode("CharacterProperties");
@@ -579,8 +601,12 @@ namespace DoS1.Util
                 ExitNode();
 
                 EnterNode("Stats");
-                foreach (Something stat in character.Stats)
+
+                int statCount = character.Stats.Count;
+                for (int s = 0;  s < statCount; s++)
                 {
+                    Something stat = character.Stats[s];
+
                     EnterNode("Stat");
                     Writer.WriteAttributeString("Name", stat.Name);
                     Writer.WriteAttributeString("Value", stat.Value.ToString());
@@ -591,8 +617,12 @@ namespace DoS1.Util
                 if (character.StatusEffects.Any())
                 {
                     EnterNode("StatusEffects");
-                    foreach (Something statusEffect in character.StatusEffects)
+
+                    int statusEffectCount = character.StatusEffects.Count;
+                    for (int e = 0;  e < statusEffectCount; e++)
                     {
+                        Something statusEffect = character.StatusEffects[e];
+
                         EnterNode("StatusEffect");
                         Writer.WriteAttributeString("Name", statusEffect.Name);
                         Writer.WriteAttributeString("Amount", statusEffect.Amount.ToString());
@@ -734,8 +764,11 @@ namespace DoS1.Util
         private static void SaveMaps(World world)
         {
             EnterNode("Maps");
-            foreach (Map map in world.Maps)
+
+            int worldCount = world.Maps.Count;
+            for (int m = 0; m < worldCount; m++)
             {
+                Map map = world.Maps[m];
                 EnterNode("Map");
 
                 EnterNode("MapProperties");
@@ -749,8 +782,11 @@ namespace DoS1.Util
                 if (map.Layers.Any())
                 {
                     EnterNode("Layers");
-                    foreach (Layer layer in map.Layers)
+
+                    int layerCount = map.Layers.Count;
+                    for (int l  = 0; l < layerCount; l++)
                     {
+                        Layer layer = map.Layers[l];
                         EnterNode("Layer");
 
                         EnterNode("LayerProperties");
@@ -766,8 +802,11 @@ namespace DoS1.Util
                         if (layer.Tiles.Any())
                         {
                             EnterNode("Tiles");
-                            foreach (Tile tile in layer.Tiles)
+
+                            int tileCount = layer.Tiles.Count;
+                            for (int t  = 0; t < tileCount; t++)
                             {
+                                Tile tile = layer.Tiles[t];
                                 EnterNode("TileProperties");
                                 Writer.WriteAttributeString("ID", tile.ID.ToString());
                                 Writer.WriteAttributeString("Name", tile.Name);

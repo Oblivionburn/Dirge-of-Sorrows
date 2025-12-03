@@ -149,7 +149,6 @@ namespace DoS1
                                 {
                                     LostFocus = true;
                                     TimeManager.Paused = true;
-                                    SoundManager.AmbientPaused = true;
 
                                     if (Handler.Combat)
                                     {
@@ -171,14 +170,8 @@ namespace DoS1
                                 {
                                     if (!Handler.CombatFinishing)
                                     {
-                                        SoundManager.AmbientPaused = false;
                                         GameUtil.Toggle_Pause_Combat(false);
                                     }
-                                }
-                                else if (!Handler.LocalMap ||
-                                         (Handler.LocalMap && !Handler.LocalPause))
-                                {
-                                    SoundManager.AmbientPaused = false;
                                 }
                             }
 
@@ -188,11 +181,7 @@ namespace DoS1
                             MenuManager.Update(Game.Game, Content);
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
-
-                            if (!SoundManager.AmbientPaused)
-                            {
-                                WeatherManager.Update(Game.Resolution);
-                            }
+                            WeatherManager.Update(Game.Resolution, RenderingManager.Lighting.DrawColor);
                         }
                     }
                     else if (!LostFocus)

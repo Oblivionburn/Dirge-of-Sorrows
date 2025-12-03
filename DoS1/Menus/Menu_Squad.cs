@@ -296,14 +296,6 @@ namespace DoS1.Menus
                 Handler.StoryStep != 15 &&
                 Handler.StoryStep != 29)
             {
-                if (!found_button &&
-                    !found_squad &&
-                    !found_grid &&
-                    InputManager.Mouse_RB_Pressed)
-                {
-                    Back();
-                }
-
                 if (InputManager.KeyPressed("Esc"))
                 {
                     Back();

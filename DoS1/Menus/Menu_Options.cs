@@ -324,8 +324,6 @@ namespace DoS1.Menus
             else if (bar.Name == "Ambience")
             {
                 SoundManager.AmbientVolume = volume / 100;
-                SoundManager.AmbientChannel.setVolume(SoundManager.AmbientVolume);
-
                 GetLabel("Ambience").Text = ((int)volume).ToString() + @"%";
             }
         }

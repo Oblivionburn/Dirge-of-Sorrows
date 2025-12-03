@@ -837,76 +837,57 @@ namespace DoS1.Util
 
             Tile tile = null;
 
+            Vector3 north = new Vector3(ally_squad.Location.X, ally_squad.Location.Y - 2, 0);
+            Vector3 east = new Vector3(ally_squad.Location.X + 2, ally_squad.Location.Y, 0);
+            Vector3 south = new Vector3(ally_squad.Location.X, ally_squad.Location.Y + 2, 0);
+            Vector3 west = new Vector3(ally_squad.Location.X - 2, ally_squad.Location.Y, 0);
+
             //Bump squad away from enemy
             if (ally_squad.Direction == Direction.North)
             {
-                //South
-                Location location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(south);
                 if (tile == null)
                 {
-                    //West
-                    location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(west);
                     if (tile == null)
                     {
-                        //East
-                        location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(east);
                     }
                 }
             }
             else if (ally_squad.Direction == Direction.East)
             {
-                //West
-                Location location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(west);
                 if (tile == null)
                 {
-                    //North
-                    location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(north);
                     if (tile == null)
                     {
-                        //South
-                        location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(south);
                     }
                 }
             }
             else if (ally_squad.Direction == Direction.South)
             {
-                //North
-                Location location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(north);
                 if (tile == null)
                 {
-                    //West
-                    location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(west);
                     if (tile == null)
                     {
-                        //East
-                        location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(east);
                     }
                 }
             }
             else if (ally_squad.Direction == Direction.West)
             {
-                //East
-                Location location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(east);
                 if (tile == null)
                 {
-                    //North
-                    location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(north);
                     if (tile == null)
                     {
-                        //South
-                        location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(south);
                     }
                 }
             }
@@ -914,73 +895,49 @@ namespace DoS1.Util
             {
                 if (enemy_squad.Direction == Direction.North)
                 {
-                    //North
-                    Location location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(north);
                     if (tile == null)
                     {
-                        //West
-                        location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(west);
                         if (tile == null)
                         {
-                            //East
-                            location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(east);
                         }
                     }
                 }
                 else if (enemy_squad.Direction == Direction.East)
                 {
-                    //East
-                    Location location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(east);
                     if (tile == null)
                     {
-                        //North
-                        location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(north);
                         if (tile == null)
                         {
-                            //South
-                            location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(south);
                         }
                     }
                 }
                 else if (enemy_squad.Direction == Direction.South)
                 {
-                    //South
-                    Location location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(south);
                     if (tile == null)
                     {
-                        //West
-                        location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(west);
                         if (tile == null)
                         {
-                            //East
-                            location = new Location(ally_squad.Location.X + 1, ally_squad.Location.Y, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(east);
                         }
                     }
                 }
                 else if (enemy_squad.Direction == Direction.West)
                 {
-                    //West
-                    Location location = new Location(ally_squad.Location.X - 1, ally_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(west);
                     if (tile == null)
                     {
-                        //North
-                        location = new Location(ally_squad.Location.X, ally_squad.Location.Y - 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(north);
                         if (tile == null)
                         {
-                            //South
-                            location = new Location(ally_squad.Location.X, ally_squad.Location.Y + 1, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(south);
                         }
                     }
                 }
@@ -988,6 +945,7 @@ namespace DoS1.Util
 
             if (tile != null)
             {
+                ally_squad.Location = new Location(tile.Location.X, tile.Location.Y, 0);
                 ally_squad.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
             }
         }
@@ -1000,76 +958,57 @@ namespace DoS1.Util
 
             Tile tile = null;
 
+            Vector3 north = new Vector3(enemy_squad.Location.X, enemy_squad.Location.Y - 2, 0);
+            Vector3 east = new Vector3(enemy_squad.Location.X + 2, enemy_squad.Location.Y, 0);
+            Vector3 south = new Vector3(enemy_squad.Location.X, enemy_squad.Location.Y + 2, 0);
+            Vector3 west = new Vector3(enemy_squad.Location.X - 2, enemy_squad.Location.Y, 0);
+
             //Bump enemy away from squad
             if (enemy_squad.Direction == Direction.North)
             {
-                //South
-                Location location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(south);
                 if (tile == null)
                 {
-                    //West
-                    location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(west);
                     if (tile == null)
                     {
-                        //East
-                        location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(east);
                     }
                 }
             }
             else if (enemy_squad.Direction == Direction.East)
             {
-                //West
-                Location location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(west);
                 if (tile == null)
                 {
-                    //North
-                    location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(north);
                     if (tile == null)
                     {
-                        //South
-                        location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(south);
                     }
                 }
             }
             else if (enemy_squad.Direction == Direction.South)
             {
-                //North
-                Location location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(north);
                 if (tile == null)
                 {
-                    //West
-                    location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(west);
                     if (tile == null)
                     {
-                        //East
-                        location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(east);
                     }
                 }
             }
             else if (enemy_squad.Direction == Direction.West)
             {
-                //East
-                Location location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                tile = ground.GetTile(east);
                 if (tile == null)
                 {
-                    //North
-                    location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(north);
                     if (tile == null)
                     {
-                        //South
-                        location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(south);
                     }
                 }
             }
@@ -1077,73 +1016,49 @@ namespace DoS1.Util
             {
                 if (ally_squad.Direction == Direction.North)
                 {
-                    //North
-                    Location location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(north);
                     if (tile == null)
                     {
-                        //West
-                        location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(west);
                         if (tile == null)
                         {
-                            //East
-                            location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(east);
                         }
                     }
                 }
                 else if (ally_squad.Direction == Direction.East)
                 {
-                    //East
-                    Location location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(east);
                     if (tile == null)
                     {
-                        //North
-                        location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(north);
                         if (tile == null)
                         {
-                            //South
-                            location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(south);
                         }
                     }
                 }
                 else if (ally_squad.Direction == Direction.South)
                 {
-                    //South
-                    Location location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(south);
                     if (tile == null)
                     {
-                        //West
-                        location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(west);
                         if (tile == null)
                         {
-                            //East
-                            location = new Location(enemy_squad.Location.X + 1, enemy_squad.Location.Y, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(east);
                         }
                     }
                 }
                 else if (ally_squad.Direction == Direction.West)
                 {
-                    //West
-                    Location location = new Location(enemy_squad.Location.X - 1, enemy_squad.Location.Y, 0);
-                    tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                    tile = ground.GetTile(west);
                     if (tile == null)
                     {
-                        //North
-                        location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y - 1, 0);
-                        tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                        tile = ground.GetTile(north);
                         if (tile == null)
                         {
-                            //South
-                            location = new Location(enemy_squad.Location.X, enemy_squad.Location.Y + 1, 0);
-                            tile = ground.GetTile(new Vector3(location.X, location.Y, 0));
+                            tile = ground.GetTile(south);
                         }
                     }
                 }

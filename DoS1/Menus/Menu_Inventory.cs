@@ -316,7 +316,6 @@ namespace DoS1.Menus
             }
 
             TimeManager.Paused = false;
-            SoundManager.AmbientPaused = false;
 
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();

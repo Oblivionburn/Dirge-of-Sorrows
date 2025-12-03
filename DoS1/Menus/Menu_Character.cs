@@ -240,19 +240,6 @@ namespace DoS1.Menus
             if (Handler.StoryStep != 16 &&
                 (Handler.StoryStep < 30 || Handler.StoryStep > 32))
             {
-                if (!found_helm &&
-                    !found_armor &&
-                    !found_shield &&
-                    !found_weapon &&
-                    !found_button &&
-                    !found_stat &&
-                    !found_grid &&
-                    !found_item &&
-                    InputManager.Mouse_RB_Pressed)
-                {
-                    Back();
-                }
-
                 if (InputManager.KeyPressed("Esc"))
                 {
                     Back();

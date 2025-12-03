@@ -211,7 +211,6 @@ namespace DoS1.Menus
                 SceneManager.ChangeScene(combat);
 
                 Handler.Combat = true;
-                SoundManager.AmbientPaused = false;
                 Close();
             }
         }
@@ -354,7 +353,7 @@ namespace DoS1.Menus
                     Squad enemy_squad = ArmyUtil.NewSquad("Enemy");
                     special.Squads.Add(enemy_squad);
 
-                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 1, 1);
+                    ArmyUtil.Gen_EnemySquad(special, enemy_squad, 1, 1, 0, 1, 1);
                     foreach (Character character in enemy_squad.Characters)
                     {
                         foreach (Item item in character.Inventory.Items)

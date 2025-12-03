@@ -434,7 +434,7 @@ namespace DoS1.Scenes
                     Handler.Combat = false;
                     Main.Timer.Start();
 
-                    SoundManager.StopMusic();
+                    SoundManager.StopAll();
                     SoundManager.NeedMusic = true;
 
                     SceneManager.ChangeScene("GameOver");
@@ -880,8 +880,19 @@ namespace DoS1.Scenes
                             {
                                 int epCost = InventoryUtil.Get_EP_Cost(character);
 
+                                bool petrified = false;
+                                foreach (Something statusEffect in character.StatusEffects)
+                                {
+                                    if (statusEffect.Name == "Petrified")
+                                    {
+                                        petrified = true;
+                                        break;
+                                    }
+                                }
+
                                 if (character.CombatStep == 0 &&
                                     character.ManaBar.Value >= epCost &&
+                                    !petrified &&
                                     !character.Dead)
                                 {
                                     current_character = character;
@@ -911,8 +922,19 @@ namespace DoS1.Scenes
                             {
                                 int epCost = InventoryUtil.Get_EP_Cost(character);
 
+                                bool petrified = false;
+                                foreach (Something statusEffect in character.StatusEffects)
+                                {
+                                    if (statusEffect.Name == "Petrified")
+                                    {
+                                        petrified = true;
+                                        break;
+                                    }
+                                }
+
                                 if (character.CombatStep == 0 &&
                                     character.ManaBar.Value >= epCost &&
+                                    !petrified &&
                                     !character.Dead)
                                 {
                                     current_character = character;
@@ -1646,13 +1668,8 @@ namespace DoS1.Scenes
                             float x = origin_tile.Region.X;
                             float distance = origin_tile.Region.Width / 4;
 
-                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
-                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
-                            {
-                                x = origin_tile.Region.X;
-                            }
-                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
                             {
                                 x = target_tile.Region.X;
                             }
@@ -1679,13 +1696,8 @@ namespace DoS1.Scenes
                             float x = origin_tile.Region.X;
                             float distance = origin_tile.Region.Width / 4;
 
-                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
-                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
-                            {
-                                x = origin_tile.Region.X;
-                            }
-                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
                             {
                                 x = target_tile.Region.X;
                             }
@@ -1712,13 +1724,8 @@ namespace DoS1.Scenes
                             float x = origin_tile.Region.X;
                             float distance = origin_tile.Region.Width / 8;
 
-                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
-                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
-                            {
-                                x = origin_tile.Region.X;
-                            }
-                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
+                                character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
                             {
                                 x = target_tile.Region.X;
                             }
@@ -1971,7 +1978,6 @@ namespace DoS1.Scenes
         private void FinishCombat()
         {
             Handler.CombatFinishing = true;
-            SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
 
             if (!ally_squad.Characters.Any())
@@ -2123,7 +2129,6 @@ namespace DoS1.Scenes
         {
             Handler.Retreating = true;
             Handler.CombatFinishing = true;
-            SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
 
             Picture battleResult = Menu.GetPicture("Result");
@@ -2153,7 +2158,6 @@ namespace DoS1.Scenes
 
         private void MainCharacterKilled()
         {
-            SoundManager.AmbientPaused = true;
             Handler.CombatTimer.Stop();
 
             Picture battleResult = Menu.GetPicture("Result");
@@ -2231,7 +2235,6 @@ namespace DoS1.Scenes
 
             if (!Handler.Retreating)
             {
-                SoundManager.AmbientPaused = false;
                 GameUtil.Toggle_Pause(false);
             }
         }

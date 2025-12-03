@@ -74,7 +74,8 @@ namespace DoS1.Util
                     for (int i = 0; i < count; i++)
                     {
                         Tile tile = ground.Tiles[i];
-                        if (InputManager.MouseWithin(tile.Region.ToRectangle))
+                        if (tile.Region != null &&
+                            InputManager.MouseWithin(tile.Region.ToRectangle))
                         {
                             current = tile;
                             break;
@@ -89,11 +90,14 @@ namespace DoS1.Util
                         for (int i = 0; i < count; i++)
                         {
                             Tile tile = ground.Tiles[i];
-                            if (x >= tile.Region.X && x < tile.Region.X + tile.Region.Width &&
-                                y >= tile.Region.Y && y < tile.Region.Y + tile.Region.Height)
+                            if (tile.Region != null)
                             {
-                                current = tile;
-                                break;
+                                if (x >= tile.Region.X && x < tile.Region.X + tile.Region.Width &&
+                                    y >= tile.Region.Y && y < tile.Region.Y + tile.Region.Height)
+                                {
+                                    current = tile;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -222,7 +226,7 @@ namespace DoS1.Util
             if (target != null)
             {
                 target.Region.X = Main.Game.Resolution.X / 2 - (Main.Game.TileSize.X / 2);
-                target.Region.Y = Main.Game.Resolution.Y / 2 - (Main.Game.TileSize.Y / 2);
+                target.Region.Y = Main.Game.Resolution.Y / 2 - Main.Game.TileSize.Y - (Main.Game.TileSize.Y / 2);
 
                 ResizeMap(menu, map, ground, target, false);
             }
@@ -1566,30 +1570,6 @@ namespace DoS1.Util
             return maxLevel;
         }
 
-        public static void AllyToken_Start(Squad squad, Map map)
-        {
-            Tile ally_base = Get_Base(map, "Ally");
-            if (ally_base != null)
-            {
-                squad.Location = new Location(ally_base.Location.X, ally_base.Location.Y, ally_base.Location.Z);
-                squad.Region = new Region(ally_base.Region.X, ally_base.Region.Y, ally_base.Region.Width, ally_base.Region.Height);
-                squad.Visible = true;
-                squad.Active = true;
-            }
-        }
-
-        public static void EnemyToken_Start(Squad squad, Map map)
-        {
-            Tile enemy_base = Get_Base(map, "Enemy");
-            if (enemy_base != null)
-            {
-                squad.Location = new Location(enemy_base.Location.X, enemy_base.Location.Y, enemy_base.Location.Z);
-                squad.Region = new Region(enemy_base.Region.X, enemy_base.Region.Y, enemy_base.Region.Width, enemy_base.Region.Height);
-                squad.Visible = true;
-                squad.Active = true;
-            }
-        }
-
         public static Squad CheckSquadCollision(Squad squad)
         {
             if (squad.Type == "Ally")
@@ -1659,7 +1639,8 @@ namespace DoS1.Util
                                     if (squad.Visible &&
                                         squad.Active)
                                     {
-                                        if (squad.Path.Any() &&
+                                        if (squad.Path != null &&
+                                            squad.Path.Any() &&
                                             squad.Region != null)
                                         {
                                             ALocation path = squad.Path[0];

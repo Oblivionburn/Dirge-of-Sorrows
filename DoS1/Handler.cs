@@ -246,7 +246,6 @@ namespace DoS1
 
             //Ambient
             AssetManager.LoadAmbient();
-            SoundManager.AmbientFade = 1;
             SoundManager.AmbientVolume = 0.8f;
             SoundManager.AmbientEnabled = true;
 
@@ -274,7 +273,8 @@ namespace DoS1
             {
                 AssetManager.Textures["Rain"],
                 AssetManager.Textures["Snow"],
-                AssetManager.Textures["Storm"]
+                AssetManager.Textures["Storm"],
+                AssetManager.Textures["Fog"]
             });
         }
 
