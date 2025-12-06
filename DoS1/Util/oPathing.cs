@@ -364,7 +364,7 @@ namespace DoS1.Util
                     }
                 }
             }
-            
+
             return locations;
         }
 
@@ -376,8 +376,8 @@ namespace DoS1.Util
                 return current;
             }
 
-            float toDestination = current.Distance_ToDestination - current.Priority;
-            float toStart = current.Distance_ToStart - current.Priority;
+            float current_near = current.Distance_ToDestination + current.Priority;
+            float current_far = current.Distance_ToStart + current.Priority;
 
             foreach (ALocation location in locations)
             {
@@ -386,14 +386,15 @@ namespace DoS1.Util
                     return location;
                 }
 
-                float new_toDestination = location.Distance_ToDestination - location.Priority;
-                float new_toStart = location.Distance_ToStart - current.Priority;
+                float pref_near = location.Distance_ToDestination + location.Priority;
+                float pref_far = location.Distance_ToStart + location.Priority;
 
-                if ((new_toDestination < toDestination && new_toStart >= toStart) ||
-                    (location.Distance_ToDestination < current.Distance_ToDestination && location.Distance_ToStart >= current.Distance_ToStart))
+                if ((pref_near <= current_near && pref_far > current_far) ||
+                    pref_near < current_near)
                 {
                     current = location;
-                    toDestination = new_toDestination;
+                    current_near = pref_near;
+                    current_far = pref_far;
                 }
             }
 
@@ -403,11 +404,20 @@ namespace DoS1.Util
         public override ALocation Get_MinLocation_Start(List<ALocation> locations)
         {
             ALocation current = locations[0];
+            if (current.Distance_ToStart == 0)
+            {
+                return current;
+            }
 
             float current_far = current.Distance_ToStart + current.Priority;
 
             foreach (ALocation location in locations)
             {
+                if (location.Distance_ToStart == 0)
+                {
+                    return location;
+                }
+
                 float pref_far = location.Distance_ToStart + location.Priority;
 
                 if (pref_far < current_far)
@@ -443,7 +453,7 @@ namespace DoS1.Util
             Tile road = roads.GetTile(new Vector3(location.X, location.Y, 0));
             if (road != null)
             {
-                location.Priority = 1.75f;
+                location.Priority = -0.75f;
             }
             else
             {
@@ -465,22 +475,22 @@ namespace DoS1.Util
                 case "Desert":
                 case "Snow":
                 case "Ice":
-                    priority = -0.25f;
+                    priority = 1f;
                     break;
 
                 case "Forest":
                 case "Forest_Snow":
-                    priority = -0.75f;
+                    priority = 1.1f;
                     break;
 
                 case "Water":
-                    priority = -1f;
+                    priority = 1.2f;
                     break;
 
                 case "Mountains":
                 case "Mountains_Desert":
                 case "Mountains_Snow":
-                    priority = -2.3f;
+                    priority = 1.25f;
                     break;
             }
 
