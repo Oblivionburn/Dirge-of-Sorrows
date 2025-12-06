@@ -11,7 +11,7 @@ For discussion/suggestions/bug-reporting:<br>
 [<img src="https://github.com/Oblivionburn/Oblivionburn-Productions/blob/main/images/Discord.png">](https://discord.gg/zDkb3C9)
 
 <br><br>
-## <ins>Features currently in the game</ins>:
+## <ins>Features</ins>:
 - **Auto-battler combat**
   - 3x3 squad formation - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
@@ -38,7 +38,3 @@ For discussion/suggestions/bug-reporting:<br>
   - Note: stat increases per Level happen automatically based on equipped weapon
 <br><br>
 - 14 types of Runes that can be attached to armor/weapons, and paired for various effects (similar to FF7 materia system), with XP/Level progression which increases their effectiveness
-
-<br><br>
-## <ins>Planned features not yet implemented</ins>:
-- More of the story
