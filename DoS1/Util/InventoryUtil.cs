@@ -774,7 +774,8 @@ namespace DoS1.Util
 
             foreach (Something existing in properties)
             {
-                if (existing.Value > 0)
+                if (existing.Value > 0 ||
+                    existing.Max_Value > 0)
                 {
                     item.Properties.Add(new Something
                     {

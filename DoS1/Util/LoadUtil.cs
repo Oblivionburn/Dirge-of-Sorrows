@@ -1,18 +1,17 @@
-﻿using System;
-using System.IO;
-using System.Xml;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Inventories;
+using OP_Engine.Menus;
 using OP_Engine.Scenes;
 using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
+using System;
+using System.IO;
+using System.Xml;
 
 namespace DoS1.Util
 {
@@ -257,6 +256,12 @@ namespace DoS1.Util
 
                     case "Level":
                         Handler.Level = int.Parse(reader.Value);
+
+                        if (Handler.LocalMap)
+                        {
+                            Menu ui = MenuManager.GetMenu("UI");
+                            ui.GetLabel("Level").Text = "Level " + (Handler.Level + 1);
+                        }
                         break;
 
                     case "ManualPause":
@@ -333,6 +338,7 @@ namespace DoS1.Util
                         if (Enum.TryParse(reader.Value, out WeatherType weather))
                         {
                             WeatherManager.CurrentWeather = weather;
+                            AssetManager.PlayAmbient(weather.ToString(), true);
                         }
                         break;
 
@@ -358,6 +364,7 @@ namespace DoS1.Util
                             if (transitionWeather != null)
                             {
                                 transitionWeather.TransitionTime = int.Parse(reader.Value);
+                                SoundManager.AmbientFade[WeatherManager.CurrentWeather.ToString()] = (float)transitionWeather.TransitionTime * 0.02f;
                                 transitionWeather.Visible = true;
                             }
                         }

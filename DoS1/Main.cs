@@ -181,7 +181,12 @@ namespace DoS1
                             MenuManager.Update(Game.Game, Content);
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
-                            WeatherManager.Update(Game.Resolution, RenderingManager.Lighting.DrawColor);
+
+                            if (!Handler.LocalPause &&
+                                !TimeManager.Paused)
+                            {
+                                WeatherManager.Update(Game.Resolution, RenderingManager.Lighting.DrawColor);
+                            }
                         }
                     }
                     else if (!LostFocus)

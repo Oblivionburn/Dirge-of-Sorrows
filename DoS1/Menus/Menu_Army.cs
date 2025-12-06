@@ -11,7 +11,6 @@ using OP_Engine.Controls;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
 using OP_Engine.Time;
-using OP_Engine.Sounds;
 
 using DoS1.Util;
 
@@ -112,30 +111,40 @@ namespace DoS1.Menus
                     {
                         if (squad.Active)
                         {
-                            foreach (Character character in squad.Characters)
+                            for (int y = 0; y < 3; y++)
                             {
-                                if (character.Visible)
+                                for (int x = 0; x < 3; x++)
                                 {
-                                    Effect Grayscale = AssetManager.Shaders["Grayscale"];
-                                    Grayscale.Parameters["percent"].SetValue(0f);
+                                    Character character = squad.GetCharacter(new Vector2(x, y));
+                                    if (character != null &&
+                                        character.Visible)
+                                    {
+                                        Effect Grayscale = AssetManager.Shaders["Grayscale"];
+                                        Grayscale.Parameters["percent"].SetValue(0f);
 
-                                    spriteBatch.End();
-                                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, Grayscale, null);
+                                        spriteBatch.End();
+                                        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, Grayscale, null);
 
-                                    CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, Color.White);
+                                        CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, Color.White);
 
-                                    spriteBatch.End();
-                                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
+                                        spriteBatch.End();
+                                        spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
+                                    }
                                 }
                             }
                         }
                         else
                         {
-                            foreach (Character character in squad.Characters)
+                            for (int y = 0; y < 3; y++)
                             {
-                                if (character.Visible)
+                                for (int x = 0; x < 3; x++)
                                 {
-                                    CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
+                                    Character character = squad.GetCharacter(new Vector2(x, y));
+                                    if (character != null &&
+                                        character.Visible)
+                                    {
+                                        CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
+                                    }
                                 }
                             }
                         }
