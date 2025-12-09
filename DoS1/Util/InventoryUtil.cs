@@ -840,6 +840,11 @@ namespace DoS1.Util
 
         public static void EquipItem(Character character, Item item)
         {
+            if (item == null)
+            {
+                return;
+            }
+
             item.Equipped = true;
             item.Visible = true;
 
@@ -1579,7 +1584,7 @@ namespace DoS1.Util
             examine.Visible = true;
         }
 
-        public static void AddItem(Inventory inventory, string material, string category, string type)
+        public static Item AddItem(Inventory inventory, string material, string category, string type)
         {
             Inventory assets = InventoryManager.GetInventory("Assets");
             if (assets != null)
@@ -1626,8 +1631,12 @@ namespace DoS1.Util
 
                     new_item.Location = new Location(x, y, 0);
                     inventory.Items.Add(new_item);
+
+                    return new_item;
                 }
             }
+
+            return null;
         }
 
         public static Item CopyItem(Item original, bool new_item)
@@ -1787,6 +1796,11 @@ namespace DoS1.Util
 
         public static void AddRunes(Item item, int amount)
         {
+            if (item == null)
+            {
+                return;
+            }
+
             Something slots = item.GetProperty("Rune Slots");
             if (slots != null)
             {

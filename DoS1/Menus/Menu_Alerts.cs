@@ -282,24 +282,27 @@ namespace DoS1.Menus
             currentLocation.Type = "Base_Ally";
             currentLocation.Texture = AssetManager.Textures["Tile_Base_Ally"];
 
-            Tile nextLocation = locations.Tiles[Handler.Level + 1];
-            nextLocation.Visible = true;
-
-            WorldGen.GenRoad(ground, roads, currentLocation, nextLocation, Direction.Nowhere);
-
-            foreach (Tile road in roads.Tiles)
+            if (Handler.Level + 1 < locations.Tiles.Count)
             {
-                road.Visible = true;
+                Tile nextLocation = locations.Tiles[Handler.Level + 1];
+                nextLocation.Visible = true;
 
-                Tile location = WorldUtil.Get_Tile(locations, new Vector2(road.Location.X, road.Location.Y));
-                if (location != null &&
-                    location.Visible)
+                WorldGen.GenRoad(ground, roads, currentLocation, nextLocation, Direction.Nowhere);
+
+                foreach (Tile road in roads.Tiles)
                 {
-                    road.Visible = false;
-                }
-            }
+                    road.Visible = true;
 
-            WorldGen.AlignRegions(map);
+                    Tile location = WorldUtil.Get_Tile(locations, new Vector2(road.Location.X, road.Location.Y));
+                    if (location != null &&
+                        location.Visible)
+                    {
+                        road.Visible = false;
+                    }
+                }
+
+                WorldGen.AlignRegions(map);
+            }
 
             Handler.Fireworks = true;
         }
@@ -354,7 +357,7 @@ namespace DoS1.Menus
                     Squad enemy_squad = ArmyUtil.NewSquad("Enemy");
                     special.AddSquad(enemy_squad);
 
-                    ArmyUtil.Gen_EnemySquad(special, enemy_squad, 1, 1, 0, 1, 1);
+                    ArmyUtil.Gen_EnemySquad(enemy_squad, 1, 1, 0, 1, 1);
                     foreach (Character character in enemy_squad.Characters)
                     {
                         foreach (Item item in character.Inventory.Items)

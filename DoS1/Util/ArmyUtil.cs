@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
-
 using OP_Engine.Characters;
 using OP_Engine.Inventories;
 using OP_Engine.Menus;
@@ -121,6 +119,8 @@ namespace DoS1.Util
             for (int i = 1; i <= squads; i++)
             {
                 Squad enemy_squad = NewSquad("Enemy");
+                army.AddSquad(enemy_squad);
+
                 if (i == 1)
                 {
                     enemy_squad.Assignment = "Guard Base";
@@ -157,13 +157,15 @@ namespace DoS1.Util
                     }
                 }
 
-                Gen_EnemySquad(army, enemy_squad, map_level + 1, -1, -1, -1, -1);
-                army.AddSquad(enemy_squad);
+                Gen_EnemySquad(enemy_squad, map_level + 1, -1, -1, -1, -1);
             }
         }
 
-        public static void Gen_EnemySquad(Army army, Squad squad, int map_level, int chars_override, int class_type_override, int min_tier_override, int max_tier_override)
+        public static void Gen_EnemySquad(Squad squad, int map_level, int chars_override, int class_type_override, int min_tier_override, int max_tier_override)
         {
+            //Check if first squad in the army
+            bool first_squad = squad.Army.Squads.Count == 1;
+
             int min_chars = 1;
             if (map_level >= 2 && map_level < 10)
             {
@@ -243,7 +245,76 @@ namespace DoS1.Util
                     continue;
                 }
 
-                Character character = CharacterUtil.NewCharacter_Random(formation, true, random.Next(0, 2));
+                Character character;
+
+                if (i == 0) //First character in the squad
+                {
+                    if (first_squad) //First squad in the army
+                    {
+                        if (map_level == 20)
+                        {
+                            character = CharacterUtil.NewCharacter_Random(formation, true, 0);
+                            character.Name = "King " + character.Name;
+
+                            class_type_override = 0;
+                        }
+                        else
+                        {
+                            int gender = random.Next(0, 2);
+                            character = CharacterUtil.NewCharacter_Random(formation, true, gender);
+
+                            if (gender == 0)
+                            {
+                                if (map_level >= 18)
+                                {
+                                    character.Name = "Duke " + character.Name;
+                                }
+                                else if (map_level >= 14)
+                                {
+                                    character.Name = "Count " + character.Name;
+                                }
+                                else if (map_level >= 10)
+                                {
+                                    character.Name = "Baron " + character.Name;
+                                }
+                                else
+                                {
+                                    character.Name = "Lord " + character.Name;
+                                }
+                            }
+                            else
+                            {
+                                if (map_level >= 18)
+                                {
+                                    character.Name = "Duchess " + character.Name;
+                                }
+                                else if (map_level >= 14)
+                                {
+                                    character.Name = "Countess " + character.Name;
+                                }
+                                else if (map_level >= 10)
+                                {
+                                    character.Name = "Baroness " + character.Name;
+                                }
+                                else
+                                {
+                                    character.Name = "Lady " + character.Name;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        character = CharacterUtil.NewCharacter_Random(formation, true, random.Next(0, 2));
+                    }
+
+                    squad.Leader_ID = character.ID;
+                    squad.Name = character.Name;
+                }
+                else
+                {
+                    character = CharacterUtil.NewCharacter_Random(formation, true, random.Next(0, 2));
+                }
 
                 //Max is always 10 once we reach level 15+
                 int max_tier = (int)Math.Ceiling(map_level / 1.5);
@@ -263,9 +334,9 @@ namespace DoS1.Util
                     min_tier = min_tier_override;
                 }
 
-                //Set min to max tier if first/boss squad 
-                if (army.Squads.Count == 0)
+                if (first_squad)
                 {
+                    //Set min to max tier if first/boss squad 
                     min_tier = max_tier;
                 }
 
@@ -277,6 +348,11 @@ namespace DoS1.Util
                     class_type = class_type_override;
                 }
 
+                Item armor = null;
+                Item helm = null;
+                Item shield = null;
+                Item weapon = null;
+
                 if (class_type == 0)
                 {
                     #region Warrior Gear
@@ -286,46 +362,46 @@ namespace DoS1.Util
                     switch (armor_tier)
                     {
                         case 1:
-                            InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                             break;
 
                         case 2:
-                            InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
                             break;
 
                         case 3:
-                            InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
                             break;
 
                         case 4:
-                            InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
                             break;
 
                         case 5:
-                            InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Armor");
                             break;
 
                         case 6:
-                            InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Armor");
                             break;
 
                         case 7:
-                            InventoryUtil.AddItem(character.Inventory, "Iron", "Platemail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Iron", "Platemail", "Armor");
                             break;
 
                         case 8:
-                            InventoryUtil.AddItem(character.Inventory, "Copper", "Platemail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Copper", "Platemail", "Armor");
                             break;
 
                         case 9:
-                            InventoryUtil.AddItem(character.Inventory, "Bronze", "Platemail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Bronze", "Platemail", "Armor");
                             break;
 
                         case 10:
-                            InventoryUtil.AddItem(character.Inventory, "Steel", "Platemail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Steel", "Platemail", "Armor");
                             break;
                     }
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                    InventoryUtil.EquipItem(character, armor);
 
                     random = new CryptoRandom();
                     int helm_chance = random.Next(min_tier, max_tier + 1);
@@ -336,46 +412,46 @@ namespace DoS1.Util
                         switch (helm_tier)
                         {
                             case 1:
-                                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
                                 break;
 
                             case 2:
-                                InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
                                 break;
 
                             case 3:
-                                InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
                                 break;
 
                             case 4:
-                                InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
                                 break;
 
                             case 5:
-                                InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Helm");
                                 break;
 
                             case 6:
-                                InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Helm");
                                 break;
 
                             case 7:
-                                InventoryUtil.AddItem(character.Inventory, "Iron", "Platemail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Iron", "Platemail", "Helm");
                                 break;
 
                             case 8:
-                                InventoryUtil.AddItem(character.Inventory, "Copper", "Platemail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Copper", "Platemail", "Helm");
                                 break;
 
                             case 9:
-                                InventoryUtil.AddItem(character.Inventory, "Bronze", "Platemail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Bronze", "Platemail", "Helm");
                                 break;
 
                             case 10:
-                                InventoryUtil.AddItem(character.Inventory, "Steel", "Platemail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Steel", "Platemail", "Helm");
                                 break;
                         }
-                        InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                        InventoryUtil.EquipItem(character, helm);
                     }
 
                     string weapon_type = "";
@@ -404,26 +480,26 @@ namespace DoS1.Util
                         case 1:
                         case 2:
                         case 3:
-                            InventoryUtil.AddItem(character.Inventory, "Iron", weapon_type, "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Iron", weapon_type, "Weapon");
                             break;
 
                         case 4:
                         case 5:
                         case 6:
-                            InventoryUtil.AddItem(character.Inventory, "Copper", weapon_type, "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Copper", weapon_type, "Weapon");
                             break;
                         
                         case 7:
                         case 8:
-                            InventoryUtil.AddItem(character.Inventory, "Bronze", weapon_type, "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Bronze", weapon_type, "Weapon");
                             break;
 
                         case 9:
                         case 10:
-                            InventoryUtil.AddItem(character.Inventory, "Steel", weapon_type, "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Steel", weapon_type, "Weapon");
                             break;
                     }
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                    InventoryUtil.EquipItem(character, weapon);
 
                     if (weapon_type != "Axe")
                     {
@@ -436,46 +512,46 @@ namespace DoS1.Util
                             switch (shield_tier)
                             {
                                 case 1:
-                                    InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
                                     break;
 
                                 case 2:
-                                    InventoryUtil.AddItem(character.Inventory, "Iron", "Round", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Iron", "Round", "Shield");
                                     break;
 
                                 case 3:
-                                    InventoryUtil.AddItem(character.Inventory, "Copper", "Round", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Copper", "Round", "Shield");
                                     break;
 
                                 case 4:
-                                    InventoryUtil.AddItem(character.Inventory, "Bronze", "Round", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Bronze", "Round", "Shield");
                                     break;
 
                                 case 5:
-                                    InventoryUtil.AddItem(character.Inventory, "Steel", "Round", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Steel", "Round", "Shield");
                                     break;
 
                                 case 6:
-                                    InventoryUtil.AddItem(character.Inventory, "Wood", "Kite", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Wood", "Kite", "Shield");
                                     break;
 
                                 case 7:
-                                    InventoryUtil.AddItem(character.Inventory, "Iron", "Kite", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Iron", "Kite", "Shield");
                                     break;
 
                                 case 8:
-                                    InventoryUtil.AddItem(character.Inventory, "Copper", "Kite", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Copper", "Kite", "Shield");
                                     break;
 
                                 case 9:
-                                    InventoryUtil.AddItem(character.Inventory, "Bronze", "Kite", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Bronze", "Kite", "Shield");
                                     break;
 
                                 case 10:
-                                    InventoryUtil.AddItem(character.Inventory, "Steel", "Kite", "Shield");
+                                    shield = InventoryUtil.AddItem(character.Inventory, "Steel", "Kite", "Shield");
                                     break;
                             }
-                            InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                            InventoryUtil.EquipItem(character, shield);
                         }
                     }
 
@@ -490,46 +566,46 @@ namespace DoS1.Util
                     switch (armor_tier)
                     {
                         case 1:
-                            InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                             break;
 
                         case 2:
-                            InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                             break;
 
                         case 3:
-                            InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
                             break;
 
                         case 4:
-                            InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
                             break;
 
                         case 5:
-                            InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
                             break;
 
                         case 6:
-                            InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
                             break;
 
                         case 7:
-                            InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
                             break;
 
                         case 8:
-                            InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
                             break;
 
                         case 9:
-                            InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Armor");
                             break;
 
                         case 10:
-                            InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Armor");
+                            armor = InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Armor");
                             break;
                     }
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                    InventoryUtil.EquipItem(character, armor);
 
                     random = new CryptoRandom();
                     int helm_chance = random.Next(min_tier, max_tier + 1);
@@ -544,46 +620,42 @@ namespace DoS1.Util
                                 break;
 
                             case 2:
-                                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
                                 break;
 
                             case 3:
-                                InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
                                 break;
 
                             case 4:
-                                InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
                                 break;
 
                             case 5:
-                                InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
                                 break;
 
                             case 6:
-                                InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
                                 break;
 
                             case 7:
-                                InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
                                 break;
 
                             case 8:
-                                InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
                                 break;
 
                             case 9:
-                                InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Helm");
                                 break;
 
                             case 10:
-                                InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Helm");
+                                helm = InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Helm");
                                 break;
                         }
-
-                        if (helm_tier > 1)
-                        {
-                            InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
-                        }
+                        InventoryUtil.EquipItem(character, helm);
                     }
 
                     random = new CryptoRandom();
@@ -593,26 +665,26 @@ namespace DoS1.Util
                         case 1:
                         case 2:
                         case 3:
-                            InventoryUtil.AddItem(character.Inventory, "Elm", "Bow", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Elm", "Bow", "Weapon");
                             break;
 
                         case 4:
                         case 5:
                         case 6:
-                            InventoryUtil.AddItem(character.Inventory, "Cedar", "Bow", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Cedar", "Bow", "Weapon");
                             break;
                         
                         case 7:
                         case 8:
-                            InventoryUtil.AddItem(character.Inventory, "Oak", "Bow", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Oak", "Bow", "Weapon");
                             break;
 
                         case 9:
                         case 10:
-                            InventoryUtil.AddItem(character.Inventory, "Ebony", "Bow", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Ebony", "Bow", "Weapon");
                             break;
                     }
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                    InventoryUtil.EquipItem(character, weapon);
 
                     #endregion
                 }
@@ -620,8 +692,8 @@ namespace DoS1.Util
                 {
                     #region Mage Gear
 
-                    InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                    armor = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                    InventoryUtil.EquipItem(character, armor);
 
                     random = new CryptoRandom();
                     int helm_chance = random.Next(min_tier, max_tier + 1);
@@ -644,8 +716,8 @@ namespace DoS1.Util
                             case 8:
                             case 9:
                             case 10:
-                                InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
-                                InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                                helm = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                                InventoryUtil.EquipItem(character, helm);
                                 break;
                         }
                     }
@@ -657,34 +729,29 @@ namespace DoS1.Util
                         case 1:
                         case 2:
                         case 3:
-                            InventoryUtil.AddItem(character.Inventory, "Apprentice", "Grimoire", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Apprentice", "Grimoire", "Weapon");
                             break;
 
                         case 4:
                         case 5:
                         case 6:
-                            InventoryUtil.AddItem(character.Inventory, "Novice", "Grimoire", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Novice", "Grimoire", "Weapon");
                             break;
 
                         case 7:
                         case 8:
-                            InventoryUtil.AddItem(character.Inventory, "Expert", "Grimoire", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Expert", "Grimoire", "Weapon");
                             break;
 
                         case 9:
                         case 10:
-                            InventoryUtil.AddItem(character.Inventory, "Master", "Grimoire", "Weapon");
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Master", "Grimoire", "Weapon");
                             break;
                     }
-                    InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
+                    InventoryUtil.EquipItem(character, weapon);
 
                     #endregion
                 }
-
-                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
-                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
-                Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
-                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
 
                 if (class_type == 0)
                 {
@@ -774,13 +841,6 @@ namespace DoS1.Util
                 }
 
                 squad.AddCharacter(character);
-
-                if (i == 0)
-                {
-                    //Set Leader
-                    squad.Leader_ID = character.ID;
-                    squad.Name = character.Name;
-                }
             }
         }
 

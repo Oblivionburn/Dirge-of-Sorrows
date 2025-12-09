@@ -560,7 +560,7 @@ namespace DoS1.Util
                 picture.Visible = true;
 
                 dialogue_name.Text = enemy.Name;
-                message = "\"Go cry about it to your local lord, " + local_lord.Name + ", I'm just following " + HisHer(local_lord.Gender) + " orders.\"";
+                message = "\"Go cry about it to " + local_lord.Name + "... I'm just following " + HisHer(local_lord.Gender) + " orders.\"";
 
                 Button option1 = alerts.GetButton("Dialogue_Option1");
                 option1.Text = "[Click here to continue]";
