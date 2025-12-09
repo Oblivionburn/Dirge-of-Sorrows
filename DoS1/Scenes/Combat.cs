@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -18,7 +16,7 @@ using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
-
+using OP_Engine.Enums;
 using DoS1.Util;
 
 namespace DoS1.Scenes
@@ -468,7 +466,7 @@ namespace DoS1.Scenes
                             Squad target_squad = null;
                             if (targets.Any())
                             {
-                                target_squad = ArmyUtil.Get_Squad(targets[0].ID);
+                                target_squad = targets[0].Squad;
                             }
 
                             switch (combat_state)
@@ -1101,7 +1099,7 @@ namespace DoS1.Scenes
                 {
                     if (defender_squad == null)
                     {
-                        defender_squad = ArmyUtil.Get_Squad(target.ID);
+                        defender_squad = target.Squad;
                     }
 
                     if (RuneUtil.Time_DodgeChance(target, defender_squad))

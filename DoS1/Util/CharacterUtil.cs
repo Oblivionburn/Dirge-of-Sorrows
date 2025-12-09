@@ -1,15 +1,14 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Utility;
+using OP_Engine.Enums;
 
 namespace DoS1.Util
 {

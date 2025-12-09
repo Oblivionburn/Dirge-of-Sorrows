@@ -425,7 +425,7 @@ namespace DoS1.Menus
                 if (reserve_army != null)
                 {
                     Squad squad = reserve_army.Squads[0];
-                    squad.Characters.Add(character);
+                    squad.AddCharacter(character);
                 }
 
                 Handler.TradingAcademy.Characters.Remove(character);
@@ -448,7 +448,7 @@ namespace DoS1.Menus
                 squad.Characters.Remove(character);
             }
 
-            Handler.TradingAcademy.Characters.Add(character);
+            Handler.TradingAcademy.AddCharacter(character);
 
             Handler.Gold += Handler.RecruitPrice;
             GetLabel("Gold").Text = "Gold: " + Handler.Gold;

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Scenes;
 using OP_Engine.Characters;
 using OP_Engine.Controls;
@@ -10,7 +9,7 @@ using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
-using Microsoft.Xna.Framework.Graphics;
+using OP_Engine.Enums;
 
 namespace DoS1.Util
 {
@@ -1151,8 +1150,7 @@ namespace DoS1.Util
                 damage -= resistance;
 
                 //Reduce by squad's Area resistances
-                Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
-                int area_resistance = RuneUtil.Area_AllArmor_PairedLevel(defender_squad, defender, element);
+                int area_resistance = RuneUtil.Area_AllArmor_PairedLevel(defender.Squad, defender, element);
                 damage -= area_resistance;
             }
 
@@ -1660,7 +1658,7 @@ namespace DoS1.Util
 
             character.Dead = true;
 
-            Squad squad = ArmyUtil.Get_Squad(character.ID);
+            Squad squad = character.Squad;
             if (squad != null)
             {
                 //Replace leader if got killed

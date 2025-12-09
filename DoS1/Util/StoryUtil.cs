@@ -5,6 +5,7 @@ using OP_Engine.Menus;
 using OP_Engine.Scenes;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
+using OP_Engine.Enums;
 using System.Linq;
 
 namespace DoS1.Util

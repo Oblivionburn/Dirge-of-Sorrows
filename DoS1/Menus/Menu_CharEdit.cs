@@ -2,14 +2,13 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
-
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
 using OP_Engine.Inventories;
-
+using OP_Engine.Enums;
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -498,7 +497,7 @@ namespace DoS1.Menus
 
             GetInput("Name").Active = false;
 
-            Squad squad = ArmyUtil.Get_Squad(character.ID);
+            Squad squad = character.Squad;
             if (squad != null)
             {
                 Character leader = squad.GetLeader();

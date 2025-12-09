@@ -1,14 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
-using OP_Engine.Sounds;
 using OP_Engine.Time;
 using OP_Engine.Utility;
-
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -114,9 +111,14 @@ namespace DoS1.Menus
                 else if (InputManager.KeyPressed("Esc"))
                 {
                     TimeManager.Paused = true;
+
                     Active = false;
                     Visible = false;
+
                     MenuManager.ChangeMenu("Main");
+
+                    InputManager.Mouse.Flush();
+                    InputManager.Keyboard.Flush();
                 }
                 else if (InputManager.KeyPressed("Debug"))
                 {

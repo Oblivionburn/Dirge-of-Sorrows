@@ -755,7 +755,7 @@ namespace DoS1.Scenes
 
                     if (location.Type == "Base_Ally")
                     {
-                        Squad hero_squad = ArmyUtil.Get_Squad(Handler.GetHero());
+                        Squad hero_squad = Handler.GetHero().Squad;
                         if (selected_squad.ID != hero_squad.ID)
                         {
                             Menu.AddButton(new ButtonOptions

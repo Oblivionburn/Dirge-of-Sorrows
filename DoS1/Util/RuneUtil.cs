@@ -175,7 +175,7 @@ namespace DoS1.Util
             Item weapon = InventoryUtil.Get_EquippedItem(attacker, "Weapon");
             int counter_chance = CounterChance(weapon);
 
-            Squad squad = ArmyUtil.Get_Squad(attacker.ID);
+            Squad squad = attacker.Squad;
             foreach (Character character in squad.Characters)
             {
                 if (character.ID != attacker.ID)
@@ -244,7 +244,7 @@ namespace DoS1.Util
         {
             int counter_chance = CounterChance_AllArmor(defender);
 
-            Squad squad = ArmyUtil.Get_Squad(defender.ID);
+            Squad squad = defender.Squad;
             foreach (Character character in squad.Characters)
             {
                 if (character.ID != defender.ID)
@@ -337,7 +337,7 @@ namespace DoS1.Util
         {
             int chance = InventoryUtil.Get_Item_Element_Level(attacker_weapon, "Death");
 
-            Squad attacker_squad = ArmyUtil.Get_Squad(attacker.ID);
+            Squad attacker_squad = attacker.Squad;
             foreach (Character character in attacker_squad.Characters)
             {
                 if (character.ID != attacker.ID)
@@ -378,8 +378,7 @@ namespace DoS1.Util
                     resist_chance += DeathResistChance(shield);
                 }
 
-                Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
-                resist_chance += Area_AllArmor_PairedLevel(defender_squad, defender, "Death");
+                resist_chance += Area_AllArmor_PairedLevel(defender.Squad, defender, "Death");
 
                 if (!Utility.RandomPercent(resist_chance))
                 {
@@ -399,7 +398,7 @@ namespace DoS1.Util
 
             int chance = InventoryUtil.Get_Item_Element_Level(attacker_weapon, element);
 
-            Squad attacker_squad = ArmyUtil.Get_Squad(attacker.ID);
+            Squad attacker_squad = attacker.Squad;
             foreach (Character character in attacker_squad.Characters)
             {
                 if (character.ID != attacker.ID)
@@ -461,7 +460,7 @@ namespace DoS1.Util
                 chance += InventoryUtil.Get_Item_Element_Level(shield, element);
             }
 
-            Squad defender_squad = ArmyUtil.Get_Squad(defender.ID);
+            Squad defender_squad = defender.Squad;
             if (defender_squad != null)
             {
                 foreach (Character character in defender_squad.Characters)
@@ -1241,8 +1240,7 @@ namespace DoS1.Util
             }
 
             //Check for AoE extra healing
-            Squad squad = ArmyUtil.Get_Squad(character.ID);
-            heal += Area_AllArmor_PairedLevel(squad, character, element);
+            heal += Area_AllArmor_PairedLevel(character.Squad, character, element);
 
             //Check for stat extra healing
             if (weapon.Categories[0] == "Grimoire")
@@ -1315,11 +1313,7 @@ namespace DoS1.Util
             }
 
             //Check for AoE extra energy
-            Squad squad = ArmyUtil.Get_Squad(character.ID);
-            if (squad != null)
-            {
-                energy += Area_AllArmor_PairedLevel(squad, character, element);
-            }
+            energy += Area_AllArmor_PairedLevel(character.Squad, character, element);
 
             //Check for stat extra energy
             if (weapon.Categories[0] == "Grimoire")

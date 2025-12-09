@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inventories;
@@ -221,7 +219,11 @@ namespace DoS1.Util
                     Writer.WriteAttributeString("TransitionTime", transitionWeather.TransitionTime.ToString());
                 }
             }
-
+            else
+            {
+                Weather weather = WeatherManager.GetWeather(WeatherManager.CurrentWeather);
+                Writer.WriteAttributeString("TransitionTime", weather.TransitionTime.ToString()); 
+            }
             ExitNode();
 
             if (Handler.MarketInventories.Any())
@@ -775,7 +777,6 @@ namespace DoS1.Util
                 Writer.WriteAttributeString("ID", map.ID.ToString());
                 Writer.WriteAttributeString("Name", map.Name);
                 Writer.WriteAttributeString("Type", map.Type);
-                Writer.WriteAttributeString("WorldID", map.WorldID.ToString());
                 Writer.WriteAttributeString("Visible", map.Visible.ToString());
                 ExitNode();
 
@@ -792,8 +793,6 @@ namespace DoS1.Util
                         EnterNode("LayerProperties");
                         Writer.WriteAttributeString("ID", layer.ID.ToString());
                         Writer.WriteAttributeString("Name", layer.Name);
-                        Writer.WriteAttributeString("WorldID", layer.WorldID.ToString());
-                        Writer.WriteAttributeString("MapID", layer.MapID.ToString());
                         Writer.WriteAttributeString("Rows", layer.Rows.ToString());
                         Writer.WriteAttributeString("Columns", layer.Columns.ToString());
                         Writer.WriteAttributeString("Visible", layer.Visible.ToString());
@@ -810,9 +809,6 @@ namespace DoS1.Util
                                 EnterNode("TileProperties");
                                 Writer.WriteAttributeString("ID", tile.ID.ToString());
                                 Writer.WriteAttributeString("Name", tile.Name);
-                                Writer.WriteAttributeString("WorldID", tile.WorldID.ToString());
-                                Writer.WriteAttributeString("MapID", tile.MapID.ToString());
-                                Writer.WriteAttributeString("LayerID", tile.LayerID.ToString());
                                 Writer.WriteAttributeString("Type", tile.Type);
                                 Writer.WriteAttributeString("Location", tile.Location.X.ToString() + "," + tile.Location.Y.ToString());
                                 Writer.WriteAttributeString("Texture", tile.Texture.Name);

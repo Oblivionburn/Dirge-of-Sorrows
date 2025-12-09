@@ -41,7 +41,7 @@ namespace DoS1.Util
             CharacterManager.Armies.Add(army);
 
             Squad ally_squad = NewSquad("Ally");
-            army.Squads.Add(ally_squad);
+            army.AddSquad(ally_squad);
 
             //Reserves
             Army reserves = new Army
@@ -52,7 +52,7 @@ namespace DoS1.Util
             CharacterManager.Armies.Add(reserves);
 
             Squad reserves_squad = NewSquad("Reserves");
-            reserves.Squads.Add(reserves_squad);
+            reserves.AddSquad(reserves_squad);
 
             //Special army
             Army special = new Army
@@ -63,7 +63,7 @@ namespace DoS1.Util
             CharacterManager.Armies.Add(special);
 
             Squad special_squad = NewSquad("Special");
-            special.Squads.Add(special_squad);
+            special.AddSquad(special_squad);
 
             //Enemy
             Army enemies = new Army
@@ -158,7 +158,7 @@ namespace DoS1.Util
                 }
 
                 Gen_EnemySquad(army, enemy_squad, map_level + 1, -1, -1, -1, -1);
-                army.Squads.Add(enemy_squad);
+                army.AddSquad(enemy_squad);
             }
         }
 
@@ -773,7 +773,7 @@ namespace DoS1.Util
                     }
                 }
 
-                squad.Characters.Add(character);
+                squad.AddCharacter(character);
 
                 if (i == 0)
                 {
@@ -799,7 +799,7 @@ namespace DoS1.Util
                 InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
                 InventoryUtil.EquipItem(character, character.Inventory.Items[character.Inventory.Items.Count - 1]);
 
-                squad.Characters.Add(character);
+                squad.AddCharacter(character);
 
                 x++;
                 if (x >= 10)
@@ -839,48 +839,6 @@ namespace DoS1.Util
                     squad.Location.Y == tile.Location.Y)
                 {
                     return squad;
-                }
-            }
-
-            return null;
-        }
-
-        public static Squad Get_Squad(Character leader)
-        {
-            if (leader != null)
-            {
-                foreach (Army army in CharacterManager.Armies)
-                {
-                    foreach (Squad squad in army.Squads)
-                    {
-                        Character squadLeader = squad.GetLeader();
-                        if (squadLeader != null)
-                        {
-                            if (squadLeader.ID == leader.ID)
-                            {
-                                return squad;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public static Squad Get_Squad(long character_id)
-        {
-            foreach (Army army in CharacterManager.Armies)
-            {
-                foreach (Squad squad in army.Squads)
-                {
-                    foreach (Character character in squad.Characters)
-                    {
-                        if (character.ID == character_id)
-                        {
-                            return squad;
-                        }
-                    }
                 }
             }
 
@@ -1140,7 +1098,7 @@ namespace DoS1.Util
 
         public static void Undeploy()
         {
-            Squad squad = Get_Squad(Handler.Dialogue_Character2);
+            Squad squad = Handler.Dialogue_Character2.Squad;
             if (squad != null)
             {
                 squad.Visible = false;

@@ -1,14 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
-
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Scenes;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
-
+using OP_Engine.Enums;
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -567,7 +566,7 @@ namespace DoS1.Menus
             InventoryUtil.EquipItem(friend, friend.Inventory.Items[friend.Inventory.Items.Count - 1]);
 
             Squad reserves = CharacterManager.GetArmy("Reserves").Squads[0];
-            reserves.Characters.Add(friend);
+            reserves.AddCharacter(friend);
 
             //Add spouse
             Character spouse;
@@ -584,7 +583,7 @@ namespace DoS1.Menus
             InventoryUtil.EquipItem(spouse, spouse.Inventory.Items[spouse.Inventory.Items.Count - 1]);
 
             Squad special = CharacterManager.GetArmy("Special").Squads[0];
-            special.Characters.Add(spouse);
+            special.AddCharacter(spouse);
 
             //Add hero
             Army army = CharacterManager.GetArmy("Ally");
@@ -594,7 +593,7 @@ namespace DoS1.Menus
             leader = CharacterUtil.NewCharacter(LeaderName, new Vector2(1, 1), "Ally", Direction.Left, Handler.HairStyles_Male[HairStyle], HairColors[HairColor],
                 Handler.HeadStyles_Male[Head], EyeColors[EyeColor], Handler.SkinTones[Skin], Gender == 0 ? "Male" : "Female");
 
-            squad.Characters.Add(leader);
+            squad.AddCharacter(leader);
             squad.Leader_ID = leader.ID;
 
             Handler.MainCharacter_ID = leader.ID;

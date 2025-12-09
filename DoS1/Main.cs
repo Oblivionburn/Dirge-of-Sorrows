@@ -3,10 +3,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows.Forms;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Inputs;
 using OP_Engine.Inventories;
@@ -18,7 +16,7 @@ using OP_Engine.Spells;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
-
+using OP_Engine.Enums;
 using DoS1.Menus;
 using DoS1.Scenes;
 using DoS1.Util;
@@ -182,8 +180,8 @@ namespace DoS1
                             SceneManager.Update(Game.Game, Content);
                             RenderingManager.Update();
 
-                            if (!Handler.LocalPause &&
-                                !TimeManager.Paused)
+                            if ((Handler.Combat && !Handler.CombatPause) ||
+                                (!Handler.LocalPause && !TimeManager.Paused))
                             {
                                 WeatherManager.Update(Game.Resolution, RenderingManager.Lighting.DrawColor);
                             }
@@ -303,6 +301,7 @@ namespace DoS1
 
         private void LoadComponents()
         {
+            Components.Add(new RenderingManager(this));
             Components.Add(new InputManager(this));
             Components.Add(new SoundManager(this));
             Components.Add(new MenuManager(this));

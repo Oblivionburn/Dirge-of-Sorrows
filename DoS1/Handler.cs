@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 using OP_Engine.Characters;
 using OP_Engine.Inputs;
 using OP_Engine.Inventories;
@@ -16,7 +13,7 @@ using OP_Engine.Sounds;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
-
+using OP_Engine.Enums;
 using DoS1.Util;
 
 namespace DoS1

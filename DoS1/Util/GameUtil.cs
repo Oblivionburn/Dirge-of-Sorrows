@@ -11,6 +11,7 @@ using OP_Engine.Tiles;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Weathers;
+using OP_Engine.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -721,7 +722,7 @@ namespace DoS1.Util
         {
             Toggle_Pause(false);
 
-            Squad hero_squad = ArmyUtil.Get_Squad(Handler.GetHero());
+            Squad hero_squad = Handler.GetHero().Squad;
 
             Handler.Dialogue_Character2 = squad.GetLeader();
             Handler.AlertType = "Location";

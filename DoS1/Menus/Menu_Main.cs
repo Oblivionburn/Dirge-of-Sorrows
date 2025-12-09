@@ -1,18 +1,14 @@
 ﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Scenes;
-using OP_Engine.Sounds;
 using OP_Engine.Time;
 using OP_Engine.Utility;
-
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -92,7 +88,8 @@ namespace DoS1.Menus
                 GetLabel("Examine").Visible = false;
             }
 
-            if (InputManager.KeyPressed("Esc"))
+            if (InputManager.KeyPressed("Esc") &&
+                Main.Game.GameStarted)
             {
                 Close();
             }

@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Scenes;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
+using OP_Engine.Enums;
 
 namespace DoS1.Util
 {
@@ -121,7 +121,7 @@ namespace DoS1.Util
             return new Map
             {
                 ID = Handler.GetID(),
-                WorldID = world.ID,
+                World = world,
                 Visible = visible,
                 DrawColor = Color.White,
                 Name = name
@@ -133,8 +133,8 @@ namespace DoS1.Util
             return new Layer
             {
                 ID = Handler.GetID(),
-                WorldID = map.WorldID,
-                MapID = map.ID,
+                World = map.World,
+                Map = map,
                 Visible = true,
                 DrawColor = Color.White,
                 Name = name,
@@ -148,8 +148,8 @@ namespace DoS1.Util
             return new Layer
             {
                 ID = Handler.GetID(),
-                WorldID = map.WorldID,
-                MapID = map.ID,
+                World = map.World,
+                Map = map,
                 Visible = true,
                 DrawColor = Color.White,
                 Name = name,
@@ -201,9 +201,9 @@ namespace DoS1.Util
                     layer.Tiles.Add(new Tile
                     {
                         ID = Handler.GetID(),
-                        WorldID = layer.WorldID,
-                        MapID = layer.MapID,
-                        LayerID = layer.ID,
+                        World = layer.World,
+                        Map = layer.Map,
+                        Layer = layer,
                         Visible = false,
                         Location = new Location(x, y, 0),
                         Region = new Region(x * width, y * height, width, height)
@@ -259,9 +259,9 @@ namespace DoS1.Util
             Tile tile = new Tile
             {
                 ID = Handler.GetID(),
-                WorldID = layer.WorldID,
-                MapID = layer.MapID,
-                LayerID = layer.ID,
+                World = layer.World,
+                Map = layer.Map,
+                Layer = layer,
                 Visible = true,
                 Name = type,
                 Type = type,

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Characters;
+using OP_Engine.Enums;
 using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Scenes;
@@ -338,6 +339,13 @@ namespace DoS1.Util
                         if (Enum.TryParse(reader.Value, out WeatherType weather))
                         {
                             WeatherManager.CurrentWeather = weather;
+
+                            Weather currentWeather = WeatherManager.GetWeather(weather);
+                            if (currentWeather != null)
+                            {
+                                currentWeather.Visible = true;
+                            }
+
                             AssetManager.PlayAmbient(weather.ToString(), true);
                         }
                         break;
@@ -367,6 +375,10 @@ namespace DoS1.Util
                                 SoundManager.AmbientFade[WeatherManager.CurrentWeather.ToString()] = (float)transitionWeather.TransitionTime * 0.02f;
                                 transitionWeather.Visible = true;
                             }
+                        }
+                        else
+                        {
+                            WeatherManager.GetWeather(WeatherManager.CurrentWeather).TransitionTime = int.Parse(reader.Value);
                         }
                         break;
                 }
@@ -718,7 +730,7 @@ namespace DoS1.Util
                     case "CharacterProperties":
                         character = new Character();
                         VisitCharacter(reader, character);
-                        squad.Characters.Add(character);
+                        squad.AddCharacter(character);
                         break;
 
                     case "Stats":
@@ -975,7 +987,7 @@ namespace DoS1.Util
                                     CharacterManager.Armies.Add(reserves);
 
                                     Squad reserves_squad = ArmyUtil.NewSquad("Reserves");
-                                    reserves.Squads.Add(reserves_squad);
+                                    reserves.AddSquad(reserves_squad);
                                 }
                                 break;
                         }
@@ -1052,7 +1064,7 @@ namespace DoS1.Util
                     case "Squad":
                         Squad squad = new Squad();
                         VisitSquad(reader, squad);
-                        army.Squads.Add(squad);
+                        army.AddSquad(squad);
                         break;
                 }
             }
@@ -1386,7 +1398,7 @@ namespace DoS1.Util
                     case "Map":
                         Map map = new Map();
                         VisitMap(reader, map);
-                        world.Maps.Add(map);
+                        world.AddMap(map);
 
                         WorldGen.AlignRegions(map);
                         break;
@@ -1437,10 +1449,6 @@ namespace DoS1.Util
                         map.Type = reader.Value;
                         break;
 
-                    case "WorldID":
-                        map.WorldID = long.Parse(reader.Value);
-                        break;
-
                     case "Visible":
                         map.Visible = reader.Value == "True";
                         break;
@@ -1460,7 +1468,7 @@ namespace DoS1.Util
                     case "Layer":
                         Layer layer = new Layer();
                         VisitLayer(reader, layer);
-                        map.Layers.Add(layer);
+                        map.AddLayer(layer);
                         break;
                 }
             }
@@ -1505,14 +1513,6 @@ namespace DoS1.Util
                         layer.Name = reader.Value;
                         break;
 
-                    case "WorldID":
-                        layer.WorldID = long.Parse(reader.Value);
-                        break;
-
-                    case "MapID":
-                        layer.MapID = long.Parse(reader.Value);
-                        break;
-
                     case "Rows":
                         layer.Rows = int.Parse(reader.Value);
                         break;
@@ -1540,7 +1540,7 @@ namespace DoS1.Util
                     case "TileProperties":
                         Tile tile = new Tile();
                         VisitTileProperties(reader, tile);
-                        layer.Tiles.Add(tile);
+                        layer.AddTile(tile);
                         break;
                 }
             }
@@ -1563,18 +1563,6 @@ namespace DoS1.Util
 
                     case "Name":
                         tile.Name = reader.Value;
-                        break;
-
-                    case "WorldID":
-                        tile.WorldID = long.Parse(reader.Value);
-                        break;
-
-                    case "MapID":
-                        tile.MapID = long.Parse(reader.Value);
-                        break;
-
-                    case "LayerID":
-                        tile.LayerID = long.Parse(reader.Value);
                         break;
 
                     case "Type":

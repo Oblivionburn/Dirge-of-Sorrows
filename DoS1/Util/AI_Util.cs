@@ -35,7 +35,7 @@ namespace DoS1.Util
             }
             else if (squad.Assignment == "Attack Hero Squad")
             {
-                Squad target_squad = ArmyUtil.Get_Squad(Handler.GetHero());
+                Squad target_squad = Handler.GetHero().Squad;
                 if (target_squad != null)
                 {
                     squad.GetLeader().Target_ID = target_squad.ID;

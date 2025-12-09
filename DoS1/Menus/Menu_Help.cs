@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Time;
 using OP_Engine.Utility;
-
+using OP_Engine.Enums;
 using DoS1.Util;
 
 namespace DoS1.Menus

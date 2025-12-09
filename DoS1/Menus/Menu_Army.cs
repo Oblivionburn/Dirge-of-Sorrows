@@ -312,7 +312,7 @@ namespace DoS1.Menus
             else if (button.Name == "Add")
             {
                 Army army = CharacterManager.GetArmy("Ally");
-                army.Squads.Add(ArmyUtil.NewSquad("Ally"));
+                army.AddSquad(ArmyUtil.NewSquad("Ally"));
                 Load();
             }
             else if (button.Name == "Remove")
@@ -392,7 +392,7 @@ namespace DoS1.Menus
                 character.HealthBar.Visible = false;
                 character.ManaBar.Visible = false;
 
-                reserves.Characters.Add(character);
+                reserves.AddCharacter(character);
                 squad.Characters.Remove(character);
                 i--;
             }

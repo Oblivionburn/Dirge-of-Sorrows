@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using OP_Engine.Characters;
 using OP_Engine.Controls;
 using OP_Engine.Inputs;
@@ -11,7 +10,7 @@ using OP_Engine.Sounds;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
 using OP_Engine.Inventories;
-
+using OP_Engine.Enums;
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -181,7 +180,7 @@ namespace DoS1.Menus
             }
             else if (button.Text == "[Continue Moving]")
             {
-                Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
+                Squad squad = Handler.Dialogue_Character2.Squad;
                 Handler.Selected_Token = squad.ID;
 
                 Scene localmap = SceneManager.GetScene("Localmap");
@@ -238,7 +237,7 @@ namespace DoS1.Menus
         {
             string type = "Town";
 
-            Squad squad = ArmyUtil.Get_Squad(Handler.Dialogue_Character2);
+            Squad squad = Handler.Dialogue_Character2.Squad;
             if (squad != null)
             {
                 Tile location = WorldUtil.GetLocation(squad);
@@ -347,11 +346,11 @@ namespace DoS1.Menus
                 Layer ground = map.GetLayer("Ground");
                 Tile ally_base = WorldUtil.Get_Base(map, "Ally");
 
-                Squad squad = ArmyUtil.Get_Squad(Handler.GetHero());
+                Squad squad = Handler.GetHero().Squad;
                 if (squad != null)
                 {
                     Squad enemy_squad = ArmyUtil.NewSquad("Enemy");
-                    special.Squads.Add(enemy_squad);
+                    special.AddSquad(enemy_squad);
 
                     ArmyUtil.Gen_EnemySquad(special, enemy_squad, 1, 1, 0, 1, 1);
                     foreach (Character character in enemy_squad.Characters)

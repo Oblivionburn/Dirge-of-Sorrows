@@ -643,7 +643,7 @@ namespace DoS1.Menus
                         ReserveList.Remove(moving_character);
                         CharacterUtil.ResizeBars(moving_character);
 
-                        ally_squad.Characters.Add(moving_character);
+                        ally_squad.AddCharacter(moving_character);
                         if (ally_squad.Characters.Count == 1)
                         {
                             ally_squad.Name = moving_character.Name;
@@ -732,7 +732,7 @@ namespace DoS1.Menus
 
                     if (!inReserves)
                     {
-                        reserves.Characters.Add(moving_character);
+                        reserves.AddCharacter(moving_character);
 
                         ReserveList.Add(moving_character);
                         moving_character.HealthBar.Visible = false;
@@ -756,9 +756,9 @@ namespace DoS1.Menus
         private void SwapCharacters(Squad old_squad, Character moving_char, Squad new_squad, Character existing_char)
         {
             new_squad.Characters.Remove(existing_char);
-            old_squad.Characters.Add(existing_char);
+            old_squad.AddCharacter(existing_char);
 
-            new_squad.Characters.Add(moving_char);
+            new_squad.AddCharacter(moving_char);
             old_squad.Characters.Remove(moving_char);
 
             moving_char.Formation = new Vector2(new_pos.X, new_pos.Y);
