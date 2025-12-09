@@ -728,6 +728,9 @@ namespace DoS1.Util
             Handler.AlertType = "Location";
 
             Menu ui = MenuManager.GetMenu("UI");
+
+            Button worldmap = ui.GetButton("Worldmap");
+
             Label examine = ui.GetLabel("Examine");
             examine.Visible = false;
 
@@ -796,6 +799,11 @@ namespace DoS1.Util
             else if (captured_enemy_base)
             {
                 message += " The enemy will no longer hold control over this region... it's ours now!";
+
+                if (worldmap.Enabled)
+                {
+                    message = "\"We arrived at " + location.Name + ".";
+                }
             }
             else if (is_base)
             {
@@ -810,6 +818,21 @@ namespace DoS1.Util
             }
 
             message += "\"";
+
+            if (captured_enemy_base &&
+                !worldmap.Enabled)
+            {
+                int gold_level = ((Handler.Level + 1) * 1000) / 2;
+                int min_gold = gold_level / 4;
+                int max_gold = gold_level / 2;
+
+                CryptoRandom random = new CryptoRandom();
+                int gold_amount = random.Next(min_gold, max_gold + 1);
+
+                Handler.Gold += gold_amount;
+
+                message += "\n\n" + gold_amount + " Gold looted!";
+            }
 
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
@@ -913,8 +936,6 @@ namespace DoS1.Util
             }
             else
             {
-                Button worldmap = ui.GetButton("Worldmap");
-
                 if (worldmap.Enabled)
                 {
                     Button option1 = alerts.GetButton("Dialogue_Option1");

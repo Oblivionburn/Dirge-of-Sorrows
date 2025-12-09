@@ -1,14 +1,13 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
-using OP_Engine.Rendering;
-using OP_Engine.Utility;
-using OP_Engine.Tiles;
-using OP_Engine.Scenes;
 using OP_Engine.Characters;
+using OP_Engine.Controls;
+using OP_Engine.Rendering;
+using OP_Engine.Scenes;
+using OP_Engine.Tiles;
+using OP_Engine.Utility;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DoS1
 {
@@ -95,6 +94,23 @@ namespace DoS1
                         DrawColor = new Color(255, 240, 160, 255)
                     });
                 }
+
+                for (int i = 0; i < scene.Menu.Pictures.Count; i++)
+                {
+                    Picture picture = scene.Menu.Pictures[i];
+                    if (picture.Name == "Fireworks")
+                    {
+                        int tileWidth = (int)picture.Region.Width / 5;
+
+                        Handler.light_maps.Add(new Something
+                        {
+                            ID = picture.ID,
+                            Name = "Fireworks",
+                            Region = new Region(picture.Region.X + tileWidth, picture.Region.Y + tileWidth, tileWidth * 3, tileWidth * 3),
+                            DrawColor = picture.DrawColor
+                        });
+                    }
+                }
             }
         }
 
@@ -109,7 +125,24 @@ namespace DoS1
                 Rectangle region = new Rectangle((int)map.Region.X, (int)map.Region.Y, (int)map.Region.Width, (int)map.Region.Height);
                 Rectangle image = new Rectangle(0, 0, light.Width, light.Height);
 
-                spriteBatch.Draw(light, region, image, map.DrawColor);
+                if (map.Name == "Fireworks")
+                {
+                    Scene scene = SceneManager.GetScene("Localmap");
+                    Picture firework = scene.Menu.GetPicture(map.ID);
+                    if (firework != null)
+                    {
+                        spriteBatch.Draw(light, region, image, firework.DrawColor * firework.Opacity);
+                    }
+                    else
+                    {
+                        Handler.light_maps.Remove(map);
+                        i--;
+                    }
+                }
+                else
+                {
+                    spriteBatch.Draw(light, region, image, map.DrawColor);
+                }
             }
         }
 

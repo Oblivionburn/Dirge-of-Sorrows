@@ -28,6 +28,7 @@ namespace DoS1
         public static string AlertType;
         public static int StoryStep = -1;
         public static bool AutoSave;
+        public static bool Fireworks;
 
         public static bool Loaded;
         public static int Loading_Step;
@@ -217,6 +218,7 @@ namespace DoS1
                 "Earth",
                 "Equip",
                 "Fire",
+                "Fireworks",
                 "Heal",
                 "Ice",
                 "IronSword",

@@ -6,6 +6,7 @@ using OP_Engine.Inputs;
 using OP_Engine.Menus;
 using OP_Engine.Time;
 using OP_Engine.Utility;
+using OP_Engine.Scenes;
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -210,6 +211,19 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Worldmap")
             {
+                Handler.Fireworks = false;
+
+                Scene scene = WorldUtil.GetScene();
+                for (int i = 0; i < scene.Menu.Pictures.Count; i++)
+                {
+                    Picture picture = scene.Menu.Pictures[i];
+                    if (picture.Name == "Fireworks")
+                    {
+                        scene.Menu.Pictures.Remove(picture);
+                        i--;
+                    }
+                }
+
                 if (Handler.Selected_Token != -1)
                 {
                     WorldUtil.DeselectToken();

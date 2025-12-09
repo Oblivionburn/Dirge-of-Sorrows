@@ -112,6 +112,12 @@ namespace DoS1.Scenes
                     }
                 }
 
+                if (Handler.Fireworks &&
+                    !Handler.LocalPause)
+                {
+                    Fireworks();
+                }
+
                 base.Update(gameRef, content);
             }
         }
@@ -182,7 +188,8 @@ namespace DoS1.Scenes
                 foreach (Picture picture in Menu.Pictures)
                 {
                     if (picture.Name != "Highlight" &&
-                        picture.Name != "Select")
+                        picture.Name != "Select" &&
+                        picture.Name != "Fireworks")
                     {
                         picture.Draw(spriteBatch);
                     }
@@ -203,6 +210,14 @@ namespace DoS1.Scenes
                     {
                         picture.Draw(spriteBatch);
                         break;
+                    }
+                }
+
+                foreach (Picture picture in Menu.Pictures)
+                {
+                    if (picture.Name == "Fireworks")
+                    {
+                        picture.Draw(spriteBatch);
                     }
                 }
 
@@ -1133,6 +1148,128 @@ namespace DoS1.Scenes
 
             examine.Region = new Region(X, Y, width, height);
             examine.Visible = true;
+        }
+
+        private void Fireworks()
+        {
+            List<Picture> fireworks = new List<Picture>();
+
+            int pictureCount = Menu.Pictures.Count;
+            for (int i = 0; i < pictureCount; i++)
+            {
+                Picture picture = Menu.Pictures[i];
+                if (picture.Name == "Fireworks")
+                {
+                    fireworks.Add(picture);
+                }
+            }
+
+            //Animate existing fireworks
+            for (int i = 0; i < fireworks.Count; i++)
+            {
+                Picture firework = fireworks[i];
+
+                int num = firework.Image.X + firework.Image.Height;
+                if (num >= firework.Texture.Width)
+                {
+                    firework.Value--;
+                    firework.Opacity = firework.Value / 100;
+
+                    if (firework.Value <= 0)
+                    {
+                        Menu.Pictures.Remove(firework);
+                        fireworks.Remove(firework);
+                        i--;
+                    }
+                }
+                else
+                {
+                    firework.Image = new Rectangle(num, firework.Image.Y, firework.Image.Width, firework.Image.Height);
+                }
+            }
+
+            CryptoRandom random = new CryptoRandom();
+            int chance = random.Next(0, 30);
+            if (chance == 0)
+            {
+                Map map = WorldUtil.GetMap(World);
+                if (map != null)
+                {
+                    Layer ground = map.GetLayer("Ground");
+
+                    Tile enemyBase = WorldUtil.Get_Base(map, "Enemy");
+                    if (enemyBase != null)
+                    {
+                        random = new CryptoRandom();
+                        int x = random.Next((int)enemyBase.Location.X - 2, (int)enemyBase.Location.X + 3);
+
+                        random = new CryptoRandom();
+                        int y = random.Next((int)enemyBase.Location.Y - 2, (int)enemyBase.Location.Y + 3);
+
+                        Tile tile = ground.GetTile(new Vector3(x, y, 0));
+                        if (tile != null)
+                        {
+                            Color drawColor = Color.White;
+
+                            random = new CryptoRandom();
+                            int colorChoice = random.Next(0, 7);
+                            switch (colorChoice)
+                            {
+                                case 0:
+                                    drawColor = Color.Red;
+                                    break;
+
+                                case 1:
+                                    drawColor = Color.Blue;
+                                    break;
+
+                                case 2:
+                                    drawColor = Color.Lime;
+                                    break;
+
+                                case 3:
+                                    drawColor = Color.Yellow;
+                                    break;
+
+                                case 4:
+                                    drawColor = Color.Cyan;
+                                    break;
+
+                                case 5:
+                                    drawColor = Color.Violet;
+                                    break;
+
+                                case 6:
+                                    drawColor = Color.Orange;
+                                    break;
+                            }
+
+                            float width = tile.Region.Width * 5;
+                            float height = tile.Region.Height * 5;
+
+                            Texture2D texture = Handler.GetTexture("Fireworks");
+
+                            Menu.Pictures.Add(new Picture
+                            {
+                                ID = Handler.GetID(),
+                                Name = "Fireworks",
+                                Texture = texture,
+                                Image = new Rectangle(0, 0, texture.Width / 4, texture.Height),
+                                Region = new Region(tile.Region.X - (tile.Region.Width * 2), tile.Region.Y - (tile.Region.Height * 2), width, height),
+                                Location = new Location(x, y, 0),
+                                DrawColor = drawColor,
+                                Visible = true,
+                                Value = 100
+                            });
+
+                            Squad squad = Handler.GetHero().Squad;
+
+                            AssetManager.PlaySound_Random_AtDistance("Fireworks", new Vector2(squad.Location.X, squad.Location.Y),
+                                new Vector2(x, y), 10);
+                        }
+                    }
+                }
+            }
         }
 
         public override void Load(ContentManager content)

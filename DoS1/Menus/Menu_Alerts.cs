@@ -300,6 +300,8 @@ namespace DoS1.Menus
             }
 
             WorldGen.AlignRegions(map);
+
+            Handler.Fireworks = true;
         }
 
         private void ContinueStory()

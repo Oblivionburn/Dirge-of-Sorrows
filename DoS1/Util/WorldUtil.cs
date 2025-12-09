@@ -591,7 +591,7 @@ namespace DoS1.Util
                     }
 
                     int weatherCount = WeatherManager.Weathers.Count;
-                    for (int i = 0; i <  weatherCount; i++)
+                    for (int i = 0; i < weatherCount; i++)
                     {
                         Weather weather = WeatherManager.Weathers[i];
                         if (weather.Visible)
@@ -602,6 +602,17 @@ namespace DoS1.Util
                                 particle.Location.X += x_diff;
                                 particle.Location.Y += y_diff;
                             }
+                        }
+                    }
+
+                    Scene scene = GetScene();
+                    for (int i = 0; i < scene.Menu.Pictures.Count; i++)
+                    {
+                        Picture picture = scene.Menu.Pictures[i];
+                        if (picture.Name == "Fireworks")
+                        {
+                            picture.Region.X += x_diff;
+                            picture.Region.Y += y_diff;
                         }
                     }
                 }
@@ -1859,26 +1870,28 @@ namespace DoS1.Util
                     for (int i = 0; i < count; i++)
                     {
                         Tile tile = locations.Tiles[i];
-
-                        int armyCount = CharacterManager.Armies.Count;
-                        for (int a = 0; a < armyCount; a++)
+                        if (tile.Location != null)
                         {
-                            Army army = CharacterManager.Armies[a];
-
-                            for (int s = 0; s < army.Squads.Count; s++)
+                            int armyCount = CharacterManager.Armies.Count;
+                            for (int a = 0; a < armyCount; a++)
                             {
-                                Squad squad = army.Squads[s];
-                                if (squad.Location != null)
+                                Army army = CharacterManager.Armies[a];
+
+                                for (int s = 0; s < army.Squads.Count; s++)
                                 {
-                                    if (squad.Location.X == tile.Location.X &&
-                                        squad.Location.Y == tile.Location.Y &&
-                                        !squad.Moving)
+                                    Squad squad = army.Squads[s];
+                                    if (squad.Location != null)
                                     {
-                                        for (int c = 0; c < squad.Characters.Count; c++)
+                                        if (squad.Location.X == tile.Location.X &&
+                                            squad.Location.Y == tile.Location.Y &&
+                                            !squad.Moving)
                                         {
-                                            Character character = squad.Characters[c];
-                                            character.HealthBar.IncreaseValue(1);
-                                            character.ManaBar.IncreaseValue(1);
+                                            for (int c = 0; c < squad.Characters.Count; c++)
+                                            {
+                                                Character character = squad.Characters[c];
+                                                character.HealthBar.IncreaseValue(1);
+                                                character.ManaBar.IncreaseValue(1);
+                                            }
                                         }
                                     }
                                 }
