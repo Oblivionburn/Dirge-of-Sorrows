@@ -140,40 +140,49 @@ namespace DoS1.Menus
 
         private bool HoveringButton()
         {
+            if (Handler.Selected_Token != -1 ||
+                Handler.StoryStep < 20)
+            {
+                return false;
+            }
+
+            if (Handler.LocalMap &&
+                Handler.StoryStep >= 57 &&
+                Handler.StoryStep <= 62)
+            {
+                return false;
+            }
+
             bool found = false;
 
-            if (Handler.StoryStep >= 20 &&
-                Handler.Selected_Token == -1)
+            foreach (Button button in Buttons)
             {
-                foreach (Button button in Buttons)
+                if (button.Visible &&
+                    button.Enabled)
                 {
-                    if (button.Visible &&
-                        button.Enabled)
+                    if (InputManager.MouseWithin(button.Region.ToRectangle))
                     {
-                        if (InputManager.MouseWithin(button.Region.ToRectangle))
+                        found = true;
+
+                        if (button.HoverText != null)
                         {
-                            found = true;
-
-                            if (button.HoverText != null)
-                            {
-                                GetLabel("Examine").TextColor = Color.White;
-                                GameUtil.Examine(this, button.HoverText);
-                            }
-
-                            button.Selected = true;
-
-                            if (InputManager.Mouse_LB_Pressed)
-                            {
-                                found = false;
-                                CheckClick(button);
-                                button.Selected = false;
-                                break;
-                            }
+                            GetLabel("Examine").TextColor = Color.White;
+                            GameUtil.Examine(this, button.HoverText);
                         }
-                        else if (InputManager.Mouse.Moved)
+
+                        button.Selected = true;
+
+                        if (InputManager.Mouse_LB_Pressed)
                         {
+                            found = false;
+                            CheckClick(button);
                             button.Selected = false;
+                            break;
                         }
+                    }
+                    else if (InputManager.Mouse.Moved)
+                    {
+                        button.Selected = false;
                     }
                 }
             }
@@ -207,7 +216,7 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Speed")
             {
-                SpeedToggle();
+                GameUtil.ToggleSpeed();
             }
             else if (button.Name == "Worldmap")
             {
@@ -229,6 +238,11 @@ namespace DoS1.Menus
                     WorldUtil.DeselectToken();
                 }
 
+                if (Handler.StoryStep == 56)
+                {
+                    Handler.StoryStep++;
+                }
+
                 GameUtil.ReturnToWorldmap();
             }
             else
@@ -237,6 +251,13 @@ namespace DoS1.Menus
 
                 Active = false;
                 Visible = false;
+
+                if (button.Name == "Army" &&
+                    Handler.StoryStep == 63)
+                {
+                    MenuManager.GetMenu("Alerts").Visible = false;
+                    Handler.StoryStep++;
+                }
 
                 MenuManager.ChangeMenu(button.Name);
 
@@ -249,49 +270,6 @@ namespace DoS1.Menus
         {
             Label gold = GetLabel("Gold");
             gold.Text = "Gold: " + Handler.Gold;
-        }
-
-        private void SpeedToggle()
-        {
-            Main.TimeSpeed += 2;
-            if (Main.TimeSpeed > 10)
-            {
-                Main.TimeSpeed = 4;
-            }
-
-            Button button = GetButton("Speed");
-            switch (Main.TimeSpeed)
-            {
-                case 4:
-                    button.HoverText = "Time x1";
-                    button.Texture = AssetManager.Textures["Button_Speed1"];
-                    button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
-                    button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
-                    break;
-
-                case 6:
-                    button.HoverText = "Time x2";
-                    button.Texture = AssetManager.Textures["Button_Speed2"];
-                    button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
-                    button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
-                    break;
-
-                case 8:
-                    button.HoverText = "Time x3";
-                    button.Texture = AssetManager.Textures["Button_Speed3"];
-                    button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
-                    button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
-                    break;
-
-                case 10:
-                    button.HoverText = "Time x4";
-                    button.Texture = AssetManager.Textures["Button_Speed4"];
-                    button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
-                    button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
-                    break;
-            }
-
-            SaveUtil.ExportINI();
         }
 
         public override void Load(ContentManager content)
@@ -396,7 +374,7 @@ namespace DoS1.Menus
             });
 
             Button speed_button = GetButton("Speed");
-            switch (Main.TimeSpeed)
+            switch (Handler.TimeSpeed)
             {
                 case 4:
                     speed_button.HoverText = "Time x1";

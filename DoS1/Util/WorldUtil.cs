@@ -1647,6 +1647,12 @@ namespace DoS1.Util
                             {
                                 for (int s = 0; s < army.Squads.Count; s++)
                                 {
+                                    if (army.Name == "Enemy" &&
+                                        Handler.StoryStep == 59)
+                                    {
+                                        break;
+                                    }
+
                                     Squad squad = army.Squads[s];
                                     if (squad.Visible &&
                                         squad.Active)

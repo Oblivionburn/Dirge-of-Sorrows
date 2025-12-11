@@ -68,6 +68,12 @@ namespace DoS1.Menus
                     }
                 }
 
+                if ((Handler.StoryStep >= 63 && Handler.StoryStep <= 65) ||
+                    (Handler.StoryStep >= 68 && Handler.StoryStep <= 70))
+                {
+                    StoryUtil.Alert_Story(this);
+                }
+
                 base.Update(gameRef, content);
             }
         }
@@ -174,6 +180,52 @@ namespace DoS1.Menus
 
         private void UpdateControls()
         {
+            bool hoveringButton = HoveringButton();
+            bool hoveringSquad = HoveringSquad();
+
+            if (!hoveringButton &&
+                !hoveringSquad)
+            {
+                GetLabel("Examine").Visible = false;
+            }
+
+            if (!hoveringSquad)
+            {
+                if (SelectedSquad == 0)
+                {
+                    GetPicture("Highlight").Visible = false;
+
+                    if (Handler.StoryStep == 69)
+                    {
+                        Handler.StoryStep = 68;
+                    }
+                }
+
+                if (InputManager.Mouse_LB_Pressed)
+                {
+                    SelectedSquad = 0;
+                    GetButton("Remove").Enabled = false;
+                    GetButton("Deploy").Enabled = false;
+                }
+            }
+
+            if (InputManager.Mouse.ScrolledDown)
+            {
+                ScrollDown();
+            }
+            else if (InputManager.Mouse.ScrolledUp)
+            {
+                ScrollUp();
+            }
+
+            if (InputManager.KeyPressed("Esc"))
+            {
+                Back();
+            }
+        }
+
+        private bool HoveringButton()
+        {
             bool found = false;
 
             foreach (Button button in Buttons)
@@ -194,6 +246,12 @@ namespace DoS1.Menus
 
                         if (InputManager.Mouse_LB_Pressed)
                         {
+                            if (Handler.StoryStep == 65 ||
+                                Handler.StoryStep == 68)
+                            {
+                                return false;
+                            }
+
                             found = false;
                             CheckClick(button);
 
@@ -210,6 +268,13 @@ namespace DoS1.Menus
                     }
                 }
             }
+
+            return found;
+        }
+
+        private bool HoveringSquad()
+        {
+            bool found = false;
 
             if (SelectedSquad == 0)
             {
@@ -238,7 +303,7 @@ namespace DoS1.Menus
                                     highlight.Region = picture.Region;
                                     highlight.Visible = true;
 
-                                    if (InputManager.Mouse_RB_Pressed) 
+                                    if (InputManager.Mouse_RB_Pressed)
                                     {
                                         found = false;
                                         SelectSquad(squad);
@@ -259,6 +324,11 @@ namespace DoS1.Menus
                                         {
                                             GetButton("Deploy").Enabled = true;
                                         }
+
+                                        if (Handler.StoryStep == 68)
+                                        {
+                                            Handler.StoryStep++;
+                                        }
                                     }
                                 }
                             }
@@ -267,38 +337,7 @@ namespace DoS1.Menus
                 }
             }
 
-            if (!found)
-            {
-                GetLabel("Examine").Visible = false;
-
-                if (InputManager.Mouse_LB_Pressed ||
-                    SelectedSquad == 0)
-                {
-                    SelectedSquad = 0;
-                    GetButton("Remove").Enabled = false;
-                    GetButton("Deploy").Enabled = false;
-                }
-            }
-
-            if (!found &&
-                SelectedSquad == 0)
-            {
-                GetPicture("Highlight").Visible = false;
-            }
-
-            if (InputManager.Mouse.ScrolledDown)
-            {
-                ScrollDown();
-            }
-            else if (InputManager.Mouse.ScrolledUp)
-            {
-                ScrollUp();
-            }
-
-            if (InputManager.KeyPressed("Esc"))
-            {
-                Back();
-            }
+            return found;
         }
 
         private void CheckClick(Button button)
@@ -311,9 +350,7 @@ namespace DoS1.Menus
             }
             else if (button.Name == "Add")
             {
-                Army army = CharacterManager.GetArmy("Ally");
-                army.AddSquad(ArmyUtil.NewSquad("Ally"));
-                Load();
+                AddSquad();
             }
             else if (button.Name == "Remove")
             {
@@ -323,11 +360,29 @@ namespace DoS1.Menus
             else if (button.Name == "Deploy")
             {
                 ArmyUtil.DeploySquad(SelectedSquad);
+
+                if (Handler.StoryStep == 69)
+                {
+                    Handler.StoryStep = 70;
+                }
             }
         }
 
         private void Back()
         {
+            if (Handler.StoryStep == 64 ||
+                Handler.StoryStep == 69)
+            {
+                return;
+            }
+
+            if (Handler.StoryStep == 70)
+            {
+                Handler.Gold += 500;
+                MenuManager.GetMenu("Alerts").Visible = false;
+                Handler.StoryStep = 71;
+            }
+
             SelectedSquad = 0;
             TimeManager.Paused = false;
 
@@ -359,8 +414,31 @@ namespace DoS1.Menus
             ResizeArmy();
         }
 
+        private void AddSquad()
+        {
+            if (Handler.StoryStep == 69 ||
+                Handler.StoryStep == 70)
+            {
+                return;
+            }
+
+            Army army = CharacterManager.GetArmy("Ally");
+            army.AddSquad(ArmyUtil.NewSquad("Ally"));
+            Load();
+
+            if (Handler.StoryStep == 64)
+            {
+                Handler.StoryStep++;
+            }
+        }
+
         private void RemoveSquad()
         {
+            if (Handler.StoryStep == 69)
+            {
+                return;
+            }
+
             Army ally_army = CharacterManager.GetArmy("Ally");
             Squad squad = ally_army.GetSquad(SelectedSquad);
 
@@ -412,24 +490,41 @@ namespace DoS1.Menus
         {
             AssetManager.PlaySound_Random("Click");
 
-            Handler.Selected_Squad = squad.ID;
+            bool okay = true;
 
-            if (squad.Active) 
+            if (Handler.StoryStep == 65)
             {
-                //Prevent editing deployed squad
-                Handler.ViewOnly_Squad = true;
-                Handler.ViewOnly_Character = true;
-                Handler.ViewOnly_Item = true;
-            }
-            else
-            {
-                Handler.ViewOnly_Squad = false;
-                Handler.ViewOnly_Character = false;
-                Handler.ViewOnly_Item = false;
+                if (squad.Characters.Count > 0)
+                {
+                    okay = false;
+                }
+                else
+                {
+                    Handler.StoryStep++;
+                }
             }
 
-            InputManager.Mouse.Flush();
-            MenuManager.ChangeMenu("Squad");
+            if (okay)
+            {
+                Handler.Selected_Squad = squad.ID;
+
+                if (squad.Active)
+                {
+                    //Prevent editing deployed squad
+                    Handler.ViewOnly_Squad = true;
+                    Handler.ViewOnly_Character = true;
+                    Handler.ViewOnly_Item = true;
+                }
+                else
+                {
+                    Handler.ViewOnly_Squad = false;
+                    Handler.ViewOnly_Character = false;
+                    Handler.ViewOnly_Item = false;
+                }
+
+                InputManager.Mouse.Flush();
+                MenuManager.ChangeMenu("Squad");
+            }
         }
 
         public override void Load(ContentManager content)

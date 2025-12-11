@@ -76,7 +76,10 @@ namespace DoS1.Scenes
                     Handler.StoryStep == 36 ||
                     Handler.StoryStep == 37 ||
                     (Handler.StoryStep >= 45 && Handler.StoryStep <= 48) ||
-                    Handler.StoryStep == 55)
+                    Handler.StoryStep == 55 ||
+                    (Handler.StoryStep >= 57 && Handler.StoryStep <= 58) ||
+                    (Handler.StoryStep >= 60 && Handler.StoryStep <= 63) ||
+                    Handler.StoryStep == 71)
                 {
                     StoryUtil.Alert_Story(Menu);
                 }
@@ -89,7 +92,8 @@ namespace DoS1.Scenes
                     Handler.StoryStep == 20 ||
                     Handler.StoryStep == 21 ||
                     Handler.StoryStep == 28 ||
-                    Handler.StoryStep > 48)
+                    (Handler.StoryStep > 48 && Handler.StoryStep < 57) ||
+                    Handler.StoryStep >= 72)
                 {
                     if (Handler.AlertType == "Story" ||
                         Handler.AlertType == "Generic" ||
@@ -309,7 +313,11 @@ namespace DoS1.Scenes
                         InputManager.Mouse_LB_Pressed)
                     {
                         SelectingMultiple = false;
-                        ClearButtons_Squad();
+
+                        if (!SelectingTown)
+                        {
+                            ClearButtons_Squad();
+                        }
                     }
                 }
                 else if (SelectingTown)
@@ -353,7 +361,8 @@ namespace DoS1.Scenes
 
         private bool HoveringButton()
         {
-            if (Handler.StoryStep == 28)
+            if (Handler.StoryStep == 28 ||
+                Handler.StoryStep == 59)
             {
                 return false;
             }
@@ -403,7 +412,8 @@ namespace DoS1.Scenes
                         {
                             Picture highlight = Menu.GetPicture("Highlight");
                             
-                            if (InputManager.MouseWithin(squad.Region.ToRectangle))
+                            if (InputManager.MouseWithin(squad.Region.ToRectangle) &&
+                                Handler.StoryStep != 59)
                             {
                                 hovered_squad = squad;
                                 ExamineSquad(squad);
@@ -414,7 +424,8 @@ namespace DoS1.Scenes
                                 {
                                     //hovered_squad = null;
 
-                                    if (Handler.StoryStep != 5)
+                                    if (Handler.StoryStep != 5 &&
+                                        Handler.StoryStep != 62)
                                     {
                                         if (Handler.Selected_Token == squad.ID)
                                         {
@@ -703,9 +714,53 @@ namespace DoS1.Scenes
             }
         }
 
+        private void SelectToken_Enemy(Squad enemy_squad)
+        {
+            if (Handler.StoryStep != 9 &&
+                Handler.StoryStep != 10 &&
+                Handler.StoryStep != 20 &&
+                Handler.StoryStep != 21)
+            {
+                Squad ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Selected_Token);
+                if (ally_squad != null)
+                {
+                    Character leader = ally_squad.GetLeader();
+                    leader.Target_ID = enemy_squad.ID;
+                }
+            }
+        }
+
         private void SelectToken(Army army, Squad selected_squad)
         {
             Menu.GetLabel("Examine").Visible = false;
+
+            SelectToken_CheckMultiple(army, selected_squad);
+            if (!SelectingMultiple)
+            {
+                SelectToken_CheckTown(selected_squad);
+                if (!SelectingTown)
+                {
+                    Handler.Selected_Token = selected_squad.ID;
+                    if (Handler.Selected_Token != -1)
+                    {
+                        if (Handler.Retreating)
+                        {
+                            Handler.Retreating = false;
+                        }
+                        else
+                        {
+                            GameUtil.Toggle_Pause(false);
+                        }
+                    }
+                }
+            }
+
+            InputManager.Mouse.Flush();
+        }
+
+        private void SelectToken_CheckMultiple(Army army, Squad selected_squad)
+        {
+            SelectingMultiple = false;
 
             int height = (Main.Game.MenuSize.Y / 4) * 3;
 
@@ -716,7 +771,8 @@ namespace DoS1.Scenes
 
             foreach (Squad squad in army.Squads)
             {
-                if (squad.Location.X == selected_squad.Location.X &&
+                if (squad.Visible &&
+                    squad.Location.X == selected_squad.Location.X &&
                     squad.Location.Y == selected_squad.Location.Y &&
                     squad.ID != selected_squad.ID)
                 {
@@ -752,78 +808,32 @@ namespace DoS1.Scenes
                     Handler.TokenMenu = true;
                 }
 
-                if (Handler.Retreating)
-                {
-                    Handler.Retreating = false;
-                }
-                else
-                {
-                    GameUtil.Toggle_Pause(false);
-                }
+                GameUtil.Toggle_Pause(false);
             }
-            else
+        }
+
+        private void SelectToken_CheckTown(Squad selected_squad)
+        {
+            SelectingTown = false;
+
+            int height = (Main.Game.MenuSize.Y / 4) * 3;
+
+            Tile location = WorldUtil.GetLocation(selected_squad);
+            if (location != null)
             {
-                Tile location = WorldUtil.GetLocation(selected_squad);
-                if (location != null)
+                SelectingTown = true;
+
+                if (location.Type == "Base_Ally")
                 {
-                    SelectingTown = true;
-
-                    if (location.Type == "Base_Ally")
-                    {
-                        Squad hero_squad = Handler.GetHero().Squad;
-                        if (selected_squad.ID != hero_squad.ID)
-                        {
-                            Menu.AddButton(new ButtonOptions
-                            {
-                                id = Handler.GetID(),
-                                font = AssetManager.Fonts["ControlFont"],
-                                name = "Squad_" + selected_squad.ID + "_Base",
-                                text = "Retreat",
-                                texture = AssetManager.Textures["ButtonFrame"],
-                                texture_highlight = AssetManager.Textures["ButtonFrame"],
-                                region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, height),
-                                draw_color = Color.White * 0.9f,
-                                draw_color_selected = Color.White,
-                                text_color = Color.Black,
-                                text_selected_color = Color.White,
-                                enabled = true,
-                                visible = true
-                            });
-
-                            Menu.AddButton(new ButtonOptions
-                            {
-                                id = Handler.GetID(),
-                                font = AssetManager.Fonts["ControlFont"],
-                                name = "Squad_" + selected_squad.ID + "_Move",
-                                text = "Move",
-                                texture = AssetManager.Textures["ButtonFrame"],
-                                texture_highlight = AssetManager.Textures["ButtonFrame"],
-                                region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + height, Main.Game.MenuSize.X * 3, height),
-                                draw_color = Color.White * 0.9f,
-                                draw_color_selected = Color.White,
-                                text_color = Color.Black,
-                                text_selected_color = Color.White,
-                                enabled = true,
-                                visible = true
-                            });
-
-                            Handler.TokenMenu = true;
-                        }
-                        else
-                        {
-                            Handler.Selected_Token = selected_squad.ID;
-                            SelectingTown = false;
-                        }
-                    }
-                    else if (location.Type.Contains("Market") ||
-                             location.Type.Contains("Academy"))
+                    Squad hero_squad = Handler.GetHero().Squad;
+                    if (selected_squad.ID != hero_squad.ID)
                     {
                         Menu.AddButton(new ButtonOptions
                         {
                             id = Handler.GetID(),
                             font = AssetManager.Fonts["ControlFont"],
-                            name = "Squad_" + selected_squad.ID + "_Town",
-                            text = "Enter Town",
+                            name = "Squad_" + selected_squad.ID + "_Base",
+                            text = "Retreat",
                             texture = AssetManager.Textures["ButtonFrame"],
                             texture_highlight = AssetManager.Textures["ButtonFrame"],
                             region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, height),
@@ -853,57 +863,82 @@ namespace DoS1.Scenes
                         });
 
                         Handler.TokenMenu = true;
+
+                        if (!SelectingMultiple)
+                        {
+                            GameUtil.Toggle_Pause(false);
+                        }
                     }
                     else
                     {
-                        Handler.Selected_Token = selected_squad.ID;
                         SelectingTown = false;
+                    }
+                }
+                else if (location.Type.Contains("Market") ||
+                         location.Type.Contains("Academy"))
+                {
+                    Menu.AddButton(new ButtonOptions
+                    {
+                        id = Handler.GetID(),
+                        font = AssetManager.Fonts["ControlFont"],
+                        name = "Squad_" + selected_squad.ID + "_Town",
+                        text = "Enter Town",
+                        texture = AssetManager.Textures["ButtonFrame"],
+                        texture_highlight = AssetManager.Textures["ButtonFrame"],
+                        region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, height),
+                        draw_color = Color.White * 0.9f,
+                        draw_color_selected = Color.White,
+                        text_color = Color.Black,
+                        text_selected_color = Color.White,
+                        enabled = true,
+                        visible = true
+                    });
+
+                    Menu.AddButton(new ButtonOptions
+                    {
+                        id = Handler.GetID(),
+                        font = AssetManager.Fonts["ControlFont"],
+                        name = "Squad_" + selected_squad.ID + "_Move",
+                        text = "Move",
+                        texture = AssetManager.Textures["ButtonFrame"],
+                        texture_highlight = AssetManager.Textures["ButtonFrame"],
+                        region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y + height, Main.Game.MenuSize.X * 3, height),
+                        draw_color = Color.White * 0.9f,
+                        draw_color_selected = Color.White,
+                        text_color = Color.Black,
+                        text_selected_color = Color.White,
+                        enabled = true,
+                        visible = true
+                    });
+
+                    Handler.TokenMenu = true;
+
+                    if (!SelectingMultiple)
+                    {
+                        GameUtil.Toggle_Pause(false);
                     }
                 }
                 else
                 {
-                    Handler.Selected_Token = selected_squad.ID;
-                }
-
-                if (Handler.Retreating)
-                {
-                    Handler.Retreating = false;
-                }
-                else
-                {
-                    GameUtil.Toggle_Pause(false);
-                }
-            }
-
-            InputManager.Mouse.Flush();
-        }
-
-        private void SelectToken_Enemy(Squad enemy_squad)
-        {
-            if (Handler.StoryStep != 9 &&
-                Handler.StoryStep != 10 &&
-                Handler.StoryStep != 20 &&
-                Handler.StoryStep != 21)
-            {
-                Squad ally_squad = CharacterManager.GetArmy("Ally").GetSquad(Handler.Selected_Token);
-                if (ally_squad != null)
-                {
-                    Character leader = ally_squad.GetLeader();
-                    leader.Target_ID = enemy_squad.ID;
+                    SelectingTown = false;
                 }
             }
         }
 
         private void SelectToken_FromMultiple(long id)
         {
+            ClearButtons_Squad();
+
             Army army = CharacterManager.GetArmy("Ally");
             Squad squad = army.GetSquad(id);
             if (squad != null)
             {
-                Handler.Selected_Token = squad.ID;
+                SelectToken_CheckTown(squad);
+                if (!SelectingTown)
+                {
+                    Handler.Selected_Token = squad.ID;
+                }
             }
-
-            ClearButtons_Squad();
         }
 
         private void SelectTown(long id)

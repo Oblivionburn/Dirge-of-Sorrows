@@ -536,11 +536,11 @@ namespace DoS1.Scenes
                                         else if (effect_frame % animation_speed == 0)
                                         {
                                             AnimateDamageEffects();
-                                            effect_frame += Main.CombatSpeed;
+                                            effect_frame += Handler.CombatSpeed;
                                         }
                                         else
                                         {
-                                            effect_frame += Main.CombatSpeed;
+                                            effect_frame += Handler.CombatSpeed;
                                         }
                                     }
                                     else
@@ -559,11 +559,11 @@ namespace DoS1.Scenes
                                         if (effect_frame % label_speed == 0)
                                         {
                                             AnimateDamageLabels();
-                                            effect_frame += Main.CombatSpeed;
+                                            effect_frame += Handler.CombatSpeed;
                                         }
                                         else
                                         {
-                                            effect_frame += Main.CombatSpeed;
+                                            effect_frame += Handler.CombatSpeed;
                                         }
                                     }
                                     else
@@ -687,11 +687,11 @@ namespace DoS1.Scenes
                                             combat_state = "AnimateDamageEffects";
                                         }
 
-                                        character_frame += Main.CombatSpeed;
+                                        character_frame += Handler.CombatSpeed;
                                     }
                                     else
                                     {
-                                        character_frame += Main.CombatSpeed;
+                                        character_frame += Handler.CombatSpeed;
                                     }
 
                                     #endregion
@@ -708,6 +708,9 @@ namespace DoS1.Scenes
                                     }
                                     else
                                     {
+                                        bool enemies_ready = CombatUtil.SquadReady(World, enemy_squad, move_speed);
+                                        bool allies_ready = CombatUtil.SquadReady(World, ally_squad, move_speed);
+
                                         if (DamageEffectExists())
                                         {
                                             if (effect_frame % 8 == 0)
@@ -717,9 +720,6 @@ namespace DoS1.Scenes
 
                                             if (effect_frame >= animation_speed * 4)
                                             {
-                                                bool enemies_ready = CombatUtil.SquadReady(World, enemy_squad, move_speed);
-                                                bool allies_ready = CombatUtil.SquadReady(World, ally_squad, move_speed);
-
                                                 if (enemies_ready &&
                                                     allies_ready)
                                                 {
@@ -732,25 +732,19 @@ namespace DoS1.Scenes
                                             else if (effect_frame % animation_speed == 0)
                                             {
                                                 AnimateDamageEffects();
-                                                effect_frame += Main.CombatSpeed;
+                                                effect_frame += Handler.CombatSpeed;
                                             }
                                             else
                                             {
-                                                effect_frame += Main.CombatSpeed;
+                                                effect_frame += Handler.CombatSpeed;
                                             }
                                         }
-                                        else
+                                        else if (enemies_ready &&
+                                                 allies_ready)
                                         {
-                                            bool enemies_ready = CombatUtil.SquadReady(World, enemy_squad, move_speed);
-                                            bool allies_ready = CombatUtil.SquadReady(World, ally_squad, move_speed);
-
-                                            if (enemies_ready &&
-                                                allies_ready)
-                                            {
-                                                ClearDamageShake();
-                                                effect_frame = 0;
-                                                combat_state = "AnimateDamageLabels";
-                                            }
+                                            ClearDamageShake();
+                                            effect_frame = 0;
+                                            combat_state = "AnimateDamageLabels";
                                         }
                                     }
 
@@ -773,11 +767,11 @@ namespace DoS1.Scenes
                                             if (effect_frame % label_speed == 0)
                                             {
                                                 AnimateDamageLabels();
-                                                effect_frame += Main.CombatSpeed;
+                                                effect_frame += Handler.CombatSpeed;
                                             }
                                             else
                                             {
-                                                effect_frame += Main.CombatSpeed;
+                                                effect_frame += Handler.CombatSpeed;
                                             }
                                         }
                                         else
@@ -1553,21 +1547,6 @@ namespace DoS1.Scenes
                         {
                             character.Tags.Add("Shake1");
                         }
-                        else if (character.Tags.Contains("Shake1"))
-                        {
-                            character.Tags.Remove("Shake1");
-                            character.Tags.Add("Shake2");
-                        }
-                        else if (character.Tags.Contains("Shake2"))
-                        {
-                            character.Tags.Remove("Shake2");
-                            character.Tags.Add("Shake3");
-                        }
-                        else if (character.Tags.Contains("Shake3"))
-                        {
-                            character.Tags.Remove("Shake3");
-                            character.Tags.Add("Shake4");
-                        }
                     }
                 }
             }
@@ -1577,6 +1556,20 @@ namespace DoS1.Scenes
         {
             foreach (Character character in enemy_squad.Characters)
             {
+                Tile origin = CombatUtil.OriginTile(World, character);
+                if (CombatUtil.AtTile(character, origin, move_speed))
+                {
+                    character.Region = new Region(origin.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
+                    CharacterUtil.UpdateGear(character);
+                }
+
+                Tile target = CombatUtil.TargetTile(World, character);
+                if (CombatUtil.AtTile(character, target, move_speed))
+                {
+                    character.Region = new Region(target.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
+                    CharacterUtil.UpdateGear(character);
+                }
+
                 for (int i = 0; i < character.Tags.Count; i++)
                 {
                     if (character.Tags[i].Contains("Shake"))
@@ -1589,6 +1582,20 @@ namespace DoS1.Scenes
 
             foreach (Character character in ally_squad.Characters)
             {
+                Tile origin = CombatUtil.OriginTile(World, character);
+                if (CombatUtil.AtTile(character, origin, move_speed))
+                {
+                    character.Region = new Region(origin.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
+                    CharacterUtil.UpdateGear(character);
+                }
+
+                Tile target = CombatUtil.TargetTile(World, character);
+                if (CombatUtil.AtTile(character, target, move_speed))
+                {
+                    character.Region = new Region(target.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
+                    CharacterUtil.UpdateGear(character);
+                }
+
                 for (int i = 0; i < character.Tags.Count; i++)
                 {
                     if (character.Tags[i].Contains("Shake"))
@@ -1638,36 +1645,14 @@ namespace DoS1.Scenes
                         Tile origin_tile = CombatUtil.OriginTile(World, character);
                         Tile target_tile = CombatUtil.TargetTile(World, character);
 
-                        float speed = 1;
-
-                        CryptoRandom random = new CryptoRandom();
-                        int choice = random.Next(1, 5);
-                        switch (choice)
-                        {
-                            case 1:
-                                speed = 2;
-                                break;
-
-                            case 2:
-                                speed = 4;
-                                break;
-
-                            case 3:
-                                speed = 8;
-                                break;
-
-                            case 4:
-                                speed = 12;
-                                break;
-                        }
+                        float speed = 2;
 
                         if (character.Tags.Contains("Shake1"))
                         {
                             float x = origin_tile.Region.X;
-                            float distance = origin_tile.Region.Width / 4;
+                            float distance = origin_tile.Region.Width / 8;
 
-                            if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            if (CombatUtil.NearTile(character, target_tile))
                             {
                                 x = target_tile.Region.X;
                             }
@@ -1679,6 +1664,12 @@ namespace DoS1.Scenes
                                 {
                                     CombatUtil.MoveBack(character, distance / speed);
                                 }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake1");
+                                    character.Tags.Add("Shake2");
+                                }
                             }
                             else if (character.Type == "Enemy")
                             {
@@ -1686,16 +1677,21 @@ namespace DoS1.Scenes
                                 if (character.Region.X > x)
                                 {
                                     CombatUtil.MoveBack(character, distance / speed);
+                                }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake1");
+                                    character.Tags.Add("Shake2");
                                 }
                             }
                         }
                         else if (character.Tags.Contains("Shake2"))
                         {
                             float x = origin_tile.Region.X;
-                            float distance = origin_tile.Region.Width / 4;
+                            float distance = origin_tile.Region.Width / 8;
 
-                            if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            if (CombatUtil.NearTile(character, target_tile))
                             {
                                 x = target_tile.Region.X;
                             }
@@ -1707,6 +1703,12 @@ namespace DoS1.Scenes
                                 {
                                     CombatUtil.MoveForward(character, distance / speed);
                                 }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake2");
+                                    character.Tags.Add("Shake3");
+                                }
                             }
                             else if (character.Type == "Enemy")
                             {
@@ -1714,16 +1716,21 @@ namespace DoS1.Scenes
                                 if (character.Region.X < x)
                                 {
                                     CombatUtil.MoveForward(character, distance / speed);
+                                }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake2");
+                                    character.Tags.Add("Shake3");
                                 }
                             }
                         }
                         else if (character.Tags.Contains("Shake3"))
                         {
                             float x = origin_tile.Region.X;
-                            float distance = origin_tile.Region.Width / 8;
+                            float distance = origin_tile.Region.Width / 16;
 
-                            if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            if (CombatUtil.NearTile(character, target_tile))
                             {
                                 x = target_tile.Region.X;
                             }
@@ -1735,6 +1742,12 @@ namespace DoS1.Scenes
                                 {
                                     CombatUtil.MoveBack(character, distance / speed);
                                 }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake3");
+                                    character.Tags.Add("Shake4");
+                                }
                             }
                             else if (character.Type == "Enemy")
                             {
@@ -1742,6 +1755,12 @@ namespace DoS1.Scenes
                                 if (character.Region.X > x)
                                 {
                                     CombatUtil.MoveBack(character, distance / speed);
+                                }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake3");
+                                    character.Tags.Add("Shake4");
                                 }
                             }
                         }
@@ -1749,8 +1768,7 @@ namespace DoS1.Scenes
                         {
                             float distance = 0;
 
-                            if (character.Region.X >= origin_tile.Region.X - origin_tile.Region.Width &&
-                                character.Region.X <= origin_tile.Region.X + origin_tile.Region.Width)
+                            if (CombatUtil.NearTile(character, origin_tile))
                             {
                                 if (character.Type == "Ally")
                                 {
@@ -1766,8 +1784,7 @@ namespace DoS1.Scenes
                                     CombatUtil.MoveForward(character, distance / (speed / 2));
                                 }
                             }
-                            else if (character.Region.X >= target_tile.Region.X - target_tile.Region.Width &&
-                                     character.Region.X <= target_tile.Region.X + target_tile.Region.Width)
+                            else if (CombatUtil.NearTile(character, target_tile))
                             {
                                 if (character.Type == "Ally")
                                 {
@@ -2404,36 +2421,36 @@ namespace DoS1.Scenes
 
         private void SpeedToggle()
         {
-            Main.CombatSpeed *= 2;
-            if (Main.CombatSpeed > 16)
+            Handler.CombatSpeed *= 2;
+            if (Handler.CombatSpeed > 16)
             {
-                Main.CombatSpeed = 2;
+                Handler.CombatSpeed = 2;
             }
 
             Button button = Menu.GetButton("Speed");
 
-            if (Main.CombatSpeed == 2)
+            if (Handler.CombatSpeed == 2)
             {
                 button.HoverText = "Speed x1";
                 button.Texture = AssetManager.Textures["Button_Speed1"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
             }
-            else if (Main.CombatSpeed == 4)
+            else if (Handler.CombatSpeed == 4)
             {
                 button.HoverText = "Speed x2";
                 button.Texture = AssetManager.Textures["Button_Speed2"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
             }
-            else if (Main.CombatSpeed == 8)
+            else if (Handler.CombatSpeed == 8)
             {
                 button.HoverText = "Speed x3";
                 button.Texture = AssetManager.Textures["Button_Speed3"];
                 button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
             }
-            else if (Main.CombatSpeed == 16)
+            else if (Handler.CombatSpeed == 16)
             {
                 button.HoverText = "Speed x4";
                 button.Texture = AssetManager.Textures["Button_Speed4"];
@@ -2441,7 +2458,7 @@ namespace DoS1.Scenes
                 button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
             }
 
-            move_speed = base_move_speed * (Main.CombatSpeed / 2);
+            move_speed = base_move_speed * (Handler.CombatSpeed / 2);
 
             SaveUtil.ExportINI();
 
@@ -2553,28 +2570,28 @@ namespace DoS1.Scenes
 
                 Button speed_button = Menu.GetButton("Speed");
 
-                if (Main.CombatSpeed == 2)
+                if (Handler.CombatSpeed == 2)
                 {
                     speed_button.HoverText = "Speed x1";
                     speed_button.Texture = AssetManager.Textures["Button_Speed1"];
                     speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
                 }
-                else if (Main.CombatSpeed == 4)
+                else if (Handler.CombatSpeed == 4)
                 {
                     speed_button.HoverText = "Speed x2";
                     speed_button.Texture = AssetManager.Textures["Button_Speed2"];
                     speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
                 }
-                else if (Main.CombatSpeed == 8)
+                else if (Handler.CombatSpeed == 8)
                 {
                     speed_button.HoverText = "Speed x3";
                     speed_button.Texture = AssetManager.Textures["Button_Speed3"];
                     speed_button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
                 }
-                else if (Main.CombatSpeed == 16)
+                else if (Handler.CombatSpeed == 16)
                 {
                     speed_button.HoverText = "Speed x4";
                     speed_button.Texture = AssetManager.Textures["Button_Speed4"];
@@ -2582,7 +2599,7 @@ namespace DoS1.Scenes
                     speed_button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
                 }
 
-                move_speed = base_move_speed * (Main.CombatSpeed / 2);
+                move_speed = base_move_speed * (Handler.CombatSpeed / 2);
 
                 Menu.AddButton(new ButtonOptions
                 {
@@ -2666,7 +2683,7 @@ namespace DoS1.Scenes
                 Menu.GetPicture("Background").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 
                 base_move_speed = tile.Region.Width / 8;
-                move_speed = base_move_speed * (Main.CombatSpeed / 2);
+                move_speed = base_move_speed * (Handler.CombatSpeed / 2);
 
                 Menu.GetPicture("Result").Region = new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y);
 

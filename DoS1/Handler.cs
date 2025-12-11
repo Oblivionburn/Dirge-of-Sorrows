@@ -25,10 +25,15 @@ namespace DoS1
         public static long ID;
         public static int Gold = 1000;
         public static long MainCharacter_ID;
+        public static long FriendCharacter_ID;
         public static string AlertType;
         public static int StoryStep = -1;
         public static bool AutoSave;
         public static bool Fireworks;
+
+        public static int TimeSpeed = 4;
+        public static int TimeSpeed_Temp = 0;
+        public static int CombatSpeed = 2;
 
         public static bool Loaded;
         public static int Loading_Step;
@@ -72,6 +77,8 @@ namespace DoS1
         public static int RecruitPrice = 100;
         public static Dictionary<int, Squad> AcademyRecruits = new Dictionary<int, Squad>();
         public static Squad TradingAcademy;
+        public static Character recruit1 = null;
+        public static Character recruit2 = null;
 
         public static System.Timers.Timer CombatTimer = new System.Timers.Timer(1);
         public static bool Combat;
@@ -362,6 +369,25 @@ namespace DoS1
         public static Character GetHero()
         {
             return CharacterManager.GetArmy("Ally").Squads[0].GetLeader();
+        }
+
+        public static Character GetFriend()
+        {
+            foreach (Army army in CharacterManager.Armies)
+            {
+                foreach (Squad squad in army.Squads)
+                {
+                    foreach (Character character in squad.Characters)
+                    {
+                        if (character.ID == FriendCharacter_ID)
+                        {
+                            return character;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         public static Texture2D GetTexture(string name)

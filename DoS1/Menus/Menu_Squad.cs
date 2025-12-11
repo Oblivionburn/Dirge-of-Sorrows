@@ -133,7 +133,9 @@ namespace DoS1.Menus
                 if (Handler.StoryStep == 6 ||
                     Handler.StoryStep == 7 ||
                     Handler.StoryStep == 15 ||
-                    Handler.StoryStep == 29)
+                    Handler.StoryStep == 29 ||
+                    Handler.StoryStep == 66 ||
+                    Handler.StoryStep == 67)
                 {
                     StoryUtil.Alert_Story(this);
                 }
@@ -307,7 +309,8 @@ namespace DoS1.Menus
         {
             if (Handler.StoryStep == 6 ||
                 Handler.StoryStep == 15 ||
-                Handler.StoryStep == 29)
+                Handler.StoryStep == 29 ||
+                Handler.StoryStep == 66)
             {
                 return false;
             }
@@ -655,6 +658,18 @@ namespace DoS1.Menus
                             MenuManager.GetMenu("Alerts").Visible = false;
                             Handler.StoryStep++;
                         }
+                        else if (Handler.StoryStep == 66)
+                        {
+                            bool recruit1 = ally_squad.Characters.Contains(Handler.recruit1);
+                            bool recruit2 = ally_squad.Characters.Contains(Handler.recruit2);
+
+                            if (recruit1 &&
+                                recruit2)
+                            {
+                                MenuManager.GetMenu("Alerts").Visible = false;
+                                Handler.StoryStep++;
+                            }
+                        }
                     }
                 }
             }
@@ -794,7 +809,8 @@ namespace DoS1.Menus
 
             bool okay = false;
 
-            if (Handler.StoryStep == 18)
+            if (Handler.StoryStep == 18 ||
+                Handler.StoryStep == 67)
             {
                 MenuManager.GetMenu("Alerts").Visible = false;
                 Handler.StoryStep++;
@@ -1133,7 +1149,7 @@ namespace DoS1.Menus
                             if (reserve.Formation.X == grid.Location.X &&
                                 reserve.Formation.Y == grid.Location.Y)
                             {
-                                reserve.Region = new Region(grid.Region.X, grid.Region.Y - grid_height, grid.Region.Width, grid_height + (grid_height / 2));
+                                reserve.Region = new Region(grid.Region.X, grid.Region.Y, grid.Region.Width, grid.Region.Height);
                                 reserve.Visible = true;
                                 break;
                             }
@@ -1194,6 +1210,25 @@ namespace DoS1.Menus
 
             ClearGrid();
             ResetGridPos();
+            ReserveList.Clear();
+
+            for (int y = 0; y < 10; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    long id = Handler.GetID();
+
+                    AddPicture(id, "x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
+                        new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y), grid_width, grid_height), Color.White, true);
+
+                    Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
+                    if (grid != null)
+                    {
+                        grid.Location = new Location(x, y, 0);
+                        GridList.Add(grid);
+                    }
+                }
+            }
 
             Label reserves = GetLabel("Name_Reserves");
             reserves.Region = new Region(starting_grid_X, starting_grid_Y + (grid_height * 10), grid_width * 10, (height / 2));
@@ -1205,34 +1240,21 @@ namespace DoS1.Menus
                 Squad squad = army.Squads[0];
                 if (squad != null)
                 {
-                    foreach (Character existing in squad.Characters)
+                    foreach (Character character in squad.Characters)
                     {
-                        ReserveList.Add(existing);
+                        ReserveList.Add(character);
                     }
 
-                    for (int y = 0; y < 10; y++)
+                    for (int i = 0; i < ReserveList.Count; i++)
                     {
-                        for (int x = 0; x < 10; x++)
+                        Character character = ReserveList[i];
+
+                        if (i < GridList.Count)
                         {
-                            long id = Handler.GetID();
-
-                            Character character = squad.GetCharacter(new Vector2(x, y));
-                            if (character != null)
-                            {
-                                id = character.ID;
-                                character.Region = new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y) - grid_height, grid_width, grid_height + (grid_height / 2));
-                                character.Visible = true;
-                            }
-
-                            AddPicture(id, "x:" + x.ToString() + ",y:" + y.ToString(), AssetManager.Textures["Grid"],
-                                new Region(starting_grid_X + (grid_width * x), starting_grid_Y + (grid_height * y), grid_width, grid_height), Color.White, true);
-
-                            Picture grid = GetPicture("x:" + x.ToString() + ",y:" + y.ToString());
-                            if (grid != null)
-                            {
-                                grid.Location = new Location(x, y, 0);
-                                GridList.Add(grid);
-                            }
+                            Picture grid = GridList[i];
+                            character.Region = new Region(grid.Region.X, grid.Region.Y, grid.Region.Width, grid.Region.Height);
+                            character.Formation = new Vector2(grid.Location.X, grid.Location.Y);
+                            character.Visible = true;
                         }
                     }
                 }

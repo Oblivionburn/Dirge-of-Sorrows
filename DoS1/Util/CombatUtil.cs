@@ -722,10 +722,23 @@ namespace DoS1.Util
             if (character.Region != null &&
                 tile.Region != null)
             {
-                if (character.Region.X >= tile.Region.X - (move_speed / 2) &&
-                    character.Region.X <= tile.Region.X + (move_speed / 2))
+                if (character.Region.X == tile.Region.X)
                 {
-                    character.Region = new Region(tile.Region.X, character.Region.Y, character.Region.Width, character.Region.Height);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool NearTile(Character character, Tile tile)
+        {
+            if (character.Region != null &&
+                tile.Region != null)
+            {
+                if (character.Region.X >= tile.Region.X - tile.Region.Width &&
+                    character.Region.X < tile.Region.X + tile.Region.Width)
+                {
                     return true;
                 }
             }
@@ -1619,8 +1632,7 @@ namespace DoS1.Util
                 case "Charging":
                     AssetManager.PlaySound_Random("Heal");
                     AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Heal"],
-                        new Region(character.Region.X, character.Region.Y - (character.Region.Height / 3), character.Region.Width,
-                            character.Region.Height), Color.White * 0.9f);
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 
                 case "Frozen":

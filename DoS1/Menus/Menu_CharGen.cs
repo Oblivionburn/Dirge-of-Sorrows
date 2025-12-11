@@ -8,6 +8,7 @@ using OP_Engine.Scenes;
 using OP_Engine.Characters;
 using OP_Engine.Utility;
 using OP_Engine.Enums;
+using OP_Engine.Inventories;
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -561,9 +562,10 @@ namespace DoS1.Menus
 
             //Add friend
             Character friend = CharacterUtil.NewCharacter_Random(new Vector2(0, 0), false, Gender);
+            Handler.FriendCharacter_ID = friend.ID;
 
-            InventoryUtil.AddItem(friend.Inventory, "Cloth", "Cloth", "Armor");
-            InventoryUtil.EquipItem(friend, friend.Inventory.Items[friend.Inventory.Items.Count - 1]);
+            Item armor = InventoryUtil.AddItem(friend.Inventory, "Cloth", "Cloth", "Armor");
+            InventoryUtil.EquipItem(friend, armor);
 
             Squad reserves = CharacterManager.GetArmy("Reserves").Squads[0];
             reserves.AddCharacter(friend);

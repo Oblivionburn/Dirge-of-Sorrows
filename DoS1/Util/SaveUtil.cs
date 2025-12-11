@@ -113,8 +113,8 @@ namespace DoS1.Util
             #region Speed
 
             EnterNode("Speed");
-            Writer.WriteAttributeString("TimeSpeed", Main.TimeSpeed.ToString());
-            Writer.WriteAttributeString("CombatSpeed", Main.CombatSpeed.ToString());
+            Writer.WriteAttributeString("TimeSpeed", Handler.TimeSpeed.ToString());
+            Writer.WriteAttributeString("CombatSpeed", Handler.CombatSpeed.ToString());
             ExitNode();
 
             #endregion
@@ -180,6 +180,7 @@ namespace DoS1.Util
             Writer.WriteAttributeString("ID", Handler.ID.ToString());
             Writer.WriteAttributeString("Gold", Handler.Gold.ToString());
             Writer.WriteAttributeString("MainCharacter_ID", Handler.MainCharacter_ID.ToString());
+            Writer.WriteAttributeString("FriendCharacter_ID", Handler.FriendCharacter_ID.ToString());
 
             Writer.WriteAttributeString("StoryStep", Handler.StoryStep.ToString());
 

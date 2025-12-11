@@ -1,12 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using OP_Engine.Characters;
 using OP_Engine.Controls;
+using OP_Engine.Enums;
+using OP_Engine.Inventories;
 using OP_Engine.Menus;
 using OP_Engine.Scenes;
 using OP_Engine.Tiles;
 using OP_Engine.Utility;
-using OP_Engine.Enums;
-using System.Linq;
 
 namespace DoS1.Util
 {
@@ -45,15 +45,6 @@ namespace DoS1.Util
         public static void Alert_Story(Menu menu)
         {
             Handler.AlertType = "Story";
-            string message = "";
-
-            Army ally = CharacterManager.GetArmy("Ally");
-            Squad squad = ally.Squads[0];
-            Character hero = squad.GetLeader();
-
-            Army special = CharacterManager.GetArmy("Special");
-
-            Character spouse = special.Squads[0].Characters[0];
 
             Menu alerts = MenuManager.GetMenu("Alerts");
             alerts.Visible = true;
@@ -64,6 +55,27 @@ namespace DoS1.Util
             Label dialogue_name = alerts.GetLabel("Dialogue_Name");
             dialogue_name.Visible = true;
 
+            Tutorial_Worldmap(dialogue, dialogue_name);
+            Intro(menu, alerts, dialogue, dialogue_name);
+            Tutorial_Formation(dialogue, dialogue_name);
+            Tutorial_Movement(dialogue, dialogue_name);
+            Tutorial_Market(alerts, dialogue, dialogue_name);
+            Tutorial_Equipment(dialogue, dialogue_name);
+            Intro_Part2(alerts, dialogue, dialogue_name);
+            Tutorial_Runes(dialogue, dialogue_name);
+            Intro_Part3(alerts, dialogue, dialogue_name);
+            Tutorial_Combat(alerts, dialogue, dialogue_name);
+            Intro_Part4(alerts, dialogue, dialogue_name);
+            Intro_Part5(alerts, dialogue, dialogue_name);
+            Tutorial_ClaimRegion(alerts, dialogue, dialogue_name);
+            Intro_Part6(alerts, dialogue, dialogue_name);
+            Tutorial_Squads(alerts, dialogue, dialogue_name);
+        }
+
+        public static void Tutorial_Worldmap(Label dialogue, Label dialogue_name)
+        {
+            string message = "";
+
             if (Handler.StoryStep == 0)
             {
                 GameUtil.LocalPause();
@@ -72,7 +84,27 @@ namespace DoS1.Util
                 message = "Left-click the red castle on the Worldmap to enter the Local Map of that location." +
                     "\n\nIf the red castle is not visible, left-click and drag the map until you can see it.";
             }
-            else if (Handler.StoryStep == 1)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Intro(Menu menu, Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Army ally = CharacterManager.GetArmy("Ally");
+            Squad squad = ally.Squads[0];
+            Character hero = squad.GetLeader();
+
+            Character friend = Handler.GetFriend();
+
+            Army special = CharacterManager.GetArmy("Special");
+            Character spouse = special.Squads[0].Characters[0];
+
+            string message = "";
+
+            if (Handler.StoryStep == 1)
             {
                 Scene scene = WorldUtil.GetScene();
                 Map map = scene.World.Maps[Handler.Level];
@@ -121,17 +153,10 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 3)
+            else if (Handler.StoryStep == 3 &&
+                     friend != null)
             {
                 GameUtil.LocalPause();
-
-                Squad reserves = CharacterManager.GetArmy("Reserves").Squads[0];
-
-                Character friend = null;
-                if (reserves.Characters.Any())
-                {
-                    friend = reserves.Characters[0];
-                }
 
                 dialogue_name.Text = "Narrator";
 
@@ -150,17 +175,10 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 4)
+            else if (Handler.StoryStep == 4 &&
+                     friend != null)
             {
                 GameUtil.LocalPause();
-
-                Squad reserves = CharacterManager.GetArmy("Reserves").Squads[0];
-
-                Character friend = null;
-                if (reserves.Characters.Any())
-                {
-                    friend = reserves.Characters[0];
-                }
 
                 Handler.Dialogue_Character2 = friend;
 
@@ -182,7 +200,20 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 5)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Formation(Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            string message = "";
+
+            if (Handler.StoryStep == 5)
             {
                 GameUtil.LocalPause();
 
@@ -190,17 +221,10 @@ namespace DoS1.Util
                 message = "Your starting squad, represented by a blue token on the map, will always be deployed at your Base when entering a Local Map. You can right-click" +
                     " any squad positioned at a Town or your Base to edit them.\n\nRight-click your starting squad now to edit it.";
             }
-            else if (Handler.StoryStep == 6)
+            else if (Handler.StoryStep == 6 &&
+                     friend != null)
             {
                 GameUtil.LocalPause();
-
-                Squad reserves = CharacterManager.GetArmy("Reserves").Squads[0];
-
-                Character friend = null;
-                if (reserves.Characters.Any())
-                {
-                    friend = reserves.Characters[0];
-                }
 
                 dialogue_name.Text = "System";
                 message = "Left-click and drag " + friend.Name + " from your Reserves (on the right) to a position in your squad's Formation (on the left).";
@@ -210,11 +234,28 @@ namespace DoS1.Util
                 dialogue_name.Text = "System";
                 message = "Now left-click the Back button in the upper-left corner to leave the Squad Menu.";
             }
-            else if (Handler.StoryStep == 8)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Movement(Label dialogue, Label dialogue_name)
+        {
+            Menu alerts = MenuManager.GetMenu("Alerts");
+
+            Army ally = CharacterManager.GetArmy("Ally");
+            Squad squad = ally.Squads[0];
+
+            Character friend = Handler.GetFriend();
+
+            string message = "";
+
+            if (Handler.StoryStep == 8 &&
+                friend != null)
             {
                 GameUtil.LocalPause();
-
-                Character friend = squad.Characters[1];
 
                 Handler.Dialogue_Character2 = friend;
 
@@ -240,10 +281,22 @@ namespace DoS1.Util
                 message = "Any Town on the map with a gold outline will possess a market. Left-click your squad to begin moving it, and then left-click " + market.Name +
                     " to set that as your destination.\n\nYou can zoom in/out the map with the Scroll Wheel.";
             }
-            else if (Handler.StoryStep == 10)
-            {
-                Character friend = squad.Characters[1];
 
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Market(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            string message = "";
+
+            if (Handler.StoryStep == 10 &&
+                friend != null)
+            {
                 dialogue_name.Text = "Narrator";
                 message = "\"Upon entering the market, you quickly found the seeds you were needing. You and " + friend.Name + " continued looking around to see" +
                     " what else was being sold...\"";
@@ -252,10 +305,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 11)
+            else if (Handler.StoryStep == 11 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
@@ -280,7 +332,20 @@ namespace DoS1.Util
                 dialogue_name.Text = "System";
                 message = "Now left-click the Exit Market button in the bottom-center to leave the Market Menu.";
             }
-            else if (Handler.StoryStep == 14)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Equipment(Label dialogue, Label dialogue_name)
+        {
+            Character hero = Handler.GetHero();
+
+            string message = "";
+
+            if (Handler.StoryStep == 14)
             {
                 GameUtil.LocalPause();
 
@@ -304,11 +369,30 @@ namespace DoS1.Util
                 dialogue_name.Text = "System";
                 message = "Now left-click the Back button in the upper-left corner to leave the Character Menu.";
             }
-            else if (Handler.StoryStep == 19)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Intro_Part2(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Army ally = CharacterManager.GetArmy("Ally");
+            Squad squad = ally.Squads[0];
+            Character hero = squad.GetLeader();
+
+            Character friend = Handler.GetFriend();
+
+            Army special = CharacterManager.GetArmy("Special");
+            Character spouse = special.Squads[0].Characters[0];
+
+            string message = "";
+
+            if (Handler.StoryStep == 19 &&
+                friend != null)
             {
                 GameUtil.LocalPause();
-
-                Character friend = squad.Characters[1];
 
                 Handler.Dialogue_Character2 = friend;
 
@@ -338,10 +422,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 23)
+            else if (Handler.StoryStep == 23 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
@@ -354,10 +437,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 24)
+            else if (Handler.StoryStep == 24 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 dialogue_name.Text = "Narrator";
                 message = "\"You and " + friend.Name + " run down the road to find " + spouse.Name + ", but as you approach your burning home you can see " + HimHer(spouse.Gender) +
                     " laying dead on the road in a pool of blood.\"";
@@ -376,10 +458,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 26)
+            else if (Handler.StoryStep == 26 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
@@ -393,10 +474,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 27)
+            else if (Handler.StoryStep == 27 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 dialogue_name.Text = "Narrator";
                 message = "\"You and " + friend.Name + " enter a nearby shed to retrieve some weapons.\"";
 
@@ -404,7 +484,18 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 28)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Runes(Label dialogue, Label dialogue_name)
+        {
+            string message = "";
+
+            if (Handler.StoryStep == 28)
             {
                 dialogue_name.Text = "System";
                 message = "Right-click your squad to equip your characters with a weapon.";
@@ -460,7 +551,23 @@ namespace DoS1.Util
                 dialogue_name.Text = "System";
                 message = "Now left-click the Back button in the upper-left corner to leave the Item Menu.";
             }
-            else if (Handler.StoryStep == 35)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Intro_Part3(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            Army special = CharacterManager.GetArmy("Special");
+            Character spouse = special.Squads[0].Characters[0];
+
+            string message = "";
+
+            if (Handler.StoryStep == 35)
             {
                 dialogue_name.Text = "System";
                 message = "Equip both characters with a weapon before leaving the Squad Menu.";
@@ -481,10 +588,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 37)
+            else if (Handler.StoryStep == 37 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 dialogue_name.Text = friend.Name;
                 message = "(yells angrily) \"There they are! Get them!\"";
 
@@ -494,8 +600,7 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 38)
             {
-                Army army = CharacterManager.GetArmy("Special");
-                Squad enemy_squad = army.Squads[1];
+                Squad enemy_squad = special.Squads[1];
                 Character enemy = enemy_squad.Characters[0];
 
                 Handler.Dialogue_Character1 = enemy;
@@ -512,8 +617,7 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 39)
             {
-                Army army = CharacterManager.GetArmy("Special");
-                Squad enemy_squad = army.Squads[1];
+                Squad enemy_squad = special.Squads[1];
                 Character enemy = enemy_squad.Characters[0];
 
                 Handler.Dialogue_Character1 = enemy;
@@ -528,10 +632,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 40)
+            else if (Handler.StoryStep == 40 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
@@ -546,8 +649,7 @@ namespace DoS1.Util
             }
             else if (Handler.StoryStep == 41)
             {
-                Army special_army = CharacterManager.GetArmy("Special");
-                Squad special_squad = special_army.Squads[1];
+                Squad special_squad = special.Squads[1];
                 Character enemy = special_squad.Characters[0];
 
                 Army enemy_army = CharacterManager.GetArmy("Enemy");
@@ -566,10 +668,9 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 42)
+            else if (Handler.StoryStep == 42 &&
+                     friend != null)
             {
-                Character friend = squad.Characters[1];
-
                 Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
@@ -582,7 +683,18 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 43)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Combat(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            string message = "";
+
+            if (Handler.StoryStep == 43)
             {
                 dialogue_name.Text = "System";
                 message = "Combat is automatic and death is permanent. Prepare your equipment prior to combat for the best chance of success.";
@@ -600,11 +712,26 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 45)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Intro_Part4(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            Army special = CharacterManager.GetArmy("Special");
+            Character spouse = special.Squads[0].Characters[0];
+
+            string message = "";
+
+            if (Handler.StoryStep == 45 &&
+                friend != null)
             {
                 GameUtil.LocalPause();
-
-                Character friend = squad.Characters[1];
 
                 dialogue_name.Text = "Narrator";
                 message = "\"With the murder of " + spouse.Name + " now avenged, " + friend.Name + " helped you bury " + HisHer(spouse.Gender) + " body.\"";
@@ -613,13 +740,12 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 46)
+            else if (Handler.StoryStep == 46 &&
+                     friend != null)
             {
                 Army enemy_army = CharacterManager.GetArmy("Enemy");
                 Squad enemy_squad = enemy_army.Squads[0];
                 Character local_lord = enemy_squad.Characters[0];
-
-                Character friend = squad.Characters[1];
 
                 Handler.Dialogue_Character2 = friend;
 
@@ -634,13 +760,12 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 47)
+            else if (Handler.StoryStep == 47 &&
+                     friend != null)
             {
                 Army enemy_army = CharacterManager.GetArmy("Enemy");
                 Squad enemy_squad = enemy_army.Squads[0];
                 Character local_lord = enemy_squad.Characters[0];
-
-                Character friend = squad.Characters[1];
 
                 Handler.Dialogue_Character2 = friend;
 
@@ -670,7 +795,20 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 50)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Intro_Part5(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            string message = "";
+
+            if (Handler.StoryStep == 50)
             {
                 Army enemy_army = CharacterManager.GetArmy("Enemy");
                 Squad enemy_squad = enemy_army.Squads[0];
@@ -688,14 +826,15 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 51)
+            else if (Handler.StoryStep == 51 &&
+                     friend != null)
             {
-                Handler.Dialogue_Character2 = hero;
+                Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
                 picture.Visible = true;
 
-                dialogue_name.Text = hero.Name;
+                dialogue_name.Text = friend.Name;
                 message = "\"We're here to put an end to your tyranny and extortion!\"";
 
                 Button option1 = alerts.GetButton("Dialogue_Option1");
@@ -721,14 +860,15 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 53)
+            else if (Handler.StoryStep == 53 &&
+                     friend != null)
             {
-                Handler.Dialogue_Character2 = hero;
+                Handler.Dialogue_Character2 = friend;
 
                 Picture picture = alerts.GetPicture("Dialogue_Portrait2");
                 picture.Visible = true;
 
-                dialogue_name.Text = hero.Name;
+                dialogue_name.Text = friend.Name;
                 message = "\"Then you're as guilty as the King for being complicit... and we'll tolerate no more of this! We will cut you all down like the snakes you" +
                     " are, until the very head of your King is rolling at our feet! You will know our suffering, until there is none left to fear us!\"";
 
@@ -754,7 +894,18 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 55)
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_ClaimRegion(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            string message = "";
+
+            if (Handler.StoryStep == 55)
             {
                 GameUtil.LocalPause();
 
@@ -767,7 +918,179 @@ namespace DoS1.Util
                 option1.Visible = true;
             }
 
-            dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Intro_Part6(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            string message = "";
+
+            if (Handler.StoryStep == 57 &&
+                friend != null)
+            {
+                GameUtil.LocalPause();
+
+                Handler.Dialogue_Character2 = friend;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = friend.Name;
+                message = "\"I've been thinking... our desire for justice may be pure, but we won't survive taking this fight all the way to the King by ourselves." +
+                    " Eventually we'll run out of energy if this war consists of just you and I.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 58 &&
+                     friend != null)
+            {
+                Handler.Dialogue_Character2 = friend;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = friend.Name;
+                message = "\"Our best chance of winning this fight is to start building an army of our own. I know some people in this area that might be willing" +
+                    " to join us... wait here for a bit while I go talk to them...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 60)
+            {
+                GameUtil.LocalPause();
+
+                Handler.TimeSpeed = Handler.TimeSpeed_Temp;
+                GameUtil.UpdateSpeed();
+
+                Army reserves = CharacterManager.GetArmy("Reserves");
+                Squad squad = reserves.Squads[0];
+
+                CryptoRandom random = new CryptoRandom();
+                Handler.recruit1 = CharacterUtil.NewCharacter_Random(new Vector2(0, 0), false, random.Next(0, 2));
+                squad.AddCharacter(Handler.recruit1);
+
+                Item armor1 = InventoryUtil.AddItem(Handler.recruit1.Inventory, "Cloth", "Cloth", "Armor");
+                InventoryUtil.EquipItem(Handler.recruit1, armor1);
+
+                random = new CryptoRandom();
+                Handler.recruit2 = CharacterUtil.NewCharacter_Random(new Vector2(0, 0), false, random.Next(0, 2));
+                squad.AddCharacter(Handler.recruit2);
+
+                Item armor2 = InventoryUtil.AddItem(Handler.recruit2.Inventory, "Cloth", "Cloth", "Armor");
+                InventoryUtil.EquipItem(Handler.recruit2, armor2);
+
+                Handler.StoryStep++;
+            }
+            else if (Handler.StoryStep == 61 &&
+                     friend != null)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"" + friend.Name + " returns some time later with two people following close behind " + HimHer(friend.Gender) + ".\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 62 &&
+                     friend != null)
+            {
+                Handler.Dialogue_Character2 = friend;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = friend.Name;
+                message = "\"We're by no means an army, yet, but this is at least a start.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 63)
+            {
+                GameUtil.LocalPause();
+
+                dialogue_name.Text = "System";
+                message = "Left-click the Army button in the upper-left corner.";
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void Tutorial_Squads(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character friend = Handler.GetFriend();
+
+            string message = "";
+
+            if (Handler.StoryStep == 64)
+            {
+                dialogue_name.Text = "System";
+                message = "Left-click the Add Squad button in the upper-left corner to create a new squad.";
+            }
+            else if (Handler.StoryStep == 65)
+            {
+                dialogue_name.Text = "System";
+                message = "Right-click your new squad to edit it.";
+            }
+            else if (Handler.StoryStep == 66)
+            {
+                dialogue_name.Text = "System";
+                message = "Left-click and drag " + Handler.recruit1.Name + " and " + Handler.recruit2.Name + " from your Reserves (on the right) to a position in your squad's Formation (on the left).";
+            }
+            else if (Handler.StoryStep == 67)
+            {
+                dialogue_name.Text = "System";
+                message = "Now left-click the Back button in the upper-left corner to leave the Squad Menu.";
+            }
+            else if (Handler.StoryStep == 68)
+            {
+                dialogue_name.Text = "System";
+                message = "Left-click your new squad to select it.";
+            }
+            else if (Handler.StoryStep == 69)
+            {
+                dialogue_name.Text = "System";
+                message = "Left-click the Deploy Squad button in the upper-left corner to add your new squad on the Local Map at your Base.";
+            }
+            else if (Handler.StoryStep == 70)
+            {
+                dialogue_name.Text = "System";
+                message = "Now left-click the Back button in the upper-left corner to leave the Army Menu.";
+            }
+            else if (Handler.StoryStep == 71 &&
+                     friend != null)
+            {
+                Handler.Dialogue_Character2 = friend;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = friend.Name;
+                message = "\"Our new recruits are unarmed, but they brought 500 gold with them... we just need to send them to the nearest market to get some" +
+                    " equipment. Would be best if they avoided combat in the meantime, so as not to get them killed before they become useful.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
         }
     }
 }

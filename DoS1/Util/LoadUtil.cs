@@ -133,15 +133,15 @@ namespace DoS1.Util
                 switch (reader.Name)
                 {
                     case "TimeSpeed":
-                        Main.TimeSpeed = int.Parse(reader.Value);
-                        if (Main.TimeSpeed < 4)
+                        Handler.TimeSpeed = int.Parse(reader.Value);
+                        if (Handler.TimeSpeed < 4)
                         {
-                            Main.TimeSpeed = 4;
+                            Handler.TimeSpeed = 4;
                         }
                         break;
 
                     case "CombatSpeed":
-                        Main.CombatSpeed = int.Parse(reader.Value);
+                        Handler.CombatSpeed = int.Parse(reader.Value);
                         break;
                 }
             }
@@ -245,6 +245,10 @@ namespace DoS1.Util
 
                     case "MainCharacter_ID":
                         Handler.MainCharacter_ID = long.Parse(reader.Value);
+                        break;
+
+                    case "FriendCharacter_ID":
+                        Handler.FriendCharacter_ID = long.Parse(reader.Value);
                         break;
 
                     case "StoryStep":

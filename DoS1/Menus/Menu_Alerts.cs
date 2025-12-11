@@ -145,7 +145,7 @@ namespace DoS1.Menus
             }
             else if (button.Text == "[No - Skip Tutorial]")
             {
-                Handler.StoryStep = 56;
+                Handler.StoryStep = 72;
                 InventoryUtil.BeginningInventory();
                 Close();
                 GameUtil.Toggle_Pause(false);
@@ -312,8 +312,9 @@ namespace DoS1.Menus
             if (Handler.StoryStep <= 4 ||
                 Handler.StoryStep == 8 ||
                 Handler.StoryStep == 19 ||
-                Handler.StoryStep == 48 |
-                Handler.StoryStep == 55)
+                Handler.StoryStep == 48 ||
+                Handler.StoryStep == 55 ||
+                Handler.StoryStep == 71)
             {
                 Handler.StoryStep++;
                 GameUtil.Toggle_Pause(false);
@@ -325,7 +326,10 @@ namespace DoS1.Menus
                      (Handler.StoryStep >= 38 && Handler.StoryStep <= 43) ||
                      (Handler.StoryStep >= 45 && Handler.StoryStep <= 46) ||
                      Handler.StoryStep == 47 ||
-                     (Handler.StoryStep >= 50 && Handler.StoryStep <= 53))
+                     (Handler.StoryStep >= 50 && Handler.StoryStep <= 53) ||
+                     Handler.StoryStep == 57 ||
+                     Handler.StoryStep == 61 ||
+                     Handler.StoryStep == 62)
             {
                 Handler.StoryStep++;
             }
@@ -368,6 +372,16 @@ namespace DoS1.Menus
                     
                     CombatUtil.StartCombat(map, ground, ally_base, squad, enemy_squad);
                 }
+            }
+            else if (Handler.StoryStep == 58)
+            {
+                Handler.TimeSpeed_Temp = Handler.TimeSpeed;
+                Handler.TimeSpeed = 10;
+                GameUtil.UpdateSpeed();
+
+                Handler.StoryStep++;
+                Close();
+                GameUtil.Toggle_Pause(false);
             }
         }
 

@@ -35,8 +35,6 @@ namespace DoS1
         public static bool SavePortrait;
         public static RenderTarget2D Portrait;
 
-        public static int TimeSpeed = 4;
-        public static int CombatSpeed = 2;
         public static double GameTime;
         public static System.Timers.Timer Timer = new System.Timers.Timer(1);
 
@@ -377,7 +375,7 @@ namespace DoS1
                     }
                 }
 
-                TimeManager.Now.AddTime(TimeRate.Second, TimeSpeed);
+                TimeManager.Now.AddTime(TimeRate.Second, Handler.TimeSpeed);
             }
         }
 

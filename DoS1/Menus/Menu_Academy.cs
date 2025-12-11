@@ -519,7 +519,6 @@ namespace DoS1.Menus
                 Squad squad = army.Squads[0];
                 foreach (Character character in squad.Characters)
                 {
-                    character.Visible = false;
                     CharacterList_Reserves.Add(character);
                 }
 

@@ -1131,10 +1131,13 @@ namespace DoS1.Util
             Handler.CombatPause = true;
 
             Button button = SceneManager.GetScene("Combat").Menu.GetButton("PlayPause");
-            button.HoverText = "Play";
-            button.Texture = AssetManager.Textures["Button_Play"];
-            button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
-            button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+            if (button != null)
+            {
+                button.HoverText = "Play";
+                button.Texture = AssetManager.Textures["Button_Play"];
+                button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+                button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+            }
         }
 
         public static void CombatUnpause()
@@ -1147,6 +1150,55 @@ namespace DoS1.Util
             button.Texture = AssetManager.Textures["Button_Pause"];
             button.Texture_Highlight = AssetManager.Textures["Button_Pause_Hover"];
             button.Texture_Disabled = AssetManager.Textures["Button_Pause_Disabled"];
+        }
+
+        public static void ToggleSpeed()
+        {
+            Handler.TimeSpeed += 2;
+            if (Handler.TimeSpeed > 10)
+            {
+                Handler.TimeSpeed = 4;
+            }
+
+            UpdateSpeed();
+
+            SaveUtil.ExportINI();
+        }
+
+        public static void UpdateSpeed()
+        {
+            Menu ui = MenuManager.GetMenu("UI");
+            Button button = ui.GetButton("Speed");
+            switch (Handler.TimeSpeed)
+            {
+                case 4:
+                    button.HoverText = "Time x1";
+                    button.Texture = AssetManager.Textures["Button_Speed1"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed1_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed1_Disabled"];
+                    break;
+
+                case 6:
+                    button.HoverText = "Time x2";
+                    button.Texture = AssetManager.Textures["Button_Speed2"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed2_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed2_Disabled"];
+                    break;
+
+                case 8:
+                    button.HoverText = "Time x3";
+                    button.Texture = AssetManager.Textures["Button_Speed3"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed3_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed3_Disabled"];
+                    break;
+
+                case 10:
+                    button.HoverText = "Time x4";
+                    button.Texture = AssetManager.Textures["Button_Speed4"];
+                    button.Texture_Highlight = AssetManager.Textures["Button_Speed4_Hover"];
+                    button.Texture_Disabled = AssetManager.Textures["Button_Speed4_Disabled"];
+                    break;
+            }
         }
 
         public static void Toggle_MainMenu()
@@ -1217,6 +1269,11 @@ namespace DoS1.Util
 
                 Handler.Selected_Save = Handler.GetHero().Name;
                 Alert_Generic("Game saved!", Color.LimeGreen);
+            }
+
+            if (Handler.StoryStep == 59)
+            {
+                Handler.StoryStep++;
             }
         }
 
