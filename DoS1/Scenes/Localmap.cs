@@ -22,6 +22,7 @@ namespace DoS1.Scenes
 
         private bool SelectingMultiple = false;
         private bool SelectingTown = false;
+        private bool EditingSquad = false;
 
         #endregion
 
@@ -316,8 +317,13 @@ namespace DoS1.Scenes
 
                         if (!SelectingTown)
                         {
+                            if (Handler.TokenMenu)
+                            {
+                                EditingSquad = false;
+                                GameUtil.Toggle_Pause(false);
+                            }
+
                             ClearButtons_Squad();
-                            GameUtil.Toggle_Pause(false);
                         }
                     }
                 }
@@ -407,12 +413,11 @@ namespace DoS1.Scenes
             {
                 foreach (Army army in CharacterManager.Armies)
                 {
-                    foreach (Squad squad in army.Squads)
+                    for (int i = 0; i < army.Squads.Count; i++)
                     {
+                        Squad squad = army.Squads[i];
                         if (squad.Visible)
                         {
-                            Picture highlight = Menu.GetPicture("Highlight");
-                            
                             if (InputManager.MouseWithin(squad.Region.ToRectangle) &&
                                 Handler.StoryStep != 59)
                             {
@@ -423,8 +428,6 @@ namespace DoS1.Scenes
 
                                 if (InputManager.Mouse_LB_Pressed)
                                 {
-                                    //hovered_squad = null;
-
                                     if (Handler.StoryStep != 5 &&
                                         Handler.StoryStep != 62)
                                     {
@@ -457,57 +460,10 @@ namespace DoS1.Scenes
                                     }
                                     else
                                     {
-                                        Handler.Selected_Squad = squad.ID;
-
-                                        Handler.ViewOnly_Squad = true;
-                                        Handler.ViewOnly_Character = true;
-                                        Handler.ViewOnly_Item = true;
-
-                                        WorldUtil.DeselectToken();
-                                        highlight.Visible = false;
-                                        Menu.GetLabel("Examine").Visible = false;
-
-                                        Layer locations = map.GetLayer("Locations");
-                                        Tile location_tile = locations.GetTile(new Vector3(squad.Location.X, squad.Location.Y, 0));
-                                        if (location_tile != null &&
-                                            squad.Type == "Ally")
-                                        {
-                                            if (location_tile.Type.Contains("Market") ||
-                                                location_tile.Type.Contains("Academy") ||
-                                                location_tile.Type.Contains("Ally"))
-                                            {
-                                                Handler.ViewOnly_Squad = false;
-                                                Handler.ViewOnly_Character = false;
-                                                Handler.ViewOnly_Item = false;
-
-                                                if (Handler.StoryStep == 5 ||
-                                                    Handler.StoryStep == 14 ||
-                                                    Handler.StoryStep == 28)
-                                                {
-                                                    MenuManager.GetMenu("Alerts").Visible = false;
-                                                    Handler.StoryStep++;
-                                                }
-                                            }
-                                        }
-
-                                        if (!Handler.ViewOnly_Squad &&
-                                            (Handler.StoryStep == 5 ||
-                                             Handler.StoryStep == 14 ||
-                                             Handler.StoryStep == 28))
-                                        {
-                                            InputManager.Mouse.Flush();
-                                            Active = false;
-                                            MenuManager.ChangeMenu("Squad");
-                                        }
-                                        else if (Handler.StoryStep != 5 &&
-                                                 Handler.StoryStep != 14 &&
-                                                 Handler.StoryStep != 28)
-                                        {
-                                            InputManager.Mouse.Flush();
-                                            Active = false;
-                                            MenuManager.ChangeMenu("Squad");
-                                        }
+                                        SelectToken_ForEdit(army, squad);
                                     }
+
+                                    break;
                                 }
                                 else if (Handler.Selected_Token == -1)
                                 {
@@ -516,6 +472,7 @@ namespace DoS1.Scenes
                             }
                             else if (Handler.Selected_Token == squad.ID)
                             {
+                                Picture highlight = Menu.GetPicture("Highlight");
                                 highlight.DrawColor = Color.Blue;
                             }
                         }
@@ -934,10 +891,20 @@ namespace DoS1.Scenes
             Squad squad = army.GetSquad(id);
             if (squad != null)
             {
-                SelectToken_CheckTown(squad);
-                if (!SelectingTown)
+                if (EditingSquad)
                 {
-                    Handler.Selected_Token = squad.ID;
+                    SelectingMultiple = false;
+                    GameUtil.Toggle_Pause(false);
+                    EditSquad(squad);
+                }
+                else
+                {
+                    SelectToken_CheckTown(squad);
+                    if (!SelectingTown)
+                    {
+                        SelectingMultiple = false;
+                        Handler.Selected_Token = squad.ID;
+                    }
                 }
             }
         }
@@ -1018,6 +985,80 @@ namespace DoS1.Scenes
             }
 
             Handler.TokenMenu = false;
+        }
+
+        private void SelectToken_ForEdit(Army army, Squad squad)
+        {
+            Menu.GetLabel("Examine").Visible = false;
+            EditingSquad = true;
+
+            SelectToken_CheckMultiple(army, squad);
+            if (!SelectingMultiple)
+            {
+                EditSquad(squad);
+            }
+
+            InputManager.Mouse.Flush();
+        }
+
+        private void EditSquad(Squad squad)
+        {
+            EditingSquad = false;
+
+            Handler.Selected_Squad = squad.ID;
+            Handler.ViewOnly_Squad = true;
+            Handler.ViewOnly_Character = true;
+            Handler.ViewOnly_Item = true;
+
+            WorldUtil.DeselectToken();
+
+            Picture highlight = Menu.GetPicture("Highlight");
+            highlight.Visible = false;
+
+            Menu.GetLabel("Examine").Visible = false;
+
+            Map map = WorldUtil.GetMap(World);
+            Layer locations = map.GetLayer("Locations");
+
+            Tile location_tile = locations.GetTile(new Vector3(squad.Location.X, squad.Location.Y, 0));
+            if (location_tile != null &&
+                squad.Type == "Ally")
+            {
+                if (location_tile.Type.Contains("Market") ||
+                    location_tile.Type.Contains("Academy") ||
+                    location_tile.Type.Contains("Ally"))
+                {
+                    Handler.ViewOnly_Squad = false;
+                    Handler.ViewOnly_Character = false;
+                    Handler.ViewOnly_Item = false;
+
+                    if (Handler.StoryStep == 5 ||
+                        Handler.StoryStep == 14 ||
+                        Handler.StoryStep == 28)
+                    {
+                        MenuManager.GetMenu("Alerts").Visible = false;
+                        Handler.StoryStep++;
+                    }
+                }
+            }
+
+            if (!Handler.ViewOnly_Squad &&
+                (Handler.StoryStep == 5 ||
+                 Handler.StoryStep == 14 ||
+                 Handler.StoryStep == 28))
+            {
+                InputManager.Mouse.Flush();
+                Active = false;
+                MenuManager.ChangeMenu("Squad");
+            }
+            else if (Handler.StoryStep != 5 &&
+                     Handler.StoryStep != 14 &&
+                     Handler.StoryStep != 28)
+            {
+                InputManager.Mouse.Flush();
+                Active = false;
+                MenuManager.ChangeMenu("Squad");
+            }
         }
 
         private void ExamineLocation(Tile location)
@@ -1298,10 +1339,7 @@ namespace DoS1.Scenes
                                 Value = 100
                             });
 
-                            Squad squad = Handler.GetHero().Squad;
-
-                            AssetManager.PlaySound_Random_AtDistance("Fireworks", new Vector2(squad.Location.X, squad.Location.Y),
-                                new Vector2(x, y), 10);
+                            AssetManager.PlaySound_Random("Fireworks");
                         }
                     }
                 }

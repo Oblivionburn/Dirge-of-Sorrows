@@ -70,7 +70,7 @@ namespace DoS1.Util
 
             Main.Timer.Stop();
             WorldUtil.CameraToTile(menu, map, ground, destination);
-            GameUtil.Alert_Combat(squad, other_squad);
+            GameUtil.Alert_Combat(menu, squad, other_squad);
         }
 
         public static void SwitchAnimation(Character character, string type)
@@ -1597,9 +1597,14 @@ namespace DoS1.Util
                     break;
 
                 case "Health":
-                case "Energy":
                     AssetManager.PlaySound_Random("Heal");
                     AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Heal"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
+                    break;
+
+                case "Energy":
+                    AssetManager.PlaySound_Random("Heal");
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Energy"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White);
                     break;
 
@@ -1658,9 +1663,14 @@ namespace DoS1.Util
                     break;
 
                 case "Regenerating":
-                case "Charging":
                     AssetManager.PlaySound_Random("Heal");
                     AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Heal"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
+                    break;
+
+                case "Charging":
+                    AssetManager.PlaySound_Random("Heal");
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Energy"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
 

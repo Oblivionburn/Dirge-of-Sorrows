@@ -130,6 +130,18 @@ namespace DoS1.Util
             ui.Visible = true;
             MenuManager.CurrentMenu_ID = ui.ID;
 
+            WorldUtil.UpdateTime();
+
+            if (Handler.ManualPause ||
+                Handler.LocalPause)
+            {
+                Button button = ui.GetButton("PlayPause");
+                button.HoverText = "Play";
+                button.Texture = AssetManager.Textures["Button_Play"];
+                button.Texture_Highlight = AssetManager.Textures["Button_Play_Hover"];
+                button.Texture_Disabled = AssetManager.Textures["Button_Play_Disabled"];
+            }
+
             Main.Game.Zoom = 1.5f;
 
             Map map = WorldUtil.GetMap(scene.World);
@@ -583,7 +595,7 @@ namespace DoS1.Util
             alert.Visible = true;
         }
 
-        public static void Alert_Combat(Squad attacker, Squad defender)
+        public static void Alert_Combat(Menu menu, Squad attacker, Squad defender)
         {
             Handler.LocalPause = true;
 
@@ -591,6 +603,9 @@ namespace DoS1.Util
 
             Label examine = ui.GetLabel("Examine");
             examine.Visible = false;
+
+            Label localExamine = menu.GetLabel("Examine");
+            localExamine.Visible = false;
 
             Button button = ui.GetButton("PlayPause");
             button.Value = 1;
@@ -654,7 +669,7 @@ namespace DoS1.Util
             option2.Visible = false;
         }
 
-        public static void Alert_Location(Map map, Layer ground, Squad squad, Tile location)
+        public static void Alert_Location(Menu menu, Layer ground, Squad squad, Tile location)
         {
             Toggle_Pause(false);
 
@@ -669,6 +684,9 @@ namespace DoS1.Util
 
             Label examine = ui.GetLabel("Examine");
             examine.Visible = false;
+
+            Label localExamine = menu.GetLabel("Examine");
+            localExamine.Visible = false;
 
             bool captured = false;
             bool liberated = false;
@@ -903,6 +921,9 @@ namespace DoS1.Util
             Label examine = ui.GetLabel("Examine");
             examine.Visible = false;
 
+            Label localExamine = menu.GetLabel("Examine");
+            localExamine.Visible = false;
+
             string message = "\"We have arrived at our destination.\"";
 
             Menu alerts = MenuManager.GetMenu("Alerts");
@@ -936,7 +957,10 @@ namespace DoS1.Util
             Handler.Selected_Token = -1;
 
             Menu ui = MenuManager.GetMenu("UI");
-            ui.GetPicture("Select").Visible = false;
+            ui.GetLabel("Examine").Visible = false;
+
+            menu.GetLabel("Examine").Visible = false;
+            menu.GetPicture("Select").Visible = false;
 
             Layer pathing = map.GetLayer("Pathing");
             pathing.Visible = false;

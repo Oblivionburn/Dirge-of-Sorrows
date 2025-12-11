@@ -1782,7 +1782,7 @@ namespace DoS1.Util
                                                                 {
                                                                     interrupt = true;
                                                                     CameraToTile(localmap.Menu, map, ground, location);
-                                                                    GameUtil.Alert_Location(map, ground, squad, location_tile);
+                                                                    GameUtil.Alert_Location(localmap.Menu, ground, squad, location_tile);
                                                                     break;
                                                                 }
                                                             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Xml;
 using Microsoft.Xna.Framework;
@@ -137,6 +138,14 @@ namespace DoS1.Util
             }
             else
             {
+                string zipFile = Path.Combine(AssetManager.Directories["Saves"], Handler.Selected_Save + "_Backup.zip");
+                if (File.Exists(zipFile))
+                {
+                    File.Delete(zipFile);
+                }
+
+                ZipFile.CreateFromDirectory(saveDir, zipFile);
+
                 //Dump current save to re-export data
                 Directory.Delete(saveDir, true);
                 Directory.CreateDirectory(saveDir);
