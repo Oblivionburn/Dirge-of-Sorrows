@@ -1527,25 +1527,28 @@ namespace DoS1.Scenes
         {
             foreach (Character character in targets)
             {
-                Something damage = character.GetStatusEffect("Damage");
-                if (damage != null)
+                if (!character.Dead)
                 {
-                    Label damage_label = Menu.GetLabel(damage.ID);
-                    if (damage_label != null)
+                    Something damage = character.GetStatusEffect("Damage");
+                    if (damage != null)
                     {
-                        bool shakeFound = false;
-                        for (int i = 0; i < character.Tags.Count; i++)
+                        Label damage_label = Menu.GetLabel(damage.ID);
+                        if (damage_label != null)
                         {
-                            if (character.Tags[i].Contains("Shake"))
+                            bool shakeFound = false;
+                            for (int i = 0; i < character.Tags.Count; i++)
                             {
-                                shakeFound = true;
-                                break;
+                                if (character.Tags[i].Contains("Shake"))
+                                {
+                                    shakeFound = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!shakeFound)
-                        {
-                            character.Tags.Add("Shake1");
+                            if (!shakeFound)
+                            {
+                                character.Tags.Add("Shake1");
+                            }
                         }
                     }
                 }

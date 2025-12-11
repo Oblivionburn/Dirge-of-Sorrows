@@ -736,8 +736,8 @@ namespace DoS1.Util
             if (character.Region != null &&
                 tile.Region != null)
             {
-                if (character.Region.X > tile.Region.X - tile.Region.Width &&
-                    character.Region.X < tile.Region.X + tile.Region.Width)
+                if (character.Region.X > tile.Region.X - (tile.Region.Width / 2) &&
+                    character.Region.X < tile.Region.X + (tile.Region.Width / 2))
                 {
                     return true;
                 }
@@ -786,39 +786,42 @@ namespace DoS1.Util
         {
             foreach (Character character in squad.Characters)
             {
-                Tile origin = OriginTile(world, character);
-                bool use_origin = NearTile(character, origin);
-
-                Tile target = TargetTile(world, character);
-                bool use_target = NearTile(character, target);
-
-                bool shakeFound = false;
-                for (int i = 0; i < character.Tags.Count; i++)
+                if (!character.Dead)
                 {
-                    string tag = character.Tags[i];
-                    if (tag.Contains("Shake") &&
-                        tag != "Shake5")
+                    Tile origin = OriginTile(world, character);
+                    bool use_origin = NearTile(character, origin);
+
+                    Tile target = TargetTile(world, character);
+                    bool use_target = NearTile(character, target);
+
+                    bool shakeFound = false;
+                    for (int i = 0; i < character.Tags.Count; i++)
                     {
-                        shakeFound = true;
-                        break;
+                        string tag = character.Tags[i];
+                        if (tag.Contains("Shake") &&
+                            tag != "Shake5")
+                        {
+                            shakeFound = true;
+                            break;
+                        }
                     }
-                }
 
-                if (shakeFound)
-                {
-                    return false;
-                }
+                    if (shakeFound)
+                    {
+                        return false;
+                    }
 
-                if (use_origin &&
-                    !AtTile(character, origin, move_speed))
-                {
-                    return false;
-                }
+                    if (use_origin &&
+                        !AtTile(character, origin, move_speed))
+                    {
+                        return false;
+                    }
 
-                if (use_target &&
-                    !AtTile(character, target, move_speed))
-                {
-                    return false;
+                    if (use_target &&
+                        !AtTile(character, target, move_speed))
+                    {
+                        return false;
+                    }
                 }
             }
 

@@ -99,27 +99,8 @@ namespace DoS1
         public static string[] HeadStyles_Female = new string[] { "Head1", "Head2", "Head3" };
         public static string[] HairStyles_Male = new string[] { "Style1", "Style2", "Style3", "Bald"};
         public static string[] HairStyles_Female = new string[] { "Style1", "Style2", "Style3" };
-
-        public static Dictionary<string, Color> HairColors = new Dictionary<string, Color>()
-        {
-            { "Brown", new Color(120, 90, 80, 255) },
-            { "Red", new Color(230, 30, 10, 255) },
-            { "Blonde", new Color(230, 230, 170, 255) },
-            { "Black", new Color(32, 32, 32, 255) },
-            { "Gray", new Color(160, 160, 160, 255) },
-            { "White", new Color(240, 240, 240, 255) }
-        };
-
-        public static Dictionary<string, Color> EyeColors = new Dictionary<string, Color>()
-        {
-            { "Green", new Color(0, 160, 0, 255) },
-            { "Brown", new Color(100, 70, 60, 255) },
-            { "Blue", new Color(0, 0, 160, 255) },
-            { "Cyan", new Color(0, 180, 200, 255) },
-            { "Purple", new Color(120, 0, 160, 255) },
-            { "Gold", new Color(200, 200, 140, 255) },
-            { "Gray", new Color(160, 160, 160, 255) }
-        };
+        public static string[] HairColors = new string[] { "Brown", "Red", "Blonde", "Black", "Gray", "White" };
+        public static string[] EyeColors = new string[] { "Green", "Brown", "Blue", "Cyan", "Purple", "Gold", "Gray" };
 
         public static List<Something> light_maps = new List<Something>();
         public static int light_tile_distance = 1;

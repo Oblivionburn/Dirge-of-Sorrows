@@ -50,9 +50,6 @@ namespace DoS1.Util
                 Visible = true
             });
 
-            Texture2D eyeTexture = Handler.GetTexture(character.Direction.ToString() + "_Eye");
-            Texture2D newEyeTexture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, eyeTexture, Handler.EyeColors[eyeColor]);
-
             character.Inventory.Items.Add(new Item
             {
                 ID = Handler.GetID(),
@@ -60,7 +57,7 @@ namespace DoS1.Util
                 Type = "Eyes",
                 Location = new Location(),
                 Equipped = true,
-                Texture = newEyeTexture,
+                Texture = Handler.GetTexture(character.Direction.ToString() + "_Eye_" + eyeColor),
                 Image = character.Image,
                 DrawColor = Color.White,
                 Visible = true
@@ -68,9 +65,6 @@ namespace DoS1.Util
 
             if (hairStyle != "Bald")
             {
-                Texture2D hairTexture = Handler.GetTexture(character.Direction.ToString() + "_" + gender + "_" + hairStyle);
-                Texture2D newHairTexture = GameUtil.CopyTexture_NewColor(Main.Game.GraphicsManager.GraphicsDevice, hairTexture, Handler.HairColors[hairColor]);
-
                 character.Inventory.Items.Add(new Item
                 {
                     ID = Handler.GetID(),
@@ -79,7 +73,7 @@ namespace DoS1.Util
                     Location = new Location(),
                     Equipped = true,
                     DrawColor = Color.White,
-                    Texture = newHairTexture,
+                    Texture = Handler.GetTexture(character.Direction.ToString() + "_" + gender + "_" + hairStyle + "_" + hairColor),
                     Image = character.Image,
                     Visible = true
                 });
@@ -138,8 +132,8 @@ namespace DoS1.Util
                 hairStyle = Handler.HairStyles_Female[random.Next(0, Handler.HairStyles_Female.Length)];
             }
 
-            string hairColor = Handler.HairColors.ElementAt(random.Next(0, Handler.HairColors.Count)).Key;
-            string eyeColor = Handler.EyeColors.ElementAt(random.Next(0, Handler.EyeColors.Count)).Key;
+            string hairColor = Handler.HairColors[random.Next(0, Handler.HairColors.Length)];
+            string eyeColor = Handler.EyeColors[random.Next(0, Handler.EyeColors.Length)];
             string skinColor = Handler.SkinTones[random.Next(0, Handler.SkinTones.Length)];
 
             return NewCharacter(name, formation, enemy ? "Enemy" : "Ally", enemy ? Direction.Right : Direction.Left, hairStyle, 
@@ -454,110 +448,6 @@ namespace DoS1.Util
                     }
                 }
             }
-        }
-
-        public static Color Get_EyeColor(Character character)
-        {
-            Texture2D texture = character.Inventory.GetItem("Eyes").Texture;
-
-            Color[] colors = new Color[texture.Width * texture.Height];
-            texture.GetData(colors);
-
-            int count = colors.Length;
-            for (int i = 0; i < count; i++)
-            {
-                Color color = colors[i];
-                if (color.R == 0 &&
-                    color.G == 0 &&
-                    color.B == 0 &&
-                    color.A == 0)
-                {
-                    
-                }
-                else
-                {
-                    return color;
-                }
-            }
-
-            return new Color(0, 0, 0, 0);
-        }
-
-        public static Color Get_EyeColor(Item eyes)
-        {
-            if (eyes != null)
-            {
-                Texture2D texture = eyes.Texture;
-
-                Color[] colors = new Color[texture.Width * texture.Height];
-                texture.GetData(colors);
-
-                int count = colors.Length;
-                for (int i = 0; i < count; i++)
-                {
-                    Color color = colors[i];
-                    if (color.R == 0 &&
-                        color.G == 0 &&
-                        color.B == 0 &&
-                        color.A == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        return color;
-                    }
-                }
-            }
-
-            return new Color(0, 0, 0, 0);
-        }
-
-        public static Color Get_HairColor(Character character)
-        {
-            Item hair = character.Inventory.GetItem("Hair");
-            if (hair != null)
-            {
-                Texture2D texture = hair.Texture;
-
-                Color[] colors = new Color[texture.Width * texture.Height];
-                texture.GetData(colors);
-
-                int count = colors.Length;
-                for (int i = 0; i < count; i++)
-                {
-                    Color color = colors[i];
-                    if (color.R == 0 &&
-                        color.G == 0 &&
-                        color.B == 0 &&
-                        color.A == 0)
-                    {
-
-                    }
-                    else
-                    {
-                        return color;
-                    }
-                }
-            }
-
-            return new Color(0, 0, 0, 0);
-        }
-
-        public static Color Get_HairColor(Item hair)
-        {
-            if (hair != null)
-            {
-                Texture2D texture = hair.Texture;
-
-                Color[] colors = new Color[texture.Width * texture.Height];
-                texture.GetData(colors);
-
-                int index = (40 * texture.Width) + 340;
-                return colors[index];
-            }
-
-            return new Color(0, 0, 0, 0);
         }
 
         public static void ResizeBars(Character character)

@@ -288,23 +288,7 @@ namespace DoS1.Util
 
                 if (item.DrawColor != default)
                 {
-                    if (item.Name.Contains("Eye"))
-                    {
-                        Color eyeColor = CharacterUtil.Get_EyeColor(item);
-                        Writer.WriteAttributeString("DrawColor", eyeColor.R.ToString() + "," + eyeColor.G.ToString() + "," +
-                            eyeColor.B.ToString());
-                    }
-                    else if (item.Name.Contains("Hair"))
-                    {
-                        Color hairColor = CharacterUtil.Get_HairColor(item);
-                        Writer.WriteAttributeString("DrawColor", hairColor.R.ToString() + "," + hairColor.G.ToString() + "," +
-                            hairColor.B.ToString());
-                    }
-                    else
-                    {
-                        Writer.WriteAttributeString("DrawColor", item.DrawColor.R.ToString() + "," + item.DrawColor.G.ToString() + "," +
-                            item.DrawColor.B.ToString());
-                    }
+                    Writer.WriteAttributeString("DrawColor", item.DrawColor.R.ToString() + "," + item.DrawColor.G.ToString() + "," + item.DrawColor.B.ToString());
                 }
                 else
                 {

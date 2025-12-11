@@ -523,18 +523,7 @@ namespace DoS1.Util
                         int G = int.Parse(color_parts[1]);
                         int B = int.Parse(color_parts[2]);
 
-                        if (item.Name.Contains("Eye") ||
-                            item.Name.Contains("Hair"))
-                        {
-                            Texture2D newTexture = GameUtil.CopyTexture_NewColor(item.Texture, new Color(R, G, B, 255));
-                            item.Texture = newTexture;
-                            item.Image = new Rectangle(0, 0, item.Texture.Width / 4, item.Texture.Height);
-                            item.DrawColor = Color.White;
-                        }
-                        else
-                        {
-                            item.DrawColor = new Color(R, G, B, 255);
-                        }
+                        item.DrawColor = new Color(R, G, B, 255);
                         break;
 
                     case "Visible":
