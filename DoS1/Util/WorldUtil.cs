@@ -1430,10 +1430,11 @@ namespace DoS1.Util
             return null;
         }
 
-        public static Tile GetNearest_Location_ToRest(Map map, Layer ground, Army army, Squad squad, bool to_guard)
+        public static Tile GetNearest_Location_ToRest(Map map, Layer ground, Squad squad, bool to_guard)
         {
             if (squad != null &&
-                map != null)
+                map != null &&
+                squad.Location != null)
             {
                 List<Tile> locations = new List<Tile>();
 
@@ -1444,7 +1445,8 @@ namespace DoS1.Util
                     for (int i = 0; i < layerCount; i++)
                     {
                         Tile tile = layer.Tiles[i];
-                        if (tile.Type != "Base_Ally")
+                        if (tile.Type != "Base_Ally" &&
+                            tile.Location != null)
                         {
                             locations.Add(tile);
                         }
@@ -1456,7 +1458,6 @@ namespace DoS1.Util
                 for (int i = 0; i < count; i++)
                 {
                     Tile tile = locations[i];
-
                     if (tile.Location.X == squad.Location.X &&
                         tile.Location.Y == squad.Location.Y)
                     {

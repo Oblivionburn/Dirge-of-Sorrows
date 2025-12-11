@@ -317,6 +317,7 @@ namespace DoS1.Scenes
                         if (!SelectingTown)
                         {
                             ClearButtons_Squad();
+                            GameUtil.Toggle_Pause(false);
                         }
                     }
                 }

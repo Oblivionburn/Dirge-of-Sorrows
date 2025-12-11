@@ -1783,6 +1783,12 @@ namespace DoS1.Scenes
                                 {
                                     CombatUtil.MoveForward(character, distance / (speed / 2));
                                 }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake4");
+                                    character.Tags.Add("Shake5");
+                                }
                             }
                             else if (CombatUtil.NearTile(character, target_tile))
                             {
@@ -1798,6 +1804,12 @@ namespace DoS1.Scenes
                                 if (character.Region.X != target_tile.Region.X)
                                 {
                                     CombatUtil.MoveForward(character, distance / (speed / 2));
+                                }
+                                else
+                                {
+                                    CharacterUtil.UpdateGear(character);
+                                    character.Tags.Remove("Shake4");
+                                    character.Tags.Add("Shake5");
                                 }
                             }
                         }

@@ -79,7 +79,7 @@ namespace DoS1.Util
             }
             else if (squad.Assignment == "Rest")
             {
-                target_tile = WorldUtil.GetNearest_Location_ToRest(map, ground, army, squad, false);
+                target_tile = WorldUtil.GetNearest_Location_ToRest(map, ground, squad, false);
             }
 
             if (target_tile == null &&

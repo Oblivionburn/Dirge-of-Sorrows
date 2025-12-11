@@ -736,7 +736,7 @@ namespace DoS1.Util
             if (character.Region != null &&
                 tile.Region != null)
             {
-                if (character.Region.X >= tile.Region.X - tile.Region.Width &&
+                if (character.Region.X > tile.Region.X - tile.Region.Width &&
                     character.Region.X < tile.Region.X + tile.Region.Width)
                 {
                     return true;
@@ -787,9 +787,35 @@ namespace DoS1.Util
             foreach (Character character in squad.Characters)
             {
                 Tile origin = OriginTile(world, character);
-                Tile target = TargetTile(world, character);
+                bool use_origin = NearTile(character, origin);
 
-                if (!AtTile(character, origin, move_speed) &&
+                Tile target = TargetTile(world, character);
+                bool use_target = NearTile(character, target);
+
+                bool shakeFound = false;
+                for (int i = 0; i < character.Tags.Count; i++)
+                {
+                    string tag = character.Tags[i];
+                    if (tag.Contains("Shake") &&
+                        tag != "Shake5")
+                    {
+                        shakeFound = true;
+                        break;
+                    }
+                }
+
+                if (shakeFound)
+                {
+                    return false;
+                }
+
+                if (use_origin &&
+                    !AtTile(character, origin, move_speed))
+                {
+                    return false;
+                }
+
+                if (use_target &&
                     !AtTile(character, target, move_speed))
                 {
                     return false;
