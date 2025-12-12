@@ -2231,7 +2231,7 @@ namespace DoS1.Util
                 #region Runes
 
                 random = new CryptoRandom();
-                int rune_choice = random.Next(0, 14);
+                int rune_choice = random.Next(0, 15);
                 switch (rune_choice)
                 {
                     case 0:
@@ -2288,6 +2288,10 @@ namespace DoS1.Util
 
                     case 13:
                         AddItem(inventory, "Effect", "Effect", "Rune");
+                        break;
+
+                    case 14:
+                        AddItem(inventory, "Diamond", "Diamond", "Rune");
                         break;
                 }
 

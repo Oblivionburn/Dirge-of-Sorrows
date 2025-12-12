@@ -138,13 +138,15 @@ namespace DoS1.Util
                             }
 
                             if (side_target1 != null &&
-                                !side_target1.Dead)
+                                !side_target1.Dead &&
+                                !targets.Contains(side_target1))
                             {
                                 targets.Add(side_target1);
                             }
 
                             if (side_target2 != null &&
-                                !side_target2.Dead)
+                                !side_target2.Dead &&
+                                !targets.Contains(side_target2))
                             {
                                 targets.Add(side_target2);
                             }
