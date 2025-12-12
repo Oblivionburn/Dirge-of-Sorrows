@@ -120,50 +120,48 @@ namespace DoS1.Util
                         {
                             targets.Add(target);
 
-                            Character side_target = null;
+                            Character side_target1 = null;
+                            Character side_target2 = null;
 
-                            if (character.Formation.Y == 0 &&
-                                target.Formation.Y == 0)
+                            if (character.Formation.Y == 0)
                             {
-                                side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y + 1));
+                                side_target1 = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y + 1));
                             }
-                            else if (character.Formation.Y == 1 &&
-                                     target.Formation.Y == 1)
+                            else if (character.Formation.Y == 1)
                             {
-                                side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y - 1));
-                                if (side_target != null &&
-                                    side_target.Dead)
-                                {
-                                    side_target = null;
-                                }
-
-                                if (side_target == null)
-                                {
-                                    side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y + 1));
-                                }
+                                side_target1 = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y - 1));
+                                side_target2 = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y + 1));
                             }
-                            else if (character.Formation.Y == 2 &&
-                                     target.Formation.Y == 2)
+                            else if (character.Formation.Y == 2)
                             {
-                                side_target = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y - 1));
+                                side_target1 = target_squad.GetCharacter(new Vector2(target.Formation.X, character.Formation.Y - 1));
                             }
 
-                            if (side_target != null &&
-                                side_target.Dead)
+                            if (side_target1 != null &&
+                                !side_target1.Dead)
                             {
-                                side_target = null;
+                                targets.Add(side_target1);
                             }
 
-                            if (side_target != null)
+                            if (side_target2 != null &&
+                                !side_target2.Dead)
                             {
-                                targets.Add(side_target);
+                                targets.Add(side_target2);
                             }
                         }
                     }
-                    else if (weapon.Categories.Contains("Bow") ||
-                             weapon.Categories.Contains("Grimoire"))
+                    else if (weapon.Categories.Contains("Bow"))
                     {
                         Character target = GetTarget_Ranged(character, target_squad);
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            targets.Add(target);
+                        }
+                    }
+                    else if (weapon.Categories.Contains("Grimoire"))
+                    {
+                        Character target = GetTarget_Grimoire(character, target_squad);
                         if (target != null &&
                             !target.Dead)
                         {
@@ -580,6 +578,252 @@ namespace DoS1.Util
                 target.Dead)
             {
                 target = null;
+            }
+
+            return target;
+        }
+
+        public static Character GetTarget_Grimoire(Character character, Squad target_squad)
+        {
+            Character target = null;
+
+            if (character.Type == "Ally")
+            {
+                if (character.Formation.Y == 0)
+                {
+                    for (int y = 0; y < 3; y++)
+                    {
+                        target = target_squad.GetCharacter(new Vector2(1, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(0, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(2, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+                    }
+                }
+                else if (character.Formation.Y == 1)
+                {
+                    target = target_squad.GetCharacter(new Vector2(1, 1));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(0, 1));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(2, 1));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(1, 2));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(0, 2));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(2, 2));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(1, 0));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+                    target = target_squad.GetCharacter(new Vector2(0, 0));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(2, 0));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+                }
+                else if (character.Formation.Y == 2)
+                {
+                    for (int y = 2; y >= 0; y--)
+                    {
+                        target = target_squad.GetCharacter(new Vector2(1, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(0, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(2, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+                    }
+                }
+            }
+            else if (character.Type == "Enemy")
+            {
+                if (character.Formation.Y == 0)
+                {
+                    for (int y = 0; y < 3; y++)
+                    {
+                        target = target_squad.GetCharacter(new Vector2(1, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(2, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(0, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+                    }
+                }
+                else if (character.Formation.Y == 1)
+                {
+                    target = target_squad.GetCharacter(new Vector2(1, 1));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(2, 1));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(0, 1));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(1, 2));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(2, 2));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(0, 2));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(1, 0));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+                    target = target_squad.GetCharacter(new Vector2(2, 0));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+
+                    target = target_squad.GetCharacter(new Vector2(0, 0));
+                    if (target != null &&
+                        !target.Dead)
+                    {
+                        return target;
+                    }
+                }
+                else if (character.Formation.Y == 2)
+                {
+                    for (int y = 2; y >= 0; y--)
+                    {
+                        target = target_squad.GetCharacter(new Vector2(1, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(2, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+
+                        target = target_squad.GetCharacter(new Vector2(0, y));
+                        if (target != null &&
+                            !target.Dead)
+                        {
+                            return target;
+                        }
+                    }
+                }
             }
 
             return target;
@@ -1126,7 +1370,8 @@ namespace DoS1.Util
                     statusEffect.Name == "Stunned" ||
                     statusEffect.Name == "Slow" ||
                     statusEffect.Name == "Frozen" ||
-                    statusEffect.Name == "Shocked")
+                    statusEffect.Name == "Shocked" ||
+                    statusEffect.Name == "Radiating")
                 {
                     character.StatusEffects.Remove(statusEffect);
                     RuneUtil.AddCombatLabel(menu, character, "-" + statusEffect.Name, Color.White);
@@ -1167,6 +1412,17 @@ namespace DoS1.Util
             else if (weapon.Categories[0] == "Grimoire")
             {
                 damage += (int)attacker.GetStat("INT").Value;
+            }
+
+            if (RuneUtil.DiamondChance_Attack(menu, attacker))
+            {
+                damage += damage / 2;
+            }
+
+            //Reduce by defender's diamond resistance
+            if (RuneUtil.DiamondChance_AllArmor(menu, defender))
+            {
+                damage /= 2;
             }
 
             if (InventoryUtil.Weapon_IsMelee(weapon) ||
@@ -1375,6 +1631,17 @@ namespace DoS1.Util
                     }
 
                     RuneUtil.AddCombatLabel(menu, character, statusEffect.Name + "! (+" + damage.ToString() + ")", damage_color);
+                }
+                else if (statusEffect.Name == "Radiating")
+                {
+                    character.ManaBar.Value -= damage;
+                    if (character.ManaBar.Value < 0)
+                    {
+                        character.ManaBar.Value = 0;
+                    }
+                    character.ManaBar.Update();
+
+                    RuneUtil.AddCombatLabel(menu, character, statusEffect.Name + "! (-" + damage.ToString() + ")", damage_color);
                 }
                 else
                 {
@@ -1683,6 +1950,12 @@ namespace DoS1.Util
                 case "Shocked":
                     AssetManager.PlaySound_Random("Shock");
                     AddCombatEffect(menu, character, "Damage", AssetManager.Textures["Lightning"],
+                        new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
+                    break;
+
+                case "Radiating":
+                    AssetManager.PlaySound_Random("Siphon");
+                    AddCombatEffect(menu, character, "Damage", AssetManager.Textures["EP Drain"],
                         new Region(character.Region.X, character.Region.Y, character.Region.Width, character.Region.Height), Color.White * 0.9f);
                     break;
             }

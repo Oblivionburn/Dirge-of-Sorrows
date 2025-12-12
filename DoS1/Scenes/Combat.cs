@@ -2030,7 +2030,8 @@ namespace DoS1.Scenes
                             statusEffect.Name == "Stunned" ||
                             statusEffect.Name == "Slow" ||
                             statusEffect.Name == "Frozen" ||
-                            statusEffect.Name == "Shocked")
+                            statusEffect.Name == "Shocked" ||
+                            statusEffect.Name == "Radiating")
                         {
                             character.StatusEffects.Remove(statusEffect);
                             i--;
@@ -2067,7 +2068,8 @@ namespace DoS1.Scenes
                             statusEffect.Name == "Stunned" ||
                             statusEffect.Name == "Slow" ||
                             statusEffect.Name == "Frozen" ||
-                            statusEffect.Name == "Shocked")
+                            statusEffect.Name == "Shocked" ||
+                            statusEffect.Name == "Radiating")
                         {
                             character.StatusEffects.Remove(statusEffect);
                             i--;

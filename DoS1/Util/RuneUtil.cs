@@ -1189,6 +1189,35 @@ namespace DoS1.Util
 
                                         #endregion
                                     }
+                                    else if (rune.Categories.Contains("Diamond"))
+                                    {
+                                        #region Radiating
+
+                                        status_name = "Radiating";
+
+                                        bool found = false;
+
+                                        foreach (Something existing in defender.StatusEffects)
+                                        {
+                                            if (existing.Name == status_name)
+                                            {
+                                                found = true;
+                                                existing.Value += 2;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(new Something
+                                            {
+                                                Name = status_name,
+                                                Value = 2
+                                            });
+                                        }
+
+                                        #endregion
+                                    }
 
                                     if (!string.IsNullOrEmpty(status_name))
                                     {
@@ -1405,6 +1434,90 @@ namespace DoS1.Util
             return false;
         }
 
+        public static int DiamondChance(Item item)
+        {
+            int total = 0;
+
+            if (item != null)
+            {
+                for (int i = 0; i < item.Attachments.Count; i++)
+                {
+                    Item rune = item.Attachments[i];
+
+                    if (rune.Categories.Contains("Diamond"))
+                    {
+                        Something level = rune.GetProperty("Level Value");
+                        if (level != null)
+                        {
+                            total += (int)level.Value * 10;
+                        }
+                    }
+                }
+            }
+
+            if (total > 0 &&
+                Main.Game.Debugging)
+            {
+                return 100;
+            }
+
+            return total;
+        }
+
+        public static bool DiamondChance_AllArmor(Menu menu, Character defender)
+        {
+            int chance = 0;
+
+            Item helm = InventoryUtil.Get_EquippedItem(defender, "Helm");
+            if (helm != null)
+            {
+                chance += DiamondChance(helm);
+            }
+
+            Item armor = InventoryUtil.Get_EquippedItem(defender, "Armor");
+            if (armor != null)
+            {
+                chance += DiamondChance(armor);
+            }
+
+            Item shield = InventoryUtil.Get_EquippedItem(defender, "Shield");
+            if (shield != null)
+            {
+                chance += DiamondChance(shield);
+            }
+
+            if (Utility.RandomPercent(chance))
+            {
+                AddCombatLabel(menu, defender, "Resisted!", new Color(200, 191, 231, 255));
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool DiamondChance_Attack(Menu menu, Character attacker)
+        {
+            Item weapon = InventoryUtil.Get_EquippedItem(attacker, "Weapon");
+            if (InventoryUtil.Item_HasElement(weapon, "Diamond"))
+            {
+                int chance = InventoryUtil.Get_Item_Element_Level(weapon, "Diamond") * 10;
+
+                if (chance > 0 &&
+                    Main.Game.Debugging)
+                {
+                    chance = 100;
+                }
+
+                if (Utility.RandomPercent(chance))
+                {
+                    AddCombatLabel(menu, attacker, "Boosted!", new Color(200, 191, 231, 255));
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void AddCombatLabel(Menu menu, Character character, string text, Color text_color)
         {
             menu.AddLabel(AssetManager.Fonts["ControlFont"], character.ID, "Damage", text, text_color,
@@ -1530,6 +1643,10 @@ namespace DoS1.Util
 
                         case "Lightning":
                             rune.Description = "On Weapon: inflict " + (level.Value * Handler.Element_Multiplier) + " Lightning damage\nOn Armor: resist " + (level.Value * Handler.Element_Multiplier) + " Lightning damage\nStatus: Shocked";
+                            break;
+
+                        case "Diamond":
+                            rune.Description = "On Weapon: " + (level.Value * 10) + "% chance to inflict extra half all damage\nOn Armor: " + (level.Value * 10) + "% chance to resist half all damage\nStatus: Radiating";
                             break;
                     }
                 }

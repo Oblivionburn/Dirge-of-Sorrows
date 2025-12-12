@@ -735,6 +735,13 @@ namespace DoS1.Util
 
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
+
+            item = NewItem(type, "Diamond", "Diamond", properties);
+            item.Buy_Price = 1200;
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
         public static Item NewItem(string type, string category, string material, List<Something> properties)

@@ -577,6 +577,10 @@ namespace DoS1.Util
             {
                 return new Color(0, 255, 255, 255);
             }
+            else if (effect_name == "Radiating")
+            {
+                return new Color(200, 191, 231, 255);
+            }
 
             return new Color(0, 0, 0, 0);
         }
