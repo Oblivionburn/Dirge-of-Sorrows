@@ -671,6 +671,7 @@ namespace DoS1.Util
 
                     case "Properties":
                         VisitProperties(reader, attachment);
+                        InventoryUtil.UpdateItem(item);
                         break;
                 }
             }

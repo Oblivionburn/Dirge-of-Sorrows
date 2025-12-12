@@ -352,6 +352,7 @@ namespace DoS1.Menus
         private void CheckClick(Button button)
         {
             AssetManager.PlaySound_Random("Click");
+            InputManager.Mouse.Flush();
 
             button.Opacity = 0.8f;
             button.Selected = false;

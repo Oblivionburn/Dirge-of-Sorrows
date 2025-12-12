@@ -1371,7 +1371,7 @@ namespace DoS1.Util
                 {
                     if (cost != null)
                     {
-                        cost.Value += level.Value;
+                        cost.Value++;
                     }
                     else
                     {

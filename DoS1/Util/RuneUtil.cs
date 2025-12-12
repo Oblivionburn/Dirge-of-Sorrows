@@ -1489,7 +1489,7 @@ namespace DoS1.Util
                             break;
 
                         case "Disarm":
-                            rune.Description = "On Weapon: " + level.Value + "% chance to destroy target's weapon\nOn Armor: " + level.Value + "% chance to destroy attacker's weapon when hit\nStatus: Melting";
+                            rune.Description = "On Weapon: " + level.Value + "% chance to disarm target's weapon\nOn Armor: " + level.Value + "% chance to disarm attacker's weapon when hit\nStatus: Melting";
                             break;
 
                         case "Drain":
