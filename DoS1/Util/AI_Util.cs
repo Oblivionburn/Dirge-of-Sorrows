@@ -159,39 +159,7 @@ namespace DoS1.Util
                     int chance = random.Next(0, 401);
                     if (chance == 0)
                     {
-                        random = new CryptoRandom();
-                        int choice = random.Next(0, 7);
-                        switch (choice)
-                        {
-                            case 0:
-                                squad.Assignment = "Attack Base";
-                                break;
-
-                            case 1:
-                                squad.Assignment = "Capture Nearest Town";
-                                break;
-
-                            case 2:
-                                squad.Assignment = "Guard Nearest Town";
-                                break;
-
-                            case 3:
-                                squad.Assignment = "Attack Nearest Squad";
-                                break;
-
-                            case 4:
-                                squad.Assignment = "Attack Hero Squad";
-                                break;
-
-                            case 5:
-                                squad.Assignment = "Sleeper";
-                                break;
-
-                            case 6:
-                                squad.Assignment = "Opportunist";
-                                break;
-                        }
-
+                        RandomAssignment(squad);
                         Set_NextTarget(map, ground, army, squad);
                     }
                 }
@@ -206,6 +174,51 @@ namespace DoS1.Util
                         Set_NextTarget(map, ground, army, squad);
                     }
                 }
+            }
+        }
+
+        public static void RandomAssignment(Squad squad)
+        {
+            CryptoRandom random = new CryptoRandom();
+            int choice = random.Next(1, 101);
+            if (choice <= 5)
+            {
+                //5% chance
+                squad.Assignment = "Attack Hero Squad";
+            }
+            else if (choice <= 10)
+            {
+                //5% chance
+                squad.Assignment = "Opportunist";
+            }
+            else if (choice <= 35)
+            {
+                //25% chance
+                squad.Assignment = "Guard Nearest Town";
+            }
+            else if (choice <= 55)
+            {
+                //20% chance
+                squad.Assignment = "Capture Nearest Town";
+            }
+            else if (choice <= 65)
+            {
+                //10% chance
+                squad.Assignment = "Attack Nearest Squad";
+            }
+            else if (choice <= 70)
+            {
+                //5% chance
+                squad.Assignment = "Sleeper";
+            }
+            else if (choice <= 80)
+            {
+                //10% chance
+                squad.Assignment = "Attack Base";
+            }
+            else
+            {
+                //20% chance don't change assignment
             }
         }
     }

@@ -204,12 +204,14 @@ namespace DoS1.Menus
                 "row, then the next row searched will be the middle and last will be the bottom row. If the character is in the middle row, then the next row searched " +
                 "will be the top and last will be the bottom row. If the character is in the bottom row, then the next row searched will be the middle and last will be " +
                 "the top row.\n";
-            newText += "- Characters wielding a ranged weapon (bow or grimoire with offensive runes) will always target whoever is furthest back on the same row. If no " +
-                "target can be found in the same row, then they will search the other rows in the same order as a character wielding a melee weapon, starting from the " +
-                "Back and working their way to the Front.\n";
-            newText += "- Characters wielding any weapon with restorative runes (e.g. Health or Energy), can simultaneously target their own squad members for " +
-                "restoration of HP/EP. Restoration targeting will always be whoever has the least amount of the value being restored. If the restorative rune is paired " +
-                "with an Area Rune, then the target will be the entire squad when the Area effect is applied.";
+            newText += "- Characters wielding a bow weapon will always target whoever is furthest back on the same row. If no target can be found in the same row, then " +
+                "they will search the other rows in the same order as a character wielding a melee weapon, starting from the Back and working their way to the Front.\n";
+            newText += "- Characters wielding a grimoire will always target whoever is in the Middle on the same row. If no target is in the Middle, then they will " +
+                "check for a target in the Back, and lastly for a target in the Front. If no target can be found in the same row, then they will search the other rows " +
+                "in the same order as a character wielding a melee weapon.\n";
+            newText += "- Characters wielding any weapon with restorative runes (e.g. Health or Energy) can simultaneously target an enemy and their own squad members " +
+                "for restoration of HP/EP. Restoration targeting will always be whoever has the least amount of the value being restored. If the restorative rune is " +
+                "paired with an Area Rune, then the target will be the entire squad when the Area effect is applied.";
 
             text.Text = GameUtil.WrapText_Help(newText, 100);
 
@@ -260,15 +262,16 @@ namespace DoS1.Menus
             newText += "- Weak = melee/bow weapons do half damage. Duration: 1 turn, until healed, or end of combat. Max stack: 3 turns.\n\n";
             newText += "- Cursed = 10% chance to instantly die at start of turn. Duration: until healed.\n\n";
             newText += "- Melting = 10% chance to lose random piece of equipment. Duration: 1 turn, until healed, or end of combat. Max stack: 3 turns.\n\n";
-            newText += "- Poisoned = 2 damage at start of turn. Duration: until healed. Max stack: infinite.\n\n";
+            newText += "- Poisoned = -2 HP at start of turn. Duration: until healed. Max stack: infinite.\n\n";
             newText += "- Petrified = skip turn. Duration: until healed.\n\n";
-            newText += "- Burning = 4 damage at start of turn. Duration: 2 turns, until healed, or end of combat. Max stack: infinite.\n\n";
-            newText += "- Regenerating = 20 HP restored at start of turn. Duration: 5 turns or end of combat. Max stack: 5 turns.\n\n";
-            newText += "- Charging = 20 EP restored at start of turn. Duration: 5 turns or end of combat. Max stack: 5 turns.\n\n";
+            newText += "- Burning = -4 HP at start of turn. Duration: 2 turns, until healed, or end of combat. Max stack: infinite.\n\n";
+            newText += "- Regenerating = +20 HP restored at start of turn. Duration: 5 turns or end of combat. Max stack: 5 turns.\n\n";
+            newText += "- Charging = +20 EP restored at start of turn. Duration: 5 turns or end of combat. Max stack: 5 turns.\n\n";
             newText += "- Stunned = skip turn. Duration: 1 turn or end of combat. Max stack: infinite.\n\n";
             newText += "- Slow = melee/bow weapons do 0 damage. Duration: 1 turn, until healed, or end of combat. Max stack: 2 turns.\n\n";
             newText += "- Frozen = skip turn and take 5 damage at start of turn. Duration: 4 turns, until healed, or end of combat. Max stack: 4 turns.\n\n";
-            newText += "- Shocked = skip turn and take 10 damage at start of turn. Duration: 2 turns, until healed, or end of combat. Max stack: 2 turns.";
+            newText += "- Shocked = skip turn and take 10 damage at start of turn. Duration: 2 turns, until healed, or end of combat. Max stack: 2 turns.\n\n";
+            newText += "- Radiating = -2 EP at start of turn. Duration: until healed, or end of combat. Max stack: infinite.";
 
             text.Text = GameUtil.WrapText_Help(newText, 107);
 

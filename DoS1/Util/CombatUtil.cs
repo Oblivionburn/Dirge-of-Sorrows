@@ -1416,17 +1416,6 @@ namespace DoS1.Util
                 damage += (int)attacker.GetStat("INT").Value;
             }
 
-            if (RuneUtil.DiamondChance_Attack(menu, attacker))
-            {
-                damage += damage / 2;
-            }
-
-            //Reduce by defender's diamond resistance
-            if (RuneUtil.DiamondChance_AllArmor(menu, defender))
-            {
-                damage /= 2;
-            }
-
             if (InventoryUtil.Weapon_IsMelee(weapon) ||
                 weapon.Categories[0] == "Bow")
             {
@@ -1466,6 +1455,17 @@ namespace DoS1.Util
                 {
                     damage = (int)Math.Floor(damage * 0.75);
                 }
+            }
+
+            if (RuneUtil.DiamondChance_Attack(menu, attacker))
+            {
+                damage += damage / 2;
+            }
+
+            //Reduce by defender's diamond resistance
+            if (RuneUtil.DiamondChance_AllArmor(menu, defender))
+            {
+                damage /= 2;
             }
 
             if (damage < 0)

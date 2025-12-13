@@ -376,6 +376,52 @@ namespace DoS1.Util
                     }
                 }
 
+                Scene scene = GetScene();
+                for (int i = 0; i < scene.Menu.Pictures.Count; i++)
+                {
+                    Picture picture = scene.Menu.Pictures[i];
+                    if (picture.Name == "Fireworks")
+                    {
+                        int x_diff = (int)picture.Location.X - (int)current.Location.X;
+                        if (x_diff < 0)
+                        {
+                            x_diff *= -1;
+                        }
+
+                        int y_diff = (int)picture.Location.Y - (int)current.Location.Y;
+                        if (y_diff < 0)
+                        {
+                            y_diff *= -1;
+                        }
+
+                        if (picture.Location.X < current.Location.X)
+                        {
+                            picture.Region.X = current.Region.X - (x_diff * Main.Game.TileSize.X);
+                        }
+                        else if (picture.Location.X > current.Location.X)
+                        {
+                            picture.Region.X = current.Region.X + (x_diff * Main.Game.TileSize.X);
+                        }
+                        else if (picture.Location.X == current.Location.X)
+                        {
+                            picture.Region.X = current.Region.X;
+                        }
+
+                        if (picture.Location.Y < current.Location.Y)
+                        {
+                            picture.Region.Y = current.Region.Y - (y_diff * Main.Game.TileSize.Y);
+                        }
+                        else if (picture.Location.Y > current.Location.Y)
+                        {
+                            picture.Region.Y = current.Region.Y + (y_diff * Main.Game.TileSize.Y);
+                        }
+                        else if (picture.Location.Y == current.Location.Y)
+                        {
+                            picture.Region.Y = current.Region.Y;
+                        }
+                    }
+                }
+
                 Picture highlight = menu.GetPicture("Highlight");
                 if (highlight != null)
                 {

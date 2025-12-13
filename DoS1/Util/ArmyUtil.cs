@@ -131,30 +131,8 @@ namespace DoS1.Util
                 }
                 else
                 {
-                    CryptoRandom random = new CryptoRandom();
-                    int choice = random.Next(0, 5);
-                    switch (choice)
-                    {
-                        case 0:
-                            enemy_squad.Assignment = "Attack Base";
-                            break;
-
-                        case 1:
-                            enemy_squad.Assignment = "Capture Nearest Town";
-                            break;
-
-                        case 2:
-                            enemy_squad.Assignment = "Guard Nearest Town";
-                            break;
-
-                        case 3:
-                            enemy_squad.Assignment = "Attack Nearest Squad";
-                            break;
-
-                        case 4:
-                            enemy_squad.Assignment = "Sleeper";
-                            break;
-                    }
+                    enemy_squad.Assignment = "Guard Nearest Town";
+                    AI_Util.RandomAssignment(enemy_squad);
                 }
 
                 Gen_EnemySquad(enemy_squad, map_level + 1, -1, -1, -1, -1);

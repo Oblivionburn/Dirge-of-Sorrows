@@ -1488,7 +1488,7 @@ namespace DoS1.Util
 
             if (Utility.RandomPercent(chance))
             {
-                AddCombatLabel(menu, defender, "Resisted!", new Color(200, 191, 231, 255));
+                AddCombatLabel(menu, defender, "Diamond Resist!", new Color(200, 191, 231, 255));
                 return true;
             }
 
@@ -1510,7 +1510,7 @@ namespace DoS1.Util
 
                 if (Utility.RandomPercent(chance))
                 {
-                    AddCombatLabel(menu, attacker, "Boosted!", new Color(200, 191, 231, 255));
+                    AddCombatLabel(menu, attacker, "Diamond Boost!", new Color(200, 191, 231, 255));
                     return true;
                 }
             }

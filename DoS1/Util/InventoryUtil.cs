@@ -1082,6 +1082,17 @@ namespace DoS1.Util
                         effect = "When Hit";
                     }
                 }
+                else if (element == "Diamond")
+                {
+                    if (item.Type == "Weapon")
+                    {
+                        effect = "Extra 1/2 All Damage Chance";
+                    }
+                    else if (IsArmor(item))
+                    {
+                        effect = "Resist 1/2 All Damage Chance";
+                    }
+                }
                 else if (element == "Effect")
                 {
                     #region Status Effects
@@ -1283,7 +1294,8 @@ namespace DoS1.Util
                     else
                     {
                         //Else add new property
-                        if (element == "Area")
+                        if (element == "Area" ||
+                            element == "Drain")
                         {
                             item.Properties.Add(new Something
                             {
@@ -1322,16 +1334,9 @@ namespace DoS1.Util
                                 Value = level.Value
                             });
                         }
-                        else if (element == "Drain")
-                        {
-                            item.Properties.Add(new Something
-                            {
-                                Name = element + " " + effect,
-                                Type = element,
-                                Value = level.Value * 10
-                            });
-                        }
-                        else if (element == "Counter")
+                        else if (element == "Counter" ||
+                                 element == "Diamond" ||
+                                 element == "Effect")
                         {
                             item.Properties.Add(new Something
                             {
@@ -1347,15 +1352,6 @@ namespace DoS1.Util
                                 Name = element + " " + effect,
                                 Type = element,
                                 Value = level.Value
-                            });
-                        }
-                        else if (element == "Effect")
-                        {
-                            item.Properties.Add(new Something
-                            {
-                                Name = effect,
-                                Type = element,
-                                Value = level.Value * 10
                             });
                         }
                         else
