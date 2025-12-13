@@ -510,14 +510,18 @@ namespace DoS1.Util
                 if (character.Texture != null)
                 {
                     Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
-                    if (armor != null)
+                    if (armor != null &&
+                        armor.Categories != null &&
+                        armor.Materials != null)
                     {
                         string armor_texture = direction + "_Armor_" + armor.Categories[0] + "_" + armor.Materials[0] + "_" + type;
                         armor.Texture = Handler.GetTexture(armor_texture);
                     }
 
                     Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                    if (weapon != null)
+                    if (weapon != null &&
+                        weapon.Categories != null &&
+                        weapon.Materials != null)
                     {
                         string weapon_texture = direction + "_Weapon_" + weapon.Categories[0] + "_" + weapon.Materials[0] + "_" + type;
                         weapon.Texture = Handler.GetTexture(weapon_texture);

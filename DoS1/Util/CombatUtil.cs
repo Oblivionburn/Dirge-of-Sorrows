@@ -79,17 +79,20 @@ namespace DoS1.Util
             {
                 CharacterUtil.SwitchAnimation(character, type);
 
-                for (int i = 0; i < character.Tags.Count; i++)
+                if (character.Tags != null)
                 {
-                    if (character.Tags[i].Contains("Animation") ||
-                        character.Tags[i].Contains("Shake"))
+                    for (int i = 0; i < character.Tags.Count; i++)
                     {
-                        character.Tags.Remove(character.Tags[i]);
-                        i--;
+                        if (character.Tags[i].Contains("Animation") ||
+                            character.Tags[i].Contains("Shake"))
+                        {
+                            character.Tags.Remove(character.Tags[i]);
+                            i--;
+                        }
                     }
-                }
 
-                character.Tags.Add("Animation_" + type);
+                    character.Tags.Add("Animation_" + type);
+                }
             }
         }
 
@@ -111,7 +114,8 @@ namespace DoS1.Util
 
             if (target_squad != null)
             {
-                if (weapon != null)
+                if (weapon != null &&
+                    weapon.Categories != null)
                 {
                     if (weapon.Categories.Contains("Axe"))
                     {
@@ -1041,14 +1045,17 @@ namespace DoS1.Util
                     bool use_target = NearTile(character, target);
 
                     bool shakeFound = false;
-                    for (int i = 0; i < character.Tags.Count; i++)
+                    if (character.Tags != null)
                     {
-                        string tag = character.Tags[i];
-                        if (tag.Contains("Shake") &&
-                            tag != "Shake5")
+                        for (int i = 0; i < character.Tags.Count; i++)
                         {
-                            shakeFound = true;
-                            break;
+                            string tag = character.Tags[i];
+                            if (tag.Contains("Shake") &&
+                                tag != "Shake5")
+                            {
+                                shakeFound = true;
+                                break;
+                            }
                         }
                     }
 

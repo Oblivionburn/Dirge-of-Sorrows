@@ -125,10 +125,6 @@ namespace DoS1.Util
                 {
                     enemy_squad.Assignment = "Guard Base";
                 }
-                else if (i == 2)
-                {
-                    enemy_squad.Assignment = "Attack Base";
-                }
                 else
                 {
                     enemy_squad.Assignment = "Guard Nearest Town";

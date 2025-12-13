@@ -32,6 +32,9 @@ namespace DoS1
         public static bool LostFocus;
         public static bool Drawing;
 
+        public static Renderer BufferRenderer;
+        public static Renderer FinalRenderer;
+
         public static bool SavePortrait;
         public static RenderTarget2D Portrait;
 
@@ -91,10 +94,20 @@ namespace DoS1
                     ClearRenderTarget_AfterDraw = true,
                     BlendState = BlendState.Additive
                 };
+
+                Handler.Init(this);
+
                 RenderingManager.LightingRenderer.Init(Game.GraphicsManager, Game.Resolution);
                 RenderingManager.AddLightingRenderer.RenderTarget = RenderingManager.LightingRenderer.RenderTarget;
 
-                Handler.Init(this);
+                BufferRenderer = new Renderer(Handler.GetID(), "Buffer");
+                BufferRenderer.Init(Game.GraphicsManager, Game.Resolution);
+
+                FinalRenderer = new Renderer(Handler.GetID(), "Final");
+                FinalRenderer.Init(Game.GraphicsManager, Game.Resolution);
+
+                ShaderUtil.Init();
+
                 Game.Zoom = 1.5f;
 
                 if (!Game.GraphicsManager.IsFullScreen)
@@ -242,8 +255,14 @@ namespace DoS1
                             //Render lighting
                             RenderingManager.LightingRenderer.Draw(Game.SpriteBatch, Game.Resolution);
 
-                            //Render world
+
+                            //=================================
+                            // Draw everything to Buffer
+                            //---------------------------------
+                            Game.GraphicsManager.GraphicsDevice.SetRenderTarget(BufferRenderer.RenderTarget);
                             Game.GraphicsManager.GraphicsDevice.Clear(Color.Black);
+
+                            //Render world
                             Game.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
                             SceneManager.Draw_WorldsOnly(Game.SpriteBatch, Game.Resolution, Color.White);
                             Game.SpriteBatch.End();
@@ -270,7 +289,7 @@ namespace DoS1
                             //Render scene specific menus
                             SceneManager.Draw_MenusOnly(Game.SpriteBatch);
 
-                            //Render weather ontop of scene but underneath menus
+                            //Render weather ontop of scene but underneath standalone menus
                             if (Handler.LocalMap &&
                                 !Handler.Combat &&
                                 !SceneManager.GetScene("GameOver").Visible)
@@ -288,6 +307,34 @@ namespace DoS1
                             //Render standalone menus
                             MenuManager.Draw(Game.SpriteBatch);
 
+                            Game.SpriteBatch.End();
+                            //---------------------------------
+                            // End of drawing to Buffer
+                            //=================================
+
+                            //Draw Buffer to Final RenderTarget
+                            Game.GraphicsManager.GraphicsDevice.SetRenderTarget(FinalRenderer.RenderTarget);
+                            Game.GraphicsManager.GraphicsDevice.Clear(Color.Black);
+
+                            Game.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+                            Game.SpriteBatch.Draw(BufferRenderer.RenderTarget, new Rectangle(0, 0, Game.Resolution.X, Game.Resolution.Y), Color.White);
+                            Game.SpriteBatch.End();
+
+                            if (Handler.Combat)
+                            {
+                                //Apply bloom to combat effects
+                                ShaderUtil.Apply_Bloom(Game.SpriteBatch, SceneManager.GetScene("Combat").Menu);
+                            }
+                            else
+                            {
+                                //Apply bloom to fireworks
+                                ShaderUtil.Apply_Bloom(Game.SpriteBatch, SceneManager.GetScene("Localmap").Menu);
+                            }
+
+                            //Draw Final RenderTarget to screen
+                            Game.GraphicsManager.GraphicsDevice.SetRenderTarget(null);
+                            Game.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+                            Game.SpriteBatch.Draw(FinalRenderer.RenderTarget, new Rectangle(0, 0, Game.Resolution.X, Game.Resolution.Y), Color.White);
                             Game.SpriteBatch.End();
                         }
 

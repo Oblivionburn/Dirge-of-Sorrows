@@ -249,24 +249,7 @@ namespace DoS1.Scenes
                     if (picture.Name == "Damage" ||
                         picture.Name == "Cast")
                     {
-                        if (picture.Texture.Name == "Lightning" ||
-                            picture.Texture.Name == "Fire" ||
-                            picture.Texture.Name == "Ice" ||
-                            picture.Texture.Name == "Heal" ||
-                            picture.Texture.Name == "Thump")
-                        {
-                            int radius = 1;
-                            if (picture.Texture.Name == "Fire")
-                            {
-                                radius = 5;
-                            }
-
-                            ShaderUtil.Apply_GaussianBlur(spriteBatch, radius, picture.Texture, picture.Region, picture.Image, picture.DrawColor, picture.Opacity);
-                        }
-                        else
-                        {
-                            spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
-                        }
+                        spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
                     }
                 }
             }
@@ -950,13 +933,13 @@ namespace DoS1.Scenes
 
             if (current_character.Type == "Ally")
             {
-                Menu.AddPicture(Handler.GetID(), "Cast", AssetManager.Textures["Cast"],
+                Menu.AddPicture(current_character.ID, "Cast", AssetManager.Textures["Cast"],
                     new Region(current_character.Region.X, current_character.Region.Y, current_character.Region.Width, current_character.Region.Height),
                         Color.White, true);
             }
             else if (current_character.Type == "Enemy")
             {
-                Menu.AddPicture(Handler.GetID(), "Cast", AssetManager.Textures["EvilCast"],
+                Menu.AddPicture(current_character.ID, "Cast", AssetManager.Textures["EvilCast"],
                     new Region(current_character.Region.X, current_character.Region.Y, current_character.Region.Width, current_character.Region.Height),
                         Color.White, true);
             }
@@ -1517,7 +1500,7 @@ namespace DoS1.Scenes
                     else
                     {
                         picture.Image = new Rectangle(X, picture.Image.Y, picture.Image.Width, picture.Image.Height);
-                        picture.Opacity -= 0.2f;
+                        picture.Opacity -= 0.1f;
                     }
                 }
             }

@@ -1,14 +1,39 @@
 ﻿using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using OP_Engine.Rendering;
 using OP_Engine.Utility;
+using OP_Engine.Controls;
+using OP_Engine.Menus;
 
 namespace DoS1.Util
 {
     public static class ShaderUtil
     {
+        public static Effect BloomExtract;
+        public static Effect BloomCombine;
+        public static RenderTarget2D RenderTarget_BrightAreas;
+        public static RenderTarget2D RenderTarget_Blurred;
+
+        public static void Init()
+        {
+            Main.BufferRenderer = new Renderer(Handler.GetID(), "Buffer");
+            Main.BufferRenderer.Init(Main.Game.GraphicsManager, Main.Game.Resolution);
+
+            Main.FinalRenderer = new Renderer(Handler.GetID(), "Final");
+            Main.FinalRenderer.Init(Main.Game.GraphicsManager, Main.Game.Resolution);
+
+            RenderTarget_BrightAreas = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+            RenderTarget_Blurred = new RenderTarget2D(Main.Game.GraphicsManager.GraphicsDevice, Main.Game.Resolution.X, Main.Game.Resolution.Y);
+
+            BloomExtract = AssetManager.Shaders["BloomExtract"];
+
+            BloomCombine = AssetManager.Shaders["BloomCombine"];
+            BloomCombine.Parameters["BaseIntensity"].SetValue(1f);
+            BloomCombine.Parameters["BloomSaturation"].SetValue(1.5f);
+            BloomCombine.Parameters["BaseSaturation"].SetValue(1f);
+        }
+
         public static Vector2[] HorizontalOffsets(int radius, float textureWidth)
         {
             Vector2[] offsets = new Vector2[radius * 2 + 1];
@@ -68,26 +93,109 @@ namespace DoS1.Util
             return kernel;
         }
 
-        public static void Apply_GaussianBlur(SpriteBatch spriteBatch, int radius, Texture2D texture, Region region, Rectangle image, Color drawColor, float opacity)
+        public static void Apply_GaussianBlur(SpriteBatch spriteBatch, int radius, Texture2D texture, Region region, bool vertical)
         {
-            Main.Game.SpriteBatch.End();
-
             Effect GaussianBlur = AssetManager.Shaders["GaussianBlur"];
             GaussianBlur.Parameters["SampleWeights"].SetValue(Kernel(radius, 2.0f));
-
-            Main.Game.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, GaussianBlur);
-            spriteBatch.Draw(texture, region.ToRectangle, image, drawColor * opacity);
-
             GaussianBlur.Parameters["Texture1"].SetValue(texture);
 
-            GaussianBlur.Parameters["SampleOffsets"].SetValue(HorizontalOffsets(radius, texture.Width));
-            GaussianBlur.CurrentTechnique.Passes[0].Apply();
+            if (vertical)
+            {
+                GaussianBlur.Parameters["SampleOffsets"].SetValue(VerticalOffsets(radius, texture.Height));
+            }
+            else
+            {
+                GaussianBlur.Parameters["SampleOffsets"].SetValue(HorizontalOffsets(radius, texture.Width));
+            }
 
-            GaussianBlur.Parameters["SampleOffsets"].SetValue(VerticalOffsets(radius, texture.Height));
-            GaussianBlur.CurrentTechnique.Passes[0].Apply();
+            Main.Game.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, GaussianBlur);
+            spriteBatch.Draw(texture, region.ToRectangle, Color.White);
 
             Main.Game.SpriteBatch.End();
-            Main.Game.SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
+        }
+
+        public static void Apply_Bloom_Fullscreen(SpriteBatch spriteBatch, Region region)
+        {
+            //Pass 1: draw BufferRenderer into RenderTarget_BrightAreas, using BloomExtract shader to extract only the brightest parts of the image
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_BrightAreas);
+
+            BloomExtract.Parameters["render_target"].SetValue(Main.BufferRenderer.RenderTarget);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, BloomExtract);
+            spriteBatch.Draw(Main.BufferRenderer.RenderTarget, region.ToRectangle, Color.White);
+            spriteBatch.End();
+
+            //Pass 2: draw from RenderTarget_BrightAreas into RenderTarget_Blurred, using a shader to apply a horizontal gaussian blur filter
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_Blurred);
+            Apply_GaussianBlur(spriteBatch, 3, RenderTarget_BrightAreas, region, false);
+
+            //Pass 3: draw from RenderTarget_Blurred back into RenderTarget_BrightAreas, using a shader to apply a vertical gaussian blur filter
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_BrightAreas);
+            Apply_GaussianBlur(spriteBatch, 3, RenderTarget_Blurred, region, true);
+
+            //Pass 4: draw RenderTarget_BrightAreas and BufferRenderer into FinalRenderer, using a shader that combines them to
+            //produce the final bloomed result
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(Main.FinalRenderer.RenderTarget);
+
+            BloomCombine.Parameters["base_target"].SetValue(Main.BufferRenderer.RenderTarget);
+            BloomCombine.Parameters["bloom_target"].SetValue(RenderTarget_BrightAreas);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, BloomCombine);
+            spriteBatch.Draw(RenderTarget_BrightAreas, region.ToRectangle, Color.White);
+            spriteBatch.End();
+        }
+
+        public static void Apply_Bloom(SpriteBatch spriteBatch, Menu menu)
+        {
+            //Pass 1: draw BufferRenderer into RenderTarget_BrightAreas, using BloomExtract shader to extract only the brightest parts of the image
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_BrightAreas);
+            Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, BloomExtract);
+
+            for (int i = 0; i < menu.Pictures.Count; i++)
+            {
+                Picture picture = menu.Pictures[i];
+                if (picture.Name == "Damage" ||
+                    picture.Name == "Cast")
+                {
+                    BloomExtract.Parameters["render_target"].SetValue(picture.Texture);
+                    BloomExtract.Parameters["BloomThreshold"].SetValue(0.45f);
+                    BloomCombine.Parameters["BloomIntensity"].SetValue(picture.Opacity * 1.5f);
+                    spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
+                }
+                else if (picture.Name == "Fireworks")
+                {
+                    BloomExtract.Parameters["render_target"].SetValue(picture.Texture);
+                    BloomExtract.Parameters["BloomThreshold"].SetValue(0f);
+                    BloomCombine.Parameters["BloomIntensity"].SetValue(picture.Opacity * 2f);
+                    spriteBatch.Draw(picture.Texture, picture.Region.ToRectangle, picture.Image, picture.DrawColor * picture.Opacity);
+                }
+            }
+
+            spriteBatch.End();
+
+            //Pass 2: draw from RenderTarget_BrightAreas into RenderTarget_Blurred, using a shader to apply a horizontal gaussian blur filter
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_Blurred);
+            Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
+
+            Apply_GaussianBlur(spriteBatch, 5, RenderTarget_BrightAreas, new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), false);
+
+            //Pass 3: draw from RenderTarget_Blurred back into RenderTarget_BrightAreas, using a shader to apply a vertical gaussian blur filter
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_BrightAreas);
+
+            Apply_GaussianBlur(spriteBatch, 5, RenderTarget_Blurred, new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), true);
+
+            //Pass 4: draw RenderTarget_BrightAreas and BufferRenderer into FinalRenderer, using a shader that combines them to
+            //produce the final bloomed result
+            Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(Main.FinalRenderer.RenderTarget);
+
+            BloomCombine.Parameters["base_target"].SetValue(Main.BufferRenderer.RenderTarget);
+            BloomCombine.Parameters["bloom_target"].SetValue(RenderTarget_BrightAreas);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, BloomCombine);
+            spriteBatch.Draw(RenderTarget_BrightAreas, new Rectangle(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), Color.White);
+            spriteBatch.End();
         }
     }
 }

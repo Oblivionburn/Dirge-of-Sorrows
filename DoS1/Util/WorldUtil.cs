@@ -642,9 +642,9 @@ namespace DoS1.Util
                         Weather weather = WeatherManager.Weathers[i];
                         if (weather.Visible)
                         {
-                            for (int p = 0; p < weather.ParticleManager.Particles.Count; p++)
+                            foreach (var pair in weather.ParticleManager.Particles)
                             {
-                                Particle particle = weather.ParticleManager.Particles[p];
+                                Particle particle = pair.Value;
                                 particle.Location.X += x_diff;
                                 particle.Location.Y += y_diff;
                             }

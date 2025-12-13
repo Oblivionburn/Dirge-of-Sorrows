@@ -196,29 +196,29 @@ namespace DoS1.Util
                 //25% chance
                 squad.Assignment = "Guard Nearest Town";
             }
-            else if (choice <= 55)
+            else if (choice <= 60)
             {
-                //20% chance
+                //25% chance
                 squad.Assignment = "Capture Nearest Town";
             }
-            else if (choice <= 65)
+            else if (choice <= 70)
             {
                 //10% chance
                 squad.Assignment = "Attack Nearest Squad";
             }
-            else if (choice <= 70)
+            else if (choice <= 75)
             {
                 //5% chance
                 squad.Assignment = "Sleeper";
             }
-            else if (choice <= 80)
+            else if (choice <= 85)
             {
                 //10% chance
                 squad.Assignment = "Attack Base";
             }
             else
             {
-                //20% chance don't change assignment
+                //15% chance don't change assignment
             }
         }
     }
