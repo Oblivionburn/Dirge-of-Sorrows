@@ -325,7 +325,7 @@ namespace DoS1
                                 //Apply bloom to combat effects
                                 ShaderUtil.Apply_Bloom(Game.SpriteBatch, SceneManager.GetScene("Combat").Menu);
                             }
-                            else
+                            else if (Handler.LocalMap)
                             {
                                 //Apply bloom to fireworks
                                 ShaderUtil.Apply_Bloom(Game.SpriteBatch, SceneManager.GetScene("Localmap").Menu);

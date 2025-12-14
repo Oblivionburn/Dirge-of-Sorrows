@@ -290,8 +290,12 @@ namespace DoS1.Util
                     character = CharacterUtil.NewCharacter_Random(formation, true, random.Next(0, 2));
                 }
 
-                //Max is always 10 once we reach level 15+
-                int max_tier = (int)Math.Ceiling(map_level / 1.5);
+                //Max is 1 at Map Level 1
+                //Max is 3 at Map Level 5
+                //Max is 6 at Map Level 10
+                //Max is 8 at Map Level 15
+                //Max is 10 at Map Level 18+
+                int max_tier = (int)Math.Ceiling(map_level / 2f) + 1;
                 if (max_tier_override != -1)
                 {
                     max_tier = max_tier_override;
@@ -300,12 +304,24 @@ namespace DoS1.Util
                 {
                     max_tier = 10;
                 }
+                else if (max_tier < 1)
+                {
+                    max_tier = 1;
+                }
 
-                //Highest min value is 8 at level 20
-                int min_tier = (int)Math.Ceiling(map_level / 2.5);
+                //Min is 1 at Map Level 1
+                //Min is 2 at Map Level 5
+                //Min is 4 at Map Level 10
+                //Min is 6 at Map Level 15
+                //Min is 8 at Map Level 20
+                int min_tier = (int)Math.Ceiling(map_level / 2.5f);
                 if (min_tier_override != -1)
                 {
                     min_tier = min_tier_override;
+                }
+                if (min_tier < 1)
+                {
+                    min_tier = 1;
                 }
 
                 if (first_squad)
@@ -315,7 +331,7 @@ namespace DoS1.Util
                 }
 
                 random = new CryptoRandom();
-                int class_type = random.Next(0, 3);
+                int class_type = random.Next(0, 4);
 
                 if (class_type_override != -1)
                 {
@@ -726,33 +742,206 @@ namespace DoS1.Util
 
                     #endregion
                 }
+                else if (class_type == 3)
+                {
+                    #region Cleric
+
+                    random = new CryptoRandom();
+                    int armor_tier = random.Next(min_tier, max_tier + 1);
+                    switch (armor_tier)
+                    {
+                        case 1:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            break;
+
+                        case 2:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Armor");
+                            break;
+
+                        case 3:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            break;
+
+                        case 4:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Armor");
+                            break;
+
+                        case 5:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            break;
+
+                        case 6:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Armor");
+                            break;
+
+                        case 7:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            break;
+
+                        case 8:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Armor");
+                            break;
+
+                        case 9:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Armor");
+                            break;
+
+                        case 10:
+                            armor = InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Armor");
+                            break;
+                    }
+                    InventoryUtil.EquipItem(character, armor);
+
+                    random = new CryptoRandom();
+                    int helm_chance = random.Next(min_tier, max_tier + 1);
+                    if (helm_chance >= (int)Math.Ceiling((double)(min_tier + max_tier) / 2))
+                    {
+                        random = new CryptoRandom();
+                        int helm_tier = random.Next(min_tier, max_tier + 1);
+                        switch (helm_tier)
+                        {
+                            case 1:
+                                //No helm
+                                break;
+
+                            case 2:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Cloth", "Cloth", "Helm");
+                                break;
+
+                            case 3:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                break;
+
+                            case 4:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Leather", "Leather", "Helm");
+                                break;
+
+                            case 5:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                break;
+
+                            case 6:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Iron", "Chainmail", "Helm");
+                                break;
+
+                            case 7:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                break;
+
+                            case 8:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Copper", "Chainmail", "Helm");
+                                break;
+
+                            case 9:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Bronze", "Chainmail", "Helm");
+                                break;
+
+                            case 10:
+                                helm = InventoryUtil.AddItem(character.Inventory, "Steel", "Chainmail", "Helm");
+                                break;
+                        }
+                        InventoryUtil.EquipItem(character, helm);
+                    }
+
+                    random = new CryptoRandom();
+                    int weapon_tier = random.Next(min_tier, max_tier + 1);
+                    switch (weapon_tier)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Iron", "Mace", "Weapon");
+                            break;
+
+                        case 4:
+                        case 5:
+                        case 6:
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Copper", "Mace", "Weapon");
+                            break;
+
+                        case 7:
+                        case 8:
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Bronze", "Mace", "Weapon");
+                            break;
+
+                        case 9:
+                        case 10:
+                            weapon = InventoryUtil.AddItem(character.Inventory, "Steel", "Mace", "Weapon");
+                            break;
+                    }
+                    InventoryUtil.EquipItem(character, weapon);
+
+                    random = new CryptoRandom();
+                    int shield_tier = random.Next(min_tier, max_tier + 1);
+                    switch (shield_tier)
+                    {
+                        case 1:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Wood", "Round", "Shield");
+                            break;
+
+                        case 2:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Iron", "Round", "Shield");
+                            break;
+
+                        case 3:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Copper", "Round", "Shield");
+                            break;
+
+                        case 4:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Bronze", "Round", "Shield");
+                            break;
+
+                        case 5:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Steel", "Round", "Shield");
+                            break;
+
+                        case 6:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Wood", "Kite", "Shield");
+                            break;
+
+                        case 7:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Iron", "Kite", "Shield");
+                            break;
+
+                        case 8:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Copper", "Kite", "Shield");
+                            break;
+
+                        case 9:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Bronze", "Kite", "Shield");
+                            break;
+
+                        case 10:
+                            shield = InventoryUtil.AddItem(character.Inventory, "Steel", "Kite", "Shield");
+                            break;
+                    }
+                    InventoryUtil.EquipItem(character, shield);
+
+                    #endregion
+                }
 
                 if (class_type == 0)
                 {
                     #region Warrior Runes
 
-                    //Max of 2 runes at level 15+, min of 1 at level 10+
+                    //Max of 1 rune at Map Level 10
+                    //Max of 2 runes at Map Level 15+
                     random = new CryptoRandom();
-                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 4);
-                    InventoryUtil.AddRunes(armor, runes_amount);
+                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 1) / 4);
+
+                    int leftover = InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
-                        random = new CryptoRandom();
-                        runes_amount = random.Next(0, max_tier + 7) / 4;
-                        InventoryUtil.AddRunes(helm, runes_amount);
+                        leftover = InventoryUtil.AddRunes(helm, leftover);
                     }
 
                     if (shield != null)
                     {
-                        random = new CryptoRandom();
-                        runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 4);
-                        InventoryUtil.AddRunes(shield, runes_amount);
+                        leftover = InventoryUtil.AddRunes(shield, leftover);
                     }
 
-                    random = new CryptoRandom();
-                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 4);
-                    InventoryUtil.AddRunes(weapon, runes_amount);
+                    InventoryUtil.AddRunes(weapon, leftover);
 
                     #endregion
                 }
@@ -760,21 +949,19 @@ namespace DoS1.Util
                 {
                     #region Ranger Runes
 
-                    //Max of 3 runes at level 15+, min of 1 at level 8+
+                    //Max of 1 rune at Map Level 5
+                    //Max of 2 runes at Map Level 10
+                    //Max of 3 runes at Map Level 15+
                     random = new CryptoRandom();
-                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 3);
-                    InventoryUtil.AddRunes(armor, runes_amount);
+                    int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 1) / 3);
+                    int leftover = InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
-                        random = new CryptoRandom();
-                        runes_amount = random.Next(0, max_tier + 9) / 3;
-                        InventoryUtil.AddRunes(helm, runes_amount);
+                        leftover = InventoryUtil.AddRunes(helm, leftover);
                     }
 
-                    random = new CryptoRandom();
-                    runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier) / 3);
-                    InventoryUtil.AddRunes(weapon, runes_amount);
+                    InventoryUtil.AddRunes(weapon, leftover);
 
                     #endregion
                 }
@@ -782,24 +969,51 @@ namespace DoS1.Util
                 {
                     #region Mage Runes
 
-                    //Max of 4 runes at level 15+, min of 1 at level 5+
+                    //Max of 1 rune at Map Level 5
+                    //Max of 2 runes at Map Level 10
+                    //Max of 4 runes at Map Level 15
+                    //Max of 5 runes at Map Level 18+
                     random = new CryptoRandom();
-                    int runes_amount = random.Next(min_tier, max_tier) / 2;
-                    InventoryUtil.AddRunes(armor, runes_amount);
+                    int runes_amount = random.Next(min_tier, max_tier + 1) / 2;
+
+                    int leftover = InventoryUtil.AddRunes(armor, runes_amount);
 
                     if (helm != null)
                     {
-                        random = new CryptoRandom();
-                        runes_amount = random.Next(0, max_tier) / 2;
-                        InventoryUtil.AddRunes(helm, runes_amount);
+                        leftover = InventoryUtil.AddRunes(helm, leftover);
                     }
 
                     //Always at least 1 offense on weapon
                     InventoryUtil.AddRune_Elemental(weapon);
 
+                    InventoryUtil.AddRunes(weapon, leftover);
+
+                    #endregion
+                }
+                else if (class_type == 3)
+                {
+                    #region Cleric Runes
+
+                    //Max of 1 rune at Map Level 5
+                    //Max of 2 runes at Map Level 10
+                    //Max of 4 runes at Map Level 15
+                    //Max of 5 runes at Map Level 18+
                     random = new CryptoRandom();
-                    runes_amount = (int)Math.Ceiling((double)random.Next(min_tier, max_tier + 7) / 2) - 1;
-                    InventoryUtil.AddRunes(weapon, runes_amount);
+                    int runes_amount = random.Next(min_tier, max_tier + 1) / 2;
+
+                    int leftover = InventoryUtil.AddRunes(armor, runes_amount);
+
+                    if (helm != null)
+                    {
+                        leftover = InventoryUtil.AddRunes(helm, leftover);
+                    }
+
+                    if (shield != null)
+                    {
+                        leftover = InventoryUtil.AddRunes(shield, leftover);
+                    }
+
+                    InventoryUtil.AddRunes(weapon, leftover);
 
                     #endregion
                 }

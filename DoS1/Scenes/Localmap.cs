@@ -1245,11 +1245,12 @@ namespace DoS1.Scenes
             for (int i = 0; i < fireworks.Count; i++)
             {
                 Picture firework = fireworks[i];
+                firework.Value--;
 
                 int num = firework.Image.X + firework.Image.Height;
-                if (num >= firework.Texture.Width)
+                if (num >= firework.Texture.Width &&
+                    firework.Value <= 100)
                 {
-                    firework.Value--;
                     firework.Opacity = firework.Value / 100;
 
                     if (firework.Value <= 0)
@@ -1259,14 +1260,14 @@ namespace DoS1.Scenes
                         i--;
                     }
                 }
-                else
+                else if (firework.Value % 5 == 0)
                 {
                     firework.Image = new Rectangle(num, firework.Image.Y, firework.Image.Width, firework.Image.Height);
                 }
             }
 
             CryptoRandom random = new CryptoRandom();
-            int chance = random.Next(0, 30);
+            int chance = random.Next(0, 20);
             if (chance == 0)
             {
                 Map map = WorldUtil.GetMap(World);
@@ -1289,7 +1290,7 @@ namespace DoS1.Scenes
                             Color drawColor = Color.White;
 
                             random = new CryptoRandom();
-                            int colorChoice = random.Next(0, 7);
+                            int colorChoice = random.Next(0, 3);
                             switch (colorChoice)
                             {
                                 case 0:
@@ -1297,46 +1298,29 @@ namespace DoS1.Scenes
                                     break;
 
                                 case 1:
-                                    drawColor = Color.Blue;
-                                    break;
-
-                                case 2:
                                     drawColor = Color.Lime;
                                     break;
 
-                                case 3:
-                                    drawColor = Color.Yellow;
-                                    break;
-
-                                case 4:
-                                    drawColor = Color.Cyan;
-                                    break;
-
-                                case 5:
-                                    drawColor = Color.Violet;
-                                    break;
-
-                                case 6:
-                                    drawColor = Color.Orange;
+                                case 2:
+                                    drawColor = Color.Blue;
                                     break;
                             }
 
                             float width = tile.Region.Width * 5;
-                            float height = tile.Region.Height * 5;
 
-                            Texture2D texture = Handler.GetTexture("Fireworks");
+                            Texture2D texture = Handler.GetTexture("Firework");
 
                             Menu.Pictures.Add(new Picture
                             {
                                 ID = Handler.GetID(),
                                 Name = "Fireworks",
                                 Texture = texture,
-                                Image = new Rectangle(0, 0, texture.Width / 4, texture.Height),
-                                Region = new Region(tile.Region.X - (tile.Region.Width * 2), tile.Region.Y - (tile.Region.Height * 2), width, height),
+                                Image = new Rectangle(0, 0, texture.Width / 8, texture.Height),
+                                Region = new Region(tile.Region.X - (tile.Region.Width * 2), tile.Region.Y - (tile.Region.Height * 2), width, width),
                                 Location = new Location(x, y, 0),
                                 DrawColor = drawColor,
                                 Visible = true,
-                                Value = 100
+                                Value = 141
                             });
 
                             AssetManager.PlaySound_Random("Fireworks");

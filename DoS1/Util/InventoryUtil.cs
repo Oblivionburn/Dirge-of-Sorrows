@@ -1768,22 +1768,107 @@ namespace DoS1.Util
             return spell;
         }
 
-        public static void AddRune(Item item, string type)
+        public static Item RandomRune()
         {
+            Item rune = null;
+
             Inventory assets = InventoryManager.GetInventory("Assets");
             if (assets != null)
             {
-                Item rune = CopyItem(assets.GetItem(type), true);
-                rune.Location = new Location(item.Attachments.Count, 0, 0);
+                string rune_type = "";
+
+                CryptoRandom random = new CryptoRandom();
+                int rune_choice = random.Next(0, 15);
+                switch (rune_choice)
+                {
+                    case 0:
+                        rune_type = "Area Rune";
+                        break;
+
+                    case 1:
+                        rune_type = "Death Rune";
+                        break;
+
+                    case 2:
+                        rune_type = "Time Rune";
+                        break;
+
+                    case 3:
+                        rune_type = "Drain Rune";
+                        break;
+
+                    case 4:
+                        rune_type = "Health Rune";
+                        break;
+
+                    case 5:
+                        rune_type = "Earth Rune";
+                        break;
+
+                    case 6:
+                        rune_type = "Ice Rune";
+                        break;
+
+                    case 7:
+                        rune_type = "Physical Rune";
+                        break;
+
+                    case 8:
+                        rune_type = "Lightning Rune";
+                        break;
+
+                    case 9:
+                        rune_type = "Fire Rune";
+                        break;
+
+                    case 10:
+                        rune_type = "Energy Rune";
+                        break;
+
+                    case 11:
+                        rune_type = "Effect Rune";
+                        break;
+
+                    case 12:
+                        rune_type = "Counter Rune";
+                        break;
+
+                    case 13:
+                        rune_type = "Disarm Rune";
+                        break;
+
+                    case 14:
+                        rune_type = "Diamond Rune";
+                        break;
+                }
+
+                rune = CopyItem(assets.GetItem(rune_type), true);
                 rune.Icon_Visible = true;
 
                 Something rp = rune.GetProperty("RP Value");
                 Something level = rune.GetProperty("Level Value");
 
-                int minLevel = (int)(((float)Handler.Level / 2) / 2);
-                int maxLevel = (Handler.Level / 2) + 1;
+                //Min 1 at Map Level 5
+                //Min 2 at Map Level 10
+                //Min 3 at Map Level 15
+                //Min 4 at Map Level 20
+                int minLevel = (int)(((float)Handler.Level / 2) / 2.5f);
+                if (minLevel < 1)
+                {
+                    minLevel = 1;
+                }
 
-                CryptoRandom random = new CryptoRandom();
+                //Max 1 at Map Level 5
+                //Max 3 at Map Level 10
+                //Max 5 at Map Level 15
+                //Max 8 at Map Level 20
+                int maxLevel = ((Handler.Level / 2) - 2);
+                if (maxLevel < 1)
+                {
+                    maxLevel = 1;
+                }
+
+                random = new CryptoRandom();
                 level.Value = random.Next(minLevel, maxLevel + 1);
                 if (level.Value >= level.Max_Value)
                 {
@@ -1791,18 +1876,19 @@ namespace DoS1.Util
                 }
 
                 RuneUtil.UpdateRune_Description(rune);
-
-                item.Attachments.Add(rune);
-                UpdateItem(item);
             }
+
+            return rune;
         }
 
-        public static void AddRunes(Item item, int amount)
+        public static int AddRunes(Item item, int amount)
         {
             if (item == null)
             {
-                return;
+                return amount;
             }
+
+            int total = 0;
 
             Something slots = item.GetProperty("Rune Slots");
             if (slots != null)
@@ -1817,73 +1903,18 @@ namespace DoS1.Util
                     bool rune_chance = Utility.RandomPercent(Handler.Level * 5);
                     if (rune_chance)
                     {
-                        string rune_type = "";
-
-                        CryptoRandom random = new CryptoRandom();
-                        int rune_choice = random.Next(0, 14);
-                        switch (rune_choice)
+                        Item rune = RandomRune();
+                        if (rune != null)
                         {
-                            case 0:
-                                rune_type = "Area Rune";
-                                break;
-
-                            case 1:
-                                rune_type = "Death Rune";
-                                break;
-
-                            case 2:
-                                rune_type = "Time Rune";
-                                break;
-
-                            case 3:
-                                rune_type = "Drain Rune";
-                                break;
-
-                            case 4:
-                                rune_type = "Health Rune";
-                                break;
-
-                            case 5:
-                                rune_type = "Earth Rune";
-                                break;
-
-                            case 6:
-                                rune_type = "Ice Rune";
-                                break;
-
-                            case 7:
-                                rune_type = "Physical Rune";
-                                break;
-
-                            case 8:
-                                rune_type = "Lightning Rune";
-                                break;
-
-                            case 9:
-                                rune_type = "Fire Rune";
-                                break;
-
-                            case 10:
-                                rune_type = "Energy Rune";
-                                break;
-
-                            case 11:
-                                rune_type = "Effect Rune";
-                                break;
-
-                            case 12:
-                                rune_type = "Counter Rune";
-                                break;
-
-                            case 13:
-                                rune_type = "Disarm Rune";
-                                break;
+                            item.Attachments.Add(rune);
+                            UpdateItem(item);
+                            total++;
                         }
-
-                        AddRune(item, rune_type);
                     }
                 }
             }
+
+            return amount - total;
         }
 
         public static void AddRune_Elemental(Item item)
@@ -1930,8 +1961,28 @@ namespace DoS1.Util
                     Something rp = rune.GetProperty("RP Value");
                     Something level = rune.GetProperty("Level Value");
 
+                    //Min 1 at Map Level 5
+                    //Min 2 at Map Level 10
+                    //Min 3 at Map Level 15
+                    //Min 4 at Map Level 20
+                    int minLevel = (int)(((float)Handler.Level / 2) / 2.5f);
+                    if (minLevel < 1)
+                    {
+                        minLevel = 1;
+                    }
+
+                    //Max 1 at Map Level 5
+                    //Max 3 at Map Level 10
+                    //Max 5 at Map Level 15
+                    //Max 8 at Map Level 20
+                    int maxLevel = ((Handler.Level / 2) - 2);
+                    if (maxLevel < 1)
+                    {
+                        maxLevel = 1;
+                    }
+
                     random = new CryptoRandom();
-                    level.Value = random.Next(1, (Handler.Level / 2) + 1);
+                    level.Value = random.Next(minLevel, maxLevel + 1);
                     if (level.Value >= level.Max_Value)
                     {
                         rp.Value = rp.Max_Value;
