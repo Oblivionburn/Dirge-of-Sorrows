@@ -1996,13 +1996,25 @@ namespace DoS1.Util
             }
         }
 
-        public static Inventory Gen_Market(int depth)
+        public static Inventory Gen_Market(int map_level)
         {
             Inventory inventory = new Inventory();
 
             CryptoRandom random;
-            int min_tier = (int)Math.Ceiling(depth / 2.5);
-            int max_tier = (int)Math.Ceiling(depth / 1.5);
+
+            //Min tier 1 at Map Level 1
+            //Min tier 2 at Map Level 5
+            //Min tier 4 at Map Level 10
+            //Min tier 6 at Map Level 15
+            //Min tier 8 at Map Level 20
+            int min_tier = (int)Math.Ceiling(map_level / 2.5f);
+
+            //Max tier 2 at Map Level 1
+            //Max tier 4 at Map Level 5
+            //Max tier 6 at Map Level 10
+            //Max tier 9 at Map Level 15
+            //Max tier 10 at Map Level 18+
+            int max_tier = (int)Math.Ceiling(map_level / 2f) + 1;
             if (max_tier > 10)
             {
                 max_tier = 10;
@@ -2362,11 +2374,6 @@ namespace DoS1.Util
             return false;
         }
 
-        public static bool IsWeapon(Item item)
-        {
-            return item.Type == "Weapon";
-        }
-
         public static bool IsArmor(Item item)
         {
             if (item.Type == "Helm" ||
@@ -2374,29 +2381,6 @@ namespace DoS1.Util
                 item.Type == "Shield")
             {
                 return true;
-            }
-
-            return false;
-        }
-
-        public static bool Weapon_IsAoE_Offense(Item weapon)
-        {
-            if (weapon != null)
-            {
-                for (int i = 0; i < weapon.Attachments.Count; i += 2)
-                {
-                    Item rune = weapon.Attachments[i];
-
-                    if (rune.Categories.Contains("Area"))
-                    {
-                        Item paired_rune = GetPairedRune(weapon, rune);
-                        if (paired_rune != null &&
-                            Element_IsDamage(paired_rune.Categories[0]))
-                        {
-                            return true;
-                        }
-                    }
-                }
             }
 
             return false;
@@ -2572,26 +2556,6 @@ namespace DoS1.Util
             return (int)((item.Location.Y * 10) + item.Location.X);
         }
 
-        public static int Get_RuneCount(Item item, string type)
-        {
-            int total = 0;
-
-            if (item != null)
-            {
-                for (int i = 0; i < item.Attachments.Count; i++)
-                {
-                    Item rune = item.Attachments[i];
-
-                    if (rune.Categories.Contains(type))
-                    {
-                        total++;
-                    }
-                }
-            }
-
-            return total;
-        }
-
         public static int GetBasePrice(Item item)
         {
             Inventory assets = InventoryManager.GetInventory("Assets");
@@ -2685,8 +2649,11 @@ namespace DoS1.Util
             if (character != null)
             {
                 Inventory inventory = character.Inventory;
-                foreach (Item item in inventory.Items)
+
+                int count = inventory.Items.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    Item item = inventory.Items[i];
                     if (item.Equipped &&
                         item.Type == type)
                     {

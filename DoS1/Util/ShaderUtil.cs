@@ -116,6 +116,8 @@ namespace DoS1.Util
 
         public static void Apply_Bloom(SpriteBatch spriteBatch, Menu menu)
         {
+            int blurRadius = 5;
+
             //Pass 1: draw BufferRenderer into RenderTarget_BrightAreas, using BloomExtract shader to extract only the brightest parts of the image
             Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_BrightAreas);
             Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
@@ -145,6 +147,8 @@ namespace DoS1.Util
                 }
                 else if (picture.Name == "Fireworks")
                 {
+                    blurRadius = 4;
+
                     BloomExtract.Parameters["render_target"].SetValue(picture.Texture);
                     BloomExtract.Parameters["BloomThreshold"].SetValue(0f);
                     BloomCombine.Parameters["BloomIntensity"].SetValue(picture.Opacity * 2f);
@@ -158,12 +162,12 @@ namespace DoS1.Util
             Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_Blurred);
             Main.Game.GraphicsManager.GraphicsDevice.Clear(Color.Transparent);
 
-            Apply_GaussianBlur(spriteBatch, 4, RenderTarget_BrightAreas, new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), false);
+            Apply_GaussianBlur(spriteBatch, blurRadius, RenderTarget_BrightAreas, new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), false);
 
             //Pass 3: draw from RenderTarget_Blurred back into RenderTarget_BrightAreas, using a shader to apply a vertical gaussian blur filter
             Main.Game.GraphicsManager.GraphicsDevice.SetRenderTarget(RenderTarget_BrightAreas);
 
-            Apply_GaussianBlur(spriteBatch, 4, RenderTarget_Blurred, new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), true);
+            Apply_GaussianBlur(spriteBatch, blurRadius, RenderTarget_Blurred, new Region(0, 0, Main.Game.Resolution.X, Main.Game.Resolution.Y), true);
 
             //Pass 4: draw RenderTarget_BrightAreas and BufferRenderer into FinalRenderer, using a shader that combines them to
             //produce the final bloomed result

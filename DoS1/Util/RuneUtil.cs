@@ -333,7 +333,7 @@ namespace DoS1.Util
             return total;
         }
 
-        public static void Death(Menu menu, Character attacker, Character defender, Item attacker_weapon)
+        public static bool Death(Menu menu, Character attacker, Character defender, Item attacker_weapon)
         {
             int chance = InventoryUtil.Get_Item_Element_Level(attacker_weapon, "Death");
 
@@ -384,12 +384,15 @@ namespace DoS1.Util
                 {
                     CombatUtil.AddEffect(menu, defender, attacker_weapon, "Death");
                     CombatUtil.Kill(defender);
+                    return true;
                 }
                 else
                 {
                     StatusEffect(menu, defender, attacker_weapon, "Death", false);
                 }
             }
+
+            return false;
         }
 
         public static void DisarmWeapon(Menu menu, Character attacker, Character defender, Item attacker_weapon)

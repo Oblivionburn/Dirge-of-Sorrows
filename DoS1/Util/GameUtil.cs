@@ -611,6 +611,8 @@ namespace DoS1.Util
             Label localExamine = menu.GetLabel("Examine");
             localExamine.Visible = false;
 
+            Handler.MovingGrid = false;
+
             Button button = ui.GetButton("PlayPause");
             button.Value = 1;
             button.HoverText = "Play";
@@ -691,6 +693,8 @@ namespace DoS1.Util
 
             Label localExamine = menu.GetLabel("Examine");
             localExamine.Visible = false;
+
+            Handler.MovingGrid = false;
 
             bool captured = false;
             bool liberated = false;
@@ -781,8 +785,8 @@ namespace DoS1.Util
                 !worldmap.Enabled)
             {
                 int gold_level = ((Handler.Level + 1) * 1000) / 2;
-                int min_gold = gold_level / 4;
-                int max_gold = gold_level / 2;
+                int min_gold = gold_level / 8;
+                int max_gold = gold_level / 4;
 
                 CryptoRandom random = new CryptoRandom();
                 int gold_amount = random.Next(min_gold, max_gold + 1);
@@ -922,11 +926,14 @@ namespace DoS1.Util
             Handler.AlertType = "MoveFinished";
 
             Menu ui = MenuManager.GetMenu("UI");
+
             Label examine = ui.GetLabel("Examine");
             examine.Visible = false;
 
             Label localExamine = menu.GetLabel("Examine");
             localExamine.Visible = false;
+
+            Handler.MovingGrid = false;
 
             string message = "\"We have arrived at our destination.\"";
 
@@ -965,6 +972,8 @@ namespace DoS1.Util
 
             menu.GetLabel("Examine").Visible = false;
             menu.GetPicture("Select").Visible = false;
+
+            Handler.MovingGrid = false;
 
             Layer pathing = map.GetLayer("Pathing");
             pathing.Visible = false;

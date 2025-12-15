@@ -1072,8 +1072,10 @@ namespace DoS1.Scenes
                 #region Initial Attack
 
                 //Handle initial weapon damage
-                foreach (Character target in targets)
+                for (int c = 0; c < targets.Count; c++)
                 {
+                    Character target = targets[c];
+
                     if (defender_squad == null)
                     {
                         defender_squad = target.Squad;
@@ -1127,6 +1129,8 @@ namespace DoS1.Scenes
 
                             if (target.Dead)
                             {
+                                c--;
+
                                 if (target.Type == "Enemy")
                                 {
                                     Reward_CharacterKilled();
@@ -1151,6 +1155,10 @@ namespace DoS1.Scenes
                                 counter_attackers.Add(target);
                             }
                         }
+                        else
+                        {
+                            c--;
+                        }
                     }
                 }
 
@@ -1166,15 +1174,18 @@ namespace DoS1.Scenes
                     if (InventoryUtil.Item_HasArea_ForElement(weapon, "Death") &&
                         RuneUtil.ApplyArea(weapon, "Death"))
                     {
-                        foreach (Character target in defender_squad.Characters)
+                        for (int c = 0; c < defender_squad.Characters.Count; c++)
                         {
+                            Character target = defender_squad.Characters[c];
+
                             //Ignore initial targets
                             if (!targets.Contains(target))
                             {
                                 RuneUtil.Death(Menu, current_character, target, weapon);
-
                                 if (target.Dead)
                                 {
+                                    c--;
+
                                     if (target.Type == "Enemy")
                                     {
                                         Reward_CharacterKilled();
@@ -1223,8 +1234,10 @@ namespace DoS1.Scenes
                     //Handle weapon Area elements
                     if (!hero_killed)
                     {
-                        foreach (Character target in defender_squad.Characters)
+                        for (int c = 0; c < defender_squad.Characters.Count; c++)
                         {
+                            Character target = defender_squad.Characters[c];
+
                             //Ignore initial targets or dead ones
                             if (!targets.Contains(target) &&
                                 !target.Dead)
@@ -1249,6 +1262,8 @@ namespace DoS1.Scenes
 
                                             if (target.Dead)
                                             {
+                                                c--;
+
                                                 if (target.Type == "Enemy")
                                                 {
                                                     Reward_CharacterKilled();
