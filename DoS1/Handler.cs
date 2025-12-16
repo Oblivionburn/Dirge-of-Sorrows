@@ -30,6 +30,7 @@ namespace DoS1
         public static int StoryStep = -1;
         public static bool AutoSave;
         public static bool Fireworks;
+        public static bool KingKilled;
 
         public static int TimeSpeed = 4;
         public static int TimeSpeed_Temp = 0;
@@ -251,6 +252,7 @@ namespace DoS1
                 "Plains",
                 "Snowy",
                 "Title",
+                "Victory",
                 "Worldmap"
             };
             foreach (string dir in music)

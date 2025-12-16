@@ -280,9 +280,6 @@ namespace DoS1.Util
                 }
             }
 
-            Menu main = MenuManager.GetMenu("Main");
-            main.GetButton("Save").Visible = true;
-
             SceneManager.ChangeScene("Worldmap");
 
             SoundManager.StopMusic();

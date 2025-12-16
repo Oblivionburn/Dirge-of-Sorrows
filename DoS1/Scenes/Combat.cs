@@ -18,6 +18,7 @@ using OP_Engine.Utility;
 using OP_Engine.Weathers;
 using OP_Engine.Enums;
 using DoS1.Util;
+using FMOD;
 
 namespace DoS1.Scenes
 {
@@ -26,6 +27,7 @@ namespace DoS1.Scenes
         #region Variables
 
         private bool step;
+        private uint musicPosition;
 
         private Squad ally_squad;
         private Squad enemy_squad;
@@ -36,7 +38,6 @@ namespace DoS1.Scenes
         private bool hero_killed = false;
 
         private Character the_king = null;
-        private bool king_killed = false;
 
         private List<Character> counter_attackers = new List<Character>();
         private Character initial_attacker = null;
@@ -90,7 +91,13 @@ namespace DoS1.Scenes
                 if (SoundManager.MusicPlaying &&
                     !musicPlaying)
                 {
+                    SoundManager.StopSound();
                     SoundManager.FMODSystem.playSound(SoundManager.MusicOut, SoundManager.MusicGroup, false, out SoundManager.MusicChannel);
+                    SoundManager.MusicChannel.setPosition(musicPosition, TIMEUNIT.MS);
+                }
+                else if (musicPlaying)
+                {
+                    SoundManager.MusicChannel.getPosition(out musicPosition, TIMEUNIT.MS);
                 }
 
                 if (SoundManager.NeedMusic)
@@ -139,8 +146,9 @@ namespace DoS1.Scenes
                         }
                     }
                 }
-                else if (king_killed &&
-                         the_king != null)
+
+                if (Handler.KingKilled &&
+                    the_king != null)
                 {
                     if (Handler.StoryStep >= 82 && Handler.StoryStep <= 90)
                     {
@@ -2570,7 +2578,7 @@ namespace DoS1.Scenes
                 character.Name.Contains("King"))
             {
                 GameUtil.Toggle_Pause_Combat(false);
-                king_killed = true;
+                Handler.KingKilled = true;
                 the_king = character;
                 Handler.StoryStep++;
             }

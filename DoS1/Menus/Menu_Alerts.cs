@@ -339,7 +339,8 @@ namespace DoS1.Menus
                      Handler.StoryStep == 61 ||
                      Handler.StoryStep == 62 ||
                      (Handler.StoryStep >= 72 && Handler.StoryStep <= 79) ||
-                     (Handler.StoryStep >= 82 && Handler.StoryStep <= 89))
+                     (Handler.StoryStep >= 82 && Handler.StoryStep <= 89) ||
+                     (Handler.StoryStep >= 92 && Handler.StoryStep <= 96))
             {
                 Handler.StoryStep++;
             }
@@ -400,6 +401,13 @@ namespace DoS1.Menus
                 Handler.StoryStep++;
                 Close();
                 GameUtil.Toggle_Pause(false);
+            }
+            else if (Handler.StoryStep == 97)
+            {
+                Handler.StoryStep++;
+                Close();
+
+                GameUtil.ReturnToTitle();
             }
         }
 

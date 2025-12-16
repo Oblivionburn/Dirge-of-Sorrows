@@ -70,6 +70,7 @@ namespace DoS1.Util
             Tutorial_ClaimRegion(alerts, dialogue, dialogue_name);
             Intro_Part6(alerts, dialogue, dialogue_name);
             Tutorial_Squads(alerts, dialogue, dialogue_name);
+            TheEnd(alerts, dialogue, dialogue_name);
         }
 
         public static void Alert_Story(Squad squad, Character king)
@@ -1384,6 +1385,78 @@ namespace DoS1.Util
             if (!string.IsNullOrEmpty(message))
             {
                 Handler.CombatFinishing = true;
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void TheEnd(Menu alerts, Label dialogue, Label dialogue_name)
+        {
+            Character hero = Handler.GetHero();
+
+            string message = "";
+
+            if (Handler.StoryStep == 92)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"With the King now dead, " + hero.Name + " ascended the throne and the kingdom once again knew peace.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 93)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The contract with The Merchant's Guild for the sale of new weapons in perpetuity was immediately torn up, as the kingdom " +
+                    "had more than enough to safeguard itself, and this enabled the taxes to be reduced to an amount that the citizens of the kingdom " +
+                    "found reasonable.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 94)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"No more innocent blood would be shed out of greed and threats of war, but the previous King's dying words haunted " + hero.Name + " as "
+                    + HeShe(hero.Gender) + " lay in bed at night...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 95)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"Would The Merchant's Guild really turn the other kingdoms against " + HimHer(hero.Gender) + " in retaliation for no longer " +
+                    "purchasing their weapons? How long would this peace really last?\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 96)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The Merchant's Guild were a bigger threat on the horizon, and it was only a matter of time before they would need to be " +
+                    "dealt with, but that's a tale for another time...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 97)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The End.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
                 dialogue.Text = GameUtil.WrapText_Dialogue(message);
             }
         }

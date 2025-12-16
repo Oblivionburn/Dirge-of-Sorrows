@@ -159,7 +159,8 @@ namespace DoS1
                                     LostFocus = true;
                                     TimeManager.Paused = true;
 
-                                    if (Handler.Combat)
+                                    if (Handler.Combat &&
+                                        !Handler.CombatPause)
                                     {
                                         GameUtil.Toggle_Pause_Combat(false);
                                     }
@@ -320,7 +321,8 @@ namespace DoS1
                             Game.SpriteBatch.Draw(BufferRenderer.RenderTarget, new Rectangle(0, 0, Game.Resolution.X, Game.Resolution.Y), Color.White);
                             Game.SpriteBatch.End();
 
-                            if (Handler.Combat)
+                            if (Handler.Combat &&
+                                !Handler.CombatFinishing)
                             {
                                 //Apply bloom to combat effects
                                 ShaderUtil.Apply_Bloom(Game.SpriteBatch, SceneManager.GetScene("Combat").Menu);
@@ -366,6 +368,7 @@ namespace DoS1
             SceneManager.Scenes.Add(new Localmap(Content));
             SceneManager.Scenes.Add(new Combat(Content));
             SceneManager.Scenes.Add(new GameOver(Content));
+            SceneManager.Scenes.Add(new TheEnd(Content));
         }
 
         private void LoadMenus()

@@ -7,6 +7,7 @@ using OP_Engine.Menus;
 using OP_Engine.Time;
 using OP_Engine.Utility;
 using OP_Engine.Scenes;
+using OP_Engine.Sounds;
 using DoS1.Util;
 
 namespace DoS1.Menus
@@ -243,7 +244,25 @@ namespace DoS1.Menus
                     Handler.StoryStep++;
                 }
 
-                GameUtil.ReturnToWorldmap();
+                if (Handler.KingKilled)
+                {
+                    Active = false;
+                    Visible = false;
+
+                    Handler.LocalMap = false;
+                    Handler.LocalPause = false;
+
+                    SoundManager.StopAll();
+                    SoundManager.NeedMusic = true;
+                    SoundManager.MusicLooping = true;
+
+                    Handler.StoryStep++;
+                    SceneManager.ChangeScene("TheEnd");
+                }
+                else
+                {
+                    GameUtil.ReturnToWorldmap();
+                }
             }
             else
             {
