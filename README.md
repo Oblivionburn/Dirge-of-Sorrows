@@ -20,10 +20,10 @@ For discussion/suggestions/bug-reporting:<br>
   - Selecting a location takes you to a Local Map where battle takes place
 <br><br>
 - **Randomly generated Local Maps consisting of:**
-  - 1 Player Base
-  - 1 Enemy Base (must be captured to win the map)
-  - 1 Market Town - where you can purchase armor/weapons to equip on characters
-  - 1 Academy Town - where you can recruit more characters for your army
+  - Player Base - where all your squads will deploy at the start of the map
+  - Enemy Base - must be captured to win the map
+  - Market Town - where you can purchase armor/weapons to equip on characters
+  - Academy Town - where you can recruit more characters for your army
   - Neutral Towns to capture for passive gold income (1 gold each per in-game day which stacks across all maps)
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
