@@ -21,7 +21,7 @@ For discussion/suggestions/bug-reporting:<br>
 <br><br>
 - **Randomly generated Local Maps consisting of:**
   - 1 Player Base
-  - 1 Enemy Base (capturing it completes a map)
+  - 1 Enemy Base (must be captured to win the map)
   - 1 Market Town - where you can purchase armor/weapons to equip on characters
   - 1 Academy Town - where you can recruit more characters for your army
   - Neutral Towns to capture for passive gold income (1 gold each per in-game day which stacks across all maps)
