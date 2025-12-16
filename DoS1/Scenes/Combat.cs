@@ -35,6 +35,9 @@ namespace DoS1.Scenes
         private string attack_type = "";
         private bool hero_killed = false;
 
+        private Character the_king = null;
+        private bool king_killed = false;
+
         private List<Character> counter_attackers = new List<Character>();
         private Character initial_attacker = null;
         private bool counter_attacking = false;
@@ -71,6 +74,7 @@ namespace DoS1.Scenes
             Load(content);
 
             Handler.CombatTimer.Elapsed += Timer_Elapsed;
+            Handler.OnCharacterKilled += CharacterKilled;
         }
 
         #endregion
@@ -82,6 +86,13 @@ namespace DoS1.Scenes
             if (Visible ||
                 Active)
             {
+                SoundManager.MusicChannel.isPlaying(out bool musicPlaying);
+                if (SoundManager.MusicPlaying &&
+                    !musicPlaying)
+                {
+                    SoundManager.FMODSystem.playSound(SoundManager.MusicOut, SoundManager.MusicGroup, false, out SoundManager.MusicChannel);
+                }
+
                 if (SoundManager.NeedMusic)
                 {
                     SoundManager.MusicLooping = true;
@@ -99,7 +110,9 @@ namespace DoS1.Scenes
                     label.Update();
                 }
 
-                if (!TimeManager.Paused)
+                if (!TimeManager.Paused &&
+                    !MenuManager.GetMenu("Character").Visible &&
+                    !MenuManager.GetMenu("Item").Visible)
                 {
                     if (Handler.StoryStep > 44)
                     {
@@ -114,6 +127,25 @@ namespace DoS1.Scenes
                     (Handler.StoryStep >= 50 && Handler.StoryStep <= 54))
                 {
                     StoryUtil.Alert_Story(Menu);
+                }
+                else if (enemy_squad.Characters.Count > 0)
+                {
+                    Character leader = enemy_squad.Characters[0];
+                    if (leader.Name.Contains("King"))
+                    {
+                        if (Handler.StoryStep >= 72 && Handler.StoryStep <= 80)
+                        {
+                            StoryUtil.Alert_Story(ally_squad, leader);
+                        }
+                    }
+                }
+                else if (king_killed &&
+                         the_king != null)
+                {
+                    if (Handler.StoryStep >= 82 && Handler.StoryStep <= 90)
+                    {
+                        StoryUtil.Alert_Story(ally_squad, the_king);
+                    }
                 }
             }
         }
@@ -139,17 +171,34 @@ namespace DoS1.Scenes
                             Character character = ally_squad.GetCharacter(new Vector2(x, y));
                             if (character != null)
                             {
+                                Something petrified = character.GetStatusEffect("Petrified");
+
                                 Something damage = character.GetStatusEffect("Damage");
                                 Label damage_label = Menu.GetLabel(character.ID);
                                 if (damage != null &&
                                     damage_label != null)
                                 {
-                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                    if (petrified != null)
+                                    {
+                                        CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, damage.DrawColor);
+                                    }
+                                    else
+                                    {
+                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                    }
+                                    
                                     damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
                                 }
                                 else
                                 {
-                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
+                                    if (petrified != null)
+                                    {
+                                        CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, lightColor);
+                                    }
+                                    else
+                                    {
+                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
+                                    }
                                 }
 
                                 DrawDamageEffects(spriteBatch, character);
@@ -167,17 +216,34 @@ namespace DoS1.Scenes
                             Character character = enemy_squad.GetCharacter(new Vector2(x, y));
                             if (character != null)
                             {
+                                Something petrified = character.GetStatusEffect("Petrified");
+
                                 Something damage = character.GetStatusEffect("Damage");
                                 Label damage_label = Menu.GetLabel(character.ID);
                                 if (damage != null &&
                                     damage_label != null)
                                 {
-                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                    if (petrified != null)
+                                    {
+                                        CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, damage.DrawColor);
+                                    }
+                                    else
+                                    {
+                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, damage.DrawColor);
+                                    }
+
                                     damage.DrawColor = Color.Lerp(damage.DrawColor, lightColor, 0.025f);
                                 }
                                 else
                                 {
-                                    CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
+                                    if (petrified != null)
+                                    {
+                                        CharacterUtil.DrawCharacter_Grayscale(spriteBatch, character, lightColor);
+                                    }
+                                    else
+                                    {
+                                        CharacterUtil.DrawCharacter_Combat(spriteBatch, character, lightColor);
+                                    }
                                 }
 
                                 DrawDamageEffects(spriteBatch, character);
@@ -192,7 +258,9 @@ namespace DoS1.Scenes
 
         public override void DrawMenu(SpriteBatch spriteBatch)
         {
-            if (Visible)
+            if (Visible &&
+                !MenuManager.GetMenu("Character").Visible &&
+                !MenuManager.GetMenu("Item").Visible)
             {
                 for (int i = 0; i < Menu.Pictures.Count; i++)
                 {
@@ -371,18 +439,39 @@ namespace DoS1.Scenes
                         }
                     }
 
-                    if (character != null)
+                    if (character != null &&
+                        !character.Dead)
                     {
                         highlight.Region = new Region(tile.Region.X, tile.Region.Y, tile.Region.Width, tile.Region.Height);
                         highlight.Visible = true;
 
                         CharacterUtil.ExamineCharacter(Menu, character);
 
+                        if (InputManager.Mouse_RB_Pressed)
+                        {
+                            Menu.GetLabel("Examine").Visible = false;
+                            highlight.Visible = false;
+
+                            InputManager.Mouse.Flush();
+
+                            Handler.ViewOnly_Character = true;
+                            Handler.ViewOnly_Item = true;
+                            Handler.Selected_Character = character.ID;
+
+                            Menu characterMenu = MenuManager.GetMenu("Character");
+                            characterMenu.Load();
+                            characterMenu.Active = true;
+                            characterMenu.Visible = true;
+
+                            GameUtil.Toggle_Pause_Combat(false);
+                        }
+
                         return true;
                     }
                 }
             }
 
+            Menu.GetLabel("Examine").Visible = false;
             highlight.Visible = false;
             return false;
         }
@@ -1129,8 +1218,6 @@ namespace DoS1.Scenes
 
                             if (target.Dead)
                             {
-                                c--;
-
                                 if (target.Type == "Enemy")
                                 {
                                     Reward_CharacterKilled();
@@ -1154,10 +1241,6 @@ namespace DoS1.Scenes
                             {
                                 counter_attackers.Add(target);
                             }
-                        }
-                        else
-                        {
-                            c--;
                         }
                     }
                 }
@@ -1617,7 +1700,7 @@ namespace DoS1.Scenes
                     for (int i = 0; i < ally_squad.Characters.Count; i++)
                     {
                         Character character = ally_squad.Characters[i];
-                        if (!character.Dead &&
+                        if (!CharacterUtil.IsImmobilized(character) &&
                             character.Tags.Contains("Animation_Idle"))
                         {
                             CharacterUtil.AnimateIdle(character);
@@ -1630,7 +1713,7 @@ namespace DoS1.Scenes
                     for (int i = 0; i < enemy_squad.Characters.Count; i++)
                     {
                         Character character = enemy_squad.Characters[i];
-                        if (!character.Dead &&
+                        if (!CharacterUtil.IsImmobilized(character) &&
                             character.Tags.Contains("Animation_Idle"))
                         {
                             CharacterUtil.AnimateIdle(character);
@@ -2478,6 +2561,19 @@ namespace DoS1.Scenes
             SaveUtil.ExportINI();
 
             effect_frame = 0;
+        }
+
+        private void CharacterKilled(object sender, CharacterKilledEventArgs e)
+        {
+            Character character = e.Character;
+            if (character.Type == "Enemy" &&
+                character.Name.Contains("King"))
+            {
+                GameUtil.Toggle_Pause_Combat(false);
+                king_killed = true;
+                the_king = character;
+                Handler.StoryStep++;
+            }
         }
 
         public override void Load()

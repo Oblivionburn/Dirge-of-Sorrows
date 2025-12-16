@@ -889,6 +889,12 @@ namespace DoS1.Scenes
 
             Army army = CharacterManager.GetArmy("Ally");
             Squad squad = army.GetSquad(id);
+            if (squad == null)
+            {
+                army = CharacterManager.GetArmy("Enemy");
+                squad = army.GetSquad(id);
+            }
+
             if (squad != null)
             {
                 if (EditingSquad)

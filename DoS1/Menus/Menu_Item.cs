@@ -557,13 +557,26 @@ namespace DoS1.Menus
             InputManager.Mouse.Flush();
             InputManager.Keyboard.Flush();
 
-            if (Handler.StoryStep == 34)
+            if (Handler.Combat)
             {
-                MenuManager.GetMenu("Alerts").Visible = false;
-                Handler.StoryStep++;
-            }
+                Active = false;
+                Visible = false;
 
-            MenuManager.ChangeMenu_Previous();
+                Menu characterMenu = MenuManager.GetMenu("Character");
+                characterMenu.Load();
+                characterMenu.Active = true;
+                characterMenu.Visible = true;
+            }
+            else
+            {
+                if (Handler.StoryStep == 34)
+                {
+                    MenuManager.GetMenu("Alerts").Visible = false;
+                    Handler.StoryStep++;
+                }
+
+                MenuManager.ChangeMenu_Previous();
+            }
         }
 
         private void ResetPos()

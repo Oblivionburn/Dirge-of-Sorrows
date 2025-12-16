@@ -15,7 +15,7 @@ namespace DoS1.Util
 {
     public static class InventoryUtil
     {
-        public static int TotalAssets = 64;
+        public static int TotalAssets = 68;
 
         public static void GenAssets()
         {
@@ -50,6 +50,8 @@ namespace DoS1.Util
 
         public static void GenArmors(Inventory assets)
         {
+            //11 Armors
+
             Handler.Loading_Message = "Loading Armors";
             string type = "Armor";
 
@@ -159,10 +161,22 @@ namespace DoS1.Util
 
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
+
+            properties[0].Value = 55;
+            properties[1].Value = 1;
+            properties[2].Value = 4;
+            item = NewItem(type, category, "Gold", properties);
+            item.Buy_Price = 500;
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
         public static void GenHelms(Inventory assets)
         {
+            //11 Helms
+
             Handler.Loading_Message = "Loading Helms";
             string type = "Helm";
 
@@ -272,10 +286,22 @@ namespace DoS1.Util
 
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
+
+            properties[0].Value = 12;
+            properties[1].Value = 0;
+            properties[2].Value = 3;
+            item = NewItem(type, category, "Gold", properties);
+            item.Buy_Price = 100;
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
         public static void GenShields(Inventory assets)
         {
+            //11 Shields
+
             Handler.Loading_Message = "Loading Shields";
             string type = "Shield";
 
@@ -388,10 +414,23 @@ namespace DoS1.Util
 
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
+
+            properties[0].Value = 33;
+            properties[1].Value = 1;
+            properties[2].Value = 2;
+            item = NewItem(type, category, "Gold", properties);
+            item.Buy_Price = 200;
+            item.Sell_Price = 200;
+            assets.Items.Add(item);
+
+            Handler.Loading_Current++;
+            Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
         }
 
         public static void GenAxes(Inventory assets)
         {
+            //4 Axes
+
             Handler.Loading_Message = "Loading Axes";
             string type = "Weapon";
             string category = "Axe";
@@ -438,6 +477,8 @@ namespace DoS1.Util
 
         public static void GenMaces(Inventory assets)
         {
+            //4 Maces
+
             Handler.Loading_Message = "Loading Maces";
             string type = "Weapon";
             string category = "Mace";
@@ -488,6 +529,8 @@ namespace DoS1.Util
 
         public static void GenSwords(Inventory assets)
         {
+            //4 Swords
+
             Handler.Loading_Message = "Loading Swords";
             string type = "Weapon";
             string category = "Sword";
@@ -538,6 +581,8 @@ namespace DoS1.Util
 
         public static void GenBows(Inventory assets)
         {
+            //4 Bows
+
             Handler.Loading_Message = "Loading Bows";
             string type = "Weapon";
             string category = "Bow";
@@ -588,6 +633,8 @@ namespace DoS1.Util
 
         public static void GenGrimoires(Inventory assets)
         {
+            //4 Grimoires
+
             Handler.Loading_Message = "Loading Grimoires";
             string type = "Weapon";
             string category = "Grimoire";
@@ -630,6 +677,8 @@ namespace DoS1.Util
 
         public static void GenRunes(Inventory assets)
         {
+            //15 Runes
+
             Handler.Loading_Message = "Loading Runes";
             string type = "Rune";
 
@@ -1497,7 +1546,8 @@ namespace DoS1.Util
                 Something property = properties[i];
                 if (property.Name.Contains("Area") ||
                     property.Name.Contains("Drain") ||
-                    property.Name.Contains("Regenerating"))
+                    property.Name.Contains("Regenerating") ||
+                    property.Name.Contains("Resist"))
                 {
                     width += Main.Game.MenuSize.X;
                     break;
@@ -1906,6 +1956,7 @@ namespace DoS1.Util
                         Item rune = RandomRune();
                         if (rune != null)
                         {
+                            rune.Location = new Location(item.Attachments.Count, 0, 0);
                             item.Attachments.Add(rune);
                             UpdateItem(item);
                             total++;
@@ -2778,7 +2829,8 @@ namespace DoS1.Util
 
             foreach (Something property in item.Properties)
             {
-                if (property.Name.Contains("Damage"))
+                if (property.Name.Contains("Damage") &&
+                    !property.Name.Contains("Area"))
                 {
                     total += property.Value;
                 }
@@ -2794,7 +2846,8 @@ namespace DoS1.Util
             foreach (Something property in item.Properties)
             {
                 if (property.Name.Contains(type) && 
-                    property.Name.Contains("Damage"))
+                    property.Name.Contains("Damage") &&
+                    !property.Name.Contains("Area"))
                 {
                     total += property.Value;
                 }

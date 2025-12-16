@@ -72,6 +72,23 @@ namespace DoS1.Util
             Tutorial_Squads(alerts, dialogue, dialogue_name);
         }
 
+        public static void Alert_Story(Squad squad, Character king)
+        {
+            Handler.AlertType = "Story";
+
+            Menu alerts = MenuManager.GetMenu("Alerts");
+            alerts.Visible = true;
+
+            Label dialogue = alerts.GetLabel("Dialogue");
+            dialogue.Visible = true;
+
+            Label dialogue_name = alerts.GetLabel("Dialogue_Name");
+            dialogue_name.Visible = true;
+
+            TheKing_Part1(alerts, dialogue, dialogue_name, squad, king);
+            TheKing_Part2(alerts, dialogue, dialogue_name, king);
+        }
+
         public static void Tutorial_Worldmap(Label dialogue, Label dialogue_name)
         {
             string message = "";
@@ -1089,6 +1106,284 @@ namespace DoS1.Util
 
             if (!string.IsNullOrEmpty(message))
             {
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void TheKing_Part1(Menu alerts, Label dialogue, Label dialogue_name, Squad squad, Character king)
+        {
+            Character leader = squad.GetCharacter(squad.Leader_ID);
+
+            string message = "";
+
+            if (Handler.StoryStep == 72)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The King stands tall and defiant before you, his guards tense at his side.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 73 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"... and here you are... ready to strike me down as you've done to so many others...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 74)
+            {
+                Handler.Dialogue_Character2 = leader;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = leader.Name;
+                message = "\"You are a greedy tyrant that must be stopped! You have abused and extorted everyone in your kingdom for too long... " +
+                    "and we are here to end it!\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 75 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"You think my deeds are merely driven by greed? How naive... I took what was needed for the good of the kingdom.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 76 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"Without gold, we can buy no weapons, and without weapons we are defenseless against the other realms. I did what needed to be done " +
+                    "for the safety of all.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 77)
+            {
+                Handler.Dialogue_Character2 = leader;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = leader.Name;
+                message = "\"Safe? People are being murdered so a few more coins can be added to your coffers, yet you stand here preaching about keeping us safe?\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 78 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"If some sacrifices were made to secure the future of our kingdom, then they were necessary.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 79)
+            {
+                Handler.Dialogue_Character2 = leader;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait2");
+                picture.Visible = true;
+
+                dialogue_name.Text = leader.Name;
+                message = "\"If the price of your future must be paid in blood, then that is too high a cost for anyone to bare. Your future ends here!\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 80 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"If you will not share my future, then in death you will become my past!\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                Handler.CombatFinishing = true;
+                dialogue.Text = GameUtil.WrapText_Dialogue(message);
+            }
+        }
+
+        public static void TheKing_Part2(Menu alerts, Label dialogue, Label dialogue_name, Character king)
+        {
+            Character hero = Handler.GetHero();
+
+            string message = "";
+
+            if (Handler.StoryStep == 82)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The King falls to his knees, coughing blood as he clasps at his wounds...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 83 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"You think you've won? (cough) You think this will stop anything? Even I am merely a pawn in a bigger game.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 84 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"(cough) We're all just... puppets (cough)... of The Merchant's Guild. They make mountains of gold (cough) from turning us " +
+                    "against each other... whispering 'War' in our ears, so they can sell more weapons to everyone.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 85 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"We needed their weapons to keep our kingdom safe. You wouldn't have made it this far if they hadn't sold them to you as well. " +
+                    "They control all the markets... they could have refused you at any point.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 86 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "\"You're as much a pawn in their game as the rest of us. Enjoy the throne... for as long as they let you hold it. It's only a " +
+                    "matter of time before they turn the other kingdoms against you.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 87)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The King gasps and coughs, struggling to squeeze out his final words...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 88 &&
+                     king != null)
+            {
+                Handler.Dialogue_Character1 = king;
+
+                Picture picture = alerts.GetPicture("Dialogue_Portrait1");
+                picture.Visible = true;
+
+                dialogue_name.Text = king.Name;
+                message = "whispers \"I tried... I tried to keep us safe. But we were never safe... nobody is safe...\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 89)
+            {
+                dialogue_name.Text = "Narrator";
+                message = "\"The King lets out a long drawn sigh as his eyes turn lifeless and the final vestiges of life leave his body.\"";
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+            else if (Handler.StoryStep == 90)
+            {
+                dialogue_name.Text = "Narrator";
+
+                if (hero.Gender == "Male")
+                {
+                    message = "\"The King is dead. Long live the new King, " + hero.Name + ".\"";
+                }
+                else
+                {
+                    message = "\"The King is dead. Long live the new Queen, " + hero.Name + ".\"";
+                }
+
+                Button option1 = alerts.GetButton("Dialogue_Option1");
+                option1.Text = "[Click here to continue]";
+                option1.Visible = true;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                Handler.CombatFinishing = true;
                 dialogue.Text = GameUtil.WrapText_Dialogue(message);
             }
         }

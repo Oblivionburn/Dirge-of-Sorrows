@@ -71,6 +71,7 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CharacterKilledEventArgs.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="LightingRenderer.cs" />
     <Compile Include="Main.cs" />

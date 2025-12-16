@@ -1558,9 +1558,13 @@ namespace DoS1.Util
                 });
             }
 
-            RuneUtil.DrainArmor(menu, defender, weapon, element, damage);
+            if (!defender.Dead)
+            {
+                RuneUtil.DrainArmor(menu, defender, weapon, element, damage);
+                RuneUtil.StatusEffect(menu, defender, weapon, element, false);
+            }
+            
             RuneUtil.DisarmArmor(menu, attacker, defender);
-            RuneUtil.StatusEffect(menu, defender, weapon, element, false);
         }
 
         public static void DoDamage_ForStatus(Menu menu, Character character, Something statusEffect, ref int ally_total_damage, ref int enemy_total_damage)
@@ -1990,6 +1994,15 @@ namespace DoS1.Util
             character.HealthBar.Update();
 
             character.Dead = true;
+            Handler.KillCharacter(character);
+
+            Menu combatMenu = SceneManager.GetScene("Combat").Menu;
+
+            Label hp_label = combatMenu.GetLabel(character.ID + "_HP,x:" + character.Formation.X.ToString() + ",y:" + character.Formation.Y.ToString());
+            if (hp_label != null)
+            {
+                hp_label.Text = character.HealthBar.Value + "/" + character.HealthBar.Max_Value + " HP";
+            }
 
             Squad squad = character.Squad;
             if (squad != null)

@@ -114,6 +114,13 @@ namespace DoS1.Menus
                     }
                 }
             }
+
+            if (InputManager.KeyPressed("Space") &&
+                GetLabel("Combat_VS").Visible)
+            {
+                InputManager.Keyboard.Flush();
+                CheckClick(GetButton("Dialogue_Option1"));
+            }
         }
 
         private void CheckClick(Button button)
@@ -201,7 +208,8 @@ namespace DoS1.Menus
                 combat.Load();
 
                 if (Handler.StoryStep == 38 ||
-                    Handler.StoryStep == 50)
+                    Handler.StoryStep == 50 ||
+                    Handler.StoryStep == 72)
                 {
                     combat.Menu.GetButton("Retreat").Visible = false;
                     GameUtil.Toggle_Pause_Combat(false);
@@ -329,13 +337,23 @@ namespace DoS1.Menus
                      (Handler.StoryStep >= 50 && Handler.StoryStep <= 53) ||
                      Handler.StoryStep == 57 ||
                      Handler.StoryStep == 61 ||
-                     Handler.StoryStep == 62)
+                     Handler.StoryStep == 62 ||
+                     (Handler.StoryStep >= 72 && Handler.StoryStep <= 79) ||
+                     (Handler.StoryStep >= 82 && Handler.StoryStep <= 89))
             {
                 Handler.StoryStep++;
             }
             else if (Handler.StoryStep == 44 ||
-                     Handler.StoryStep == 54)
+                     Handler.StoryStep == 54 ||
+                     Handler.StoryStep == 80 ||
+                     Handler.StoryStep == 90)
             {
+                if (Handler.StoryStep == 80 ||
+                    Handler.StoryStep == 90)
+                {
+                    Handler.CombatFinishing = false;
+                }
+
                 Handler.StoryStep++;
                 GameUtil.Toggle_Pause_Combat(false);
             }

@@ -18,6 +18,7 @@ namespace DoS1.Menus
 
         bool ControlsLoaded;
         Character character = null;
+        Region character_region;
 
         int Top;
         List<Picture> GridList = new List<Picture>();
@@ -60,7 +61,19 @@ namespace DoS1.Menus
 
                 if (character != null)
                 {
-                    CharacterUtil.AnimateIdle(character);
+                    if (Handler.Combat)
+                    {
+                        if (!CharacterUtil.IsImmobilized(character) &&
+                            character.Tags.Contains("Animation_Idle"))
+                        {
+                            CharacterUtil.AnimateIdle(character);
+                        }
+                    }
+                    else
+                    {
+                        CharacterUtil.AnimateIdle(character);
+                    }
+
                     CharacterUtil.UpdateGear(character);
                 }
 
@@ -107,9 +120,18 @@ namespace DoS1.Menus
                     }
                 }
 
-                if (character != null)
+                if (character != null &&
+                    character_region != null)
                 {
-                    CharacterUtil.DrawCharacter(spriteBatch, character, Color.White);
+                    Something petrified = character.GetStatusEffect("Petrified");
+                    if (petrified != null)
+                    {
+                        DrawCharacter_Grayscale(spriteBatch, character, character_region);
+                    }
+                    else
+                    {
+                        DrawCharacter(spriteBatch, character, character_region);
+                    }
                 }
 
                 Inventory inventory = InventoryManager.GetInventory("Ally");
@@ -151,6 +173,278 @@ namespace DoS1.Menus
                 if (movingItem != null)
                 {
                     spriteBatch.Draw(movingItem.Icon, movingItem.Icon_Region.ToRectangle, movingItem.Icon_Image, Color.White);
+                }
+            }
+        }
+
+        private void DrawCharacter(SpriteBatch spriteBatch, Character character, Region region)
+        {
+            if (character != null &&
+                !character.Dead)
+            {
+                Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+                if (shield != null)
+                {
+                    spriteBatch.Draw(shield.Texture, region.ToRectangle, shield.Image, Color.White);
+                    if (shield.Icon_Visible &&
+                        shield.Icon != null &&
+                        shield.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(shield.Icon, shield.Icon_Region.ToRectangle, shield.Icon_Image, Color.White);
+                    }
+                }
+
+                //Draw body
+                spriteBatch.Draw(character.Texture, region.ToRectangle, character.Image, Color.White);
+
+                Item head = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (head != null)
+                {
+                    spriteBatch.Draw(head.Texture, region.ToRectangle, head.Image, Color.White);
+                }
+
+                Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (eyes != null)
+                {
+                    if (eyes.Visible)
+                    {
+                        spriteBatch.Draw(eyes.Texture, region.ToRectangle, eyes.Image, Color.White);
+                    }
+                    else
+                    {
+                        string[] parts = character.Texture.Name.Split('_');
+                        string direction = parts[0];
+                        string skin_tone = parts[2];
+                        string closed_eye = direction + "_Eye_Closed_" + skin_tone;
+
+                        spriteBatch.Draw(Handler.GetTexture(closed_eye), region.ToRectangle, eyes.Image, Color.White);
+                    }
+                }
+
+                Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (hair != null)
+                {
+                    spriteBatch.Draw(hair.Texture, region.ToRectangle, hair.Image, Color.White);
+                }
+
+                Item beard = InventoryUtil.Get_EquippedItem(character, "Beard");
+                if (beard != null)
+                {
+                    spriteBatch.Draw(beard.Texture, region.ToRectangle, beard.Image, Color.White);
+                }
+
+                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (helm != null)
+                {
+                    spriteBatch.Draw(helm.Texture, region.ToRectangle, helm.Image, Color.White);
+                    if (helm.Icon_Visible &&
+                        helm.Icon != null &&
+                        helm.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(helm.Icon, helm.Icon_Region.ToRectangle, helm.Icon_Image, Color.White);
+                    }
+                }
+
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor != null)
+                {
+                    spriteBatch.Draw(armor.Texture, region.ToRectangle, armor.Image, Color.White);
+                    if (armor.Icon_Visible &&
+                        armor.Icon != null &&
+                        armor.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(armor.Icon, armor.Icon_Region.ToRectangle, armor.Icon_Image, Color.White);
+                    }
+                }
+
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
+                {
+                    spriteBatch.Draw(weapon.Texture, region.ToRectangle, weapon.Image, Color.White);
+                    if (weapon.Icon_Visible &&
+                        weapon.Icon != null &&
+                        weapon.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(weapon.Icon, weapon.Icon_Region.ToRectangle, weapon.Icon_Image, Color.White);
+                    }
+                }
+
+                if (character.HealthBar.Visible)
+                {
+                    ProgressBar progressBar = character.HealthBar;
+
+                    float bar_x = region.X + (region.Width / 8);
+                    float bar_width = (region.Width / 8) * 6;
+                    float bar_height = region.Width / 16;
+
+                    Region base_region = new Region(bar_x, region.Y + region.Height, bar_width, bar_height);
+
+                    float num = base_region.Width / progressBar.Max_Value * progressBar.Value;
+                    Region bar_region = new Region(base_region.X, base_region.Y, (int)num, base_region.Height);
+
+                    spriteBatch.Draw(progressBar.Base_Texture, base_region.ToRectangle, Color.White);
+                    spriteBatch.Draw(progressBar.Bar_Texture, bar_region.ToRectangle, progressBar.Bar_Image, progressBar.DrawColor);
+                }
+
+                if (character.ManaBar.Visible)
+                {
+                    ProgressBar progressBar = character.ManaBar;
+
+                    float bar_x = region.X + (region.Width / 8);
+                    float bar_width = (region.Width / 8) * 6;
+                    float bar_height = region.Width / 16;
+
+                    Region base_region = new Region(bar_x, region.Y + region.Height + bar_height, bar_width, bar_height);
+
+                    float num = base_region.Width / progressBar.Max_Value * progressBar.Value;
+                    Region bar_region = new Region(base_region.X, base_region.Y, (int)num, base_region.Height);
+
+                    spriteBatch.Draw(progressBar.Base_Texture, base_region.ToRectangle, Color.White);
+                    spriteBatch.Draw(progressBar.Bar_Texture, bar_region.ToRectangle, progressBar.Bar_Image, progressBar.DrawColor);
+                }
+            }
+        }
+
+        private void DrawCharacter_Grayscale(SpriteBatch spriteBatch, Character character, Region region)
+        {
+            if (character != null &&
+                !character.Dead)
+            {
+                spriteBatch.End();
+
+                Effect effect = AssetManager.Shaders["Grayscale"];
+                effect.Parameters["percent"].SetValue(0f);
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, effect, null);
+
+                //Draw shield
+                Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+                if (shield != null)
+                {
+                    spriteBatch.Draw(shield.Texture, region.ToRectangle, shield.Image, Color.White);
+                }
+
+                //Draw body
+                spriteBatch.Draw(character.Texture, region.ToRectangle, character.Image, Color.White);
+
+                Item head = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (head != null)
+                {
+                    spriteBatch.Draw(head.Texture, region.ToRectangle, head.Image, Color.White);
+                }
+
+                Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (eyes != null)
+                {
+                    spriteBatch.Draw(eyes.Texture, region.ToRectangle, eyes.Image, Color.White);
+                }
+
+                Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (hair != null)
+                {
+                    spriteBatch.Draw(hair.Texture, region.ToRectangle, hair.Image, Color.White);
+                }
+
+                Item beard = InventoryUtil.Get_EquippedItem(character, "Beard");
+                if (beard != null)
+                {
+                    spriteBatch.Draw(beard.Texture, region.ToRectangle, beard.Image, Color.White);
+                }
+
+                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (helm != null)
+                {
+                    spriteBatch.Draw(helm.Texture, region.ToRectangle, helm.Image, Color.White);
+                }
+
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor != null)
+                {
+                    spriteBatch.Draw(armor.Texture, region.ToRectangle, armor.Image, Color.White);
+                }
+
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
+                {
+                    spriteBatch.Draw(weapon.Texture, region.ToRectangle, weapon.Image, Color.White);
+                }
+
+                spriteBatch.End();
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
+
+                if (shield != null)
+                {
+                    if (shield.Icon_Visible &&
+                        shield.Icon != null &&
+                        shield.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(shield.Icon, shield.Icon_Region.ToRectangle, shield.Icon_Image, Color.White);
+                    }
+                }
+
+                if (helm != null)
+                {
+                    if (helm.Icon_Visible &&
+                        helm.Icon != null &&
+                        helm.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(helm.Icon, helm.Icon_Region.ToRectangle, helm.Icon_Image, Color.White);
+                    }
+                }
+
+                if (armor != null)
+                {
+                    if (armor.Icon_Visible &&
+                        armor.Icon != null &&
+                        armor.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(armor.Icon, armor.Icon_Region.ToRectangle, armor.Icon_Image, Color.White);
+                    }
+                }
+
+                if (weapon != null)
+                {
+                    if (weapon.Icon_Visible &&
+                        weapon.Icon != null &&
+                        weapon.Icon_Region != null)
+                    {
+                        spriteBatch.Draw(weapon.Icon, weapon.Icon_Region.ToRectangle, weapon.Icon_Image, Color.White);
+                    }
+                }
+
+                if (character.HealthBar.Visible)
+                {
+                    ProgressBar progressBar = character.HealthBar;
+
+                    float bar_x = region.X + (region.Width / 8);
+                    float bar_width = (region.Width / 8) * 6;
+                    float bar_height = region.Width / 16;
+
+                    Region base_region = new Region(bar_x, region.Y + region.Height, bar_width, bar_height);
+
+                    float num = base_region.Width / progressBar.Max_Value * progressBar.Value;
+                    Region bar_region = new Region(base_region.X, base_region.Y, (int)num, base_region.Height);
+
+                    spriteBatch.Draw(progressBar.Base_Texture, base_region.ToRectangle, Color.White);
+                    spriteBatch.Draw(progressBar.Bar_Texture, bar_region.ToRectangle, progressBar.Bar_Image, progressBar.DrawColor);
+                }
+
+                if (character.ManaBar.Visible)
+                {
+                    ProgressBar progressBar = character.ManaBar;
+
+                    float bar_x = region.X + (region.Width / 8);
+                    float bar_width = (region.Width / 8) * 6;
+                    float bar_height = region.Width / 16;
+
+                    Region base_region = new Region(bar_x, region.Y + region.Height + bar_height, bar_width, bar_height);
+
+                    float num = base_region.Width / progressBar.Max_Value * progressBar.Value;
+                    Region bar_region = new Region(base_region.X, base_region.Y, (int)num, base_region.Height);
+
+                    spriteBatch.Draw(progressBar.Base_Texture, base_region.ToRectangle, Color.White);
+                    spriteBatch.Draw(progressBar.Bar_Texture, bar_region.ToRectangle, progressBar.Bar_Image, progressBar.DrawColor);
                 }
             }
         }
@@ -719,16 +1013,26 @@ namespace DoS1.Menus
                 item.Icon_Visible = false;
             }
 
-            character.HealthBar.Visible = false;
-            character.ManaBar.Visible = false;
+            //character.HealthBar.Visible = false;
+            //character.ManaBar.Visible = false;
 
-            if (Handler.StoryStep == 17)
+            if (Handler.Combat)
             {
-                MenuManager.GetMenu("Alerts").Visible = false;
-                Handler.StoryStep++;
-            }
+                Active = false;
+                Visible = false;
 
-            MenuManager.ChangeMenu_Previous();
+                GameUtil.Toggle_Pause_Combat(false);
+            }
+            else
+            {
+                if (Handler.StoryStep == 17)
+                {
+                    MenuManager.GetMenu("Alerts").Visible = false;
+                    Handler.StoryStep++;
+                }
+
+                MenuManager.ChangeMenu_Previous();
+            }
         }
 
         private void Edit()
@@ -744,7 +1048,21 @@ namespace DoS1.Menus
             Handler.Selected_Item = id;
 
             InputManager.Mouse.Flush();
-            MenuManager.ChangeMenu("Item");
+
+            if (Handler.Combat)
+            {
+                Active = false;
+                Visible = false;
+
+                Menu itemMenu = MenuManager.GetMenu("Item");
+                itemMenu.Load();
+                itemMenu.Active = true;
+                itemMenu.Visible = true;
+            }
+            else
+            {
+                MenuManager.ChangeMenu("Item");
+            }
         }
 
         private void HighlightSlot(Item item)
@@ -1135,8 +1453,7 @@ namespace DoS1.Menus
                 Picture char_pic = GetPicture("Character");
                 char_pic.Region = new Region(starting_X - (width * 7), starting_Y + (height * 2), (width * 4), (height * 6));
 
-                character.Region = new Region(char_pic.Region.X, char_pic.Region.Y, char_pic.Region.Width, char_pic.Region.Height);
-                character.Visible = true;
+                character_region = new Region(char_pic.Region.X, char_pic.Region.Y, char_pic.Region.Width, char_pic.Region.Height);
 
                 GetLabel("Name").Region = new Region(char_pic.Region.X, char_pic.Region.Y - height, char_pic.Region.Width, height);
 
@@ -1148,7 +1465,7 @@ namespace DoS1.Menus
                 GetPicture("Shield").Region = new Region(X, Y + (height * 2), width, height);
                 GetPicture("Weapon").Region = new Region(X, Y + (height * 3), width, height);
 
-                CharacterUtil.ResizeBars(character);
+                //CharacterUtil.ResizeBars(character);
                 GetLabel("Name").Text = character.Name;
 
                 GetButton("Edit").Region = new Region(char_pic.Region.X + (char_pic.Region.Width / 2) - (Main.Game.MenuSize.X / 2), 

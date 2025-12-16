@@ -113,6 +113,12 @@ namespace DoS1
 
         #endregion
 
+        #region Events
+
+        public static event EventHandler<CharacterKilledEventArgs> OnCharacterKilled;
+
+        #endregion
+
         #region Constructors
 
         public Handler(Game game) : base(game)
@@ -374,6 +380,15 @@ namespace DoS1
         public static Texture2D GetTexture(string name)
         {
             return AssetManager.GetTexture_LazyLoad(Main.Game.GraphicsManager.GraphicsDevice, name);
+        }
+
+        #endregion
+
+        #region Trigger Stuff
+
+        public static void KillCharacter(Character character)
+        {
+            OnCharacterKilled?.Invoke(null, new CharacterKilledEventArgs(character));
         }
 
         #endregion

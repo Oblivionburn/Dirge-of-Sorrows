@@ -798,19 +798,22 @@ namespace DoS1.Util
 
                                 if (!resisted)
                                 {
-                                    string status_name = "";
+                                    Something statusEffect = null;
+                                    bool found = false;
 
                                     if (rune.Categories.Contains("Counter"))
                                     {
                                         #region Weak
 
-                                        status_name = "Weak";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Weak",
+                                            Amount = 1
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -822,15 +825,6 @@ namespace DoS1.Util
 
                                                 break;
                                             }
-                                        }
-
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 1
-                                            });
                                         }
 
                                         #endregion
@@ -839,13 +833,9 @@ namespace DoS1.Util
                                     {
                                         #region Cursed
 
-                                        status_name = "Cursed";
-
-                                        bool found = false;
-
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == "Cursed")
                                             {
                                                 found = true;
                                                 break;
@@ -854,10 +844,10 @@ namespace DoS1.Util
 
                                         if (!found)
                                         {
-                                            defender.StatusEffects.Add(new Something
+                                            statusEffect = new Something
                                             {
-                                                Name = status_name
-                                            });
+                                                Name = "Cursed"
+                                            };
                                         }
 
                                         #endregion
@@ -866,13 +856,15 @@ namespace DoS1.Util
                                     {
                                         #region Melting
 
-                                        status_name = "Melting";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Melting",
+                                            Amount = 1
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -886,42 +878,27 @@ namespace DoS1.Util
                                             }
                                         }
 
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 1
-                                            });
-                                        }
-
                                         #endregion
                                     }
                                     else if (rune.Categories.Contains("Drain"))
                                     {
                                         #region Poisoned
 
-                                        status_name = "Poisoned";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Poisoned",
+                                            Value = 2
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
+
                                                 existing.Value += 2;
                                                 break;
                                             }
-                                        }
-
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Value = 2
-                                            });
                                         }
 
                                         #endregion
@@ -930,13 +907,9 @@ namespace DoS1.Util
                                     {
                                         #region Petrified
 
-                                        status_name = "Petrified";
-
-                                        bool found = false;
-
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == "Petrified")
                                             {
                                                 found = true;
                                                 break;
@@ -945,10 +918,10 @@ namespace DoS1.Util
 
                                         if (!found)
                                         {
-                                            defender.StatusEffects.Add(new Something
+                                            statusEffect = new Something
                                             {
-                                                Name = status_name
-                                            });
+                                                Name = "Petrified"
+                                            };
                                         }
 
                                         #endregion
@@ -957,29 +930,23 @@ namespace DoS1.Util
                                     {
                                         #region Burning
 
-                                        status_name = "Burning";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Burning",
+                                            Amount = 2,
+                                            Value = 4
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
+
                                                 existing.Amount += 2;
                                                 existing.Value += 4;
                                                 break;
                                             }
-                                        }
-
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 2,
-                                                Value = 4
-                                            });
                                         }
 
                                         #endregion
@@ -988,13 +955,16 @@ namespace DoS1.Util
                                     {
                                         #region Regenerating
 
-                                        status_name = "Regenerating";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Regenerating",
+                                            Amount = 5,
+                                            Value = 20
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -1006,16 +976,6 @@ namespace DoS1.Util
 
                                                 break;
                                             }
-                                        }
-
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 5,
-                                                Value = 20
-                                            });
                                         }
 
                                         #endregion
@@ -1024,13 +984,16 @@ namespace DoS1.Util
                                     {
                                         #region Charging
 
-                                        status_name = "Charging";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Charging",
+                                            Amount = 5,
+                                            Value = 20
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -1044,43 +1007,27 @@ namespace DoS1.Util
                                             }
                                         }
 
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 5,
-                                                Value = 20
-                                            });
-                                        }
-
                                         #endregion
                                     }
                                     else if (rune.Categories.Contains("Physical"))
                                     {
                                         #region Stunned
 
-                                        status_name = "Stunned";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Stunned",
+                                            Amount = 1
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
+
                                                 existing.Amount += 1;
                                                 break;
                                             }
-                                        }
-
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 1
-                                            });
                                         }
 
                                         #endregion
@@ -1089,13 +1036,15 @@ namespace DoS1.Util
                                     {
                                         #region Slow
 
-                                        status_name = "Slow";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Slow",
+                                            Amount = 1
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -1109,28 +1058,22 @@ namespace DoS1.Util
                                             }
                                         }
 
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 1
-                                            });
-                                        }
-
                                         #endregion
                                     }
                                     else if (rune.Categories.Contains("Ice"))
                                     {
                                         #region Frozen
 
-                                        status_name = "Frozen";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Frozen",
+                                            Amount = 4,
+                                            Value = 5
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -1144,29 +1087,22 @@ namespace DoS1.Util
                                             }
                                         }
 
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 4,
-                                                Value = 5
-                                            });
-                                        }
-
                                         #endregion
                                     }
                                     else if (rune.Categories.Contains("Lightning"))
                                     {
                                         #region Shocked
 
-                                        status_name = "Shocked";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Shocked",
+                                            Amount = 2,
+                                            Value = 10
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
 
@@ -1180,29 +1116,21 @@ namespace DoS1.Util
                                             }
                                         }
 
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Amount = 2,
-                                                Value = 10
-                                            });
-                                        }
-
                                         #endregion
                                     }
                                     else if (rune.Categories.Contains("Diamond"))
                                     {
                                         #region Radiating
 
-                                        status_name = "Radiating";
-
-                                        bool found = false;
+                                        statusEffect = new Something
+                                        {
+                                            Name = "Radiating",
+                                            Value = 2
+                                        };
 
                                         foreach (Something existing in defender.StatusEffects)
                                         {
-                                            if (existing.Name == status_name)
+                                            if (existing.Name == statusEffect.Name)
                                             {
                                                 found = true;
                                                 existing.Value += 2;
@@ -1210,22 +1138,18 @@ namespace DoS1.Util
                                             }
                                         }
 
-                                        if (!found)
-                                        {
-                                            defender.StatusEffects.Add(new Something
-                                            {
-                                                Name = status_name,
-                                                Value = 2
-                                            });
-                                        }
-
                                         #endregion
                                     }
 
-                                    if (!string.IsNullOrEmpty(status_name))
+                                    if (statusEffect != null)
                                     {
-                                        Color damage_color = GameUtil.Get_EffectColor(status_name);
-                                        AddCombatLabel(menu, defender, "+" + status_name, damage_color);
+                                        if (!found)
+                                        {
+                                            defender.StatusEffects.Add(statusEffect);
+                                        }
+
+                                        Color damage_color = GameUtil.Get_EffectColor(statusEffect.Name);
+                                        AddCombatLabel(menu, defender, "+" + statusEffect.Name, damage_color);
                                     }
                                 }
                             }

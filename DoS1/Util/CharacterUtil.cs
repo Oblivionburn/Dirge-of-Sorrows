@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OP_Engine.Characters;
@@ -190,6 +189,12 @@ namespace DoS1.Util
                     spriteBatch.Draw(hair.Texture, hair.Region.ToRectangle, hair.Image, color);
                 }
 
+                Item beard = InventoryUtil.Get_EquippedItem(character, "Beard");
+                if (beard != null)
+                {
+                    spriteBatch.Draw(beard.Texture, beard.Region.ToRectangle, beard.Image, color);
+                }
+
                 Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
                 if (helm != null)
                 {
@@ -282,6 +287,12 @@ namespace DoS1.Util
                     spriteBatch.Draw(hair.Texture, hair.Region.ToRectangle, hair.Image, color);
                 }
 
+                Item beard = InventoryUtil.Get_EquippedItem(character, "Beard");
+                if (beard != null)
+                {
+                    spriteBatch.Draw(beard.Texture, beard.Region.ToRectangle, beard.Image, color);
+                }
+
                 Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
                 if (helm != null)
                 {
@@ -317,69 +328,68 @@ namespace DoS1.Util
             if (character != null &&
                 !character.Dead)
             {
+                spriteBatch.End();
+
                 Effect effect = AssetManager.Shaders["Grayscale"];
+                effect.Parameters["percent"].SetValue(0f);
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, null, null, null, effect, null);
 
                 //Draw shield
-                Item item = InventoryUtil.Get_EquippedItem(character, "Shield");
-                if (item != null)
+                Item shield = InventoryUtil.Get_EquippedItem(character, "Shield");
+                if (shield != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(shield.Texture, shield.Region.ToRectangle, shield.Image, color);
                 }
 
                 //Draw body
-                effect.Parameters["Texture1"].SetValue(character.Texture);
                 spriteBatch.Draw(character.Texture, character.Region.ToRectangle, character.Image, color);
-                effect.CurrentTechnique.Passes[0].Apply();
 
-                item = InventoryUtil.Get_EquippedItem(character, "Head");
-                if (item != null)
+                Item head = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (head != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(head.Texture, head.Region.ToRectangle, head.Image, color);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Eyes");
-                if (item != null)
+                Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (eyes != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(eyes.Texture, eyes.Region.ToRectangle, eyes.Image, color);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Hair");
-                if (item != null)
+                Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (hair != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(hair.Texture, hair.Region.ToRectangle, hair.Image, color);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Helm");
-                if (item != null)
+                Item beard = InventoryUtil.Get_EquippedItem(character, "Beard");
+                if (beard != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(beard.Texture, beard.Region.ToRectangle, beard.Image, color);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Armor");
-                if (item != null)
+                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (helm != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(helm.Texture, helm.Region.ToRectangle, helm.Image, color);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Weapon");
-                if (item != null)
+                Item armor = InventoryUtil.Get_EquippedItem(character, "Armor");
+                if (armor != null)
                 {
-                    item.Draw(spriteBatch, Main.Game.Resolution, color);
-                    effect.Parameters["Texture1"].SetValue(item.Texture);
-                    effect.CurrentTechnique.Passes[0].Apply();
+                    spriteBatch.Draw(armor.Texture, armor.Region.ToRectangle, armor.Image, color);
                 }
+
+                Item weapon = InventoryUtil.Get_EquippedItem(character, "Weapon");
+                if (weapon != null)
+                {
+                    spriteBatch.Draw(weapon.Texture, weapon.Region.ToRectangle, weapon.Image, color);
+                }
+
+                spriteBatch.End();
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
 
                 if (character.HealthBar.Visible)
                 {
@@ -395,8 +405,7 @@ namespace DoS1.Util
 
         public static void DrawCharacter_Portrait(SpriteBatch spriteBatch, Picture portraitBox, Character character)
         {
-            if (character != null &&
-                !character.Dead)
+            if (character != null)
             {
                 int x = 0;
                 int width = 0;
@@ -405,32 +414,38 @@ namespace DoS1.Util
                 int margin = (int)(portraitBox.Region.Width * 3.125f / 100);
                 Rectangle region = new Rectangle((int)portraitBox.Region.X + margin, (int)portraitBox.Region.Y + margin, (int)portraitBox.Region.Width - (margin * 2), (int)portraitBox.Region.Height - (margin * 2));
 
-                Item item = InventoryUtil.Get_EquippedItem(character, "Head");
-                if (item != null)
+                Item head = InventoryUtil.Get_EquippedItem(character, "Head");
+                if (head != null)
                 {
-                    x = (item.Texture.Width / 32) * 3;
-                    width = item.Texture.Width / 16;
-                    height = item.Texture.Height / 4;
+                    x = (head.Texture.Width / 32) * 3;
+                    width = head.Texture.Width / 16;
+                    height = head.Texture.Height / 4;
 
-                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
+                    spriteBatch.Draw(head.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Eyes");
-                if (item != null)
+                Item eyes = InventoryUtil.Get_EquippedItem(character, "Eyes");
+                if (eyes != null)
                 {
-                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
+                    spriteBatch.Draw(eyes.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Hair");
-                if (item != null)
+                Item hair = InventoryUtil.Get_EquippedItem(character, "Hair");
+                if (hair != null)
                 {
-                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
+                    spriteBatch.Draw(hair.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
 
-                item = InventoryUtil.Get_EquippedItem(character, "Helm");
-                if (item != null)
+                Item beard = InventoryUtil.Get_EquippedItem(character, "Beard");
+                if (beard != null)
                 {
-                    spriteBatch.Draw(item.Texture, region, new Rectangle(x, 0, width, height), Color.White);
+                    spriteBatch.Draw(beard.Texture, region, new Rectangle(x, 0, width, height), Color.White);
+                }
+
+                Item helm = InventoryUtil.Get_EquippedItem(character, "Helm");
+                if (helm != null)
+                {
+                    spriteBatch.Draw(helm.Texture, region, new Rectangle(x, 0, width, height), Color.White);
                 }
             }
         }
@@ -640,6 +655,27 @@ namespace DoS1.Util
 
             examine.Region = new Region(X, Y, width, height);
             examine.Visible = true;
+        }
+
+        public static bool IsImmobilized(Character character)
+        {
+            if (character.Dead)
+            {
+                return true;
+            }
+
+            foreach (Something statusEffect in character.StatusEffects)
+            {
+                if (statusEffect.Name == "Petrified" ||
+                    statusEffect.Name == "Stunned" ||
+                    statusEffect.Name == "Frozen" ||
+                    statusEffect.Name == "Shocked")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static int Increase_XP(Character character, int xp)
