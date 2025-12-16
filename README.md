@@ -24,7 +24,7 @@ For discussion/suggestions/bug-reporting:<br>
   - Enemy Base - must be captured to win the map
   - Market Town - where you can purchase armor/weapons to equip your characters with
   - Academy Town - where you can recruit more characters for your army
-  - Neutral Towns to capture for passive gold income (1 gold each per in-game day which stacks across all maps)
+  - Neutral Towns to capture for passive gold income - 1 gold per town per in-game day (across all maps)
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
 <br><br>
