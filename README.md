@@ -28,8 +28,6 @@ For discussion/suggestions/bug-reporting:<br>
   - Roads and various types of terrain effecting movement speed
   - Biome aesthetic based on Worldmap position
 <br><br>
-- Randomly generated enemy squads which increase in amount/difficulty across locations
-<br><br>
 - **Individual character XP/Level progression and 4 combat stats:**
   - Strength - effects melee/bow weapon damage
   - Intelligence - effects grimoire (magic) weapon damage
