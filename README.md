@@ -36,4 +36,4 @@ For discussion/suggestions/bug-reporting:<br>
     - Dodge Chance(%) = Defender's Agility - Attacker's Dexterity, so dodging rarely happens
   - Note: stat increases per Level happen automatically based on equipped weapon
 <br><br>
-- 15 types of Runes that can be attached to armor/weapons, and paired for various effects (similar to FF7 materia system), with XP/Level progression that increases their effectiveness as they gain levels
+- 15 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), with XP/Level progression that increases their effectiveness as they gain levels
