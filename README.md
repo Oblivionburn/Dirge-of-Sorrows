@@ -13,7 +13,7 @@ For discussion/suggestions/bug-reporting:<br>
 <br><br>
 ## <ins>Features</ins>:
 - **Auto-battler combat**
-  - 3x3 squad formation - position in the formation effects damage dealt and received
+  - 3x3 squad formations - position in the formation effects damage dealt and received
   - No classes - characters are what they wear
 <br><br>
 - **Randomly generated Worldmap with 20 battle locations to unlock**
