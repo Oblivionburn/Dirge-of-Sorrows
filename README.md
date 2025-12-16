@@ -34,6 +34,6 @@ For discussion/suggestions/bug-reporting:<br>
   - Dexterity - effects chance to hit with melee/bow weapons
   - Agility - effects chance to dodge melee/bow weapon attacks
     - Dodge Chance(%) = Defender's Agility - Attacker's Dexterity, so dodging rarely happens
-  - Note: stat increases per Level happen automatically based on equipped weapon
+  - Note: stats increase per Level automatically based on equipped weapon
 <br><br>
 - 15 types of Runes that can be attached to armor/weapons and paired for various effects (similar to FF7 materia system), with XP/Level progression that increases their effectiveness as they gain levels
