@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharacterKilledEventArgs.cs" />
+    <Compile Include="DoS1_Game.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="LightingRenderer.cs" />
     <Compile Include="Main.cs" />
@@ -118,7 +119,7 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Windows\x86\Debug\Libs\MonoGame.Framework.dll</HintPath>
+      <HintPath>bin\x86\Debug\Libs\MonoGame.Framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="OP_Engine">

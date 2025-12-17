@@ -849,6 +849,12 @@ namespace DoS1.Menus
 
             if (okay)
             {
+                if (squad.Characters.Count == 0)
+                {
+                    Army ally_army = CharacterManager.GetArmy("Ally");
+                    ally_army.Squads.Remove(squad);
+                }
+
                 if (MenuManager.PreviousMenu.Name != "Army")
                 {
                     GameUtil.Toggle_Pause(false);

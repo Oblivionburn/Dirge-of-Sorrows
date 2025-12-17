@@ -27,7 +27,7 @@ namespace DoS1
     {
         #region Variables
 
-        public static OP_Game Game;
+        public static DoS1_Game Game;
         public static string Version;
         public static bool LostFocus;
         public static bool Drawing;
@@ -49,7 +49,7 @@ namespace DoS1
         {
             try
             {
-                Game = new OP_Game
+                Game = new DoS1_Game
                 {
                     Form = (Form)Control.FromHandle(Window.Handle),
                     Zoom = 2
