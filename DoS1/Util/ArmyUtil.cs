@@ -378,7 +378,7 @@ namespace DoS1.Util
                 //Min is 2 at Map Level 5
                 //Min is 4 at Map Level 10
                 //Min is 6 at Map Level 15
-                //Min is 8 at Map Level 20
+                //Min is 8 at Map Level 18+
                 int min_tier = (int)Math.Ceiling(map_level / 2.5f);
                 if (min_tier_override != -1)
                 {
@@ -397,6 +397,19 @@ namespace DoS1.Util
 
                 random = new CryptoRandom();
                 int class_type = random.Next(0, 4);
+
+                if (i == 0 &&
+                    first_squad)
+                {
+                    if (Utility.RandomPercent(50))
+                    {
+                        class_type = 0;
+                    }
+                    else if (Utility.RandomPercent(50))
+                    {
+                        class_type = 3;
+                    }
+                }
 
                 if (class_type_override != -1)
                 {
@@ -1091,17 +1104,17 @@ namespace DoS1.Util
 
                     int leftover = InventoryUtil.AddRunes(armor, runes_amount);
 
-                    if (helm != null)
-                    {
-                        leftover = InventoryUtil.AddRunes(helm, leftover);
-                    }
-
                     if (shield != null)
                     {
                         leftover = InventoryUtil.AddRunes(shield, leftover);
                     }
 
-                    InventoryUtil.AddRunes(weapon, leftover);
+                    leftover = InventoryUtil.AddRunes(weapon, leftover);
+
+                    if (helm != null)
+                    {
+                        InventoryUtil.AddRunes(helm, leftover);
+                    }
 
                     #endregion
                 }
@@ -1116,12 +1129,12 @@ namespace DoS1.Util
                     int runes_amount = (int)Math.Floor((double)random.Next(min_tier, max_tier + 1) / 3);
                     int leftover = InventoryUtil.AddRunes(armor, runes_amount);
 
+                    leftover = InventoryUtil.AddRunes(weapon, leftover);
+
                     if (helm != null)
                     {
-                        leftover = InventoryUtil.AddRunes(helm, leftover);
+                        InventoryUtil.AddRunes(helm, leftover);
                     }
-
-                    InventoryUtil.AddRunes(weapon, leftover);
 
                     #endregion
                 }
@@ -1137,21 +1150,18 @@ namespace DoS1.Util
                     random = new CryptoRandom();
                     int runes_amount = (random.Next(min_tier, max_tier + 1) / 2) + 1;
 
+                    //Always at least 1 offense rune on weapon
+                    InventoryUtil.AddRune_Elemental(weapon);
+                    runes_amount--;
+
                     int leftover = InventoryUtil.AddRunes(armor, runes_amount);
+
+                    leftover = InventoryUtil.AddRunes(weapon, leftover);
 
                     if (helm != null)
                     {
-                        leftover = InventoryUtil.AddRunes(helm, leftover);
+                        InventoryUtil.AddRunes(helm, leftover);
                     }
-
-                    //Always at least 1 offense on weapon
-                    InventoryUtil.AddRune_Elemental(weapon);
-                    if (leftover > 0)
-                    {
-                        leftover--;
-                    }
-
-                    InventoryUtil.AddRunes(weapon, leftover);
 
                     #endregion
                 }
@@ -1168,17 +1178,17 @@ namespace DoS1.Util
 
                     int leftover = InventoryUtil.AddRunes(armor, runes_amount);
 
-                    if (helm != null)
-                    {
-                        leftover = InventoryUtil.AddRunes(helm, leftover);
-                    }
-
                     if (shield != null)
                     {
                         leftover = InventoryUtil.AddRunes(shield, leftover);
                     }
 
-                    InventoryUtil.AddRunes(weapon, leftover);
+                    leftover = InventoryUtil.AddRunes(weapon, leftover);
+
+                    if (helm != null)
+                    {
+                        InventoryUtil.AddRunes(helm, leftover);
+                    }
 
                     #endregion
                 }

@@ -650,7 +650,7 @@ namespace DoS1.Util
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
-            properties[0].Value = 6;
+            properties[0].Value = 5;
             item = NewItem(type, category, "Novice", properties);
             item.Buy_Price = 600;
             assets.Items.Add(item);
@@ -658,7 +658,7 @@ namespace DoS1.Util
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
-            properties[0].Value = 8;
+            properties[0].Value = 6;
             item = NewItem(type, category, "Expert", properties);
             item.Buy_Price = 800;
             assets.Items.Add(item);
@@ -666,7 +666,7 @@ namespace DoS1.Util
             Handler.Loading_Current++;
             Handler.Loading_Percent = (Handler.Loading_Current * 100) / TotalAssets;
 
-            properties[0].Value = 10;
+            properties[0].Value = 7;
             item = NewItem(type, category, "Master", properties);
             item.Buy_Price = 1000;
             assets.Items.Add(item);
@@ -1899,20 +1899,20 @@ namespace DoS1.Util
                 Something level = rune.GetProperty("Level Value");
 
                 //Min 1 at Map Level 5
-                //Min 2 at Map Level 10
-                //Min 3 at Map Level 15
-                //Min 4 at Map Level 20
-                int minLevel = (int)(((float)Handler.Level / 2) / 2.5f);
+                //Min 3 at Map Level 10
+                //Min 5 at Map Level 15
+                //Min 8 at Map Level 20
+                int minLevel = (Handler.Level / 2) - 2;
                 if (minLevel < 1)
                 {
                     minLevel = 1;
                 }
 
-                //Max 1 at Map Level 5
-                //Max 3 at Map Level 10
-                //Max 5 at Map Level 15
-                //Max 8 at Map Level 20
-                int maxLevel = ((Handler.Level / 2) - 2);
+                //Max 2 at Map Level 5
+                //Max 5 at Map Level 10
+                //Max 7 at Map Level 15
+                //Max 10 at Map Level 20
+                int maxLevel = Handler.Level / 2;
                 if (maxLevel < 1)
                 {
                     maxLevel = 1;
@@ -1933,7 +1933,8 @@ namespace DoS1.Util
 
         public static int AddRunes(Item item, int amount)
         {
-            if (item == null)
+            if (item == null ||
+                amount <= 0)
             {
                 return amount;
             }
@@ -1981,7 +1982,7 @@ namespace DoS1.Util
                     string rune_type = "";
 
                     random = new CryptoRandom();
-                    int rune_choice = random.Next(0, 5);
+                    int rune_choice = random.Next(0, 4);
                     switch (rune_choice)
                     {
                         case 0:
@@ -1993,14 +1994,10 @@ namespace DoS1.Util
                             break;
 
                         case 2:
-                            rune_type = "Physical Rune";
-                            break;
-
-                        case 3:
                             rune_type = "Lightning Rune";
                             break;
 
-                        case 4:
+                        case 3:
                             rune_type = "Fire Rune";
                             break;
                     }

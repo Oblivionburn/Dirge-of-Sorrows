@@ -387,10 +387,6 @@ namespace DoS1.Util
                     spriteBatch.Draw(weapon.Texture, weapon.Region.ToRectangle, weapon.Image, color);
                 }
 
-                spriteBatch.End();
-
-                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
-
                 if (character.HealthBar.Visible)
                 {
                     character.HealthBar.Draw(spriteBatch);
@@ -400,6 +396,10 @@ namespace DoS1.Util
                 {
                     character.ManaBar.Draw(spriteBatch);
                 }
+
+                spriteBatch.End();
+
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             }
         }
 

@@ -115,8 +115,12 @@ namespace DoS1.Menus
                 {
                     foreach (Squad squad in army.Squads)
                     {
+                        Label deployed = GetLabel(squad.Name + "_Deployed");
+
                         if (squad.Active)
                         {
+                            deployed.Visible = true;
+
                             for (int y = 0; y < 3; y++)
                             {
                                 for (int x = 0; x < 3; x++)
@@ -129,9 +133,13 @@ namespace DoS1.Menus
                                     }
                                 }
                             }
+
+                            spriteBatch.DrawString(deployed.Font, deployed.Text, deployed.Position, deployed.TextColor, -0.8f, default, deployed.Scale, SpriteEffects.None, 0f);
                         }
                         else
                         {
+                            deployed.Visible = false;
+
                             for (int y = 0; y < 3; y++)
                             {
                                 for (int x = 0; x < 3; x++)
@@ -164,7 +172,10 @@ namespace DoS1.Menus
 
                 foreach (Label label in Labels)
                 {
-                    label.Draw(spriteBatch);
+                    if (!label.Name.Contains("Deployed"))
+                    {
+                        label.Draw(spriteBatch);
+                    }
                 }
             }
         }
@@ -731,6 +742,9 @@ namespace DoS1.Menus
                     Squad squad = army.Squads[s];
                     AddPicture(squad.ID, squad.Name, AssetManager.Textures["Squad"],
                         new Region(X, Y, Main.Game.MenuSize.X * 3, Main.Game.MenuSize.Y * 3), Color.White, true);
+
+                    AddLabel(AssetManager.Fonts["ControlFont"], Handler.GetID(), squad.Name + "_Deployed", "Deployed", Color.White,
+                        new Region(X - (Main.Game.MenuSize.X / 4), Y + (Main.Game.MenuSize.Y * 2), (Main.Game.MenuSize.X * 3) + ((Main.Game.MenuSize.X / 4) * 3), Main.Game.MenuSize.Y * 2), false);
 
                     SquadList.Add(squad);
 

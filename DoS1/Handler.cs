@@ -85,7 +85,7 @@ namespace DoS1
         public static bool Combat;
         public static bool CombatFinishing;
         public static bool Retreating;
-        public static int Element_Multiplier = 4;
+        public static int Element_Multiplier = 2;
         public static string Combat_Terrain;
         public static bool Combat_Ally_Base;
         public static bool Combat_Enemy_Base;

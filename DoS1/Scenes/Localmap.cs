@@ -791,7 +791,7 @@ namespace DoS1.Scenes
                             id = Handler.GetID(),
                             font = AssetManager.Fonts["ControlFont"],
                             name = "Squad_" + selected_squad.ID + "_Base",
-                            text = "Retreat",
+                            text = "Undeploy",
                             texture = AssetManager.Textures["ButtonFrame"],
                             texture_highlight = AssetManager.Textures["ButtonFrame"],
                             region = new Region(selected_squad.Region.X + selected_squad.Region.Width, selected_squad.Region.Y, Main.Game.MenuSize.X * 3, height),

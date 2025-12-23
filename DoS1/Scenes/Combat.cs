@@ -140,7 +140,7 @@ namespace DoS1.Scenes
                     Character leader = enemy_squad.Characters[0];
                     if (leader.Name.Contains("King"))
                     {
-                        if (Handler.StoryStep >= 72 && Handler.StoryStep <= 80)
+                        if (Handler.StoryStep >= 73 && Handler.StoryStep <= 81)
                         {
                             StoryUtil.Alert_Story(ally_squad, leader);
                         }
@@ -150,7 +150,7 @@ namespace DoS1.Scenes
                 if (Handler.KingKilled &&
                     the_king != null)
                 {
-                    if (Handler.StoryStep >= 82 && Handler.StoryStep <= 90)
+                    if (Handler.StoryStep >= 83 && Handler.StoryStep <= 91)
                     {
                         StoryUtil.Alert_Story(ally_squad, the_king);
                     }
@@ -354,7 +354,16 @@ namespace DoS1.Scenes
 
             if (InputManager.KeyPressed("Space"))
             {
-                GameUtil.Toggle_Pause_Combat(true);
+                InputManager.Keyboard.Flush();
+
+                if (Menu.GetButton("Result").Visible)
+                {
+                    Result();
+                }
+                else
+                {
+                    GameUtil.Toggle_Pause_Combat(true);
+                }
             }
         }
 
@@ -503,26 +512,7 @@ namespace DoS1.Scenes
             }
             else if (button.Name == "Result")
             {
-                Army ally_army = CharacterManager.GetArmy("Ally");
-
-                if (hero_killed ||
-                    ally_army.Squads.Count == 0)
-                {
-                    ResetCombat_Final();
-                    Handler.Combat = false;
-                    Main.Timer.Start();
-
-                    SoundManager.StopAll();
-                    SoundManager.NeedMusic = true;
-
-                    SceneManager.ChangeScene("GameOver");
-
-                    hero_killed = false;
-                }
-                else
-                {
-                    Leave();
-                }
+                Result();
             }
         }
 
@@ -2323,6 +2313,30 @@ namespace DoS1.Scenes
             return text;
         }
 
+        private void Result()
+        {
+            Army ally_army = CharacterManager.GetArmy("Ally");
+
+            if (hero_killed ||
+                ally_army.Squads.Count == 0)
+            {
+                ResetCombat_Final();
+                Handler.Combat = false;
+                Main.Timer.Start();
+
+                SoundManager.StopAll();
+                SoundManager.NeedMusic = true;
+
+                SceneManager.ChangeScene("GameOver");
+
+                hero_killed = false;
+            }
+            else
+            {
+                Leave();
+            }
+        }
+
         private void Leave()
         {
             if (!won_battle &&
@@ -2607,6 +2621,11 @@ namespace DoS1.Scenes
 
                 foreach (Character character in enemy_squad.Characters)
                 {
+                    if (character.Name.Contains("King"))
+                    {
+                        Handler.StoryStep = 73;
+                    }
+
                     CombatUtil.SwitchAnimation(character, "Idle");
                 }
 

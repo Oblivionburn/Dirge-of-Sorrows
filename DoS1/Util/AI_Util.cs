@@ -140,38 +140,33 @@ namespace DoS1.Util
                             squad.Assignment = "Guard Base";
                             break;
                         }
-                        else if (i == 1)
+                    }
+                }
+
+                if (squad.Assignment != "Guard Base")
+                {
+                    CryptoRandom random;
+
+                    if (squad.Assignment != "Opportunist" &&
+                        squad.Assignment != "Guard Nearest Town" &&
+                        squad.Assignment != "Sleeper")
+                    {
+                        random = new CryptoRandom();
+                        int chance = random.Next(0, 401);
+                        if (chance == 0)
                         {
-                            squad.Assignment = "Attack Base";
-                            break;
+                            RandomAssignment(squad);
+                            Set_NextTarget(map, ground, army, squad);
                         }
                     }
-                }
-
-                CryptoRandom random;
-
-                if (squad.Assignment != "Guard Base" &&
-                    squad.Assignment != "Attack Base" &&
-                    squad.Assignment != "Sleeper" &&
-                    squad.Assignment != "Guard Nearest Town")
-                {
-                    random = new CryptoRandom();
-                    int chance = random.Next(0, 401);
-                    if (chance == 0)
+                    else
                     {
-                        RandomAssignment(squad);
-                        Set_NextTarget(map, ground, army, squad);
-                    }
-                }
-                else if (squad.Assignment == "Attack Base" ||
-                         squad.Assignment == "Sleeper" ||
-                         squad.Assignment == "Guard Nearest Town")
-                {
-                    random = new CryptoRandom();
-                    int chance = random.Next(0, 401);
-                    if (chance == 0)
-                    {
-                        Set_NextTarget(map, ground, army, squad);
+                        random = new CryptoRandom();
+                        int chance = random.Next(0, 401);
+                        if (chance == 0)
+                        {
+                            Set_NextTarget(map, ground, army, squad);
+                        }
                     }
                 }
             }
@@ -179,46 +174,52 @@ namespace DoS1.Util
 
         public static void RandomAssignment(Squad squad)
         {
-            CryptoRandom random = new CryptoRandom();
-            int choice = random.Next(1, 101);
-            if (choice <= 5)
+            string assignment = "";
+
+            if (Utility.RandomPercent(5))
             {
-                //5% chance
-                squad.Assignment = "Attack Hero Squad";
+                assignment = "Attack Hero Squad";
             }
-            else if (choice <= 10)
+
+            if (string.IsNullOrEmpty(assignment) &&
+                Utility.RandomPercent(10))
             {
-                //5% chance
-                squad.Assignment = "Opportunist";
+                assignment = "Opportunist";
             }
-            else if (choice <= 35)
+
+            if (string.IsNullOrEmpty(assignment) &&
+                Utility.RandomPercent(50))
             {
-                //25% chance
-                squad.Assignment = "Guard Nearest Town";
+                assignment = "Guard Nearest Town";
             }
-            else if (choice <= 60)
+
+            if (string.IsNullOrEmpty(assignment) &&
+                Utility.RandomPercent(25))
             {
-                //25% chance
-                squad.Assignment = "Capture Nearest Town";
+                assignment = "Capture Nearest Town";
             }
-            else if (choice <= 70)
+
+            if (string.IsNullOrEmpty(assignment) &&
+                Utility.RandomPercent(10))
             {
-                //10% chance
-                squad.Assignment = "Attack Nearest Squad";
+                assignment = "Attack Nearest Squad";
             }
-            else if (choice <= 75)
+
+            if (string.IsNullOrEmpty(assignment) &&
+                Utility.RandomPercent(20))
             {
-                //5% chance
-                squad.Assignment = "Sleeper";
+                assignment = "Sleeper";
             }
-            else if (choice <= 85)
+
+            if (string.IsNullOrEmpty(assignment) &&
+                Utility.RandomPercent(5))
             {
-                //10% chance
-                squad.Assignment = "Attack Base";
+                assignment = "Attack Base";
             }
-            else
+
+            if (!string.IsNullOrEmpty(assignment))
             {
-                //15% chance don't change assignment
+                squad.Assignment = assignment;
             }
         }
     }

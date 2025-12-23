@@ -1117,7 +1117,7 @@ namespace DoS1.Util
 
             string message = "";
 
-            if (Handler.StoryStep == 72)
+            if (Handler.StoryStep == 73)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The King stands tall and defiant before you, his guards tense at his side.\"";
@@ -1126,7 +1126,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 73 &&
+            else if (Handler.StoryStep == 74 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1141,7 +1141,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 74)
+            else if (Handler.StoryStep == 75)
             {
                 Handler.Dialogue_Character2 = leader;
 
@@ -1156,7 +1156,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 75 &&
+            else if (Handler.StoryStep == 76 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1171,7 +1171,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 76 &&
+            else if (Handler.StoryStep == 77 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1187,7 +1187,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 77)
+            else if (Handler.StoryStep == 78)
             {
                 Handler.Dialogue_Character2 = leader;
 
@@ -1201,7 +1201,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 78 &&
+            else if (Handler.StoryStep == 79 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1216,7 +1216,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 79)
+            else if (Handler.StoryStep == 80)
             {
                 Handler.Dialogue_Character2 = leader;
 
@@ -1230,7 +1230,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 80 &&
+            else if (Handler.StoryStep == 81 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1259,7 +1259,7 @@ namespace DoS1.Util
 
             string message = "";
 
-            if (Handler.StoryStep == 82)
+            if (Handler.StoryStep == 83)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The King falls to his knees, coughing blood as he clasps at his wounds...\"";
@@ -1268,7 +1268,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 83 &&
+            else if (Handler.StoryStep == 84 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1283,7 +1283,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 84 &&
+            else if (Handler.StoryStep == 85 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1299,7 +1299,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 85 &&
+            else if (Handler.StoryStep == 86 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1315,7 +1315,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 86 &&
+            else if (Handler.StoryStep == 87 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1331,7 +1331,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 87)
+            else if (Handler.StoryStep == 88)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The King gasps and coughs, struggling to squeeze out his final words...\"";
@@ -1340,7 +1340,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 88 &&
+            else if (Handler.StoryStep == 89 &&
                      king != null)
             {
                 Handler.Dialogue_Character1 = king;
@@ -1355,7 +1355,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 89)
+            else if (Handler.StoryStep == 90)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The King lets out a long drawn sigh as his eyes turn lifeless and the final vestiges of life leave his body.\"";
@@ -1364,7 +1364,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 90)
+            else if (Handler.StoryStep == 91)
             {
                 dialogue_name.Text = "Narrator";
 

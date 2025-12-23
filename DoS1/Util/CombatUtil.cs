@@ -969,11 +969,13 @@ namespace DoS1.Util
 
         public static bool AtTile(Character character, Tile tile, float move_speed)
         {
-            if (character.Region != null &&
+            if (character?.Region != null &&
                 tile.Region != null)
             {
-                if (character.Region.X == tile.Region.X)
+                if (character.Region.X >= tile.Region.X - (move_speed - 1) &&
+                    character.Region.X <= tile.Region.X + (move_speed - 1))
                 {
+                    character.Region.X = tile.Region.X;
                     return true;
                 }
             }

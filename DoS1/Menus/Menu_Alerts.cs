@@ -209,7 +209,7 @@ namespace DoS1.Menus
 
                 if (Handler.StoryStep == 38 ||
                     Handler.StoryStep == 50 ||
-                    Handler.StoryStep == 72)
+                    Handler.StoryStep == 73)
                 {
                     combat.Menu.GetButton("Retreat").Visible = false;
                     GameUtil.Toggle_Pause_Combat(false);
