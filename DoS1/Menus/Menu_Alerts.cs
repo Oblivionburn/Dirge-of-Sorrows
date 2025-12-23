@@ -338,19 +338,19 @@ namespace DoS1.Menus
                      Handler.StoryStep == 57 ||
                      Handler.StoryStep == 61 ||
                      Handler.StoryStep == 62 ||
-                     (Handler.StoryStep >= 72 && Handler.StoryStep <= 79) ||
-                     (Handler.StoryStep >= 82 && Handler.StoryStep <= 89) ||
-                     (Handler.StoryStep >= 92 && Handler.StoryStep <= 96))
+                     (Handler.StoryStep >= 73 && Handler.StoryStep <= 80) ||
+                     (Handler.StoryStep >= 83 && Handler.StoryStep <= 90) ||
+                     (Handler.StoryStep >= 93 && Handler.StoryStep <= 97))
             {
                 Handler.StoryStep++;
             }
             else if (Handler.StoryStep == 44 ||
                      Handler.StoryStep == 54 ||
-                     Handler.StoryStep == 80 ||
-                     Handler.StoryStep == 90)
+                     Handler.StoryStep == 81 ||
+                     Handler.StoryStep == 91)
             {
-                if (Handler.StoryStep == 80 ||
-                    Handler.StoryStep == 90)
+                if (Handler.StoryStep == 81 ||
+                    Handler.StoryStep == 91)
                 {
                     Handler.CombatFinishing = false;
                 }
@@ -402,7 +402,7 @@ namespace DoS1.Menus
                 Close();
                 GameUtil.Toggle_Pause(false);
             }
-            else if (Handler.StoryStep == 97)
+            else if (Handler.StoryStep == 98)
             {
                 Handler.StoryStep++;
                 Close();

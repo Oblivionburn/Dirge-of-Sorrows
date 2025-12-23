@@ -1395,7 +1395,7 @@ namespace DoS1.Util
 
             string message = "";
 
-            if (Handler.StoryStep == 92)
+            if (Handler.StoryStep == 93)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"With the King now dead, " + hero.Name + " ascended the throne and the kingdom once again knew peace.\"";
@@ -1404,7 +1404,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 93)
+            else if (Handler.StoryStep == 94)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The contract with The Merchant's Guild for the sale of new weapons in perpetuity was immediately torn up, as the kingdom " +
@@ -1415,7 +1415,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 94)
+            else if (Handler.StoryStep == 95)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"No more innocent blood would be shed out of greed and threats of war, but the previous King's dying words haunted " + hero.Name + " as "
@@ -1425,7 +1425,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 95)
+            else if (Handler.StoryStep == 96)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"Would The Merchant's Guild really turn the other kingdoms against " + HimHer(hero.Gender) + " in retaliation for no longer " +
@@ -1435,7 +1435,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 96)
+            else if (Handler.StoryStep == 97)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The Merchant's Guild were a bigger threat on the horizon, and it was only a matter of time before they would need to be " +
@@ -1445,7 +1445,7 @@ namespace DoS1.Util
                 option1.Text = "[Click here to continue]";
                 option1.Visible = true;
             }
-            else if (Handler.StoryStep == 97)
+            else if (Handler.StoryStep == 98)
             {
                 dialogue_name.Text = "Narrator";
                 message = "\"The End.\"";
