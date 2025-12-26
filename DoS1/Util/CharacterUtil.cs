@@ -664,8 +664,9 @@ namespace DoS1.Util
                 return true;
             }
 
-            foreach (Something statusEffect in character.StatusEffects)
+            for (int i = 0; i < character.StatusEffects.Count; i++)
             {
+                Something statusEffect = character.StatusEffects[i];
                 if (statusEffect.Name == "Petrified" ||
                     statusEffect.Name == "Stunned" ||
                     statusEffect.Name == "Frozen" ||
