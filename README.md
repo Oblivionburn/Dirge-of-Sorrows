@@ -1,7 +1,7 @@
 ![](/Assets/Title_Banner_Clear.png)
 ### A low-fantasy RPG/Strategy auto-battler game (e.g. like Ogre Battle) built with [OP Game Engine](https://github.com/Oblivionburn/OP_Engine).
 <br><br>
-# Current state: Preparing For Release
+# Current state: Preparing Official Release
 >[!NOTE]
 >Releases will only be available on github up through Beta (v0.9.X.X) state of the game, but source code will stay updated for those who wish to see the inner-workings of the game, its history of changes, and/or to compile their own modded version.
 ><br><br>After 1.0 release, the game will need to be purchased on Steam to acquire the needed media files (e.g. music, sounds, and textures) for the game to function.
