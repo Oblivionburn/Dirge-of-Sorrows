@@ -21,11 +21,14 @@ namespace DoS1.Menus
         #region Variables
 
         Squad squad = null;
+        Squad reserves = null;
 
         int Top = 0;
 
         bool examining;
         bool moving;
+        bool fromSquad;
+        bool fromGrid;
         Character moving_character = null;
 
         List<Picture> GridList = new List<Picture>();
@@ -411,6 +414,9 @@ namespace DoS1.Menus
                                         examining = false;
                                         moving = true;
 
+                                        fromSquad = true;
+                                        fromGrid = false;
+
                                         starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
                                         starting_region = character.Region.ToRectangle;
                                         moving_character = character;
@@ -507,6 +513,9 @@ namespace DoS1.Menus
                                                 examining = false;
                                                 moving = true;
 
+                                                fromSquad = false;
+                                                fromGrid = true;
+
                                                 starting_pos = new Vector2(character.Formation.X, character.Formation.Y);
                                                 starting_region = character.Region.ToRectangle;
                                                 moving_character = character;
@@ -563,25 +572,80 @@ namespace DoS1.Menus
             {
                 moving = false;
 
+                bool stay = false;
+
                 if (!found_squad &&
                     !found_grid)
                 {
+                    stay = true;
+                }
+                else if (squad.Characters.Count >= 5)
+                {
+                    if (found_squad)
+                    {
+                        if (fromSquad)
+                        {
+                            AddToSquad();
+                        }
+                        else if (fromGrid)
+                        {
+                            Character existing = squad.GetCharacter(new Vector2(new_pos.X, new_pos.Y));
+                            if (existing != null)
+                            {
+                                if (moving_character.ID != Handler.MainCharacter_ID &&
+                                    existing.ID != Handler.MainCharacter_ID)
+                                {
+                                    AssetManager.PlaySound_Random("Equip");
+                                    SwapCharacters(reserves, moving_character, squad, existing);
+                                }
+                                else
+                                {
+                                    stay = true;
+                                }
+                            }
+                            else
+                            {
+                                stay = true;
+                            }
+                        }
+                    }
+                    else if (fromSquad &&
+                             found_grid &&
+                             moving_character.ID != Handler.MainCharacter_ID)
+                    {
+                        AddToReserves();
+                    }
+                    else if (fromGrid &&
+                             found_grid)
+                    {
+                        AddToReserves();
+                    }
+                    else
+                    {
+                        stay = true;
+                    }
+                }
+                else
+                {
+                    if (found_squad)
+                    {
+                        AddToSquad();
+                    }
+                    else if (moving_character.ID == Handler.MainCharacter_ID)
+                    {
+                        //Prevent removing hero from first squad
+                        stay = true;
+                    }
+                    else if (found_grid)
+                    {
+                        AddToReserves();
+                    }
+                }
+
+                if (stay)
+                {
                     moving_character.Formation = new Vector2(starting_pos.X, starting_pos.Y);
                     moving_character.Region = new Region(starting_region.X, starting_region.Y, starting_region.Width, starting_region.Height);
-                }
-                else if (found_squad)
-                {
-                    AddToSquad();
-                }
-                else if (moving_character.ID == Handler.MainCharacter_ID)
-                {
-                    //Prevent removing hero from first squad
-                    moving_character.Formation = new Vector2(starting_pos.X, starting_pos.Y);
-                    moving_character.Region = new Region(starting_region.X, starting_region.Y, starting_region.Width, starting_region.Height);
-                }
-                else if (found_grid)
-                {
-                    AddToReserves();
                 }
 
                 ResizeSquad();
@@ -595,21 +659,7 @@ namespace DoS1.Menus
         {
             AssetManager.PlaySound_Random("Equip");
 
-            Squad ally_squad = null;
             Squad reserves = null;
-
-            Army army = CharacterManager.GetArmy("Ally");
-            if (army != null)
-            {
-                foreach (Squad squad in army.Squads)
-                {
-                    if (squad.ID == Handler.Selected_Squad)
-                    {
-                        ally_squad = squad;
-                        break;
-                    }
-                }
-            }
 
             Army reserve_army = CharacterManager.GetArmy("Reserves");
             if (reserve_army != null)
@@ -617,10 +667,10 @@ namespace DoS1.Menus
                 reserves = reserve_army.Squads[0];
             }
 
-            if (ally_squad != null)
+            if (squad != null)
             {
                 bool inSquad = false;
-                foreach (Character existing in ally_squad.Characters)
+                foreach (Character existing in squad.Characters)
                 {
                     if (existing.ID == moving_character.ID)
                     {
@@ -631,7 +681,7 @@ namespace DoS1.Menus
 
                 bool found_other = false;
 
-                foreach (Character existing in ally_squad.Characters)
+                foreach (Character existing in squad.Characters)
                 {
                     if (existing.Formation.X == new_pos.X &&
                         existing.Formation.Y == new_pos.Y &&
@@ -641,43 +691,17 @@ namespace DoS1.Menus
 
                         if (inSquad)
                         {
-                            SwapCharacters(ally_squad, moving_character, ally_squad, existing);
-
-                            CharacterUtil.ResizeBars_Squad(moving_character);
-
-                            Label label = GetLabel("squad_x:" + new_pos.X.ToString() + ",squad_y:" + new_pos.Y.ToString());
-                            if (label != null)
-                            {
-                                label.Text = moving_character.Name;
-                                label.Visible = true;
-                            }
-
-                            CharacterUtil.ResizeBars_Squad(existing);
-
-                            label = GetLabel("squad_x:" + starting_pos.X.ToString() + ",squad_y:" + starting_pos.Y.ToString());
-                            if (label != null)
-                            {
-                                label.Text = existing.Name;
-                                label.Visible = true;
-                            }
+                            SwapCharacters(squad, moving_character, squad, existing);
                         }
                         else if (existing.ID != Handler.GetHero().ID)
                         {
-                            SwapCharacters(reserves, moving_character, ally_squad, existing);
+                            SwapCharacters(reserves, moving_character, squad, existing);
 
                             ReserveList.Add(existing);
                             existing.HealthBar.Visible = false;
                             existing.ManaBar.Visible = false;
 
                             ReserveList.Remove(moving_character);
-                            CharacterUtil.ResizeBars_Squad(moving_character);
-
-                            Label label = GetLabel("squad_x:" + new_pos.X.ToString() + ",squad_y:" + new_pos.Y.ToString());
-                            if (label != null)
-                            {
-                                label.Text = moving_character.Name;
-                                label.Visible = true;
-                            }
                         }
                         
                         break;
@@ -702,11 +726,11 @@ namespace DoS1.Menus
                             label.Visible = true;
                         }
 
-                        ally_squad.AddCharacter(moving_character);
-                        if (ally_squad.Characters.Count == 1)
+                        squad.AddCharacter(moving_character);
+                        if (squad.Characters.Count == 1)
                         {
-                            ally_squad.Name = moving_character.Name;
-                            ally_squad.Leader_ID = moving_character.ID;
+                            squad.Name = moving_character.Name;
+                            squad.Leader_ID = moving_character.ID;
                         }
 
                         if (Handler.StoryStep == 6)
@@ -716,8 +740,8 @@ namespace DoS1.Menus
                         }
                         else if (Handler.StoryStep == 66)
                         {
-                            bool recruit1 = ally_squad.Characters.Contains(Handler.recruit1);
-                            bool recruit2 = ally_squad.Characters.Contains(Handler.recruit2);
+                            bool recruit1 = squad.Characters.Contains(Handler.recruit1);
+                            bool recruit2 = squad.Characters.Contains(Handler.recruit2);
 
                             if (recruit1 &&
                                 recruit2)
@@ -733,6 +757,8 @@ namespace DoS1.Menus
 
         private void AddToReserves()
         {
+            AssetManager.PlaySound_Random("Equip");
+
             Squad ally_squad = null;
             Squad reserves = null;
 
@@ -790,7 +816,6 @@ namespace DoS1.Menus
                             moving_character.ManaBar.Visible = false;
 
                             ReserveList.Remove(existing);
-                            CharacterUtil.ResizeBars_Squad(existing);
                         }
                         
                         break;
@@ -826,17 +851,44 @@ namespace DoS1.Menus
 
         private void SwapCharacters(Squad old_squad, Character moving_char, Squad new_squad, Character existing_char)
         {
-            new_squad.Characters.Remove(existing_char);
-            old_squad.AddCharacter(existing_char);
-
             new_squad.AddCharacter(moving_char);
             old_squad.Characters.Remove(moving_char);
 
             moving_char.Formation = new Vector2(new_pos.X, new_pos.Y);
             moving_char.Region = new Region(existing_char.Region.X, existing_char.Region.Y, existing_char.Region.Width, existing_char.Region.Height);
 
+            CharacterUtil.ResizeBars_Squad(moving_char);
+
+            Label label = GetLabel("squad_x:" + new_pos.X.ToString() + ",squad_y:" + new_pos.Y.ToString());
+            if (label != null)
+            {
+                label.Text = moving_char.Name;
+                label.Visible = true;
+            }
+
+            new_squad.Characters.Remove(existing_char);
+            old_squad.AddCharacter(existing_char);
+
             existing_char.Formation = new Vector2(starting_pos.X, starting_pos.Y);
             existing_char.Region = new Region(starting_region.X, starting_region.Y, starting_region.Width, starting_region.Height);
+
+            CharacterUtil.ResizeBars_Squad(existing_char);
+
+            label = GetLabel("squad_x:" + starting_pos.X.ToString() + ",squad_y:" + starting_pos.Y.ToString());
+            if (label != null)
+            {
+                label.Text = existing_char.Name;
+                label.Visible = true;
+            }
+
+            if (old_squad.ID == reserves.ID)
+            {
+                ReserveList.Add(existing_char);
+                existing_char.HealthBar.Visible = false;
+                existing_char.ManaBar.Visible = false;
+
+                ReserveList.Remove(moving_character);
+            }
         }
 
         private void CheckClick(Button button)
@@ -1311,17 +1363,17 @@ namespace DoS1.Menus
                 }
             }
 
-            Label reserves = GetLabel("Name_Reserves");
-            reserves.Region = new Region(starting_grid_X, starting_grid_Y + (grid_height * 10), grid_width * 10, (height / 2));
-            reserves.Visible = true;
+            Label reservesLabel = GetLabel("Name_Reserves");
+            reservesLabel.Region = new Region(starting_grid_X, starting_grid_Y + (grid_height * 10), grid_width * 10, (height / 2));
+            reservesLabel.Visible = true;
 
             Army army = CharacterManager.GetArmy("Reserves");
             if (army != null)
             {
-                Squad squad = army.Squads[0];
-                if (squad != null)
+                reserves = army.Squads[0];
+                if (reserves != null)
                 {
-                    foreach (Character character in squad.Characters)
+                    foreach (Character character in reserves.Characters)
                     {
                         ReserveList.Add(character);
                     }
