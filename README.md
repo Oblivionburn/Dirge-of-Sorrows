@@ -1,9 +1,6 @@
 ![](/Assets/Title_Banner_Clear.png)
 ### A low-fantasy RPG/Strategy auto-battler game (e.g. like Ogre Battle) built with [OP Game Engine](https://github.com/Oblivionburn/OP_Engine).
 <br><br>
-# Current state: Preparing Official Release
-
-<br><br>
 For discussion/suggestions/bug-reporting:<br>
 [<img src="https://github.com/Oblivionburn/Oblivionburn-Productions/blob/main/images/Discord.png">](https://discord.gg/zDkb3C9)
 
