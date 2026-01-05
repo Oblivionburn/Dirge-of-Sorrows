@@ -450,7 +450,7 @@ namespace DoS1.Util
             }
         }
 
-        public static void DrawSquad(SpriteBatch spriteBatch, Squad squad, Color color)
+        public static void DrawSquad(Menu menu, SpriteBatch spriteBatch, Squad squad, Color color)
         {
             for (int y = 0; y < 3; y++)
             {
@@ -460,6 +460,12 @@ namespace DoS1.Util
                     if (character != null)
                     {
                         DrawCharacter(spriteBatch, character, color);
+
+                        Label label = menu.GetLabel("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                        if (label != null)
+                        {
+                            label.Draw(spriteBatch);
+                        }
                     }
                 }
             }
@@ -476,6 +482,21 @@ namespace DoS1.Util
             character.HealthBar.Update();
 
             character.ManaBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height + bar_height, bar_width, bar_height);
+            character.ManaBar.Visible = true;
+            character.ManaBar.Update();
+        }
+
+        public static void ResizeBars_Squad(Character character)
+        {
+            float bar_x = character.Region.X + (character.Region.Width / 8);
+            float bar_width = (character.Region.Width / 8) * 6;
+            float bar_height = character.Region.Width / 16;
+
+            character.HealthBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height + (bar_height / 2) + (bar_height * 2), bar_width, bar_height);
+            character.HealthBar.Visible = true;
+            character.HealthBar.Update();
+
+            character.ManaBar.Base_Region = new Region(bar_x, character.Region.Y + character.Region.Height + (bar_height / 2) + (bar_height * 3), bar_width, bar_height);
             character.ManaBar.Visible = true;
             character.ManaBar.Update();
         }

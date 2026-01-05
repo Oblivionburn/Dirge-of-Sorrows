@@ -183,7 +183,7 @@ namespace DoS1.Menus
                     {
                         if (ally_squad.ID == Handler.Selected_Squad)
                         {
-                            CharacterUtil.DrawSquad(spriteBatch, ally_squad, Color.White);
+                            CharacterUtil.DrawSquad(this, spriteBatch, ally_squad, Color.White);
                         }
                     }
                 }
@@ -195,7 +195,7 @@ namespace DoS1.Menus
                     {
                         if (enemy_squad.ID == Handler.Selected_Squad)
                         {
-                            CharacterUtil.DrawSquad(spriteBatch, enemy_squad, Color.White);
+                            CharacterUtil.DrawSquad(this, spriteBatch, enemy_squad, Color.White);
                         }
                     }
                 }
@@ -231,7 +231,25 @@ namespace DoS1.Menus
 
                 foreach (Label label in Labels)
                 {
-                    label.Draw(spriteBatch);
+                    if (label.Name != "Examine" &&
+                        !label.Name.Contains("squad_x"))
+                    {
+                        label.Draw(spriteBatch);
+                    }
+                }
+
+                foreach (Label label in Labels)
+                {
+                    if (label.Name == "Examine")
+                    {
+                        label.Draw(spriteBatch);
+                        break;
+                    }
+                }
+
+                if (moving_character != null)
+                {
+                    CharacterUtil.DrawCharacter(spriteBatch, moving_character, Color.White);
                 }
             }  
         }
@@ -367,7 +385,9 @@ namespace DoS1.Menus
             {
                 for (int x = 0; x < 3; x++)
                 {
-                    Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                    string name = "squad_x:" + x.ToString() + ",squad_y:" + y.ToString();
+
+                    Picture tile = GetPicture(name);
                     if (tile != null)
                     {
                         if (InputManager.MouseWithin(tile.Region.ToRectangle))
@@ -396,6 +416,8 @@ namespace DoS1.Menus
                                         moving_character = character;
                                         character.HealthBar.Visible = false;
                                         character.ManaBar.Visible = false;
+
+                                        GetLabel(name).Text = "";
 
                                         break;
                                     }
@@ -476,7 +498,7 @@ namespace DoS1.Menus
                                         {
                                             examining = true;
 
-                                            GameUtil.Examine(this, character.Name);
+                                            CharacterUtil.ExamineCharacter(this, character);
 
                                             if (InputManager.Mouse_LB_Held &&
                                                 InputManager.Mouse.Moved)
@@ -564,6 +586,8 @@ namespace DoS1.Menus
 
                 ResizeSquad();
                 ResizeGrid();
+
+                moving_character = null;
             }
         }
 
@@ -618,6 +642,24 @@ namespace DoS1.Menus
                         if (inSquad)
                         {
                             SwapCharacters(ally_squad, moving_character, ally_squad, existing);
+
+                            CharacterUtil.ResizeBars_Squad(moving_character);
+
+                            Label label = GetLabel("squad_x:" + new_pos.X.ToString() + ",squad_y:" + new_pos.Y.ToString());
+                            if (label != null)
+                            {
+                                label.Text = moving_character.Name;
+                                label.Visible = true;
+                            }
+
+                            CharacterUtil.ResizeBars_Squad(existing);
+
+                            label = GetLabel("squad_x:" + starting_pos.X.ToString() + ",squad_y:" + starting_pos.Y.ToString());
+                            if (label != null)
+                            {
+                                label.Text = existing.Name;
+                                label.Visible = true;
+                            }
                         }
                         else if (existing.ID != Handler.GetHero().ID)
                         {
@@ -628,7 +670,14 @@ namespace DoS1.Menus
                             existing.ManaBar.Visible = false;
 
                             ReserveList.Remove(moving_character);
-                            CharacterUtil.ResizeBars(moving_character);
+                            CharacterUtil.ResizeBars_Squad(moving_character);
+
+                            Label label = GetLabel("squad_x:" + new_pos.X.ToString() + ",squad_y:" + new_pos.Y.ToString());
+                            if (label != null)
+                            {
+                                label.Text = moving_character.Name;
+                                label.Visible = true;
+                            }
                         }
                         
                         break;
@@ -644,7 +693,14 @@ namespace DoS1.Menus
                         reserves.Characters.Remove(moving_character);
 
                         ReserveList.Remove(moving_character);
-                        CharacterUtil.ResizeBars(moving_character);
+                        CharacterUtil.ResizeBars_Squad(moving_character);
+
+                        Label label = GetLabel("squad_x:" + new_pos.X.ToString() + ",squad_y:" + new_pos.Y.ToString());
+                        if (label != null)
+                        {
+                            label.Text = moving_character.Name;
+                            label.Visible = true;
+                        }
 
                         ally_squad.AddCharacter(moving_character);
                         if (ally_squad.Characters.Count == 1)
@@ -734,7 +790,7 @@ namespace DoS1.Menus
                             moving_character.ManaBar.Visible = false;
 
                             ReserveList.Remove(existing);
-                            CharacterUtil.ResizeBars(existing);
+                            CharacterUtil.ResizeBars_Squad(existing);
                         }
                         
                         break;
@@ -996,11 +1052,21 @@ namespace DoS1.Menus
                 {
                     for (int x = 0; x < 3; x++)
                     {
-                        Picture tile = GetPicture("squad_x:" + x.ToString() + ",squad_y:" + y.ToString());
+                        string name = "squad_x:" + x.ToString() + ",squad_y:" + y.ToString();
+
+                        Picture tile = GetPicture(name);
                         if (tile != null)
                         {
                             tile.Region = new Region(starting_X + (width * x), starting_Y + (height * y), width, height);
                             tile.Location = new Location(x, y, 0);
+                        }
+
+                        Label label = GetLabel(name);
+                        if (label != null)
+                        {
+                            label.Region = new Region(starting_X + (width * x), starting_Y + (height * y) + (height / 2) - (height / 16), width, height / 4);
+                            label.Text = "";
+                            label.Visible = true;
                         }
 
                         Character character = squad.GetCharacter(new Vector2(x, y));
@@ -1008,7 +1074,13 @@ namespace DoS1.Menus
                         {
                             character.Region = new Region(starting_X + (width * x), starting_Y + (height * y) - height, width, height + (height / 2));
                             character.Visible = true;
-                            CharacterUtil.ResizeBars(character);
+                            CharacterUtil.ResizeBars_Squad(character);
+
+                            if (label != null)
+                            {
+                                label.ID = character.ID;
+                                label.Text = character.Name;
+                            }
                         }
                     }
                 }
@@ -1021,33 +1093,28 @@ namespace DoS1.Menus
             {
                 GetLabel("Name_Squad").Text = "";
 
-                for (int i = 0; i < Pictures.Count; i++)
+                for (int y = 0; y < 3; y++)
                 {
-                    bool found = false;
-
-                    Picture picture = Pictures[i];
-                    for (int y = 0; y < 3; y++)
+                    for (int x = 0; x < 3; x++)
                     {
-                        for (int x = 0; x < 3; x++)
+                        Character character = squad.GetCharacter(new Vector2(x, y));
+                        if (character != null)
                         {
-                            Character character = squad.GetCharacter(new Vector2(x, y));
-                            if (character != null)
-                            {
-                                character.Visible = false;
-                            }
-
-                            if (picture.Name == "squad_x:" + x.ToString() + ",squad_y:" + y.ToString())
-                            {
-                                found = true;
-                                Pictures.Remove(picture);
-                                i--;
-                                break;
-                            }
+                            character.Visible = false;
                         }
 
-                        if (found)
+                        string name = "squad_x:" + x.ToString() + ",squad_y:" + y.ToString();
+
+                        Picture picture = GetPicture(name);
+                        if (picture.Name != null)
                         {
-                            break;
+                            Pictures.Remove(picture);
+                        }
+
+                        Label label = GetLabel(name);
+                        if (label != null)
+                        {
+                            Labels.Remove(label);
                         }
                     }
                 }
@@ -1102,6 +1169,9 @@ namespace DoS1.Menus
                     {
                         long id = Handler.GetID();
 
+                        string name = "squad_x:" + x.ToString() + ",squad_y:" + y.ToString();
+                        string label_text = "";
+
                         Character character = squad.GetCharacter(new Vector2(x, y));
                         if (character != null)
                         {
@@ -1110,11 +1180,16 @@ namespace DoS1.Menus
                             character.Visible = true;
 
                             CharacterUtil.SwitchAnimation(character, "Idle");
-                            CharacterUtil.ResizeBars(character);
+                            CharacterUtil.ResizeBars_Squad(character);
+
+                            label_text = character.Name;
                         }
 
-                        AddPicture(id, "squad_x:" + x.ToString() + ",squad_y:" + y.ToString(), AssetManager.Textures["Grid"],
+                        AddPicture(id, name, AssetManager.Textures["Grid"],
                             new Region(starting_X + (width * x), starting_Y + (height * y), width, height), Color.White, true);
+
+                        AddLabel(AssetManager.Fonts["ControlFont"], id, name, label_text, Color.White,
+                            new Region(starting_X + (width * x), starting_Y + (height * y) + (height / 2) - (height / 16), width, height / 4), true);
                     }
                 }
             }

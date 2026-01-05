@@ -352,7 +352,7 @@ namespace DoS1.Menus
                         {
                             found = true;
 
-                            Examine(character.Name);
+                            Examine(character);
 
                             if (InputManager.Mouse_RB_Pressed)
                             {
@@ -376,7 +376,7 @@ namespace DoS1.Menus
                         {
                             found = true;
 
-                            Examine(character.Name);
+                            Examine(character);
 
                             if (InputManager.Mouse_RB_Pressed)
                             {
@@ -465,13 +465,58 @@ namespace DoS1.Menus
             other_starting_x = (Main.Game.ScreenWidth / 2) + (width / 2);
         }
 
-        private void Examine(string text)
+        private void Examine(Character character)
         {
-            Label examine = GetLabel("Examine");
-            examine.Text = text + "\n\nPrice: " + Handler.RecruitPrice;
+            int width = Main.Game.MenuSize.X * 4;
+            int height = Main.Game.MenuSize.X;
 
-            int width = Main.Game.MenuSize.X * 5;
-            int height = Main.Game.MenuSize.Y * 2;
+            Label examine = GetLabel("Examine");
+            examine.Text = "";
+
+            List<string> lines = new List<string>
+            {
+                character.Name,
+                "",
+                "HP: " + character.HealthBar.Value + "/" + character.HealthBar.Max_Value,
+                "EP: " + character.ManaBar.Value + "/" + character.ManaBar.Max_Value
+            };
+
+            List<Something> statusEffects = new List<Something>();
+            for (int i = 0; i < character.StatusEffects.Count; i++)
+            {
+                Something statusEffect = character.StatusEffects[i];
+                if (statusEffect.Name != "Damage")
+                {
+                    statusEffects.Add(statusEffect);
+                }
+            }
+
+            if (statusEffects.Count > 0)
+            {
+                lines.Add("");
+                lines.Add("Status Effects:");
+
+                for (int i = 0; i < statusEffects.Count; i++)
+                {
+                    lines.Add("- " + statusEffects[i].Name);
+                }
+            }
+
+            lines.Add("");
+            lines.Add("Price: " + Handler.RecruitPrice);
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+
+                examine.Text += line;
+
+                if (i < lines.Count - 1)
+                {
+                    examine.Text += "\n";
+                    height += (Main.Game.MenuSize.Y / 2);
+                }
+            }
 
             int X = InputManager.Mouse.X - (width / 2);
             if (X < 0)
